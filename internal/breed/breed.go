@@ -3,4 +3,5 @@
 package breed
 
 type Breed struct {
+	DefaultShape string
 }
