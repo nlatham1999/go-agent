@@ -2,6 +2,7 @@ package universe
 
 import (
 	"github.com/nlatham1999/go-agent/internal/breed"
+	patch "github.com/nlatham1999/go-agent/internal/patches"
 	turtle "github.com/nlatham1999/go-agent/internal/turtles"
 )
 
@@ -14,7 +15,7 @@ type Universe struct {
 	DefaultShapeLinks   string //the default shape for links
 
 	Turtles map[int]*turtle.Turtle //all the turtles
-
+	Patches []*patch.Patch         //all the patches
 }
 
 func NewUniverse() *Universe {

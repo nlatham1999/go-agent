@@ -1,15 +1,17 @@
-package patches
+package patch
 
-type Patches struct {
+type Patch struct {
 	x int
 	y int
 
-	topLeft     *Patches
-	top         *Patches
-	topRight    *Patches
-	left        *Patches
-	right       *Patches
-	bottomLeft  *Patches
-	bottom      *Patches
-	bottomRight *Patches
+	customVars map[string]interface{}
+
+	topLeft     *Patch
+	top         *Patch
+	topRight    *Patch
+	left        *Patch
+	right       *Patch
+	bottomLeft  *Patch
+	bottom      *Patch
+	bottomRight *Patch
 }

@@ -1,6 +1,7 @@
 package ants
 
 import (
+	patch "github.com/nlatham1999/go-agent/internal/patches"
 	turtle "github.com/nlatham1999/go-agent/internal/turtles"
 	"github.com/nlatham1999/go-agent/internal/universe"
 )
@@ -30,5 +31,12 @@ func setup() {
 }
 
 func setupPatches() {
+	enviroment.AskPatches(
+		[]patch.PatchOperation{
+			setupNest,
+		},
+	)
+}
 
+func setupNest(p *patch.Patch) {
 }
