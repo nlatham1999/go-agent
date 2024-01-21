@@ -1,17 +1,17 @@
 package patch
 
 type Patch struct {
-	x int
-	y int
+	patchesOwn map[string]interface{}
+}
 
-	customVars map[string]interface{}
+func NewPatch(patchesOwn map[string]interface{}) *Patch {
 
-	topLeft     *Patch
-	top         *Patch
-	topRight    *Patch
-	left        *Patch
-	right       *Patch
-	bottomLeft  *Patch
-	bottom      *Patch
-	bottomRight *Patch
+	patch := &Patch{}
+
+	patch.patchesOwn = map[string]interface{}{}
+	for key, value := range patchesOwn {
+		patch.patchesOwn[key] = value
+	}
+
+	return patch
 }

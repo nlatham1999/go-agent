@@ -14,7 +14,16 @@ var (
 )
 
 func Init() {
-	enviroment = universe.NewUniverse()
+	patchesOwn := map[string]interface{}{
+		"chemical":         0.0,
+		"food":             0.0,
+		"nest":             false,
+		"nestScent":        0,
+		"foodSourceNumber": 0,
+	}
+
+	enviroment = universe.NewUniverse(patchesOwn)
+
 }
 
 func setup() {
@@ -27,16 +36,24 @@ func setup() {
 		},
 	)
 	setupPatches()
-	enviroment.ResetTickCounter()
+	enviroment.ResetTicks()
 }
 
 func setupPatches() {
 	enviroment.AskPatches(
 		[]patch.PatchOperation{
 			setupNest,
+			setupFood,
+			setupNest,
 		},
 	)
 }
 
 func setupNest(p *patch.Patch) {
+}
+
+func setupFood(p *patch.Patch) {
+}
+
+func recolorPatch(p *patch.Patch) {
 }

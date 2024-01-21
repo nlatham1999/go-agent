@@ -8,18 +8,59 @@ import (
 
 type Universe struct {
 	TickCounter int
-	PatchesOwn  map[string]interface{}  //additional variables for each patch
-	Breeds      map[string]*breed.Breed //the different types of breeds
+	TicksOn     bool
+
+	PatchesOwn map[string]interface{}  //additional variables for each patch
+	Breeds     map[string]*breed.Breed //the different types of breeds
+
+	MaxPxCor    int
+	MaxPyCor    int
+	MinPxCor    int
+	MinPyCor    int
+	WorldWidth  int
+	WorldHeight int
 
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
 
-	Turtles map[int]*turtle.Turtle //all the turtles
-	Patches []*patch.Patch         //all the patches
+	Turtles          map[int]*turtle.Turtle //all the turtles
+	TurtlesWhoNumber int
+
+	Patches      []*patch.Patch //all the patches
+	PatchesArray [][]*patch.Patch
 }
 
-func NewUniverse() *Universe {
-	return &Universe{}
+func NewUniverse(patchesOwn map[string]interface{}) *Universe {
+	maxPxCor := 15
+	maxPyCor := 15
+	minPxCor := -15
+	minPyCor := -15
+	universe := &Universe{
+		MaxPxCor:    maxPxCor,
+		MaxPyCor:    maxPyCor,
+		MinPxCor:    minPxCor,
+		MinPyCor:    minPyCor,
+		WorldWidth:  maxPxCor - minPxCor + 1,
+		WorldHeight: maxPyCor - minPyCor + 1,
+		PatchesOwn:  patchesOwn,
+	}
+
+	universe.buildPatches()
+
+	return universe
+}
+
+//builds an array of patches and links them togethor
+func (u *Universe) buildPatches() {
+	u.PatchesArray = [][]*patch.Patch{}
+	for i := 0; i < u.WorldHeight; i++ {
+		row := []*patch.Patch{}
+		for j := 0; j < u.WorldWidth; j++ {
+			p := patch.NewPatch(u.PatchesOwn)
+			row = append(row, p)
+		}
+		u.PatchesArray = append(u.PatchesArray, row)
+	}
 }
 
 func (u *Universe) ClearAll() {
@@ -36,9 +77,8 @@ func (u *Universe) ClearGlobals() {
 
 }
 
-//@TODO Implement
 func (u *Universe) ClearTicks() {
-
+	u.TicksOn = false
 }
 
 //@TODO Implement
@@ -89,6 +129,7 @@ func (u *Universe) CreateTurtles(amount int, operations []turtle.TurtleOperation
 	}
 }
 
-func (u *Universe) ResetTickCounter() {
+func (u *Universe) ResetTicks() {
+	u.TicksOn = true
 	u.TickCounter = 0
 }
