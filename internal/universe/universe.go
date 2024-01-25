@@ -56,7 +56,7 @@ func (u *Universe) buildPatches() {
 	for i := 0; i < u.WorldHeight; i++ {
 		row := []*patch.Patch{}
 		for j := 0; j < u.WorldWidth; j++ {
-			p := patch.NewPatch(u.PatchesOwn)
+			p := patch.NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
 			row = append(row, p)
 		}
 		u.PatchesArray = append(u.PatchesArray, row)

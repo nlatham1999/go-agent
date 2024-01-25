@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	enviroment *universe.Universe
+	environment *universe.Universe
 
 	//@TODO figure out how to handle widgets
 	population int
@@ -22,25 +22,25 @@ func Init() {
 		"foodSourceNumber": 0,
 	}
 
-	enviroment = universe.NewUniverse(patchesOwn)
+	environment = universe.NewUniverse(patchesOwn)
 
 }
 
 func setup() {
-	enviroment.ClearAll()
-	enviroment.SetDefaultShapeTurtles("bug")
-	enviroment.CreateTurtles(population,
+	environment.ClearAll()
+	environment.SetDefaultShapeTurtles("bug")
+	environment.CreateTurtles(population,
 		[]turtle.TurtleOperation{
 			turtle.SetColor("red"),
 			turtle.SetSize(2),
 		},
 	)
 	setupPatches()
-	enviroment.ResetTicks()
+	environment.ResetTicks()
 }
 
 func setupPatches() {
-	enviroment.AskPatches(
+	environment.AskPatches(
 		[]patch.PatchOperation{
 			setupNest,
 			setupFood,
@@ -50,6 +50,8 @@ func setupPatches() {
 }
 
 func setupNest(p *patch.Patch) {
+	p.PatchesOwn["nest"] = p.DistanceXY(0, 0) < 5
+	p.PatchesOwn["nestScent"] = 200 - p.DistanceXY(0, 0)
 }
 
 func setupFood(p *patch.Patch) {
