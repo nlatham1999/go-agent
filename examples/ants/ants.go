@@ -111,3 +111,23 @@ func recolorPatch(p *patch.Patch) {
 		}
 	}
 }
+
+func run() {
+
+	// ask turtles
+	// [ if who >= ticks [ stop ] ;; delay initial departure
+	//   ifelse color = red
+	//   [ look-for-food  ]       ;; not carrying food? look for it
+	//   [ return-to-nest ]       ;; carrying food? take it back to nest
+	//   wiggle
+	//   fd 1 ]
+	// diffuse chemical (diffusion-rate / 100)
+	// ask patches
+	// [ set chemical chemical * (100 - evaporation-rate) / 100  ;; slowly evaporate chemical
+	//   recolor-patch ]
+	// tick
+
+	environment.AskTurtles(
+		[]turtle.TurtleOperation{},
+	)
+}
