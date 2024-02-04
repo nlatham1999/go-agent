@@ -4,8 +4,6 @@ import (
 	"math/rand"
 	"time"
 
-	patch "github.com/nlatham1999/go-agent/internal/patches"
-	turtle "github.com/nlatham1999/go-agent/internal/turtles"
 	"github.com/nlatham1999/go-agent/internal/universe"
 	"github.com/nlatham1999/go-agent/internal/util"
 )
@@ -46,9 +44,9 @@ func setup() {
 	environment.ClearAll()
 	environment.SetDefaultShapeTurtles("bug")
 	environment.CreateTurtles(population,
-		[]turtle.TurtleOperation{
-			turtle.SetColor("red"),
-			turtle.SetSize(2),
+		[]universe.TurtleOperation{
+			universe.SetColor("red"),
+			universe.SetSize(2),
 		},
 	)
 	setupPatches()
@@ -57,7 +55,7 @@ func setup() {
 
 func setupPatches() {
 	environment.AskPatches(
-		[]patch.PatchOperation{
+		[]universe.PatchOperation{
 			setupNest,
 			setupFood,
 			setupNest,
@@ -65,12 +63,12 @@ func setupPatches() {
 	)
 }
 
-func setupNest(p *patch.Patch) {
+func setupNest(p *universe.Patch) {
 	p.PatchesOwn[nest] = p.DistanceXY(0, 0) < 5
 	p.PatchesOwn[nestScent] = 200 - p.DistanceXY(0, 0)
 }
 
-func setupFood(p *patch.Patch) {
+func setupFood(p *universe.Patch) {
 	// ;; setup food source one on the right
 	if p.DistanceXY(.6*float64(environment.MaxPxCor), 0) < 5 {
 		p.PatchesOwn[foodSourceNumber] = 1
@@ -92,7 +90,7 @@ func setupFood(p *patch.Patch) {
 	}
 }
 
-func recolorPatch(p *patch.Patch) {
+func recolorPatch(p *universe.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
@@ -128,6 +126,30 @@ func run() {
 	// tick
 
 	environment.AskTurtles(
-		[]turtle.TurtleOperation{},
+		[]universe.TurtleOperation{
+			func(t *universe.Turtle) {
+				if t.Who >= environment.Ticks {
+					return
+				}
+				if t.Color == "red" {
+					lookForFood(t)
+				} else {
+					returnToNest(t)
+				}
+				wiggle(t)
+			},
+		},
 	)
+}
+
+func lookForFood(t *universe.Turtle) {
+
+}
+
+func returnToNest(t *universe.Turtle) {
+
+}
+
+func wiggle(t *universe.Turtle) {
+
 }

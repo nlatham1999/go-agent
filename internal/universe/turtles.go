@@ -2,9 +2,7 @@
 
 package universe
 
-import turtle "github.com/nlatham1999/go-agent/internal/turtles"
-
-func (u *Universe) AskTurtles(operations []turtle.TurtleOperation) {
+func (u *Universe) AskTurtles(operations []TurtleOperation) {
 	for i := 0; i < len(u.Turtles); i++ {
 		for j := 0; j < len(operations); j++ {
 			operations[j](u.Turtles[i])

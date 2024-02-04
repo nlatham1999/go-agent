@@ -1,17 +1,11 @@
 package universe
 
-import (
-	"github.com/nlatham1999/go-agent/internal/breed"
-	patch "github.com/nlatham1999/go-agent/internal/patches"
-	turtle "github.com/nlatham1999/go-agent/internal/turtles"
-)
-
 type Universe struct {
-	TickCounter int
-	TicksOn     bool
+	Ticks   int
+	TicksOn bool
 
-	PatchesOwn map[string]interface{}  //additional variables for each patch
-	Breeds     map[string]*breed.Breed //the different types of breeds
+	PatchesOwn map[string]interface{} //additional variables for each patch
+	Breeds     map[string]*Breed      //the different types of breeds
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -23,11 +17,11 @@ type Universe struct {
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
 
-	Turtles          map[int]*turtle.Turtle //all the turtles
+	Turtles          map[int]*Turtle //all the turtles
 	TurtlesWhoNumber int
 
-	Patches      []*patch.Patch //all the patches
-	PatchesArray [][]*patch.Patch
+	Patches      []*Patch //all the patches
+	PatchesArray [][]*Patch
 }
 
 func NewUniverse(patchesOwn map[string]interface{}) *Universe {
@@ -52,11 +46,11 @@ func NewUniverse(patchesOwn map[string]interface{}) *Universe {
 
 //builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
-	u.PatchesArray = [][]*patch.Patch{}
+	u.PatchesArray = [][]*Patch{}
 	for i := 0; i < u.WorldHeight; i++ {
-		row := []*patch.Patch{}
+		row := []*Patch{}
 		for j := 0; j < u.WorldWidth; j++ {
-			p := patch.NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
+			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
 			row = append(row, p)
 		}
 		u.PatchesArray = append(u.PatchesArray, row)
@@ -113,11 +107,11 @@ func (u *Universe) SetDefaultShapeBreed(shape string, breedType string) {
 	u.Breeds[breedType].DefaultShape = shape
 }
 
-func (u *Universe) CreateTurtles(amount int, operations []turtle.TurtleOperation) {
+func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 	startIndex := len(u.Turtles)
 	end := amount + startIndex
 	for startIndex < end {
-		newTurtle := turtle.NewTurtle(startIndex)
+		newTurtle := NewTurtle(startIndex)
 
 		for i := 0; i < len(operations); i++ {
 			operations[i](newTurtle)
@@ -131,5 +125,13 @@ func (u *Universe) CreateTurtles(amount int, operations []turtle.TurtleOperation
 
 func (u *Universe) ResetTicks() {
 	u.TicksOn = true
-	u.TickCounter = 0
+	u.Ticks = 0
+}
+
+func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
+	if x < u.MinPxCor || x > u.MaxPxCor || y < u.MinPyCor || y > u.MaxPyCor {
+		return nil
+	}
+
+	return u.PatchesArray[y-u.MinPyCor][x-u.MinPxCor]
 }

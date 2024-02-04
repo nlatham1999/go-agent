@@ -1,6 +1,6 @@
 //breeds are groups of turtles
 
-package breed
+package universe
 
 type Breed struct {
 	DefaultShape string
