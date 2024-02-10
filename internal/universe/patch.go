@@ -11,7 +11,7 @@ type Patch struct {
 	yFloat64 float64
 
 	//same as pcolor
-	Color      string
+	Color      float64
 	ColorScale float64
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
@@ -25,7 +25,7 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 		y:        y,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
-		Color:    "black",
+		Color:    0,
 	}
 
 	patch.PatchesOwn = map[string]interface{}{}
@@ -46,6 +46,7 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	return math.Sqrt(deltaX*deltaX - deltaY*deltaY)
 }
 
+//replaces scale-color
 func (p *Patch) SetColorAndScale(number float64, range1 float64, range2 float64) {
 	if range1 > range2 {
 		//invert

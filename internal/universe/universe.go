@@ -1,5 +1,7 @@
 package universe
 
+import "math/rand"
+
 type Universe struct {
 	Ticks   int
 	TicksOn bool
@@ -22,6 +24,8 @@ type Universe struct {
 
 	Patches      []*Patch //all the patches
 	PatchesArray [][]*Patch
+
+	ColorHueMap map[string]float64
 }
 
 func NewUniverse(patchesOwn map[string]interface{}) *Universe {
@@ -42,6 +46,28 @@ func NewUniverse(patchesOwn map[string]interface{}) *Universe {
 	universe.buildPatches()
 
 	return universe
+}
+
+func (u *Universe) buildColors() {
+	u.ColorHueMap = map[string]float64{
+		"black":     0,
+		"white":     9.9,
+		"grey":      5,
+		"gray":      5,
+		"red":       15,
+		"orange":    25,
+		"brown":     35,
+		"yellow":    45,
+		"green":     55,
+		"lime":      65,
+		"turquoise": 75,
+		"cyan":      85,
+		"sky":       95,
+		"blue":      105,
+		"violet":    115,
+		"magenta":   125,
+		"pink":      135,
+	}
 }
 
 //builds an array of patches and links them togethor
@@ -134,4 +160,13 @@ func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
 	}
 
 	return u.PatchesArray[y-u.MinPyCor][x-u.MinPxCor]
+}
+
+func (u *Universe) OneOfInt(arr []int) interface{} {
+
+	return arr[rand.Intn(len(arr))-1]
+}
+
+func (u *Universe) RandomAmount(n int) int {
+	return rand.Intn(n)
 }

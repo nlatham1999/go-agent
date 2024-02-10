@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/nlatham1999/go-agent/internal/universe"
-	"github.com/nlatham1999/go-agent/internal/util"
 )
 
 var (
@@ -45,7 +44,7 @@ func setup() {
 	environment.SetDefaultShapeTurtles("bug")
 	environment.CreateTurtles(population,
 		[]universe.TurtleOperation{
-			universe.SetColor("red"),
+			universe.SetColor(environment.ColorHueMap["red"]),
 			universe.SetSize(2),
 		},
 	)
@@ -86,7 +85,7 @@ func setupFood(p *universe.Patch) {
 
 	// ;; set "food" at sources to either 1 or 2, randomly
 	if p.PatchesOwn[foodSourceNumber].(int) > 0 {
-		p.PatchesOwn[food] = util.OneOfInt([]int{1, 2})
+		p.PatchesOwn[food] = environment.OneOfInt([]int{1, 2})
 	}
 }
 
@@ -94,15 +93,15 @@ func recolorPatch(p *universe.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
-		p.Color = "violet"
+		p.Color = environment.ColorHueMap["violet"]
 	} else {
 		if p.PatchesOwn[food].(int) > 0 {
 			if p.PatchesOwn[foodSourceNumber].(int) == 1 {
-				p.Color = "cyan"
+				p.Color = environment.ColorHueMap["cyan"]
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 2 {
-				p.Color = "sky"
+				p.Color = environment.ColorHueMap["sky"]
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 3 {
-				p.Color = "blue"
+				p.Color = environment.ColorHueMap["blue"]
 			}
 		} else {
 			p.SetColorAndScale(p.PatchesOwn[chemical].(float64), .1, 5)
@@ -131,7 +130,7 @@ func run() {
 				if t.Who >= environment.Ticks {
 					return
 				}
-				if t.Color == "red" {
+				if t.Color == environment.ColorHueMap["red"] {
 					lookForFood(t)
 				} else {
 					returnToNest(t)
@@ -142,14 +141,81 @@ func run() {
 	)
 }
 
+func returnToNest(t *universe.Turtle) {
+	if t.GetPatch().PatchesOwn[nest].(bool) {
+		t.Color = environment.ColorHueMap["red"]
+		t.Right(180)
+	} else {
+		t.GetPatch().PatchesOwn[chemical] = t.GetPatch().PatchesOwn[chemical].(int) + 60
+		uphillNestScent(t)
+	}
+}
+
 func lookForFood(t *universe.Turtle) {
+	// if food > 0
+	// [ set color orange + 1     ;; pick up food
+	//   set food food - 1        ;; and reduce the food source
+	//   rt 180                   ;; and turn around
+	//   stop ]
+	// ;; go in the direction where the chemical smell is strongest
+	// if (chemical >= 0.05) and (chemical < 2)
+	// [ uphill-chemical ]
+	p := t.GetPatch()
+	if p.PatchesOwn[food].(int) > 0 {
+
+	}
 
 }
 
-func returnToNest(t *universe.Turtle) {
-
+func uphillChemical(t *universe.Turtle) {
+	scentAhead := chemicalScentAtAngle(t, 0)
+	scentRight := chemicalScentAtAngle(t, 45)
+	scentLeft := chemicalScentAtAngle(t, -45)
+	if scentRight > scentAhead || scentLeft > scentAhead {
+		if scentRight > scentLeft {
+			t.Right(45)
+		} else {
+			t.Left(45)
+		}
+	}
 }
 
 func wiggle(t *universe.Turtle) {
+	t.Right(float64(environment.RandomAmount(40)))
+	t.Left(float64(environment.RandomAmount(40)))
 
+	if !t.CanMove(1) {
+		t.Right(180)
+	}
+}
+
+func uphillNestScent(t *universe.Turtle) {
+	scentAhead := nestScentAtAngle(t, 0)
+	scentRight := nestScentAtAngle(t, 45)
+	scentLeft := nestScentAtAngle(t, -45)
+	if scentRight > scentAhead || scentLeft > scentAhead {
+		if scentRight > scentLeft {
+			t.Right(45)
+		} else {
+			t.Left(45)
+		}
+	}
+}
+
+func nestScentAtAngle(t *universe.Turtle, angle float64) int {
+	p := t.PatchRightAndAhead(angle, 1)
+	if p == nil {
+		return 0
+	} else {
+		return p.PatchesOwn[nestScent].(int)
+	}
+}
+
+func chemicalScentAtAngle(t *universe.Turtle, angle float64) float64 {
+	p := t.PatchRightAndAhead(angle, 1)
+	if p == nil {
+		return 0
+	} else {
+		return p.PatchesOwn[chemical].(float64)
+	}
 }
