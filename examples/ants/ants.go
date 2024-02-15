@@ -136,6 +136,7 @@ func run() {
 					returnToNest(t)
 				}
 				wiggle(t)
+				t.Forward(1)
 			},
 		},
 	)
@@ -152,17 +153,16 @@ func returnToNest(t *universe.Turtle) {
 }
 
 func lookForFood(t *universe.Turtle) {
-	// if food > 0
-	// [ set color orange + 1     ;; pick up food
-	//   set food food - 1        ;; and reduce the food source
-	//   rt 180                   ;; and turn around
-	//   stop ]
-	// ;; go in the direction where the chemical smell is strongest
-	// if (chemical >= 0.05) and (chemical < 2)
-	// [ uphill-chemical ]
 	p := t.GetPatch()
 	if p.PatchesOwn[food].(int) > 0 {
+		t.Color = environment.ColorHueMap["orange"] + 1
+		p.PatchesOwn[food] = p.PatchesOwn[food].(int) - 1
+		t.Right(180)
+		return
+	}
 
+	if p.PatchesOwn[chemical].(float64) >= .05 && p.PatchesOwn[chemical].(float64) < 2 {
+		uphillChemical(t)
 	}
 
 }
