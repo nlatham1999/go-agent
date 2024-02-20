@@ -1,6 +1,8 @@
 package universe
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type Universe struct {
 	Ticks   int
@@ -169,4 +171,38 @@ func (u *Universe) OneOfInt(arr []int) interface{} {
 
 func (u *Universe) RandomAmount(n int) int {
 	return rand.Intn(n)
+}
+
+// @TODO instead of looping through and assiging from the patch, might be better to loop through and grab
+func (u *Universe) Diffuse(patchVariable string, amount float64) {
+
+	newValues := map[*Patch]float64{}
+
+	for y := range u.PatchesArray {
+		for x := range u.PatchesArray[y] {
+
+			currentPatch := u.PatchesArray[y][x]
+
+			topLeft := u.safeGetPatch(x-1, y-1)
+			top := u.safeGetPatch(x, y-1)
+			topRight := u.safeGetPatch(x+1, y-1)
+			left := u.safeGetPatch(x-1, y)
+			right := u.safeGetPatch(x+1, y)
+			bottomLeft := u.safeGetPatch(x-1, y+1)
+			bottom := u.safeGetPatch(x, y+1)
+			bottomRight := u.safeGetPatch(x+1, y+1)
+
+			if topLeft != nil {
+
+			}
+		}
+	}
+}
+
+func (u *Universe) safeGetPatch(x int, y int) *Patch {
+	if x < 0 || y < 0 || x > len(u.PatchesArray[0]) || y > len(u.PatchesArray) {
+		return nil
+	}
+
+	return u.PatchesArray[y][x]
 }
