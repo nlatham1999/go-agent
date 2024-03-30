@@ -2,6 +2,6 @@
 
 package universe
 
-type Breed struct {
+type BreedConfiguration struct {
 	DefaultShape string
 }

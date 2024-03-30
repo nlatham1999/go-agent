@@ -1,6 +1,7 @@
 package universe
 
 import (
+	"errors"
 	"math/rand"
 )
 
@@ -8,8 +9,13 @@ type Universe struct {
 	Ticks   int
 	TicksOn bool
 
-	PatchesOwn map[string]interface{} //additional variables for each patch
-	Breeds     map[string]*Breed      //the different types of breeds
+	PatchesOwn map[string]interface{}            //additional variables for each patch
+	TurtlesOwn map[string]interface{}            //additional variables for each turtle
+	BreedsOwn  map[string]map[string]interface{} //additional variables for each breed. The first key is the breed name
+
+	PatchesArray2D [][]*Patch
+	Turtles        map[int]*Turtle            //all the turtles
+	Breeds         map[string]map[int]*Turtle //turtles that are part of specific breeds
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -21,16 +27,15 @@ type Universe struct {
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
 
-	Turtles          map[int]*Turtle //all the turtles
 	TurtlesWhoNumber int
 
-	Patches      []*Patch //all the patches
-	PatchesArray [][]*Patch
-
 	ColorHueMap map[string]float64
+
+	GlobalFloats map[string]float64
+	GlobalBools  map[string]bool
 }
 
-func NewUniverse(patchesOwn map[string]interface{}) *Universe {
+func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, breedsOwn map[string]map[string]interface{}) *Universe {
 	maxPxCor := 15
 	maxPyCor := 15
 	minPxCor := -15
@@ -43,6 +48,8 @@ func NewUniverse(patchesOwn map[string]interface{}) *Universe {
 		WorldWidth:  maxPxCor - minPxCor + 1,
 		WorldHeight: maxPyCor - minPyCor + 1,
 		PatchesOwn:  patchesOwn,
+		TurtlesOwn:  turtlesOwn,
+		BreedsOwn:   breedsOwn,
 	}
 
 	universe.buildPatches()
@@ -74,14 +81,14 @@ func (u *Universe) buildColors() {
 
 //builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
-	u.PatchesArray = [][]*Patch{}
+	u.PatchesArray2D = [][]*Patch{}
 	for i := 0; i < u.WorldHeight; i++ {
 		row := []*Patch{}
 		for j := 0; j < u.WorldWidth; j++ {
 			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
 			row = append(row, p)
 		}
-		u.PatchesArray = append(u.PatchesArray, row)
+		u.PatchesArray2D = append(u.PatchesArray2D, row)
 	}
 }
 
@@ -94,18 +101,25 @@ func (u *Universe) ClearAll() {
 	u.ClearOutput()
 }
 
-//@TODO Implement
 func (u *Universe) ClearGlobals() {
-
+	for g := range u.GlobalBools {
+		u.GlobalBools[g] = false
+	}
+	for g := range u.GlobalFloats {
+		u.GlobalFloats[g] = 0
+	}
 }
 
 func (u *Universe) ClearTicks() {
 	u.TicksOn = false
 }
 
-//@TODO Implement
 func (u *Universe) ClearPatches() {
-
+	for y := range u.PatchesArray2D {
+		for x := range u.PatchesArray2D[y] {
+			u.PatchesArray2D[y][x].Reset(u.PatchesOwn)
+		}
+	}
 }
 
 //@TODO Implement
@@ -131,10 +145,6 @@ func (u *Universe) SetDefaultShapeLinks(shape string) {
 	u.DefaultShapeLinks = shape
 }
 
-func (u *Universe) SetDefaultShapeBreed(shape string, breedType string) {
-	u.Breeds[breedType].DefaultShape = shape
-}
-
 func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 	startIndex := len(u.Turtles)
 	end := amount + startIndex
@@ -156,12 +166,18 @@ func (u *Universe) ResetTicks() {
 	u.Ticks = 0
 }
 
+func (u *Universe) Tick() {
+	if u.TicksOn {
+		u.Ticks++
+	}
+}
+
 func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
 	if x < u.MinPxCor || x > u.MaxPxCor || y < u.MinPyCor || y > u.MaxPyCor {
 		return nil
 	}
 
-	return u.PatchesArray[y-u.MinPyCor][x-u.MinPxCor]
+	return u.PatchesArray2D[y-u.MinPyCor][x-u.MinPxCor]
 }
 
 func (u *Universe) OneOfInt(arr []int) interface{} {
@@ -173,36 +189,144 @@ func (u *Universe) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
 
-// @TODO instead of looping through and assiging from the patch, might be better to loop through and grab
-func (u *Universe) Diffuse(patchVariable string, amount float64) {
+func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 
-	newValues := map[*Patch]float64{}
+	if percent > 1 || percent < 0 {
+		return errors.New("percent amount was outside bounds")
+	}
 
-	for y := range u.PatchesArray {
-		for x := range u.PatchesArray[y] {
+	diffusions := make(map[*Patch]float64)
 
-			currentPatch := u.PatchesArray[y][x]
-
-			topLeft := u.safeGetPatch(x-1, y-1)
-			top := u.safeGetPatch(x, y-1)
-			topRight := u.safeGetPatch(x+1, y-1)
-			left := u.safeGetPatch(x-1, y)
-			right := u.safeGetPatch(x+1, y)
-			bottomLeft := u.safeGetPatch(x-1, y+1)
-			bottom := u.safeGetPatch(x, y+1)
-			bottomRight := u.safeGetPatch(x+1, y+1)
-
-			if topLeft != nil {
-
-			}
+	//go through each patch and calculate the diffusion amount
+	for y := range u.PatchesArray2D {
+		for x := range u.PatchesArray2D[y] {
+			currentPatch := u.PatchesArray2D[y][x]
+			patchAmount := currentPatch.PatchesOwn[patchVariable].(float64)
+			amountToGive := patchAmount * percent / 8
+			diffusions[currentPatch] = amountToGive
 		}
 	}
+
+	//go through each patch and get the new amount
+	for y := range u.PatchesArray2D {
+		for x := range u.PatchesArray2D[y] {
+			currentPatch := u.PatchesArray2D[y][x]
+
+			amountFromNeighbors := 0.0
+			neighbors := u.getNeighbors(x, y)
+			if len(neighbors) > 8 || len(neighbors) < 3 {
+				return errors.New("invalid amount of neighbors")
+			}
+			for n := range neighbors {
+				amountFromNeighbors += diffusions[neighbors[n]]
+			}
+
+			patchAmount := currentPatch.PatchesOwn[patchVariable].(float64)
+			amountToKeep := 1 - (patchAmount * percent) + (float64(8-len(neighbors)) * (patchAmount * percent / 8))
+
+			currentPatch.PatchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+		}
+	}
+
+	return nil
+}
+
+//@TODO if we are wrapping around then it will always be 8
+func (u *Universe) howManyNeighbors(x int, y int) int {
+
+	neighborCount := 0
+
+	hasNeighborsLeft := x > 0
+	hasNeighborsRight := x < len(u.PatchesArray2D[0])-1
+	hasNeighborsAbove := y > 0
+	hasNeighborsBelow := y < len(u.PatchesArray2D)-1
+
+	if hasNeighborsAbove {
+		neighborCount++
+	}
+
+	if hasNeighborsBelow {
+		neighborCount++
+	}
+
+	if hasNeighborsLeft {
+		neighborCount++
+	}
+
+	if hasNeighborsRight {
+		neighborCount++
+	}
+
+	if hasNeighborsAbove && hasNeighborsLeft {
+		neighborCount++
+	}
+
+	if hasNeighborsAbove && hasNeighborsRight {
+		neighborCount++
+	}
+
+	if hasNeighborsBelow && hasNeighborsLeft {
+		neighborCount++
+	}
+
+	if hasNeighborsBelow && hasNeighborsRight {
+		neighborCount++
+	}
+
+	return neighborCount
+}
+
+//@TODO check to see if we are wrapping around
+func (u *Universe) getNeighbors(x int, y int) []*Patch {
+	n := []*Patch{}
+
+	left := u.safeGetPatch(x-1, y)
+	if left != nil {
+		n = append(n, left)
+	}
+
+	topLeft := u.safeGetPatch(x-1, y-1)
+	if topLeft != nil {
+		n = append(n, topLeft)
+	}
+
+	bottomLeft := u.safeGetPatch(x-1, y+1)
+	if bottomLeft != nil {
+		n = append(n, bottomLeft)
+	}
+
+	top := u.safeGetPatch(x, y-1)
+	if top != nil {
+		n = append(n, top)
+	}
+
+	topRight := u.safeGetPatch(x+1, y+1)
+	if topRight != nil {
+		n = append(n, topRight)
+	}
+
+	right := u.safeGetPatch(x+1, y)
+	if right != nil {
+		n = append(n, right)
+	}
+
+	bottomRight := u.safeGetPatch(x+1, y+1)
+	if bottomRight != nil {
+		n = append(n, bottomRight)
+	}
+
+	bottom := u.safeGetPatch(x, y+1)
+	if bottom != nil {
+		n = append(n, bottom)
+	}
+
+	return n
 }
 
 func (u *Universe) safeGetPatch(x int, y int) *Patch {
-	if x < 0 || y < 0 || x > len(u.PatchesArray[0]) || y > len(u.PatchesArray) {
+	if x < 0 || y < 0 || x > len(u.PatchesArray2D[0]) || y > len(u.PatchesArray2D) {
 		return nil
 	}
 
-	return u.PatchesArray[y][x]
+	return u.PatchesArray2D[y][x]
 }

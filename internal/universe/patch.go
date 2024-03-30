@@ -36,6 +36,14 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 	return patch
 }
 
+func (p *Patch) Reset(patchesOwn map[string]interface{}) {
+	p.Color = 0
+
+	for key, value := range patchesOwn {
+		p.PatchesOwn[key] = value
+	}
+}
+
 // Returns the distance of this patch from the provided x y coordinates
 //@TODO Implement wrapping if wrapping is enabled and it is shorter
 func (p *Patch) DistanceXY(x float64, y float64) float64 {

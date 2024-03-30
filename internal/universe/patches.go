@@ -2,9 +2,11 @@
 package universe
 
 func (u *Universe) AskPatches(operations []PatchOperation) {
-	for i := 0; i < len(u.Patches); i++ {
-		for j := 0; j < len(operations); j++ {
-			operations[j](u.Patches[i])
+	for y := 0; y < len(u.PatchesArray2D); y++ {
+		for x := 0; x < len(u.PatchesArray2D[y]); x++ {
+			for j := 0; j < len(operations); j++ {
+				operations[j](u.PatchesArray2D[y][x])
+			}
 		}
 	}
 }

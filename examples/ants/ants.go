@@ -4,23 +4,28 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/nlatham1999/go-agent/internal/slider"
 	"github.com/nlatham1999/go-agent/internal/universe"
 )
 
 var (
 	environment *universe.Universe
 
-	//@TODO figure out how to handle widgets
-	population int
+	sliders map[string]*slider.Slider
 )
 
-//we declare the patches own variable keys as constants
 const (
+	//patches own
 	chemical         = "chemical"
 	food             = "food"
 	nest             = "nest"
 	nestScent        = "nestScent"
 	foodSourceNumber = "foodSourceNumber"
+
+	//widgets
+	population      = "population"
+	diffusionRate   = "diffusionRate"
+	evaporationRate = "evaporationRate"
 )
 
 func Init() {
@@ -35,14 +40,20 @@ func Init() {
 		foodSourceNumber: 0,
 	}
 
-	environment = universe.NewUniverse(patchesOwn)
+	environment = universe.NewUniverse(patchesOwn, nil, nil)
+
+	sliders = map[string]*slider.Slider{
+		population:      slider.NewSlider(0, 1, 200, 125),
+		diffusionRate:   slider.NewSlider(0, 1, 99, 50),
+		evaporationRate: slider.NewSlider(0, 1, 99, 10),
+	}
 
 }
 
 func setup() {
 	environment.ClearAll()
 	environment.SetDefaultShapeTurtles("bug")
-	environment.CreateTurtles(population,
+	environment.CreateTurtles(int(sliders[population].GetValue()),
 		[]universe.TurtleOperation{
 			universe.SetColor(environment.ColorHueMap["red"]),
 			universe.SetSize(2),
@@ -140,6 +151,17 @@ func run() {
 			},
 		},
 	)
+	environment.Diffuse(chemical, sliders[diffusionRate].GetValue()/100)
+	environment.AskPatches(
+		[]universe.PatchOperation{
+			func(p *universe.Patch) {
+				p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100
+				recolorPatch(p)
+			},
+		},
+	)
+	environment.Tick()
+
 }
 
 func returnToNest(t *universe.Turtle) {
