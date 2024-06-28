@@ -5,6 +5,27 @@ import (
 	"math/rand"
 )
 
+const (
+	//color constants
+	Black     float64 = 0
+	White     float64 = 9.9
+	Grey      float64 = 5
+	Gray      float64 = 5
+	Red       float64 = 15
+	Orange    float64 = 25
+	Brown     float64 = 35
+	Yellow    float64 = 45
+	Green     float64 = 55
+	Lime      float64 = 65
+	Turquoise float64 = 75
+	Cyan      float64 = 85
+	Sky       float64 = 95
+	Blue      float64 = 105
+	Violet    float64 = 115
+	Magenta   float64 = 125
+	Pink      float64 = 135
+)
+
 type Universe struct {
 	Ticks   int
 	TicksOn bool
@@ -14,8 +35,9 @@ type Universe struct {
 	BreedsOwn  map[string]map[string]interface{} //additional variables for each breed. The first key is the breed name
 
 	PatchesArray2D [][]*Patch
-	Turtles        map[int]*Turtle            //all the turtles
-	Breeds         map[string]map[int]*Turtle //turtles that are part of specific breeds
+	Patches        []*Patch
+	Turtles        []*Turtle          //all the turtles
+	Breeds         map[string]*Turtle //turtles that are part of specific breeds
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -33,6 +55,8 @@ type Universe struct {
 
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
+
+	Base
 }
 
 func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, breedsOwn map[string]map[string]interface{}) *Universe {
@@ -57,28 +81,6 @@ func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interf
 	return universe
 }
 
-func (u *Universe) buildColors() {
-	u.ColorHueMap = map[string]float64{
-		"black":     0,
-		"white":     9.9,
-		"grey":      5,
-		"gray":      5,
-		"red":       15,
-		"orange":    25,
-		"brown":     35,
-		"yellow":    45,
-		"green":     55,
-		"lime":      65,
-		"turquoise": 75,
-		"cyan":      85,
-		"sky":       95,
-		"blue":      105,
-		"violet":    115,
-		"magenta":   125,
-		"pink":      135,
-	}
-}
-
 //builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
 	u.PatchesArray2D = [][]*Patch{}
@@ -90,6 +92,41 @@ func (u *Universe) buildPatches() {
 		}
 		u.PatchesArray2D = append(u.PatchesArray2D, row)
 	}
+}
+
+//@TODO implement
+func (u *Universe) AllLinks(agentset LinkSet, operation LinkBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) AllPatches(agentset PatchSet, operation PatchBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) AllTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) AnyLinks(agentset LinkSet, operation LinkBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) AnyPatches(agentset PatchSet, operation PatchBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) AnyTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
+	return false
+}
+
+//@TODO implement
+func (u *Universe) BothEnds(link *Link) []*Turtle {
+	return nil
 }
 
 func (u *Universe) ClearAll() {
@@ -108,6 +145,11 @@ func (u *Universe) ClearGlobals() {
 	for g := range u.GlobalFloats {
 		u.GlobalFloats[g] = 0
 	}
+}
+
+//@TODO implement
+func (u *Universe) ClearLinks() {
+
 }
 
 func (u *Universe) ClearTicks() {
@@ -134,6 +176,11 @@ func (u *Universe) ClearAllPlots() {
 
 //@TODO Implement
 func (u *Universe) ClearOutput() {
+
+}
+
+//@TODO Implement
+func (u *Universe) ClearTurtles() {
 
 }
 

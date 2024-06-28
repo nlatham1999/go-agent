@@ -10,6 +10,8 @@ type Turtle struct {
 	Color   float64
 	Heading float64   //direction the turtle is facing in degrees
 	parent  *Universe //universe the turtle belongs too
+
+	Base
 }
 
 func NewTurtle(who int) *Turtle {
@@ -31,10 +33,41 @@ func NewTurtleFromTemplate(template *Turtle, who int) *Turtle {
 	return t
 }
 
-//just use a for loop
-// func repeat(){
+//@TODO Implement
+func (t *Turtle) Back(distance float64) {
 
-// }
+}
+
+//@TODO implement
+func (t *Turtle) GetBreedName() string {
+	return ""
+}
+
+//@TODO implement
+func (t *Turtle) GetBreedSet() []*Turtle {
+	return nil
+}
+
+//@TODO implement
+func (t *Turtle) SetBreed(name string) {
+
+}
+
+//@TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice
+func (t *Turtle) CanMove(distance float64) bool {
+
+	newX := t.x + distance*math.Cos(t.Heading)
+	newY := t.y + distance*math.Sin(t.Heading)
+
+	patchX := math.Round(newX)
+	patchY := math.Round(newY)
+
+	if t.parent.getPatchAtCoords(int(patchX), int(patchY)) != nil {
+		return true
+	}
+
+	return true
+}
 
 //@TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
 func (t *Turtle) Forward(distance float64) {
@@ -62,22 +95,6 @@ func (t *Turtle) Jump(distance float64) bool {
 	if t.CanMove(distance) {
 		t.x = t.x + distance*math.Cos(t.Heading)
 		t.y = t.y + distance*math.Sin(t.Heading)
-	}
-
-	return true
-}
-
-//@TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice
-func (t *Turtle) CanMove(distance float64) bool {
-
-	newX := t.x + distance*math.Cos(t.Heading)
-	newY := t.y + distance*math.Sin(t.Heading)
-
-	patchX := math.Round(newX)
-	patchY := math.Round(newY)
-
-	if t.parent.getPatchAtCoords(int(patchX), int(patchY)) != nil {
-		return true
 	}
 
 	return true

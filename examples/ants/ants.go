@@ -55,8 +55,8 @@ func setup() {
 	environment.SetDefaultShapeTurtles("bug")
 	environment.CreateTurtles(int(sliders[population].GetValue()),
 		[]universe.TurtleOperation{
-			universe.SetColor(environment.ColorHueMap["red"]),
-			universe.SetSize(2),
+			// universe.SetColor(environment.ColorHueMap["red"]),
+			// universe.SetSize(2),
 		},
 	)
 	setupPatches()
@@ -65,6 +65,7 @@ func setup() {
 
 func setupPatches() {
 	environment.AskPatches(
+		environment.Patches,
 		[]universe.PatchOperation{
 			setupNest,
 			setupFood,
@@ -136,6 +137,7 @@ func run() {
 	// tick
 
 	environment.AskTurtles(
+		environment.Turtles,
 		[]universe.TurtleOperation{
 			func(t *universe.Turtle) {
 				if t.Who >= environment.Ticks {
@@ -153,6 +155,7 @@ func run() {
 	)
 	environment.Diffuse(chemical, sliders[diffusionRate].GetValue()/100)
 	environment.AskPatches(
+		environment.Patches,
 		[]universe.PatchOperation{
 			func(p *universe.Patch) {
 				p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100

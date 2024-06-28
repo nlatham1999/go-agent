@@ -14,8 +14,18 @@ var (
 	sliders map[string]*slider.Slider
 
 	//globals
-	colorList   []float64 // colors for hives, which keeps consistency among the hive colors, plots  pens colors, and committed bees' colors
-	qualityList []int     // quality of hives
+	colorList       []float64 // colors for hives, which keeps consistency among the hive colors, plots  pens colors, and committed bees' colors
+	qualityList     []int     // quality of hives
+	showDancePath   bool
+	scoutsVisible   bool
+	watchDanceTask  []universe.TurtleOperation
+	discoverTask    universe.TurtleOperation
+	inspectHiveTask universe.TurtleOperation
+	goHomeTask      universe.TurtleOperation
+	danceTask       universe.TurtleOperation
+	reVisitTask     universe.TurtleOperation
+	pipeTask        universe.TurtleOperation
+	takeOffTask     universe.TurtleOperation
 )
 
 const (
@@ -52,18 +62,6 @@ const (
 	circleSwitch = "circleSwitch" // when making a waggle dance, a bee alternates left and right to make the figure "8". circle-switch alternates between 1 and -1 to tell a bee which direction to turn.
 	tempXDance   = "tempXDance"   // initial position of a dance
 	tempYDance   = "tempYDance"
-
-	//globals
-	showDancePath   = "showDancePath"  // dance path is the circular patter with a zigzag line in the middle. when large amount of bees dance, the patterns overlaps each other, which makes them hard to distinguish. turn show-dance-path? off can clear existing patterns
-	scoutsVisible   = "scoutsVisible"  // you can hide scouts and only look at the dance patterns to avoid distraction from bees' dancing movements
-	watchDanceTask  = "watchDanceTask" // a list of tasks
-	discoverTask    = "discoverTask"
-	inspectHiveTask = "inspectHiveTask"
-	goHomeTask      = "goHomeTask"
-	danceTask       = "danceTask"
-	reVisitTask     = "reVisitTask"
-	pipeTask        = "pipeTask"
-	takeOffTask     = "takeOffTask"
 )
 
 func Init() {
@@ -155,4 +153,14 @@ func setupHives() {
 
 	colorList = []float64{97.9, 94.5, 57.5, 63.8, 17.6, 14.9, 27.5, 25.1, 117.9, 114.4}
 	qualityList = []int{100, 75, 50, 1, 54, 48, 40, 32, 24, 16}
+
+	environment.AskPatches(
+		environment.Patches,
+		[]universe.PatchOperation{
+			func(p *universe.Patch) {
+				// p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100
+				// recolorPatch(p)
+			},
+		},
+	)
 }

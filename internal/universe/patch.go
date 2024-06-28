@@ -16,6 +16,8 @@ type Patch struct {
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
 	PatchesOwn map[string]interface{}
+
+	Base
 }
 
 func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
