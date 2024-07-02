@@ -7,7 +7,7 @@ type Turtle struct {
 	y       float64
 	Who     int //the id of the turtle
 	size    int
-	Color   float64
+	Color   Color
 	Heading float64   //direction the turtle is facing in degrees
 	parent  *Universe //universe the turtle belongs too
 

@@ -2,6 +2,7 @@ package universe
 
 type Link struct {
 	Base
+	Color Color
 }
 
 //@TODO implement

@@ -129,6 +129,20 @@ implement?
 ### clear-turtles, ct
 ```(u *Universe) ClearTurtles()```
 
+### Color
+turtles and links have a color struct
+
+### cos
+math library
+
+### count
+use the len() on the array
+
+### create ordered turtles
+(u *Universe) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation)
+
+
+
 
 
 

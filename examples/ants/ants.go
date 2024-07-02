@@ -143,7 +143,7 @@ func run() {
 				if t.Who >= environment.Ticks {
 					return
 				}
-				if t.Color == environment.ColorHueMap["red"] {
+				if t.Color.GetColorScale() == environment.ColorHueMap["red"] {
 					lookForFood(t)
 				} else {
 					returnToNest(t)
@@ -169,7 +169,7 @@ func run() {
 
 func returnToNest(t *universe.Turtle) {
 	if t.GetPatch().PatchesOwn[nest].(bool) {
-		t.Color = environment.ColorHueMap["red"]
+		t.Color.SetColorScale(environment.ColorHueMap["red"])
 		t.Right(180)
 	} else {
 		t.GetPatch().PatchesOwn[chemical] = t.GetPatch().PatchesOwn[chemical].(int) + 60
@@ -180,7 +180,7 @@ func returnToNest(t *universe.Turtle) {
 func lookForFood(t *universe.Turtle) {
 	p := t.GetPatch()
 	if p.PatchesOwn[food].(int) > 0 {
-		t.Color = environment.ColorHueMap["orange"] + 1
+		t.Color.SetColorScale(environment.ColorHueMap["orange"] + 1)
 		p.PatchesOwn[food] = p.PatchesOwn[food].(int) - 1
 		t.Right(180)
 		return

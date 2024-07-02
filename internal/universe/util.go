@@ -1,13 +1,13 @@
 package universe
 
 //@TODO implement
-func ApproximateHSB(hue float64, saturation float64, brightness float64) int {
-
+func ApproximateHSB(hue int, saturation int, brightness int) float64 {
+	return 0.0
 }
 
 //@TODO implement
-func ApproximateRGB(red float64, green float64, blue float64) int {
-
+func ApproximateRGB(red int, green int, blue int) float64 {
+	return 0.0
 }
 
 func BaseColors() []float64 {
