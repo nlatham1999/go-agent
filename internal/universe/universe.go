@@ -187,14 +187,6 @@ func (u *Universe) CreateOrderedTurtles(breed string, amount float64, operations
 
 }
 
-func (u *Universe) SetDefaultShapeTurtles(shape string) {
-	u.DefaultShapeTurtles = shape
-}
-
-func (u *Universe) SetDefaultShapeLinks(shape string) {
-	u.DefaultShapeLinks = shape
-}
-
 func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 	startIndex := len(u.Turtles)
 	end := amount + startIndex
@@ -211,37 +203,12 @@ func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 	}
 }
 
-func (u *Universe) ResetTicks() {
-	u.TicksOn = true
-	u.Ticks = 0
+//@TODO implement
+func (u *Universe) DieTurtle(turtle *Turtle) {
 }
 
-func (u *Universe) Tick() {
-	if u.TicksOn {
-		u.Ticks++
-	}
-}
-
-func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
-	if x < u.MinPxCor || x > u.MaxPxCor || y < u.MinPyCor || y > u.MaxPyCor {
-		return nil
-	}
-
-	offsetX := x - u.MinPxCor
-	offsetY := y - u.MinPyCor
-
-	pos := offsetY*u.WorldWidth + offsetX
-
-	return u.Patches[pos]
-}
-
-func (u *Universe) OneOfInt(arr []int) interface{} {
-
-	return arr[rand.Intn(len(arr))-1]
-}
-
-func (u *Universe) RandomAmount(n int) int {
-	return rand.Intn(n)
+//@TODO implement
+func (u *Universe) DieLink(link *Link) {
 }
 
 func (u *Universe) Diffuse(patchVariable string, percent float64) error {
@@ -280,6 +247,52 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 	}
 
 	return nil
+}
+
+//@TODO implement
+func (u *Universe) Diffuse4(patchVariable string, percent float64) error {
+	return nil
+}
+
+//@TODO implement
+func (u *Universe) SetDefaultShapeTurtles(shape string) {
+	u.DefaultShapeTurtles = shape
+}
+
+func (u *Universe) SetDefaultShapeLinks(shape string) {
+	u.DefaultShapeLinks = shape
+}
+func (u *Universe) ResetTicks() {
+	u.TicksOn = true
+	u.Ticks = 0
+}
+
+func (u *Universe) Tick() {
+	if u.TicksOn {
+		u.Ticks++
+	}
+}
+
+func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
+	if x < u.MinPxCor || x > u.MaxPxCor || y < u.MinPyCor || y > u.MaxPyCor {
+		return nil
+	}
+
+	offsetX := x - u.MinPxCor
+	offsetY := y - u.MinPyCor
+
+	pos := offsetY*u.WorldWidth + offsetX
+
+	return u.Patches[pos]
+}
+
+func (u *Universe) OneOfInt(arr []int) interface{} {
+
+	return arr[rand.Intn(len(arr))-1]
+}
+
+func (u *Universe) RandomAmount(n int) int {
+	return rand.Intn(n)
 }
 
 //@TODO check to see if we are wrapping around

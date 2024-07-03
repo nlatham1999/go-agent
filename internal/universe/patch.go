@@ -38,6 +38,16 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 	return patch
 }
 
+//@TODO implement
+func (p *Patch) DistanceTurtle(t *Turtle) float64 {
+	return 0
+}
+
+//@TODO implement
+func (p *Patch) DistancePatch(patch *Patch) float64 {
+	return 0
+}
+
 func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 	p.Color = 0
 

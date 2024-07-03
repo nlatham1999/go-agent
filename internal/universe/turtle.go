@@ -69,6 +69,106 @@ func (t *Turtle) CanMove(distance float64) bool {
 	return true
 }
 
+//@TODO implement
+//creates a directed breed link from the current turtle to the turtle passed in
+func (t *Turtle) CreateBreedTo(breed string, turtle *Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+//creates a directed breed link from the current turtle to the turtles passed in
+func (t *Turtle) CreateBreedsTo(breed string, turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+//creates an undirected breed link from the current turtle with the turtle passed in
+func (t *Turtle) CreateBreedWith(breed string, turtle Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+//creates an undirected breed link from the current turtle with the turtles passed in
+func (t *Turtle) CreateBreedsWith(breed string, turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+//creates a directed breed link from the current turtle with the turtle passed in
+func (t *Turtle) CreateBreedFrom(breed string, turtle *Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateBreedsFrom(breed string, turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinkTo(turtle *Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinksTo(turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinkWith(turtle *Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinksWith(turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinkFrom(turtle *Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) CreateLinksFrom(turtles []*Turtle, operations []TurtleOperation) {
+
+}
+
+//@TODO implement
+func (t *Turtle) DistanceTurtle(turtle *Turtle) float64 {
+	return 0
+}
+
+//@TODO implement
+func (t *Turtle) DistancePatch(patch *Patch) float64 {
+	return 0
+}
+
+//@TODO implement
+func (t *Turtle) DistanceXY(x float64, y float64) float64 {
+	return 0
+}
+
+//@TODO implement
+func (t *Turtle) Downhill(patchVariable string) {
+
+}
+
+//@TODO implement
+func (t *Turtle) Downhill4(patchVariable string) {
+
+}
+
+//@TODO implement
+func (t *Turtle) DX() float64 {
+	return 0
+}
+
+//@TODO implement
+func (t *Turtle) DY() float64 {
+	return 0
+}
+
 //@TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
 func (t *Turtle) Forward(distance float64) {
 	intPart := int(distance)
