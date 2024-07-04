@@ -2,6 +2,10 @@
 
 package universe
 
-type BreedConfiguration struct {
-	DefaultShape string
+type DirectedLinkBreed struct {
+	Links []*Link
+}
+
+type UndirectedLinkBreed struct {
+	Links []*Link
 }

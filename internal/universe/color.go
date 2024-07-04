@@ -13,12 +13,6 @@ type RGB struct {
 	green int
 }
 
-type HSB struct {
-	hue        int
-	saturation int
-	brightness int
-}
-
 func (c *Color) SetColorScale(val float64) {
 	c.scaleColor = val
 	c.usingScaleColor = true

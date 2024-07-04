@@ -38,12 +38,12 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 	return patch
 }
 
-//@TODO implement
+// @TODO implement
 func (p *Patch) DistanceTurtle(t *Turtle) float64 {
 	return 0
 }
 
-//@TODO implement
+// @TODO implement
 func (p *Patch) DistancePatch(patch *Patch) float64 {
 	return 0
 }
@@ -57,7 +57,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 }
 
 // Returns the distance of this patch from the provided x y coordinates
-//@TODO Implement wrapping if wrapping is enabled and it is shorter
+// @TODO Implement wrapping if wrapping is enabled and it is shorter
 func (p *Patch) DistanceXY(x float64, y float64) float64 {
 
 	deltaX := x - p.xFloat64
@@ -66,7 +66,17 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	return math.Sqrt(deltaX*deltaX - deltaY*deltaY)
 }
 
-//replaces scale-color
+// @TODO implement
+func (p *Patch) InRadiusPatches(radius float64) []*Patch {
+	return nil
+}
+
+// @TODO implement
+func (p *Patch) InRadiusTurtles(radius float64) []*Turtle {
+	return nil
+}
+
+// replaces scale-color
 func (p *Patch) SetColorAndScale(number float64, range1 float64, range2 float64) {
 	if range1 > range2 {
 		//invert

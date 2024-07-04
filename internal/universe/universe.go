@@ -2,6 +2,7 @@ package universe
 
 import (
 	"errors"
+	"math"
 	"math/rand"
 )
 
@@ -30,9 +31,11 @@ type Universe struct {
 	Ticks   int
 	TicksOn bool
 
-	PatchesOwn map[string]interface{}            //additional variables for each patch
-	TurtlesOwn map[string]interface{}            //additional variables for each turtle
-	BreedsOwn  map[string]map[string]interface{} //additional variables for each breed. The first key is the breed name
+	LinksOwn        map[string]interface{}            //additional variables for each link
+	LinkBreedsOwn   map[string]map[string]interface{} //additional variables for each link breed. The first key is the breed name
+	PatchesOwn      map[string]interface{}            //additional variables for each patch
+	TurtlesOwn      map[string]interface{}            //additional variables for each turtle
+	TurtleBreedsOwn map[string]map[string]interface{} //additional variables for each turtle breed. The first key is the breed name
 
 	Patches []*Patch
 	Turtles []*Turtle          //all the turtles
@@ -55,24 +58,27 @@ type Universe struct {
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
 
+	DirectedLinkBreeds  map[string]DirectedLinkBreed
+	UndirectedLinkBreed map[string]UndirectedLinkBreed
+
 	Base
 }
 
-func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, breedsOwn map[string]map[string]interface{}) *Universe {
+func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, turtleBreedsOwn map[string]map[string]interface{}) *Universe {
 	maxPxCor := 15
 	maxPyCor := 15
 	minPxCor := -15
 	minPyCor := -15
 	universe := &Universe{
-		MaxPxCor:    maxPxCor,
-		MaxPyCor:    maxPyCor,
-		MinPxCor:    minPxCor,
-		MinPyCor:    minPyCor,
-		WorldWidth:  maxPxCor - minPxCor + 1,
-		WorldHeight: maxPyCor - minPyCor + 1,
-		PatchesOwn:  patchesOwn,
-		TurtlesOwn:  turtlesOwn,
-		BreedsOwn:   breedsOwn,
+		MaxPxCor:        maxPxCor,
+		MaxPyCor:        maxPyCor,
+		MinPxCor:        minPxCor,
+		MinPyCor:        minPyCor,
+		WorldWidth:      maxPxCor - minPxCor + 1,
+		WorldHeight:     maxPyCor - minPyCor + 1,
+		PatchesOwn:      patchesOwn,
+		TurtlesOwn:      turtlesOwn,
+		TurtleBreedsOwn: turtleBreedsOwn,
 	}
 
 	universe.buildPatches()
@@ -80,7 +86,7 @@ func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interf
 	return universe
 }
 
-//builds an array of patches and links them togethor
+// builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
 	u.Patches = []*Patch{}
 	for i := 0; i < u.WorldHeight; i++ {
@@ -93,37 +99,37 @@ func (u *Universe) buildPatches() {
 	}
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AllLinks(agentset LinkSet, operation LinkBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AllPatches(agentset PatchSet, operation PatchBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AllTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AnyLinks(agentset LinkSet, operation LinkBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AnyPatches(agentset PatchSet, operation PatchBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) AnyTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
 	return false
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) BothEnds(link *Link) []*Turtle {
 	return nil
 }
@@ -146,7 +152,7 @@ func (u *Universe) ClearGlobals() {
 	}
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) ClearLinks() {
 
 }
@@ -161,28 +167,28 @@ func (u *Universe) ClearPatches() {
 	}
 }
 
-//@TODO Implement
+// @TODO Implement
 func (u *Universe) ClearDrawing() {
 
 }
 
-//@TODO Implement
+// @TODO Implement
 func (u *Universe) ClearAllPlots() {
 
 }
 
-//@TODO Implement
+// @TODO Implement
 func (u *Universe) ClearOutput() {
 
 }
 
-//@TODO Implement
+// @TODO Implement
 func (u *Universe) ClearTurtles() {
 
 }
 
-//@TODO Implement
-//idea is that if an empty string is passed then it will be for the general population
+// @TODO Implement
+// idea is that if an empty string is passed then it will be for the general population
 func (u *Universe) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation) {
 
 }
@@ -203,11 +209,11 @@ func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 	}
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) DieTurtle(turtle *Turtle) {
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) DieLink(link *Link) {
 }
 
@@ -249,12 +255,51 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 	return nil
 }
 
-//@TODO implement
+// @TODO implement
 func (u *Universe) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
-//@TODO implement
+func (u *Universe) LayoutCircle(turtles []*Turtle, radius float64) {
+	amount := len(turtles)
+	for i := 0; i < amount; i++ {
+		agent := turtles[i]
+		agent.SetXY(radius*math.Cos(2*math.Pi*float64(i)/float64(amount)), radius*math.Sin(2*math.Pi*float64(i)/float64(amount)))
+		agent.Heading = 2 * math.Pi * float64(i) / float64(amount)
+	}
+}
+
+// @TODO implement
+func (u *Universe) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle) {
+
+}
+
+// @TODO implement
+func (u *Universe) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64) {
+
+}
+
+// @TODO implement
+func (u *Universe) LayoutTutte(turtles []*Turtle, links []*Link, radius float64) {
+
+}
+
+// @TODO implement
+func (u *Universe) Link(breed string, turtle1 int, turtle2 int) *Link {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) LinkShapes() []string {
+	return []string{}
+}
+
+// @TODO implement
 func (u *Universe) SetDefaultShapeTurtles(shape string) {
 	u.DefaultShapeTurtles = shape
 }
@@ -295,7 +340,7 @@ func (u *Universe) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
 
-//@TODO check to see if we are wrapping around
+// @TODO check to see if we are wrapping around
 func (u *Universe) getNeighbors(x int) []*Patch {
 	n := []*Patch{}
 
