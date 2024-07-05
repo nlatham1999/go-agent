@@ -496,3 +496,399 @@ for loop
 
 ### lput
 slice function
+
+### map
+pretty sure theres a map library
+
+### max
+implement?
+
+### max-n-of
+```(u *Universe) MaxNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link```
+```(u *Universe) MaxNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch```
+```(u *Universe) MaxNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle```
+
+### max-one-of
+```(u *Universe) MaxOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link```
+```(u *Universe) MaxOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch```
+```(u *Universe) MaxOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle```
+
+### max-pxcor
+```Universe.MaxPxCor```
+
+### max-pycor
+```Universe.MaxPyCor```
+
+### mean
+probably a built in function that does this
+
+### median
+probably a function that does this
+
+### member?
+built in
+
+### min
+built in
+
+### min-n-of
+```(u *Universe) MinNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link```
+```(u *Universe) MinNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch```
+```(u *Universe) MinNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle```
+
+### min-one-of
+```(u *Universe) MinOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link```
+```(u *Universe) MinOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch```
+```(u *Universe) MinOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle```
+
+### min-pxcor
+```Universe.MinPxCor```
+
+### min-pycor
+```Universe.MinPyCor```
+
+### mod
+%
+
+### modes
+probably built in
+
+### mouse-down?
+implement?
+
+### mouse-inside?
+implement?
+
+### mouse-xcor
+implement?
+
+### mouse-xcor
+implement?
+
+### move-to
+```(t *Turtle) MoveToPatch(patch *Patch)```
+```(t *Turtle) MoveToTurtle(turtle *Turtle)```
+
+### my-links
+```(t *Turtle) MyLinks(breed string) []*Link```
+
+### my-in-links
+```(t *Turtle) MyInLinks(breed string) []*Link```
+
+### my-out-links
+```(t *Turtle) MyOutLinks(breed string) []*Link```
+
+### myself
+the turtle, patch, or link is part of the operater parameter so it can be accessed in that way
+
+### n-of
+implement?
+
+### n-values
+implement?
+
+### neighbors
+```(t *Turtle) Neighbors() []*Patch```
+```(p *Patch) Neighbors() []*Patch```
+
+### neighbors4
+```(t *Turtle) Neighbors4() []*Patch```
+```(p *Patch) Neighbors4() []*Patch```
+
+### link-neighbors
+```(t *Turtle) LinkNeighbors(breed string) []*Turtle```
+
+### link-neighbor?
+```(t *Turtle) LinkNeighbor(turtle *Turtle)```
+
+### new-seed
+random library
+
+### no-display
+implement?
+
+### nobody
+this is nil
+
+### no-links
+empty array
+
+### no-patches
+empty array
+
+### not
+!
+
+### no-turtles
+empty array
+
+### of
+this is the . operator
+
+### one-of
+```OneOf(arr []interface{}) interface{}```
+
+### or
+||
+
+### other
+```(p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet```
+```(t *Turtle) Other(turtles TurtleAgentSet) *TurtleAgentSet```
+
+
+### other-end
+```(l *Link) OtherEnd(t *Turtle) *Turtle```
+```(t *Turtle) OtherEnd(link *Link) *Turtle```
+
+### out-link-neighbor?
+```(t *Turtle) OutLinkNeighbor(breed string, turtle *Turtle) bool```
+
+
+### out-link-neighbors
+```(t *Turtle) OutLinkNeighbors(breed string, turtle *Turtle) *TurtleAgentSet```
+
+### out-link-to
+```(t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link```
+
+### patch
+```(u *Universe) Patch(pxcor float64, pycor float64) *Patch```
+
+### patch-ahead
+```(t *Turtle) PatchAhead(distance float64) *Patch```
+
+### patch-at
+```(p *Patch) PatchAt(dx float64, dy float64) *Patch```
+```(t *Turtle) PatchAt(dx float64, dy float64) *Patch```
+
+### patch-at-heading-and-distance
+```(p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch```
+```(t *Turtle) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch```
+
+### patch-here
+```(t *Turtle) PatchHere() *Patch```
+
+### patch-left-and-ahead
+```(t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch```
+
+### patch-right-and-ahead
+```(t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch```
+
+
+### patch-set
+implement?
+
+### patch-size
+implement?
+
+### patches
+```Universe.Patches```
+
+
+### patches-own
+```Universe.PatchesOwn```
+
+### pcolor
+```Patch.PColor```
+```Turtle.PatchHere().PColor```
+
+### pen-down
+implement?
+
+### pen-erase
+implement?
+
+### pen-up
+implement?
+
+### pen-mode
+implement?
+
+### pen-size
+implement?
+
+### plabel
+```Patch.Label```
+```Turtle.PatchHere().Label```
+
+### plabel-color
+```Patch.PLabelColor```
+```Turtle.PatchHere().PLabelColor```
+
+### plot
+implement?
+
+### plot-name
+implement?
+
+### plot-pen-exists?
+implement?
+
+### plot-pen-down
+implement?
+
+### plot-pen-up
+implement?
+
+### plot-pen-reset
+implement?
+
+### plotxy
+implement?
+
+### plot-x-min
+implement?
+
+### plot-x-max
+implement?
+
+### plot-y-min
+implement?
+
+### plot-y-max
+implement?
+
+### position
+this is basically a find
+
+### precision
+implement?
+
+### print
+implement?
+
+### pxcor
+```(p *Patch) PXCor() int```
+```Turtle.PatchHere().PXCor```
+
+### pycor
+```(p *Patch) PYCor() int```
+```Turtle.PatchHere().PYCor```
+
+### random
+implement?
+
+### random-float
+implement?
+
+### random-*
+not really needed
+
+### range
+for loop
+
+### read-from-string
+implement?
+
+### reduce
+implement?
+
+### remainder
+implement?
+
+### implement?
+remove
+
+### remove-duplicates
+implement?
+
+### remove-item
+implement?
+
+### repeat
+implement?
+
+### replace-item
+implement?
+
+### report
+return
+
+### reset-perspective
+implement?
+
+### reset-ticks
+```(u *Universe) ResetTicks()```
+
+### reset-timer
+```(u *Universe) ResetTimer()```
+
+### resize-world
+```(u *Universe) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int)```
+
+### reverse
+implement?
+
+### rgb
+implement?
+
+### ride
+implement?
+
+### ride-me
+implement?
+
+### right
+```(t *Turtle) Right(number float64)```
+
+### round
+implement?
+
+### run
+implement?
+
+### self
+not needed
+
+### sentence
+not needed
+
+### set
+not needed
+
+### set-current-directory
+implement?
+
+### set-current-plot
+implement?
+
+### set-current-plot-pen
+implement?
+
+### set-default-shape
+```(u *Universe) SetDefaultShapeLinks(shape string)```
+```(u *Universe) SetDefaultShapeTurtles(shape string)```
+```(u *Universe) SetDefaultShapeLinkBreed(breed string, shape string)```
+```(u *Universe) SetDefaultShapeTurtleBreed(breed string, shape string)```
+
+### set-histogram-num-bars
+implement?
+
+### __set-line-thickness
+implement?
+
+### set-patch-size
+implement?
+
+### set-plot-background-color
+implement?
+
+### set-plot-pen-color
+implement?
+
+### set-plot-pen-interval
+implement?
+
+### set-plot-pen-mode
+implement?
+
+### setup-plots
+implement?
+
+### set-plot-x-range
+implement?
+
+### set-plot-y-range
+implement?
+
+### setxy
+```(t *Turtle) SetXY(x float64, y float64)```

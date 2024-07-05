@@ -14,30 +14,35 @@ type Link struct {
 }
 
 // @TODO implement
-func (t *Link) GetBreedName() string {
+func (l *Link) GetBreedName() string {
 	return ""
 }
 
 // @TODO implement
-func (t *Link) GetBreedSet() []*Link {
+func (l *Link) GetBreedSet() []*Link {
 	return nil
 }
 
 // @TODO implement
-func (t *Link) SetBreed(name string) {
+func (l *Link) SetBreed(name string) {
 
 }
 
-func (t *Link) Hide() {
-	t.Hidden = true
+func (l *Link) Hide() {
+	l.Hidden = true
 }
 
 // @TODO implement
-func (t *Link) Heading() float64 {
+func (l *Link) Heading() float64 {
 	return 0
 }
 
 // @TODO implement
-func (t *Link) Length() float64 {
+func (l *Link) Length() float64 {
 	return 0
+}
+
+// @TODO implement
+func (l *Link) OtherEnd(t *Turtle) *Turtle {
+	return nil
 }

@@ -3,19 +3,25 @@ package universe
 import "math"
 
 type Patch struct {
-	x int
-	y int
+	x     int
+	y     int
+	index int
+
+	parent *Universe
 
 	//we have float54 versions of the variables so that we don't have to do a bunch of conversions
 	xFloat64 float64
 	yFloat64 float64
 
 	//same as pcolor
-	Color      float64
+	PColor     float64
 	ColorScale float64
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
 	PatchesOwn map[string]interface{}
+
+	Label       interface{}
+	PLabelColor Color
 
 	Base
 }
@@ -27,7 +33,7 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 		y:        y,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
-		Color:    0,
+		PColor:   0,
 	}
 
 	patch.PatchesOwn = map[string]interface{}{}
@@ -49,7 +55,7 @@ func (p *Patch) DistancePatch(patch *Patch) float64 {
 }
 
 func (p *Patch) Reset(patchesOwn map[string]interface{}) {
-	p.Color = 0
+	p.PColor = 0
 
 	for key, value := range patchesOwn {
 		p.PatchesOwn[key] = value
@@ -76,24 +82,54 @@ func (p *Patch) InRadiusTurtles(radius float64) []*Turtle {
 	return nil
 }
 
-// replaces scale-color
-func (p *Patch) SetColorAndScale(number float64, range1 float64, range2 float64) {
-	if range1 > range2 {
-		//invert
-		if number > range1 {
-			number = range1
+func (p *Patch) Neighbors() []*Patch {
+	neighbors := p.parent.Neighbors(p.index)
+
+	return neighbors
+}
+
+func (p *Patch) Neighbors4() []*Patch {
+	neighbors := p.parent.Neighbors4(p.index)
+
+	return neighbors
+}
+
+// @TODO implement
+func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
+	other := &PatchAgentSet{}
+
+	for _, patch := range patches.patches {
+		if patch != p {
+			other.patches = append(other.patches, patch)
 		}
-		if number < range2 {
-			number = range2
-		}
-		p.ColorScale = (range1 - number) / (range1 - range2)
-	} else {
-		if number > range2 {
-			number = range2
-		}
-		if number < range1 {
-			number = range1
-		}
-		p.ColorScale = number
 	}
+
+	return other
+}
+
+func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
+
+	//round the coords
+	rx := int(math.Round(p.xFloat64 + dx))
+	ry := int(math.Round(p.yFloat64 + dy))
+
+	x := p.x + rx
+	y := p.y + ry
+
+	return p.parent.getPatchAtCoords(x, y)
+}
+
+func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch {
+	dx := distance * math.Cos(heading)
+	dy := distance * math.Sin(heading)
+
+	return p.PatchAt(dx, dy)
+}
+
+func (p *Patch) PXCor() int {
+	return p.x
+}
+
+func (p *Patch) PYCor() int {
+	return p.y
 }

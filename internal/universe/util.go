@@ -68,3 +68,13 @@ func Filter(arr []interface{}, pred func(interface{}) bool) []interface{} {
 func HSB(hue int, saturation int, brightness int) (int, int, int) {
 	return 0, 0, 0
 }
+
+// @TODO implement
+func OneOf(arr []interface{}) interface{} {
+	return arr[0]
+}
+
+// @TODO implement
+func ScaleColor(color Color, number float64, range1 float64, range2 float64) Color {
+	return color
+}

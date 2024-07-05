@@ -19,6 +19,8 @@ type Turtle struct {
 
 	Label      interface{}
 	LabelColor Color
+
+	patch *Patch
 }
 
 func NewTurtle(who int) *Turtle {
@@ -289,22 +291,147 @@ func (t *Turtle) Jump(distance float64) {
 	}
 }
 
-func (t *Turtle) GetPatch() *Patch {
+func (t *Turtle) Left(number float64) {
+	t.Heading = math.Mod((t.Heading + number), 360)
+}
+
+// @TODO implement
+func (t *Turtle) LinkNeighbors(breed string) []*Turtle {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) LinkNeighbor(turtle *Turtle) bool {
+	return false
+}
+
+func (t *Turtle) MoveToPatch(patch *Patch) {
+	t.x = patch.xFloat64
+	t.y = patch.yFloat64
+}
+
+func (t *Turtle) MoveToTurtle(turtle *Turtle) {
+	t.x = turtle.x
+	t.y = turtle.y
+}
+
+// @TODO implement
+func (t *Turtle) MyLinks(breed string) []*Link {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) MyInLinks(breed string) []*Link {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) MyOutLinks(breed string) []*Link {
+	return nil
+}
+
+func (t *Turtle) Neighbors() []*Patch {
+	//get the patch the turtle is on
+	p := t.PatchHere()
+	if p == nil {
+		return nil
+	}
+
+	//get the index of the patch
+	index := p.index
+
+	//get the neighbors of the patch
+	neighbors := t.parent.Neighbors(index)
+
+	return neighbors
+}
+
+func (t *Turtle) Neighbors4() []*Patch {
+	//get the patch the turtle is on
+	p := t.PatchHere()
+	if p == nil {
+		return nil
+	}
+
+	//get the index of the patch
+	index := p.index
+
+	//get the neighbors of the patch
+	neighbors := t.parent.Neighbors4(index)
+
+	return neighbors
+}
+
+// TODO implement
+func (t *Turtle) Other(turtles TurtleAgentSet) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) OtherEnd(link *Link) *Turtle {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) OutLinkNeighbor(breed string, turtle *Turtle) bool {
+	return false
+}
+
+// @TODO implement
+func (t *Turtle) OutLinkNeighbors(breed string, turtle *Turtle) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
+	return nil
+}
+
+func (t *Turtle) PatchAhead(distance float64) *Patch {
+	distX := t.x + distance*math.Cos(t.Heading)
+	distY := t.y + distance*math.Sin(t.Heading)
+	return t.parent.getPatchAtCoords(int(distX), int(distY))
+}
+
+func (t *Turtle) PatchAt(dx float64, dy float64) *Patch {
+
+	//round the coords
+	px := int(math.Round(t.x + dx))
+	py := int(math.Round(t.y + dy))
+
+	return t.parent.getPatchAtCoords(px, py)
+}
+
+func (t *Turtle) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch {
+	distX := t.x + distance*math.Cos(heading)
+	distY := t.y + distance*math.Sin(heading)
+	return t.parent.Patch(distX, distY)
+}
+
+func (t *Turtle) PatchHere() *Patch {
+
+	if t.patch != nil {
+		return t.patch
+	}
+
 	px := int(math.Round(t.x))
 	py := int(math.Round(t.y))
 	p := t.parent.getPatchAtCoords(px, py)
+
+	t.patch = p
+
 	return p
 }
 
-func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
-	rightHeading := t.Heading - angle
+func (t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch {
+	rightHeading := t.Heading + angle
 	distX := t.x + distance*math.Cos(rightHeading)
 	distY := t.y + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
-func (t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch {
-	rightHeading := t.Heading + angle
+func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
+	rightHeading := t.Heading - angle
 	distX := t.x + distance*math.Cos(rightHeading)
 	distY := t.y + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
@@ -318,6 +445,7 @@ func (t *Turtle) Right(number float64) {
 	}
 }
 
-func (t *Turtle) Left(number float64) {
-	t.Heading = math.Mod((t.Heading + number), 360)
+func (t *Turtle) SetXY(x float64, y float64) {
+	t.x = x
+	t.y = y
 }

@@ -6,27 +6,6 @@ import (
 	"math/rand"
 )
 
-const (
-	//color constants
-	Black     float64 = 0
-	White     float64 = 9.9
-	Grey      float64 = 5
-	Gray      float64 = 5
-	Red       float64 = 15
-	Orange    float64 = 25
-	Brown     float64 = 35
-	Yellow    float64 = 45
-	Green     float64 = 55
-	Lime      float64 = 65
-	Turquoise float64 = 75
-	Cyan      float64 = 85
-	Sky       float64 = 95
-	Blue      float64 = 105
-	Violet    float64 = 115
-	Magenta   float64 = 125
-	Pink      float64 = 135
-)
-
 type Universe struct {
 	Ticks   int
 	TicksOn bool
@@ -38,8 +17,8 @@ type Universe struct {
 	TurtleBreedsOwn map[string]map[string]interface{} //additional variables for each turtle breed. The first key is the breed name
 
 	Patches []*Patch
-	Turtles []*Turtle          //all the turtles
-	Breeds  map[string]*Turtle //turtles that are part of specific breeds
+	Turtles []*Turtle               //all the turtles
+	Breeds  map[string]*TurtleBreed //turtles that are part of specific breeds
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -58,8 +37,8 @@ type Universe struct {
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
 
-	DirectedLinkBreeds  map[string]DirectedLinkBreed
-	UndirectedLinkBreed map[string]UndirectedLinkBreed
+	DirectedLinkBreeds  map[string]*LinkBreed
+	UndirectedLinkBreed map[string]*LinkBreed
 
 	Base
 }
@@ -238,7 +217,7 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 		currentPatch := u.Patches[x]
 
 		amountFromNeighbors := 0.0
-		neighbors := u.getNeighbors(x)
+		neighbors := u.Neighbors(x)
 		if len(neighbors) > 8 || len(neighbors) < 3 {
 			return errors.New("invalid amount of neighbors")
 		}
@@ -300,21 +279,86 @@ func (u *Universe) LinkShapes() []string {
 }
 
 // @TODO implement
-func (u *Universe) SetDefaultShapeTurtles(shape string) {
-	u.DefaultShapeTurtles = shape
+func (u *Universe) MaxNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link {
+	return nil
 }
 
-func (u *Universe) SetDefaultShapeLinks(shape string) {
-	u.DefaultShapeLinks = shape
-}
-func (u *Universe) ResetTicks() {
-	u.TicksOn = true
-	u.Ticks = 0
+// @TODO implement
+func (u *Universe) MaxNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch {
+	return nil
 }
 
-func (u *Universe) Tick() {
-	if u.TicksOn {
-		u.Ticks++
+// @TODO implement
+func (u *Universe) MaxNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle {
+	return nil
+}
+
+func (u *Universe) MaxOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link {
+	links := u.MaxNOfLinks(1, agentSet, operation)
+	if len(links) == 0 {
+		return nil
+	} else {
+		return links[0]
+	}
+}
+
+func (u *Universe) MaxOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch {
+	patches := u.MaxNOfPatches(1, agentSet, operation)
+	if len(patches) == 0 {
+		return nil
+	} else {
+		return patches[0]
+	}
+}
+
+func (u *Universe) MaxOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle {
+	turtles := u.MaxNOfTurtles(1, agentSet, operation)
+	if len(turtles) == 0 {
+		return nil
+	} else {
+		return turtles[0]
+	}
+}
+
+// @TODO implement
+func (u *Universe) MinNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) MinNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) MinNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle {
+	return nil
+}
+
+func (u *Universe) MinOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link {
+	links := u.MinNOfLinks(1, agentSet, operation)
+	if len(links) == 0 {
+		return nil
+	} else {
+		return links[0]
+	}
+}
+
+func (u *Universe) MinOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch {
+	patches := u.MinNOfPatches(1, agentSet, operation)
+	if len(patches) == 0 {
+		return nil
+	} else {
+		return patches[0]
+	}
+}
+
+func (u *Universe) MinOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle {
+	turtles := u.MinNOfTurtles(1, agentSet, operation)
+	if len(turtles) == 0 {
+		return nil
+	} else {
+		return turtles[0]
 	}
 }
 
@@ -340,54 +384,100 @@ func (u *Universe) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
 
+func (u *Universe) topLeftNeighbor(x int) *Patch {
+	return u.safeGetPatch(x - u.WorldWidth - 1)
+}
+
+func (u *Universe) topNeighbor(x int) *Patch {
+	return u.safeGetPatch(x - u.WorldWidth)
+}
+
+func (u *Universe) topRightNeighbor(x int) *Patch {
+	return u.safeGetPatch(x - u.WorldWidth + 1)
+}
+
+func (u *Universe) leftNeighbor(x int) *Patch {
+	return u.safeGetPatch(x - 1)
+}
+
+func (u *Universe) rightNeighbor(x int) *Patch {
+	return u.safeGetPatch(x + 1)
+}
+
+func (u *Universe) bottomLeftNeighbor(x int) *Patch {
+	return u.safeGetPatch(x + u.WorldWidth - 1)
+}
+
+func (u *Universe) bottomNeighbor(x int) *Patch {
+	return u.safeGetPatch(x + u.WorldWidth)
+}
+
+func (u *Universe) bottomRightNeighbor(x int) *Patch {
+	return u.safeGetPatch(x + u.WorldWidth + 1)
+}
+
 // @TODO check to see if we are wrapping around
-func (u *Universe) getNeighbors(x int) []*Patch {
+func (u *Universe) Neighbors(x int) []*Patch {
 	n := []*Patch{}
 
-	topLeftPos := x - u.WorldWidth - 1
-	topPos := x - u.WorldWidth
-	topRightPos := x - u.WorldWidth + 1
-	leftPos := x - 1
-	rightPos := x + 1
-	bottomLeftPos := x + u.WorldWidth - 1
-	bottomPos := x + u.WorldWidth
-	bottomRightPos := x + u.WorldWidth + 1
-	left := u.safeGetPatch(leftPos)
-	if left != nil {
-		n = append(n, left)
-	}
-
-	topLeft := u.safeGetPatch(topLeftPos)
+	topLeft := u.topLeftNeighbor(x)
 	if topLeft != nil {
 		n = append(n, topLeft)
 	}
 
-	bottomLeft := u.safeGetPatch(bottomLeftPos)
+	bottomLeft := u.bottomLeftNeighbor(x)
 	if bottomLeft != nil {
 		n = append(n, bottomLeft)
 	}
 
-	top := u.safeGetPatch(topPos)
+	top := u.topNeighbor(x)
 	if top != nil {
 		n = append(n, top)
 	}
 
-	topRight := u.safeGetPatch(topRightPos)
+	topRight := u.topRightNeighbor(x)
 	if topRight != nil {
 		n = append(n, topRight)
 	}
 
-	right := u.safeGetPatch(rightPos)
+	right := u.rightNeighbor(x)
 	if right != nil {
 		n = append(n, right)
 	}
 
-	bottomRight := u.safeGetPatch(bottomRightPos)
+	bottomRight := u.bottomRightNeighbor(x)
 	if bottomRight != nil {
 		n = append(n, bottomRight)
 	}
 
-	bottom := u.safeGetPatch(bottomPos)
+	bottom := u.bottomNeighbor(x)
+	if bottom != nil {
+		n = append(n, bottom)
+	}
+
+	return n
+}
+
+// @TODO check to see if we are wrapping around
+func (u *Universe) Neighbors4(x int) []*Patch {
+	n := []*Patch{}
+
+	top := u.topNeighbor(x)
+	if top != nil {
+		n = append(n, top)
+	}
+
+	left := u.leftNeighbor(x)
+	if left != nil {
+		n = append(n, left)
+	}
+
+	right := u.rightNeighbor(x)
+	if right != nil {
+		n = append(n, right)
+	}
+
+	bottom := u.bottomNeighbor(x)
 	if bottom != nil {
 		n = append(n, bottom)
 	}
@@ -401,4 +491,54 @@ func (u *Universe) safeGetPatch(x int) *Patch {
 	}
 
 	return u.Patches[x]
+}
+
+func (u *Universe) Patch(pxcor float64, pycor float64) *Patch {
+	//round to get x and y
+	x := int(math.Round(pxcor))
+	y := int(math.Round(pycor))
+
+	return u.getPatchAtCoords(x, y)
+}
+
+func (u *Universe) ResetTicks() {
+	u.Ticks = 0
+}
+
+// @TODO implement
+func (u *Universe) ResetTimer() {
+
+}
+
+func (u *Universe) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
+	u.MinPxCor = minPxcor
+	u.MaxPxCor = maxPxcor
+	u.MinPyCor = minPycor
+	u.MaxPyCor = maxPycor
+	u.WorldWidth = maxPxcor - minPxcor + 1
+	u.WorldHeight = maxPycor - minPycor + 1
+
+	u.buildPatches()
+}
+
+func (u *Universe) SetDefaultShapeLinks(shape string) {
+	u.DefaultShapeLinks = shape
+}
+
+func (u *Universe) SetDefaultShapeTurtles(shape string) {
+	u.DefaultShapeTurtles = shape
+}
+
+func (u *Universe) SetDefaultShapeLinkBreed(breed string, shape string) {
+	u.DirectedLinkBreeds[breed].DefaultShape = shape
+}
+
+func (u *Universe) SetDefaultShapeTurtleBreed(breed string, shape string) {
+	u.Breeds[breed].DefaultShape = shape
+}
+
+func (u *Universe) Tick() {
+	if u.TicksOn {
+		u.Ticks++
+	}
 }

@@ -2,10 +2,15 @@
 
 package universe
 
-type DirectedLinkBreed struct {
+type LinkBreed struct {
 	Links []*Link
+
+	Directed     bool
+	DefaultShape string
 }
 
-type UndirectedLinkBreed struct {
-	Links []*Link
+type TurtleBreed struct {
+	Turtles []*Turtle
+
+	DefaultShape string
 }

@@ -105,18 +105,18 @@ func recolorPatch(p *universe.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
-		p.Color = environment.ColorHueMap["violet"]
+		p.PColor = environment.ColorHueMap["violet"]
 	} else {
 		if p.PatchesOwn[food].(int) > 0 {
 			if p.PatchesOwn[foodSourceNumber].(int) == 1 {
-				p.Color = environment.ColorHueMap["cyan"]
+				p.PColor = environment.ColorHueMap["cyan"]
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 2 {
-				p.Color = environment.ColorHueMap["sky"]
+				p.PColor = environment.ColorHueMap["sky"]
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 3 {
-				p.Color = environment.ColorHueMap["blue"]
+				p.PColor = environment.ColorHueMap["blue"]
 			}
 		} else {
-			p.SetColorAndScale(p.PatchesOwn[chemical].(float64), .1, 5)
+			// p.SetColorAndScale(p.PatchesOwn[chemical].(float64), .1, 5)
 		}
 	}
 }
@@ -168,17 +168,17 @@ func run() {
 }
 
 func returnToNest(t *universe.Turtle) {
-	if t.GetPatch().PatchesOwn[nest].(bool) {
+	if t.PatchHere().PatchesOwn[nest].(bool) {
 		t.Color.SetColorScale(environment.ColorHueMap["red"])
 		t.Right(180)
 	} else {
-		t.GetPatch().PatchesOwn[chemical] = t.GetPatch().PatchesOwn[chemical].(int) + 60
+		t.PatchHere().PatchesOwn[chemical] = t.PatchHere().PatchesOwn[chemical].(int) + 60
 		uphillNestScent(t)
 	}
 }
 
 func lookForFood(t *universe.Turtle) {
-	p := t.GetPatch()
+	p := t.PatchHere()
 	if p.PatchesOwn[food].(int) > 0 {
 		t.Color.SetColorScale(environment.ColorHueMap["orange"] + 1)
 		p.PatchesOwn[food] = p.PatchesOwn[food].(int) - 1
