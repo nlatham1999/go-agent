@@ -58,3 +58,8 @@ func (l *Link) Show() {
 func (l *Link) Tie() {
 
 }
+
+// @TODO implement
+func (l *Link) Untie() {
+
+}

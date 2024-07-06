@@ -81,36 +81,6 @@ func (u *Universe) buildPatches() {
 }
 
 // @TODO implement
-func (u *Universe) AllLinks(agentset LinkAgentSet, operation LinkBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
-func (u *Universe) AllPatches(agentset PatchAgentSet, operation PatchBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
-func (u *Universe) AllTurtles(agentset TurtleAgentSet, operation TurtleBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
-func (u *Universe) AnyLinks(agentset LinkAgentSet, operation LinkBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
-func (u *Universe) AnyPatches(agentset PatchAgentSet, operation PatchBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
-func (u *Universe) AnyTurtles(agentset TurtleAgentSet, operation TurtleBoolOperation) bool {
-	return false
-}
-
-// @TODO implement
 func (u *Universe) BothEnds(link *Link) []*Turtle {
 	return nil
 }
@@ -278,90 +248,6 @@ func (u *Universe) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 // @TODO implement
 func (u *Universe) LinkShapes() []string {
 	return []string{}
-}
-
-// @TODO implement
-func (u *Universe) MaxNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link {
-	return nil
-}
-
-// @TODO implement
-func (u *Universe) MaxNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch {
-	return nil
-}
-
-// @TODO implement
-func (u *Universe) MaxNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle {
-	return nil
-}
-
-func (u *Universe) MaxOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link {
-	links := u.MaxNOfLinks(1, agentSet, operation)
-	if len(links) == 0 {
-		return nil
-	} else {
-		return links[0]
-	}
-}
-
-func (u *Universe) MaxOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch {
-	patches := u.MaxNOfPatches(1, agentSet, operation)
-	if len(patches) == 0 {
-		return nil
-	} else {
-		return patches[0]
-	}
-}
-
-func (u *Universe) MaxOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle {
-	turtles := u.MaxNOfTurtles(1, agentSet, operation)
-	if len(turtles) == 0 {
-		return nil
-	} else {
-		return turtles[0]
-	}
-}
-
-// @TODO implement
-func (u *Universe) MinNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link {
-	return nil
-}
-
-// @TODO implement
-func (u *Universe) MinNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch {
-	return nil
-}
-
-// @TODO implement
-func (u *Universe) MinNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle {
-	return nil
-}
-
-func (u *Universe) MinOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link {
-	links := u.MinNOfLinks(1, agentSet, operation)
-	if len(links) == 0 {
-		return nil
-	} else {
-		return links[0]
-	}
-}
-
-func (u *Universe) MinOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch {
-	patches := u.MinNOfPatches(1, agentSet, operation)
-	if len(patches) == 0 {
-		return nil
-	} else {
-		return patches[0]
-	}
-}
-
-func (u *Universe) MinOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle {
-	turtles := u.MinNOfTurtles(1, agentSet, operation)
-	if len(turtles) == 0 {
-		return nil
-	} else {
-		return turtles[0]
-	}
 }
 
 func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
@@ -552,6 +438,20 @@ func (u *Universe) TickAdvance(amount int) {
 }
 
 // @TODO implement
-func (u *Universe) Turtle(breed string) *Turtle {
+func (u *Universe) Turtle(breed string, who int) *Turtle {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
+	x := int(math.Round(pxcor))
+	y := int(math.Round(pycor))
+
+	patch := u.getPatchAtCoords(x, y)
+
+	if patch == nil {
+		return nil
+	}
+
 	return nil
 }

@@ -21,16 +21,15 @@
 ### acos
 ```math.Acos```
 
-
 ### all?
-```Universe.AllLinks(agentset LinkSet, operation TurtleLinkOperation) bool```  
-```Universe.AllPatches(agentset PatchSet, operation PatchBoolOperation) bool```  
-```Universe.AllTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool```  
+```(l *LinkAgentSet) All(operation LinkBoolOperation) bool```  
+```(p *PatchAgentSet) All(operation PatchBoolOperation) bool```  
+```(t *TurtleAgentSet) All(operation TurtleBoolOperation) bool```  
 
 ### any?
-```Universe.AnyLinks(agentset LinkSet, operation TurtleLinkOperation) bool```  
-```Universe.AnyPatches(agentset PatchSet, operation PatchBoolOperation) bool```  
-```Universe.AnyTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool```  
+```(l *LinkAgentSet) Any(operation LinkBoolOperation) bool```  
+```(p *PatchAgentSet) Any(operation PatchBoolOperation) bool```  
+```(t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool```  
 
 ### approximate-hsb
 ```ApproximateHSB(hue float64, saturation float64, brightness float64) int```
@@ -197,7 +196,7 @@ just use the date time library
 ```(u *Universe) Diffuse4(patchVariable string, percent float64) error```
 
 ### directed-link-breed
-will probably just be a variable in the universe struct
+```Universe.DirectedLinkBreeds```
 
 ### display
 implement?
@@ -504,14 +503,14 @@ pretty sure theres a map library
 implement?
 
 ### max-n-of
-```(u *Universe) MaxNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link```
-```(u *Universe) MaxNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch```
-```(u *Universe) MaxNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle```
+```(l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet```
+```(l *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgentSet```
+```(l *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet```
 
 ### max-one-of
-```(u *Universe) MaxOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link```
-```(u *Universe) MaxOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch```
-```(u *Universe) MaxOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle```
+```(l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link```
+```(p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) *Patch```
+```(t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle```
 
 ### max-pxcor
 ```Universe.MaxPxCor```
@@ -532,14 +531,14 @@ built in
 built in
 
 ### min-n-of
-```(u *Universe) MinNOfLinks(n int, agentSet []*Link, operation LinkFloatOperation) []*Link```
-```(u *Universe) MinNOfPatches(n int, agentSet []*Patch, operation PatchFloatOperation) []*Patch```
-```(u *Universe) MinNOfTurtles(n int, agentSet []*Turtle, operation TurtleFloatOperation) []*Turtle```
+```(l *LinkAgentSet) MinNOf(n int, operation LinkFloatOperation) *LinkAgentSet```
+```(p *PatchAgentSet) MinNOf(n int, operation PatchFloatOperation) *PatchAgentSet```
+```(t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet```
 
 ### min-one-of
-```(u *Universe) MinOneOfLinks(agentSet []*Link, operation LinkFloatOperation) *Link```
-```(u *Universe) MinOneOfPatches(agentSet []*Patch, operation PatchFloatOperation) *Patch```
-```(u *Universe) MinOneOfTurtles(agentSet []*Turtle, operation TurtleFloatOperation) *Turtle```
+```(l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link```
+```(p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch```
+```(t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle```
 
 ### min-pxcor
 ```Universe.MinPxCor```
@@ -1018,5 +1017,123 @@ func
 ### turtle-set
 ```TurtleSet(turtles []*Turtle) *TurtleAgentSet```
 
+### turtles
+```Universe.Turtles```
+
+### turtles-at
+```(u *Universe) TurtlesAt(pxcor float64, pycor float64) *TurtleAgentSet```
+
+### turtles-here
+```(p *Patch) TurtlesHere() *TurtleAgentSet```
+```(t *Turtle) TurtlesHere() *TurtleAgentSet```
+
+### turtles-on
+```(p *Patch) TurtlesOn(breed string) *TurtleAgentSet```
+```(p *PatchAgentSet) TurtlesOn(breed string) *TurtleAgentSet```
+```(t *Turtle) TurtlesOn(breed string) *TurtleAgentSet```
+```(t *TurtleAgentSet) TurtlesOn(breed string) *TurtleAgentSet```
+
+### turtles-own
+```Universe.TurtlesOwn```
+```Universe.TurtleBreedsOwn```
+
+### type
+implement?
+
+### undirected-link-breed
+```Universe.UndirectedLinkBreeds```
+
+### untie
+```(l *Link) Untie()```
+
+### up-to-n-of
+```(l *LinkAgentSet) UpToNOf() *LinkAgentSet```
+```(l *PatchAgentSet) UpToNOf(n int) *PatchAgentSet```
+```(l *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet```
+
+### update-plots
+implement?
+
+### uphill
+```(t *Turtle) Uphill(patchVariable string)```
+
+### uphill4
+```(t *Turtle) Uphill4(patchVariable string)```
+
+### user-*
+implement?
+
+### variance
+implement?
+
+### wait
+implement?
+
+### watch
+implement?
+
+### watch-me
+implement?
+
+### while
+implement?
+
+### who
+```Turtle.Who```
+
+### who-are-not
+```(l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet```
+```(l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet```
+```(p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet```
+```(p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet```
+```(t *TurtleAgentSet) WhoAreNot(turtles *TurtleAgentSet) *TurtleAgentSet```
+```(t *TurtleAgentSet) WhoAreNotTurtle(turtle *Turtle) *TurtleAgentSet```
+
+### with
+```(l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet```
+```(p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet```
+```(t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet```
+
+### link-with
+```(t *Turtle) LinkWith(turtle *Turtle) *Link```
+
+### with-max
+```(l *LinkAgentSet) WithMax(operation LinkFloatOperation) *LinkAgentSet```
+```(p *PatchAgentSet) WithMax(operation PatchFloatOperation) *PatchAgentSet```
+```(t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet```
+
+### with-min
+```(l *LinkAgentSet) WithMin(operation LinkFloatOperation) *LinkAgentSet```
+```(p *PatchAgentSet) WithMin(operation PatchFloatOperation) *PatchAgentSet```
+```(t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet```
 
 
+### with-local-randomness
+implement?
+
+### without-interruption
+implement?
+
+### word
+implement?
+
+### world-width
+```Universe.WorldWidth```
+
+### world-height
+```Universe.WorldHeight```
+
+### wrap-color
+```WrapColor(color float64) float64```
+
+### write
+implement?
+
+### xcor
+```(t *Turtle) XCor() float64 ```
+
+### xor
+not needed
+
+### ycor
+```(t *Turtle) YCor() float64```

@@ -149,8 +149,8 @@ func (p *Patch) TowardsPatch(patch *Patch) float64 {
 
 func (p *Patch) TowardsTurtle(t *Turtle) float64 {
 	//returns heading that points towards the turtle
-	deltaX := t.x - p.xFloat64
-	deltaY := t.y - p.yFloat64
+	deltaX := t.xcor - p.xFloat64
+	deltaY := t.ycor - p.yFloat64
 
 	return math.Atan2(deltaY, deltaX)
 }
@@ -161,4 +161,14 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	deltaY := y - p.yFloat64
 
 	return math.Atan2(deltaY, deltaX)
+}
+
+// @TODO implement
+func (p *Patch) TurtlesHere() *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (p *Patch) TurtlesOn(breed string) *TurtleAgentSet {
+	return nil
 }

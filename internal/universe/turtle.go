@@ -3,8 +3,8 @@ package universe
 import "math"
 
 type Turtle struct {
-	x    float64
-	y    float64
+	xcor float64
+	ycor float64
 	Who  int //the id of the turtle
 	size int
 
@@ -68,8 +68,8 @@ func (t *Turtle) SetBreed(name string) {
 // @TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice
 func (t *Turtle) CanMove(distance float64) bool {
 
-	newX := t.x + distance*math.Cos(t.Heading)
-	newY := t.y + distance*math.Sin(t.Heading)
+	newX := t.xcor + distance*math.Cos(t.Heading)
+	newY := t.ycor + distance*math.Sin(t.Heading)
 
 	patchX := math.Round(newX)
 	patchY := math.Round(newY)
@@ -193,7 +193,7 @@ func (t *Turtle) FacePatch(patch *Patch) {
 
 // @TODO implement
 func (t *Turtle) FaceXY(x float64, y float64) {
-	t.Heading = math.Atan2(y-t.y, x-t.x)
+	t.Heading = math.Atan2(y-t.ycor, x-t.xcor)
 }
 
 // @TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
@@ -288,8 +288,8 @@ func (t *Turtle) InRadiusTurtles(distance float64) []*Turtle {
 func (t *Turtle) Jump(distance float64) {
 
 	if t.CanMove(distance) {
-		t.x = t.x + distance*math.Cos(t.Heading)
-		t.y = t.y + distance*math.Sin(t.Heading)
+		t.xcor = t.xcor + distance*math.Cos(t.Heading)
+		t.ycor = t.ycor + distance*math.Sin(t.Heading)
 	}
 }
 
@@ -308,13 +308,13 @@ func (t *Turtle) LinkNeighbor(turtle *Turtle) bool {
 }
 
 func (t *Turtle) MoveToPatch(patch *Patch) {
-	t.x = patch.xFloat64
-	t.y = patch.yFloat64
+	t.xcor = patch.xFloat64
+	t.ycor = patch.yFloat64
 }
 
 func (t *Turtle) MoveToTurtle(turtle *Turtle) {
-	t.x = turtle.x
-	t.y = turtle.y
+	t.xcor = turtle.xcor
+	t.ycor = turtle.ycor
 }
 
 // @TODO implement
@@ -390,23 +390,23 @@ func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
 }
 
 func (t *Turtle) PatchAhead(distance float64) *Patch {
-	distX := t.x + distance*math.Cos(t.Heading)
-	distY := t.y + distance*math.Sin(t.Heading)
+	distX := t.xcor + distance*math.Cos(t.Heading)
+	distY := t.ycor + distance*math.Sin(t.Heading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
 func (t *Turtle) PatchAt(dx float64, dy float64) *Patch {
 
 	//round the coords
-	px := int(math.Round(t.x + dx))
-	py := int(math.Round(t.y + dy))
+	px := int(math.Round(t.xcor + dx))
+	py := int(math.Round(t.ycor + dy))
 
 	return t.parent.getPatchAtCoords(px, py)
 }
 
 func (t *Turtle) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch {
-	distX := t.x + distance*math.Cos(heading)
-	distY := t.y + distance*math.Sin(heading)
+	distX := t.xcor + distance*math.Cos(heading)
+	distY := t.ycor + distance*math.Sin(heading)
 	return t.parent.Patch(distX, distY)
 }
 
@@ -416,8 +416,8 @@ func (t *Turtle) PatchHere() *Patch {
 		return t.patch
 	}
 
-	px := int(math.Round(t.x))
-	py := int(math.Round(t.y))
+	px := int(math.Round(t.xcor))
+	py := int(math.Round(t.ycor))
 	p := t.parent.getPatchAtCoords(px, py)
 
 	t.patch = p
@@ -427,15 +427,15 @@ func (t *Turtle) PatchHere() *Patch {
 
 func (t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch {
 	rightHeading := t.Heading + angle
-	distX := t.x + distance*math.Cos(rightHeading)
-	distY := t.y + distance*math.Sin(rightHeading)
+	distX := t.xcor + distance*math.Cos(rightHeading)
+	distY := t.ycor + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
 func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
 	rightHeading := t.Heading - angle
-	distX := t.x + distance*math.Cos(rightHeading)
-	distY := t.y + distance*math.Sin(rightHeading)
+	distX := t.xcor + distance*math.Cos(rightHeading)
+	distY := t.ycor + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
@@ -448,8 +448,8 @@ func (t *Turtle) Right(number float64) {
 }
 
 func (t *Turtle) SetXY(x float64, y float64) {
-	t.x = x
-	t.y = y
+	t.xcor = x
+	t.ycor = y
 }
 
 func (t *Turtle) Show() {
@@ -458,15 +458,48 @@ func (t *Turtle) Show() {
 
 func (t *Turtle) TowardsPatch(patch *Patch) float64 {
 	//returns heading that faces the patch
-	return math.Atan2(patch.yFloat64-t.y, patch.xFloat64-t.x)
+	return math.Atan2(patch.yFloat64-t.ycor, patch.xFloat64-t.xcor)
 }
 
 func (t *Turtle) TowardsTurtle(turtle *Turtle) float64 {
 	//returns heading that faces the turtle
-	return math.Atan2(turtle.y-t.y, turtle.x-t.x)
+	return math.Atan2(turtle.ycor-t.ycor, turtle.xcor-t.xcor)
 }
 
 func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 	//returns heading that faces the x y coordinates
-	return math.Atan2(y-t.y, x-t.x)
+	return math.Atan2(y-t.ycor, x-t.xcor)
+}
+
+// @TODO implement
+func (t *Turtle) TurtlesHere() *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) TurtlesOn(breed string) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (t *Turtle) Uphill(patchVariable string) {
+
+}
+
+// @TODO implement
+func (t *Turtle) Uphill4(patchVariable string) {
+
+}
+
+// @TODO implement
+func (t *Turtle) LinkWith(turtle *Turtle) *Link {
+	return nil
+}
+
+func (t *Turtle) XCor() float64 {
+	return t.xcor
+}
+
+func (t *Turtle) YCor() float64 {
+	return t.ycor
 }
