@@ -12,6 +12,8 @@ type Turtle struct {
 	Heading float64 //direction the turtle is facing in degrees
 	Hidden  bool    //if the turtle is hidden
 	Breed   string
+	Shape   string
+	Size    float64
 
 	parent *Universe //universe the turtle belongs too
 
@@ -448,4 +450,23 @@ func (t *Turtle) Right(number float64) {
 func (t *Turtle) SetXY(x float64, y float64) {
 	t.x = x
 	t.y = y
+}
+
+func (t *Turtle) Show() {
+	t.Hidden = false
+}
+
+func (t *Turtle) TowardsPatch(patch *Patch) float64 {
+	//returns heading that faces the patch
+	return math.Atan2(patch.yFloat64-t.y, patch.xFloat64-t.x)
+}
+
+func (t *Turtle) TowardsTurtle(turtle *Turtle) float64 {
+	//returns heading that faces the turtle
+	return math.Atan2(turtle.y-t.y, turtle.x-t.x)
+}
+
+func (t *Turtle) TowardsXY(x float64, y float64) float64 {
+	//returns heading that faces the x y coordinates
+	return math.Atan2(y-t.y, x-t.x)
 }

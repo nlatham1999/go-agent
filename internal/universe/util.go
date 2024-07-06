@@ -78,3 +78,13 @@ func OneOf(arr []interface{}) interface{} {
 func ScaleColor(color Color, number float64, range1 float64, range2 float64) Color {
 	return color
 }
+
+// @TODO implement
+func ShadeOf(color1 float64, color2 float64) bool {
+	return false
+}
+
+// @TODO implement
+func SubtractHeadings(h1 float64, h2 float64) float64 {
+	return 0.0
+}

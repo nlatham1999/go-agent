@@ -133,3 +133,32 @@ func (p *Patch) PXCor() int {
 func (p *Patch) PYCor() int {
 	return p.y
 }
+
+// @TODO implement
+func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
+
+}
+
+func (p *Patch) TowardsPatch(patch *Patch) float64 {
+	//returns heading that points towards the patch
+	deltaX := patch.xFloat64 - p.xFloat64
+	deltaY := patch.yFloat64 - p.yFloat64
+
+	return math.Atan2(deltaY, deltaX)
+}
+
+func (p *Patch) TowardsTurtle(t *Turtle) float64 {
+	//returns heading that points towards the turtle
+	deltaX := t.x - p.xFloat64
+	deltaY := t.y - p.yFloat64
+
+	return math.Atan2(deltaY, deltaX)
+}
+
+func (p *Patch) TowardsXY(x float64, y float64) float64 {
+	//returns heading that points towards the x y coordinates
+	deltaX := x - p.xFloat64
+	deltaY := y - p.yFloat64
+
+	return math.Atan2(deltaY, deltaX)
+}

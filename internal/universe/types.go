@@ -1,16 +1,5 @@
 package universe
 
-//agentset types
-
-// set of links
-type LinkSet []*Link
-
-// set of Patches
-type PatchSet []*Patch
-
-// set of Turtles
-type TurtleSet []*Turtle
-
 //operation types
 
 // general function for acting on a link

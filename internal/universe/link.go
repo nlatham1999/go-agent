@@ -2,12 +2,15 @@ package universe
 
 type Link struct {
 	Base
-	Color    Color
-	End1     *Turtle
-	End2     *Turtle
-	Hidden   bool
-	Directed bool
-	Breed    string
+	Color     Color
+	End1      *Turtle
+	End2      *Turtle
+	Hidden    bool
+	Directed  bool
+	Breed     string
+	Shape     string
+	Thickness float64
+	TieMode   string
 
 	Label      interface{}
 	LabelColor Color
@@ -45,4 +48,13 @@ func (l *Link) Length() float64 {
 // @TODO implement
 func (l *Link) OtherEnd(t *Turtle) *Turtle {
 	return nil
+}
+
+func (l *Link) Show() {
+	l.Hidden = false
+}
+
+// @TODO implement
+func (l *Link) Tie() {
+
 }

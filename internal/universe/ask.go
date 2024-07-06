@@ -1,12 +1,12 @@
-//universe functions that deal with patches
+// universe functions that deal with patches
 package universe
 
 //ask functions
 
-func (u *Universe) AskLinks(agentset LinkSet, operations []LinkOperation) {
-	for i := 0; i < len(agentset); i++ {
+func (u *Universe) AskLinks(agentset LinkAgentSet, operations []LinkOperation) {
+	for i := 0; i < len(agentset.links); i++ {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset[i])
+			operations[j](agentset.links[i])
 		}
 	}
 }
@@ -17,10 +17,10 @@ func (u *Universe) AskLink(agent *Link, operations []LinkOperation) {
 	}
 }
 
-func (u *Universe) AskPatches(agentset PatchSet, operations []PatchOperation) {
-	for i := 0; i < len(agentset); i++ {
+func (u *Universe) AskPatches(agentset PatchAgentSet, operations []PatchOperation) {
+	for i := 0; i < len(agentset.patches); i++ {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset[i])
+			operations[j](agentset.patches[i])
 		}
 	}
 }
@@ -31,10 +31,10 @@ func (u *Universe) AskPatch(agent *Patch, operations []PatchOperation) {
 	}
 }
 
-func (u *Universe) AskTurtles(agentset TurtleSet, operations []TurtleOperation) {
-	for i := 0; i < len(agentset); i++ {
+func (u *Universe) AskTurtles(agentset TurtleAgentSet, operations []TurtleOperation) {
+	for i := 0; i < len(agentset.turtles); i++ {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset[i])
+			operations[j](agentset.turtles[i])
 		}
 	}
 }

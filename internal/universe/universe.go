@@ -16,8 +16,8 @@ type Universe struct {
 	TurtlesOwn      map[string]interface{}            //additional variables for each turtle
 	TurtleBreedsOwn map[string]map[string]interface{} //additional variables for each turtle breed. The first key is the breed name
 
-	Patches []*Patch
-	Turtles []*Turtle               //all the turtles
+	Patches PatchAgentSet
+	Turtles TurtleAgentSet          //all the turtles
 	Breeds  map[string]*TurtleBreed //turtles that are part of specific breeds
 
 	MaxPxCor    int
@@ -67,44 +67,46 @@ func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interf
 
 // builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
-	u.Patches = []*Patch{}
+	u.Patches = PatchAgentSet{
+		patches: []*Patch{},
+	}
 	for i := 0; i < u.WorldHeight; i++ {
 		row := []*Patch{}
 		for j := 0; j < u.WorldWidth; j++ {
 			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
 			row = append(row, p)
 		}
-		u.Patches = append(u.Patches, row...)
+		u.Patches.patches = append(u.Patches.patches, row...)
 	}
 }
 
 // @TODO implement
-func (u *Universe) AllLinks(agentset LinkSet, operation LinkBoolOperation) bool {
+func (u *Universe) AllLinks(agentset LinkAgentSet, operation LinkBoolOperation) bool {
 	return false
 }
 
 // @TODO implement
-func (u *Universe) AllPatches(agentset PatchSet, operation PatchBoolOperation) bool {
+func (u *Universe) AllPatches(agentset PatchAgentSet, operation PatchBoolOperation) bool {
 	return false
 }
 
 // @TODO implement
-func (u *Universe) AllTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
+func (u *Universe) AllTurtles(agentset TurtleAgentSet, operation TurtleBoolOperation) bool {
 	return false
 }
 
 // @TODO implement
-func (u *Universe) AnyLinks(agentset LinkSet, operation LinkBoolOperation) bool {
+func (u *Universe) AnyLinks(agentset LinkAgentSet, operation LinkBoolOperation) bool {
 	return false
 }
 
 // @TODO implement
-func (u *Universe) AnyPatches(agentset PatchSet, operation PatchBoolOperation) bool {
+func (u *Universe) AnyPatches(agentset PatchAgentSet, operation PatchBoolOperation) bool {
 	return false
 }
 
 // @TODO implement
-func (u *Universe) AnyTurtles(agentset TurtleSet, operation TurtleBoolOperation) bool {
+func (u *Universe) AnyTurtles(agentset TurtleAgentSet, operation TurtleBoolOperation) bool {
 	return false
 }
 
@@ -141,8 +143,8 @@ func (u *Universe) ClearTicks() {
 }
 
 func (u *Universe) ClearPatches() {
-	for x := range u.Patches {
-		u.Patches[x].Reset(u.PatchesOwn)
+	for x := range u.Patches.patches {
+		u.Patches.patches[x].Reset(u.PatchesOwn)
 	}
 }
 
@@ -173,7 +175,7 @@ func (u *Universe) CreateOrderedTurtles(breed string, amount float64, operations
 }
 
 func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
-	startIndex := len(u.Turtles)
+	startIndex := len(u.Turtles.turtles)
 	end := amount + startIndex
 	for startIndex < end {
 		newTurtle := NewTurtle(startIndex)
@@ -182,7 +184,7 @@ func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
 			operations[i](newTurtle)
 		}
 
-		u.Turtles[startIndex] = newTurtle
+		u.Turtles.turtles[startIndex] = newTurtle
 
 		startIndex++
 	}
@@ -205,16 +207,16 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 	diffusions := make(map[*Patch]float64)
 
 	//go through each patch and calculate the diffusion amount
-	for x := range u.Patches {
-		currentPatch := u.Patches[x]
+	for x := range u.Patches.patches {
+		currentPatch := u.Patches.patches[x]
 		patchAmount := currentPatch.PatchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[currentPatch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for x := range u.Patches {
-		currentPatch := u.Patches[x]
+	for x := range u.Patches.patches {
+		currentPatch := u.Patches.patches[x]
 
 		amountFromNeighbors := 0.0
 		neighbors := u.Neighbors(x)
@@ -372,7 +374,7 @@ func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
 
 	pos := offsetY*u.WorldWidth + offsetX
 
-	return u.Patches[pos]
+	return u.Patches.patches[pos]
 }
 
 func (u *Universe) OneOfInt(arr []int) interface{} {
@@ -486,11 +488,11 @@ func (u *Universe) Neighbors4(x int) []*Patch {
 }
 
 func (u *Universe) safeGetPatch(x int) *Patch {
-	if x < 0 || x > len(u.Patches) {
+	if x < 0 || x > len(u.Patches.patches) {
 		return nil
 	}
 
-	return u.Patches[x]
+	return u.Patches.patches[x]
 }
 
 func (u *Universe) Patch(pxcor float64, pycor float64) *Patch {
@@ -541,4 +543,15 @@ func (u *Universe) Tick() {
 	if u.TicksOn {
 		u.Ticks++
 	}
+}
+
+func (u *Universe) TickAdvance(amount int) {
+	if u.TicksOn {
+		u.Ticks += amount
+	}
+}
+
+// @TODO implement
+func (u *Universe) Turtle(breed string) *Turtle {
+	return nil
 }

@@ -473,7 +473,7 @@ not necessary
 ```(t *Link) Length() float64```
 
 ### link-set
-implement?
+```LinkSet(links []*Link) *LinkAgentSet```
 
 ### link-shapes
 ```u *Universe) LinkShapes() []string```
@@ -675,7 +675,7 @@ this is the . operator
 
 
 ### patch-set
-implement?
+```PatchSet(patches []*Patch) *PatchAgentSet```
 
 ### patch-size
 implement?
@@ -892,3 +892,131 @@ implement?
 
 ### setxy
 ```(t *Turtle) SetXY(x float64, y float64)```
+
+### shade-of?
+```ShadeOf(color1 float64, color2 float64) bool```
+
+### shape
+```Link.Shape```
+```Turtle.Shape```
+
+### shapes
+implement?
+
+### show
+implement?
+
+### show-turtle
+```(t *Turtle) Show()```
+
+### show-link
+```(l *Link) Show()```
+
+### shuffle
+implement?
+
+### sin
+math library
+
+### size
+```Turtle.Size```
+
+### sort
+implement?
+
+### sort-by
+implement?
+
+### sort-on
+implement?
+
+### sprout
+```(p *Patch) Sprout(breed string, number int, operations []TurtleOperation)```
+
+### sqrt
+math library
+
+### stamp
+implement?
+
+### stamp-erase
+implement?
+
+### standard-deviation
+implement?
+
+### startup
+called in main
+
+### stop
+break or return
+
+### stop-inspecting
+implement?
+
+### stop-inspecting-dead-agents
+implement?
+
+### subject
+implement?
+
+### sublist
+implement?
+
+### substring
+implement?
+
+### subtract-headings
+```SubtractHeadings(h1 float64, h2 float64) float64```
+
+### sum
+implement?
+
+### tan
+implement?
+
+### thickness
+```Link.Thickness```
+
+### tick
+```(u *Universe) Tick()```
+
+### tick-advance
+```(u *Universe) TickAdvance(amount int)```
+
+### ticks
+```Universe.Ticks```
+
+### tie
+```(l *Link) Tie()```
+
+### tie-mode
+```Link.TieMode```
+
+### timer
+implement?
+
+### to
+func
+
+### to-report
+func
+
+### towards
+```(p *Patch) TowardsTurtle(t *Turtle) float64```
+```(p *Patch) TowardsPatch(patch *Patch) float64```
+```(t *Turtle) TowardsTurtle(turtle *Turtle)```
+```(t *Turtle) TowardsPatch(patch *Patch) float64```
+
+### towardsxy
+```(p *Patch) TowardsXY(x float64, y float64) float64```
+```(t *Turtle) TowardsXY(x float64, y float64) float64```
+
+### turtle
+```(u *Universe) Turtle(breed string) *Turtle```
+
+### turtle-set
+```TurtleSet(turtles []*Turtle) *TurtleAgentSet```
+
+
+
