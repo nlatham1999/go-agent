@@ -39,8 +39,6 @@ type Universe struct {
 
 	DirectedLinkBreeds  map[string]*LinkBreed
 	UndirectedLinkBreed map[string]*LinkBreed
-
-	Base
 }
 
 func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, turtleBreedsOwn map[string]map[string]interface{}) *Universe {
@@ -453,5 +451,25 @@ func (u *Universe) TurtlesAt(breed string, pxcor float64, pycor float64) *Turtle
 		return nil
 	}
 
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (u *Universe) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 	return nil
 }

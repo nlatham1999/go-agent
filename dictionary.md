@@ -135,7 +135,9 @@ turtles and links have a color struct
 math library
 
 ### count
-use the len() on the array
+```(l *LinkAgentSet) Count()```
+```(p *PatchAgentSet) Count() int```
+```(t *TurtleAgentSet) Count()```
 
 ### create ordered turtles
 ```(u *Universe) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation)```
@@ -1021,17 +1023,17 @@ func
 ```Universe.Turtles```
 
 ### turtles-at
-```(u *Universe) TurtlesAt(pxcor float64, pycor float64) *TurtleAgentSet```
+```(t *TurtleAgentSet) AtPoints(points []Coordinate) *TurtleAgentSet```
 
 ### turtles-here
-```(p *Patch) TurtlesHere() *TurtleAgentSet```
-```(t *Turtle) TurtlesHere() *TurtleAgentSet```
+```(p *Patch) TurtlesHere(breed string) *TurtleAgentSet```
+```(t *Turtle) TurtlesHere(breed string) *TurtleAgentSet```
 
 ### turtles-on
-```(p *Patch) TurtlesOn(breed string) *TurtleAgentSet```
-```(p *PatchAgentSet) TurtlesOn(breed string) *TurtleAgentSet```
-```(t *Turtle) TurtlesOn(breed string) *TurtleAgentSet```
-```(t *TurtleAgentSet) TurtlesOn(breed string) *TurtleAgentSet```
+```(u *Universe) TurtlesOnPatch(patch *Patch) *TurtleAgentSet```
+```(u *Universe) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet```
+```(u *Universe) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet```
+```(u *Universe) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet```
 
 ### turtles-own
 ```Universe.TurtlesOwn```

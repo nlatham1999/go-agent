@@ -22,8 +22,6 @@ type Patch struct {
 
 	Label       interface{}
 	PLabelColor Color
-
-	Base
 }
 
 func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
@@ -164,11 +162,6 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 }
 
 // @TODO implement
-func (p *Patch) TurtlesHere() *TurtleAgentSet {
-	return nil
-}
-
-// @TODO implement
-func (p *Patch) TurtlesOn(breed string) *TurtleAgentSet {
+func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 	return nil
 }

@@ -1,7 +1,6 @@
 package universe
 
 type Link struct {
-	Base
 	Color     Color
 	End1      *Turtle
 	End2      *Turtle

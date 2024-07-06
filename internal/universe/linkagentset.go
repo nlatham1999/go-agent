@@ -29,6 +29,10 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 	return false
 }
 
+func (l *LinkAgentSet) Count() int {
+	return len(l.links)
+}
+
 // @TODO implement
 func (l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet {
 	return nil

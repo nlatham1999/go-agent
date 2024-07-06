@@ -17,8 +17,6 @@ type Turtle struct {
 
 	parent *Universe //universe the turtle belongs too
 
-	Base
-
 	Label      interface{}
 	LabelColor Color
 
@@ -472,12 +470,7 @@ func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 }
 
 // @TODO implement
-func (t *Turtle) TurtlesHere() *TurtleAgentSet {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) TurtlesOn(breed string) *TurtleAgentSet {
+func (t *Turtle) TurtlesHere(breed string) *TurtleAgentSet {
 	return nil
 }
 

@@ -29,6 +29,10 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	return false
 }
 
+func (p *PatchAgentSet) Count() int {
+	return len(p.patches)
+}
+
 func (p *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
 	return nil
 }
@@ -59,10 +63,6 @@ func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {
 		}
 	}
 	return minPatch
-}
-
-func (p *PatchAgentSet) TurtlesOn(breed string) *TurtleAgentSet {
-	return nil
 }
 
 func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {

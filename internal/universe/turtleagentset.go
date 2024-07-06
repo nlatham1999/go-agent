@@ -4,6 +4,7 @@ import "math"
 
 type TurtleAgentSet struct {
 	turtles []*Turtle
+	parent  *Universe
 }
 
 // @TODO implement
@@ -27,6 +28,34 @@ func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
 		}
 	}
 	return false
+}
+
+func (t *TurtleAgentSet) AtPoints(points []Coordinate) *TurtleAgentSet {
+	//get the turtles at the patches
+	turtlesAtPatches := []*Turtle{}
+	for _, point := range points {
+		patch := t.parent.Patch(point.X, point.Y)
+		turtlesAtPatches = append(turtlesAtPatches, patch.TurtlesHere("").turtles...)
+	}
+
+	//create a map of the turtles at the patches
+	turtlesAtPatchesMap := make(map[*Turtle]interface{})
+	for _, turtle := range turtlesAtPatches {
+		turtlesAtPatchesMap[turtle] = nil
+	}
+
+	//get the turtles that are in the map
+	turtles := make([]*Turtle, 0)
+	for _, turtle := range t.turtles {
+		if _, ok := turtlesAtPatchesMap[turtle]; ok {
+			turtles = append(turtles, turtle)
+		}
+	}
+	return TurtleSet(turtles)
+}
+
+func (t *TurtleAgentSet) Count() int {
+	return len(t.turtles)
 }
 
 // @TODO implement
@@ -60,10 +89,6 @@ func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
 		}
 	}
 	return minTurtle
-}
-
-func (t *TurtleAgentSet) TurtlesOn(breed string) *TurtleAgentSet {
-	return nil
 }
 
 // @TODO implement
