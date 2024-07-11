@@ -40,7 +40,7 @@ func Init() {
 		foodSourceNumber: 0,
 	}
 
-	environment = universe.NewUniverse(patchesOwn, nil, nil)
+	environment = universe.NewUniverse(patchesOwn, nil, nil, nil, nil, nil, false)
 
 	sliders = map[string]*slider.Slider{
 		population:      slider.NewSlider(0, 1, 200, 125),
@@ -54,6 +54,7 @@ func setup() {
 	environment.ClearAll()
 	environment.SetDefaultShapeTurtles("bug")
 	environment.CreateTurtles(int(sliders[population].GetValue()),
+		"",
 		[]universe.TurtleOperation{
 			// universe.SetColor(environment.ColorHueMap["red"]),
 			// universe.SetSize(2),
@@ -105,15 +106,15 @@ func recolorPatch(p *universe.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
-		p.PColor = environment.ColorHueMap["violet"]
+		p.PColor.SetColorScale(environment.ColorHueMap["violet"])
 	} else {
 		if p.PatchesOwn[food].(int) > 0 {
 			if p.PatchesOwn[foodSourceNumber].(int) == 1 {
-				p.PColor = environment.ColorHueMap["cyan"]
+				p.PColor.SetColorScale(environment.ColorHueMap["cyan"])
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 2 {
-				p.PColor = environment.ColorHueMap["sky"]
+				p.PColor.SetColorScale(environment.ColorHueMap["sky"])
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 3 {
-				p.PColor = environment.ColorHueMap["blue"]
+				p.PColor.SetColorScale(environment.ColorHueMap["blue"])
 			}
 		} else {
 			// p.SetColorAndScale(p.PatchesOwn[chemical].(float64), .1, 5)

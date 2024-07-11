@@ -10,7 +10,7 @@ type LinkBreed struct {
 }
 
 type TurtleBreed struct {
-	Turtles TurtleAgentSet
+	Turtles *TurtleAgentSet
 
 	DefaultShape string
 }

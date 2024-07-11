@@ -16,9 +16,12 @@ type Universe struct {
 	TurtlesOwn      map[string]interface{}            //additional variables for each turtle
 	TurtleBreedsOwn map[string]map[string]interface{} //additional variables for each turtle breed. The first key is the breed name
 
-	Patches PatchAgentSet
-	Turtles TurtleAgentSet          //all the turtles
-	Breeds  map[string]*TurtleBreed //turtles that are part of specific breeds
+	Patches             *PatchAgentSet
+	Turtles             *TurtleAgentSet         //all the turtles
+	Breeds              map[string]*TurtleBreed //turtles that are part of specific breeds
+	Links               *LinkAgentSet           //all the links
+	DirectedLinkBreeds  map[string]*LinkBreed
+	UndirectedLinkBreed map[string]*LinkBreed
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -26,26 +29,33 @@ type Universe struct {
 	MinPyCor    int
 	WorldWidth  int
 	WorldHeight int
+	wrapping    bool
 
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
 
-	TurtlesWhoNumber int
+	turtlesWhoNumber int //who number of the next turtle to be created
 
 	ColorHueMap map[string]float64
 
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
-
-	DirectedLinkBreeds  map[string]*LinkBreed
-	UndirectedLinkBreed map[string]*LinkBreed
 }
 
-func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interface{}, turtleBreedsOwn map[string]map[string]interface{}) *Universe {
+func NewUniverse(
+	patchesOwn map[string]interface{},
+	turtlesOwn map[string]interface{},
+	turtleBreedsOwn map[string]map[string]interface{},
+	turtleBreeds []string,
+	directedLinkBreeds []string,
+	undirectedLinkBreeds []string,
+	wrapping bool,
+) *Universe {
 	maxPxCor := 15
 	maxPyCor := 15
 	minPxCor := -15
 	minPyCor := -15
+
 	universe := &Universe{
 		MaxPxCor:        maxPxCor,
 		MaxPyCor:        maxPyCor,
@@ -56,6 +66,55 @@ func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interf
 		PatchesOwn:      patchesOwn,
 		TurtlesOwn:      turtlesOwn,
 		TurtleBreedsOwn: turtleBreedsOwn,
+		wrapping:        wrapping,
+	}
+
+	//construct turtle breeds
+	turtleBreedsMap := make(map[string]*TurtleBreed)
+	for i := 0; i < len(turtleBreeds); i++ {
+		turtleBreedsMap[turtleBreeds[i]] = &TurtleBreed{
+			Turtles: &TurtleAgentSet{
+				turtles:      []*Turtle{},
+				whoToTurtles: map[int]*Turtle{},
+				parent:       universe,
+			},
+			DefaultShape: "",
+		}
+	}
+	universe.Breeds = turtleBreedsMap
+
+	//construct directed link breeds
+	directedLinkBreedsMap := make(map[string]*LinkBreed)
+	for i := 0; i < len(directedLinkBreeds); i++ {
+		directedLinkBreedsMap[directedLinkBreeds[i]] = &LinkBreed{
+			Links:        []*Link{},
+			Directed:     true,
+			DefaultShape: "",
+		}
+	}
+	universe.DirectedLinkBreeds = directedLinkBreedsMap
+
+	//construct undirected link breeds
+	undirectedLinkBreedsMap := make(map[string]*LinkBreed)
+	for i := 0; i < len(undirectedLinkBreeds); i++ {
+		undirectedLinkBreedsMap[undirectedLinkBreeds[i]] = &LinkBreed{
+			Links:        []*Link{},
+			Directed:     false,
+			DefaultShape: "",
+		}
+	}
+	universe.UndirectedLinkBreed = undirectedLinkBreedsMap
+
+	//construct general turtle set
+	universe.Turtles = &TurtleAgentSet{
+		turtles:      []*Turtle{},
+		whoToTurtles: map[int]*Turtle{},
+		parent:       universe,
+	}
+
+	//construct general link set
+	universe.Links = &LinkAgentSet{
+		links: []*Link{},
 	}
 
 	universe.buildPatches()
@@ -65,7 +124,7 @@ func NewUniverse(patchesOwn map[string]interface{}, turtlesOwn map[string]interf
 
 // builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
-	u.Patches = PatchAgentSet{
+	u.Patches = &PatchAgentSet{
 		patches: []*Patch{},
 	}
 	for i := 0; i < u.WorldHeight; i++ {
@@ -142,20 +201,38 @@ func (u *Universe) CreateOrderedTurtles(breed string, amount float64, operations
 
 }
 
-func (u *Universe) CreateTurtles(amount int, operations []TurtleOperation) {
-	startIndex := len(u.Turtles.turtles)
-	end := amount + startIndex
-	for startIndex < end {
-		newTurtle := NewTurtle(startIndex)
+func (u *Universe) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
+
+	agentSet := u.Turtles
+	var agentSet2 *TurtleAgentSet = nil
+	if breed != "" {
+		breed, found := u.Breeds[breed]
+		if !found {
+			return errors.New("breed not found")
+		}
+		agentSet2 = breed.Turtles
+	}
+
+	end := amount + u.turtlesWhoNumber
+	for u.turtlesWhoNumber < end {
+		newTurtle := NewTurtle(u.turtlesWhoNumber)
+
+		agentSet.turtles = append(agentSet.turtles, newTurtle)
+		agentSet.whoToTurtles[u.turtlesWhoNumber] = newTurtle
+
+		if agentSet2 != nil {
+			agentSet2.turtles = append(agentSet2.turtles, newTurtle)
+			agentSet2.whoToTurtles[u.turtlesWhoNumber] = newTurtle
+		}
 
 		for i := 0; i < len(operations); i++ {
 			operations[i](newTurtle)
 		}
 
-		u.Turtles.turtles[startIndex] = newTurtle
-
-		startIndex++
+		u.turtlesWhoNumber++
 	}
+
+	return nil
 }
 
 // @TODO implement
@@ -435,9 +512,18 @@ func (u *Universe) TickAdvance(amount int) {
 	}
 }
 
-// @TODO implement
+// provides a turtle from the universe given a breed and who number
+// if the breed is empty then selects from the general population
+// if the breed or who number is not found then returns nil
 func (u *Universe) Turtle(breed string, who int) *Turtle {
-	return nil
+	if breed == "" {
+		return u.Turtles.whoToTurtles[who]
+	} else {
+		if u.Breeds[breed] == nil {
+			return nil //breed not found
+		}
+		return u.Breeds[breed].Turtles.whoToTurtles[who]
+	}
 }
 
 // @TODO implement

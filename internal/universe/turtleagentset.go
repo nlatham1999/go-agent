@@ -3,13 +3,19 @@ package universe
 import "math"
 
 type TurtleAgentSet struct {
-	turtles []*Turtle
-	parent  *Universe
+	turtles      []*Turtle
+	whoToTurtles map[int]*Turtle
+	parent       *Universe
 }
 
 // @TODO implement
 func TurtleSet(turtles []*Turtle) *TurtleAgentSet {
-	return nil
+	newTurtles := make([]*Turtle, len(turtles))
+	copy(newTurtles, turtles)
+
+	return &TurtleAgentSet{
+		turtles: newTurtles,
+	}
 }
 
 func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {

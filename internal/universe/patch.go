@@ -14,8 +14,7 @@ type Patch struct {
 	yFloat64 float64
 
 	//same as pcolor
-	PColor     float64
-	ColorScale float64
+	PColor Color
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
 	PatchesOwn map[string]interface{}
@@ -31,8 +30,10 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 		y:        y,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
-		PColor:   0,
+		PColor:   Color{},
 	}
+
+	patch.PColor.SetColorScale(Black)
 
 	patch.PatchesOwn = map[string]interface{}{}
 	for key, value := range patchesOwn {
@@ -53,7 +54,7 @@ func (p *Patch) DistancePatch(patch *Patch) float64 {
 }
 
 func (p *Patch) Reset(patchesOwn map[string]interface{}) {
-	p.PColor = 0
+	p.PColor.SetColorScale(Black)
 
 	for key, value := range patchesOwn {
 		p.PatchesOwn[key] = value
@@ -67,7 +68,20 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	deltaX := x - p.xFloat64
 	deltaY := y - p.yFloat64
 
-	return math.Sqrt(deltaX*deltaX - deltaY*deltaY)
+	distance := math.Sqrt(deltaX*deltaX - deltaY*deltaY)
+
+	if !p.parent.wrapping {
+		return distance
+	}
+
+	deltaXInverse := float64(p.parent.WorldWidth) - math.Abs(deltaX)
+	deltaYInverse := float64(p.parent.WorldHeight) - math.Abs(deltaY)
+
+	distance = math.Min(distance, math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse))
+	distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY))
+	distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse))
+
+	return distance
 }
 
 // @TODO implement

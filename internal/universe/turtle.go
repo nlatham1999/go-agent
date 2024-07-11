@@ -29,20 +29,6 @@ func NewTurtle(who int) *Turtle {
 	}
 }
 
-// @TODO is this needed
-// creates a new turtle from a template
-// possible template attributes:
-//
-//	color
-//	size
-func NewTurtleFromTemplate(template *Turtle, who int) *Turtle {
-	t := NewTurtle(who)
-	t.Color = template.Color
-	t.size = template.size
-
-	return t
-}
-
 // @TODO Implement
 func (t *Turtle) Back(distance float64) {
 

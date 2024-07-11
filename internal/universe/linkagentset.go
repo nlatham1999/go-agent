@@ -6,9 +6,13 @@ type LinkAgentSet struct {
 	links []*Link
 }
 
-// @TODO implement
 func LinkSet(links []*Link) *LinkAgentSet {
-	return nil
+	newLinks := make([]*Link, len(links))
+	copy(newLinks, links)
+
+	return &LinkAgentSet{
+		links: newLinks,
+	}
 }
 
 func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {

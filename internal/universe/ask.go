@@ -17,7 +17,7 @@ func (u *Universe) AskLink(agent *Link, operations []LinkOperation) {
 	}
 }
 
-func (u *Universe) AskPatches(agentset PatchAgentSet, operations []PatchOperation) {
+func (u *Universe) AskPatches(agentset *PatchAgentSet, operations []PatchOperation) {
 	for i := 0; i < len(agentset.patches); i++ {
 		for j := 0; j < len(operations); j++ {
 			operations[j](agentset.patches[i])
@@ -31,7 +31,7 @@ func (u *Universe) AskPatch(agent *Patch, operations []PatchOperation) {
 	}
 }
 
-func (u *Universe) AskTurtles(agentset TurtleAgentSet, operations []TurtleOperation) {
+func (u *Universe) AskTurtles(agentset *TurtleAgentSet, operations []TurtleOperation) {
 	for i := 0; i < len(agentset.turtles); i++ {
 		for j := 0; j < len(operations); j++ {
 			operations[j](agentset.turtles[i])

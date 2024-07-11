@@ -6,9 +6,13 @@ type PatchAgentSet struct {
 	patches []*Patch
 }
 
-// @TODO implement
 func PatchSet(patches []*Patch) *PatchAgentSet {
-	return nil
+	newPatches := make([]*Patch, len(patches))
+	copy(newPatches, patches)
+
+	return &PatchAgentSet{
+		patches: newPatches,
+	}
 }
 
 func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {

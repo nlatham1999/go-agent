@@ -97,7 +97,7 @@ func Init() {
 		scout: scoutsOwn,
 	}
 
-	environment = universe.NewUniverse(nil, nil, breedsOwn)
+	environment = universe.NewUniverse(nil, nil, breedsOwn, []string{"site", "scouts"}, nil, nil, false)
 
 	sliders = map[string]*slider.Slider{
 		hiveNumber:         slider.NewSlider(4, 1, 10, 10),
