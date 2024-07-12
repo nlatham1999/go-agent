@@ -41,9 +41,13 @@ func NewTurtle(u *Universe, who int, breed string) *Turtle {
 		parent: u,
 		xcor:   0,
 		ycor:   0,
-		patch:  u.Patch(0, 0),
 		breed:  breed,
 	}
+
+	//link the turtle to the patch
+	t.patch = t.PatchHere()
+	t.patch.addTurtle(t)
+
 	return t
 }
 
@@ -290,8 +294,9 @@ func (t *Turtle) InRadiusTurtles(distance float64) []*Turtle {
 func (t *Turtle) Jump(distance float64) {
 
 	if t.CanMove(distance) {
-		t.xcor = t.xcor + distance*math.Cos(t.Heading)
-		t.ycor = t.ycor + distance*math.Sin(t.Heading)
+		xcor := t.xcor + distance*math.Cos(t.Heading)
+		ycor := t.ycor + distance*math.Sin(t.Heading)
+		t.SetXY(xcor, ycor)
 	}
 }
 
@@ -418,9 +423,7 @@ func (t *Turtle) PatchHere() *Patch {
 		return t.patch
 	}
 
-	px := int(math.Round(t.xcor))
-	py := int(math.Round(t.ycor))
-	p := t.parent.getPatchAtCoords(px, py)
+	p := t.parent.Patch(t.xcor, t.ycor)
 
 	t.patch = p
 
@@ -452,6 +455,13 @@ func (t *Turtle) Right(number float64) {
 func (t *Turtle) SetXY(x float64, y float64) {
 	t.xcor = x
 	t.ycor = y
+
+	oldPatch := t.patch
+	t.patch = t.PatchHere()
+	if t.patch != oldPatch {
+		oldPatch.removeTurtle(t)
+		t.patch.addTurtle(t)
+	}
 }
 
 func (t *Turtle) Show() {

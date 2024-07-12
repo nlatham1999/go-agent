@@ -21,6 +21,8 @@ type Patch struct {
 
 	Label       interface{}
 	PLabelColor Color
+
+	turtles map[string]map[*Turtle]interface{} // sets of turtles keyed by breed
 }
 
 func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
@@ -41,6 +43,35 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 	}
 
 	return patch
+}
+
+// links a turtle to this patch
+func (p *Patch) addTurtle(t *Turtle) {
+	if _, ok := p.turtles[t.breed]; !ok {
+		p.turtles[t.breed] = map[*Turtle]interface{}{}
+	}
+	p.turtles[t.breed][t] = nil
+
+	// if the breed is provided, add it to the general set of turtles as well
+	if t.breed != "" {
+		if _, ok := p.turtles[""]; !ok {
+			p.turtles[""] = map[*Turtle]interface{}{}
+		}
+		p.turtles[""][t] = nil
+	}
+}
+
+// unlinks a turtle from this patch
+func (p *Patch) removeTurtle(t *Turtle) {
+	if _, ok := p.turtles[t.breed]; ok {
+		delete(p.turtles[t.breed], t)
+	}
+
+	if t.breed != "" {
+		if _, ok := p.turtles[""]; ok {
+			delete(p.turtles[""], t)
+		}
+	}
 }
 
 // @TODO implement
@@ -177,5 +208,7 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 
 // @TODO implement
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
-	return nil
+	return &TurtleAgentSet{
+		turtles: []*Turtle{},
+	}
 }
