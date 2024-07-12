@@ -154,7 +154,7 @@ func setupHives() {
 	colorList = []float64{97.9, 94.5, 57.5, 63.8, 17.6, 14.9, 27.5, 25.1, 117.9, 114.4}
 	qualityList = []int{100, 75, 50, 1, 54, 48, 40, 32, 24, 16}
 
-	environment.AskPatches(
+	universe.AskPatches(
 		environment.Patches,
 		[]universe.PatchOperation{
 			func(p *universe.Patch) {

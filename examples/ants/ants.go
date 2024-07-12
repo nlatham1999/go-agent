@@ -65,7 +65,7 @@ func setup() {
 }
 
 func setupPatches() {
-	environment.AskPatches(
+	universe.AskPatches(
 		environment.Patches,
 		[]universe.PatchOperation{
 			setupNest,
@@ -137,7 +137,7 @@ func run() {
 	//   recolor-patch ]
 	// tick
 
-	environment.AskTurtles(
+	universe.AskTurtles(
 		environment.Turtles,
 		[]universe.TurtleOperation{
 			func(t *universe.Turtle) {
@@ -155,7 +155,7 @@ func run() {
 		},
 	)
 	environment.Diffuse(chemical, sliders[diffusionRate].GetValue()/100)
-	environment.AskPatches(
+	universe.AskPatches(
 		environment.Patches,
 		[]universe.PatchOperation{
 			func(p *universe.Patch) {
