@@ -1,6 +1,8 @@
 package universe
 
-import "math"
+import (
+	"math"
+)
 
 type Patch struct {
 	x     int
@@ -22,7 +24,7 @@ type Patch struct {
 	Label       interface{}
 	PLabelColor Color
 
-	turtles map[string]map[*Turtle]interface{} // sets of turtles keyed by breed
+	turtles map[string]*TurtleAgentSet // sets of turtles keyed by breed
 }
 
 func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
@@ -33,6 +35,7 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 		xFloat64: float64(x),
 		yFloat64: float64(y),
 		PColor:   Color{},
+		turtles:  make(map[string]*TurtleAgentSet),
 	}
 
 	patch.PColor.SetColorScale(Black)
@@ -48,28 +51,28 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
 	if _, ok := p.turtles[t.breed]; !ok {
-		p.turtles[t.breed] = map[*Turtle]interface{}{}
+		p.turtles[t.breed] = TurtleSet([]*Turtle{})
 	}
-	p.turtles[t.breed][t] = nil
+	p.turtles[t.breed].Add(t)
 
 	// if the breed is provided, add it to the general set of turtles as well
 	if t.breed != "" {
 		if _, ok := p.turtles[""]; !ok {
-			p.turtles[""] = map[*Turtle]interface{}{}
+			p.turtles[""] = TurtleSet([]*Turtle{})
 		}
-		p.turtles[""][t] = nil
+		p.turtles[""].Add(t)
 	}
 }
 
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
 	if _, ok := p.turtles[t.breed]; ok {
-		delete(p.turtles[t.breed], t)
+		p.turtles[t.breed].Remove(t)
 	}
 
 	if t.breed != "" {
 		if _, ok := p.turtles[""]; ok {
-			delete(p.turtles[""], t)
+			p.turtles[""].Remove(t)
 		}
 	}
 }
@@ -208,7 +211,18 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 
 // @TODO implement
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
-	return &TurtleAgentSet{
-		turtles: []*Turtle{},
+
+	//is the breed valid
+	if breed != "" {
+		if _, ok := p.turtles[breed]; !ok {
+			return TurtleSet([]*Turtle{})
+		}
 	}
+
+	turtles := p.turtles[breed]
+	if turtles == nil {
+		return TurtleSet([]*Turtle{})
+	}
+
+	return &TurtleAgentSet{}
 }

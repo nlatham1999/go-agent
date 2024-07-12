@@ -457,6 +457,7 @@ func (t *Turtle) SetXY(x float64, y float64) {
 	t.ycor = y
 
 	oldPatch := t.patch
+	t.patch = nil
 	t.patch = t.PatchHere()
 	if t.patch != oldPatch {
 		oldPatch.removeTurtle(t)

@@ -32,9 +32,9 @@ func AskPatch(agent *Patch, operations []PatchOperation) {
 }
 
 func AskTurtles(agentset *TurtleAgentSet, operations []TurtleOperation) {
-	for i := 0; i < len(agentset.turtles); i++ {
+	for turtle := range agentset.turtles {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset.turtles[i])
+			operations[j](turtle)
 		}
 	}
 }

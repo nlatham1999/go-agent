@@ -3,22 +3,35 @@ package universe
 import "math"
 
 type TurtleAgentSet struct {
-	turtles      []*Turtle
+	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
+
 	whoToTurtles map[int]*Turtle
 }
 
 // @TODO implement
 func TurtleSet(turtles []*Turtle) *TurtleAgentSet {
-	newTurtles := make([]*Turtle, len(turtles))
-	copy(newTurtles, turtles)
+	turtleSet := make(map[*Turtle]interface{})
+	for _, turtle := range turtles {
+		turtleSet[turtle] = nil
+	}
 
 	return &TurtleAgentSet{
-		turtles: newTurtles,
+		turtles: turtleSet,
+	}
+}
+
+func (t *TurtleAgentSet) Add(turtle *Turtle) {
+	t.turtles[turtle] = len(t.turtles) - 1
+}
+
+func (t *TurtleAgentSet) Remove(turtle *Turtle) {
+	if _, ok := t.turtles[turtle]; ok {
+		delete(t.turtles, turtle)
 	}
 }
 
 func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
-	for _, turtle := range t.turtles {
+	for turtle, _ := range t.turtles {
 		if !operation(turtle) {
 			return false
 		}
@@ -27,7 +40,7 @@ func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
 }
 
 func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
-	for _, turtle := range t.turtles {
+	for turtle, _ := range t.turtles {
 		if operation(turtle) {
 			return true
 		}
@@ -40,25 +53,16 @@ func (t *TurtleAgentSet) AtPoints(u *Universe, points []Coordinate) *TurtleAgent
 	turtlesAtPatches := []*Turtle{}
 	for _, point := range points {
 		patch := u.Patch(point.X, point.Y)
-		if patch != nil {
-			turtlesAtPatches = append(turtlesAtPatches, patch.TurtlesHere("").turtles...)
+		if patch != nil && patch.turtles[""] != nil {
+			for turtle, _ := range patch.turtles[""].turtles {
+				if _, ok := t.turtles[turtle]; ok {
+					turtlesAtPatches = append(turtlesAtPatches, turtle)
+				}
+			}
 		}
 	}
 
-	//create a map of the turtles at the patches
-	turtlesAtPatchesMap := make(map[*Turtle]interface{})
-	for _, turtle := range turtlesAtPatches {
-		turtlesAtPatchesMap[turtle] = nil
-	}
-
-	//get the turtles that are in the map
-	turtles := make([]*Turtle, 0)
-	for _, turtle := range t.turtles {
-		if _, ok := turtlesAtPatchesMap[turtle]; ok {
-			turtles = append(turtles, turtle)
-		}
-	}
-	return TurtleSet(turtles)
+	return TurtleSet(turtlesAtPatches)
 }
 
 func (t *TurtleAgentSet) Count() int {
@@ -73,7 +77,7 @@ func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAg
 func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle {
 	max := math.MaxFloat64 * -1
 	var maxTurtle *Turtle
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) > max {
 			max = operation(turtle)
 			maxTurtle = turtle
@@ -89,7 +93,7 @@ func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAg
 func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
 	min := math.MaxFloat64
 	var minTurtle *Turtle
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) < min {
 			min = operation(turtle)
 			minTurtle = turtle
@@ -120,7 +124,7 @@ func (t *TurtleAgentSet) WhoAreNotTurtle(turtle *Turtle) *TurtleAgentSet {
 
 func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {
 	turtles := make([]*Turtle, 0)
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) {
 			turtles = append(turtles, turtle)
 		}
@@ -130,7 +134,7 @@ func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {
 
 func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet {
 	max := math.MaxFloat64 * -1
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) > max {
 			max = operation(turtle)
 		}
@@ -138,7 +142,7 @@ func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet
 
 	//get all turtles where the float operation is equal to the max
 	turtles := make([]*Turtle, 0)
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) == max {
 			turtles = append(turtles, turtle)
 		}
@@ -149,7 +153,7 @@ func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet
 
 func (t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet {
 	min := math.MaxFloat64
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) < min {
 			min = operation(turtle)
 		}
@@ -157,7 +161,7 @@ func (t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet
 
 	//get all turtles where the float operation is equal to the min
 	turtles := make([]*Turtle, 0)
-	for _, turtle := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) == min {
 			turtles = append(turtles, turtle)
 		}
