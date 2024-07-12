@@ -72,6 +72,11 @@ func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {
 }
 
 // @TODO implement
+func (l *LinkAgentSet) OneOf() *Link {
+	return nil
+}
+
+// @TODO implement
 func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 	return nil
 }

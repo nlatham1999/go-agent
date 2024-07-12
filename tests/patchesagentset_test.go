@@ -59,3 +59,23 @@ func TestAnyPatch(t *testing.T) {
 		t.Errorf("Expected patchset to not have a patch with color 'blue'")
 	}
 }
+
+func TestAtPointsPatch(t *testing.T) {
+	//create basic universe
+	u := universe.NewUniverse(nil, nil, nil, nil, nil, nil, false)
+
+	//get some random patches from the universe
+	patch1 := u.Patch(0, 0)
+	patch2 := u.Patch(1, 1)
+	patch3 := u.Patch(2, 2)
+
+	//create a patchset
+	patchSet := universe.PatchSet([]*universe.Patch{patch1, patch2, patch3})
+
+	//get the patchset at the points
+	patchSetAtPoints := patchSet.AtPoints(u, []universe.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}, {X: 5, Y: 5}, {X: 100, Y: 0}})
+	if patchSetAtPoints.Count() != 2 {
+		t.Errorf("Expected 2 patches, got %d", patchSetAtPoints.Count())
+	}
+
+}

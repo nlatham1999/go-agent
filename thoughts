@@ -3,3 +3,6 @@ should there be a specific agentset type?
 this would store the positions of each turtle so we can do list operations really fast
 
 where should n-of functions be placed? At the universe level? General (util) level? Or the Agentset level
+
+AtPoints will always be use absolute coordinates since the caller will always be the observer
+

@@ -46,9 +46,8 @@
 ```(u *Universe) AskTurtle(agent *Turtle, operations []TurtleOperation)```
 
 ### at-points
-```(t *Base) AtPointsLinks(points []Coordinate) []*Link```  
-```(t *Base) AtPointsPatches(points []Coordinate)```  
-```(t *Base) AtPointsTurtles(points []Coordinate)```  
+```(t *TurtleAgentSet) AtPoints(u *Universe, points []Coordinate) *TurtleAgentSet```
+```(p *PatchAgentSet) AtPoints(u *Universe, points []Coordinate) *PatchAgentSet```
 
 
 ### autoplot?
@@ -627,7 +626,9 @@ empty array
 this is the . operator
 
 ### one-of
-```OneOf(arr []interface{}) interface{}```
+```(l *LinkAgentSet) OneOf(operation LinkBoolOperation) *Link```
+```(p *PatchAgentSet) OneOf() *Patch```
+```(t *TurtleAgentSet) OneOf() *Turtle```
 
 ### or
 ||

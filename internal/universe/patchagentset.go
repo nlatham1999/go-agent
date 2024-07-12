@@ -33,6 +33,27 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	return false
 }
 
+func (p *PatchAgentSet) AtPoints(u *Universe, points []Coordinate) *PatchAgentSet {
+	// create a map of the patches
+	pointsMap := make(map[*Patch]interface{})
+	for _, point := range points {
+		patch := u.Patch(point.X, point.Y)
+		if patch != nil {
+			pointsMap[patch] = nil
+		}
+	}
+
+	// get the patches that are in the map
+	patches := make([]*Patch, 0)
+	for _, patch := range p.patches {
+		if _, ok := pointsMap[patch]; ok {
+			patches = append(patches, patch)
+		}
+	}
+
+	return PatchSet(patches)
+}
+
 func (p *PatchAgentSet) Count() int {
 	return len(p.patches)
 }
@@ -67,6 +88,11 @@ func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {
 		}
 	}
 	return minPatch
+}
+
+// @TODO implement
+func (p *PatchAgentSet) OneOf() *Patch {
+	return nil
 }
 
 func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
