@@ -6,3 +6,4 @@ where should n-of functions be placed? At the universe level? General (util) lev
 
 AtPoints will always be use absolute coordinates since the caller will always be the observer
 
+what if we stored the neighbors as pointers in each Patch

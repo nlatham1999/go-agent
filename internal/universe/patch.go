@@ -142,11 +142,13 @@ func (p *Patch) Neighbors4() []*Patch {
 
 // @TODO implement
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
-	other := &PatchAgentSet{}
+	other := &PatchAgentSet{
+		patches: make(map[*Patch]interface{}),
+	}
 
-	for _, patch := range patches.patches {
+	for patch := range patches.patches {
 		if patch != p {
-			other.patches = append(other.patches, patch)
+			other.patches[patch] = nil
 		}
 	}
 

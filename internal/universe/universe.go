@@ -23,6 +23,8 @@ type Universe struct {
 	DirectedLinkBreeds  map[string]*LinkBreed
 	UndirectedLinkBreed map[string]*LinkBreed
 
+	PosOfPatches map[int]*Patch //map of patches by their index
+
 	MaxPxCor    int
 	MaxPyCor    int
 	MinPxCor    int
@@ -123,15 +125,15 @@ func NewUniverse(
 // builds an array of patches and links them togethor
 func (u *Universe) buildPatches() {
 	u.Patches = &PatchAgentSet{
-		patches: []*Patch{},
+		patches: map[*Patch]interface{}{},
 	}
+	u.PosOfPatches = make(map[int]*Patch)
 	for i := 0; i < u.WorldHeight; i++ {
-		row := []*Patch{}
 		for j := 0; j < u.WorldWidth; j++ {
 			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
-			row = append(row, p)
+			u.Patches.patches[p] = nil
+			u.PosOfPatches[j*u.WorldWidth+i] = p
 		}
-		u.Patches.patches = append(u.Patches.patches, row...)
 	}
 }
 
@@ -168,8 +170,8 @@ func (u *Universe) ClearTicks() {
 }
 
 func (u *Universe) ClearPatches() {
-	for x := range u.Patches.patches {
-		u.Patches.patches[x].Reset(u.PatchesOwn)
+	for patch := range u.Patches.patches {
+		patch.Reset(u.PatchesOwn)
 	}
 }
 
@@ -250,18 +252,17 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 	diffusions := make(map[*Patch]float64)
 
 	//go through each patch and calculate the diffusion amount
-	for x := range u.Patches.patches {
-		currentPatch := u.Patches.patches[x]
-		patchAmount := currentPatch.PatchesOwn[patchVariable].(float64)
+	for patch := range u.Patches.patches {
+		patchAmount := patch.PatchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
-		diffusions[currentPatch] = amountToGive
+		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for x := range u.Patches.patches {
-		currentPatch := u.Patches.patches[x]
+	for patch := range u.Patches.patches {
 
 		amountFromNeighbors := 0.0
+		x := u.WorldHeight*patch.x + patch.y
 		neighbors := u.Neighbors(x)
 		if len(neighbors) > 8 || len(neighbors) < 3 {
 			return errors.New("invalid amount of neighbors")
@@ -270,10 +271,10 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 			amountFromNeighbors += diffusions[neighbors[n]]
 		}
 
-		patchAmount := currentPatch.PatchesOwn[patchVariable].(float64)
+		patchAmount := patch.PatchesOwn[patchVariable].(float64)
 		amountToKeep := 1 - (patchAmount * percent) + (float64(8-len(neighbors)) * (patchAmount * percent / 8))
 
-		currentPatch.PatchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+		patch.PatchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
 	}
 
 	return nil
@@ -333,7 +334,7 @@ func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
 
 	pos := offsetY*u.WorldWidth + offsetX
 
-	return u.Patches.patches[pos]
+	return u.PosOfPatches[pos]
 }
 
 func (u *Universe) OneOfInt(arr []int) interface{} {
@@ -451,7 +452,7 @@ func (u *Universe) safeGetPatch(x int) *Patch {
 		return nil
 	}
 
-	return u.Patches.patches[x]
+	return u.PosOfPatches[x]
 }
 
 func (u *Universe) Patch(pxcor float64, pycor float64) *Patch {

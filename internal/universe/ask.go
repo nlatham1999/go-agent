@@ -18,9 +18,9 @@ func AskLink(agent *Link, operations []LinkOperation) {
 }
 
 func AskPatches(agentset *PatchAgentSet, operations []PatchOperation) {
-	for i := 0; i < len(agentset.patches); i++ {
+	for patch := range agentset.patches {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset.patches[i])
+			operations[j](patch)
 		}
 	}
 }
