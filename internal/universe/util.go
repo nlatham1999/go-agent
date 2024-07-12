@@ -70,11 +70,6 @@ func HSB(hue int, saturation int, brightness int) (int, int, int) {
 }
 
 // @TODO implement
-func OneOf(arr []interface{}) interface{} {
-	return arr[0]
-}
-
-// @TODO implement
 func ScaleColor(color Color, number float64, range1 float64, range2 float64) Color {
 	return color
 }
