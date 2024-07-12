@@ -76,7 +76,6 @@ func NewUniverse(
 			Turtles: &TurtleAgentSet{
 				turtles:      []*Turtle{},
 				whoToTurtles: map[int]*Turtle{},
-				parent:       universe,
 			},
 			DefaultShape: "",
 		}
@@ -109,7 +108,6 @@ func NewUniverse(
 	universe.Turtles = &TurtleAgentSet{
 		turtles:      []*Turtle{},
 		whoToTurtles: map[int]*Turtle{},
-		parent:       universe,
 	}
 
 	//construct general link set
@@ -215,7 +213,7 @@ func (u *Universe) CreateTurtles(amount int, breed string, operations []TurtleOp
 
 	end := amount + u.turtlesWhoNumber
 	for u.turtlesWhoNumber < end {
-		newTurtle := NewTurtle(u.turtlesWhoNumber)
+		newTurtle := NewTurtle(u, u.turtlesWhoNumber, breed)
 
 		agentSet.turtles = append(agentSet.turtles, newTurtle)
 		agentSet.whoToTurtles[u.turtlesWhoNumber] = newTurtle

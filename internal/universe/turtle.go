@@ -11,7 +11,7 @@ type Turtle struct {
 	Color   Color
 	Heading float64 //direction the turtle is facing in degrees
 	Hidden  bool    //if the turtle is hidden
-	Breed   string
+	breed   string
 	Shape   string
 	Size    float64
 
@@ -20,13 +20,31 @@ type Turtle struct {
 	Label      interface{}
 	LabelColor Color
 
-	patch *Patch
+	patch *Patch //patch the turtle is on
 }
 
-func NewTurtle(who int) *Turtle {
-	return &Turtle{
-		Who: who,
+func NewTurtle(u *Universe, who int, breed string) *Turtle {
+
+	if u == nil {
+		return nil
 	}
+
+	//if the breed is nonexistent then return nil
+	if breed != "" {
+		if _, found := u.Breeds[breed]; !found {
+			return nil
+		}
+	}
+
+	t := &Turtle{
+		Who:    who,
+		parent: u,
+		xcor:   0,
+		ycor:   0,
+		patch:  u.Patch(0, 0),
+		breed:  breed,
+	}
+	return t
 }
 
 // @TODO Implement
