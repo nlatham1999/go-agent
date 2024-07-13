@@ -4,12 +4,12 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/nlatham1999/go-agent/internal/model"
 	"github.com/nlatham1999/go-agent/internal/slider"
-	"github.com/nlatham1999/go-agent/internal/universe"
 )
 
 var (
-	environment *universe.Universe
+	environment *model.Model
 
 	sliders map[string]*slider.Slider
 )
@@ -40,7 +40,7 @@ func Init() {
 		foodSourceNumber: 0,
 	}
 
-	environment = universe.NewUniverse(patchesOwn, nil, nil, nil, nil, nil, false)
+	environment = model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false)
 
 	sliders = map[string]*slider.Slider{
 		population:      slider.NewSlider(0, 1, 200, 125),
@@ -55,9 +55,9 @@ func setup() {
 	environment.SetDefaultShapeTurtles("bug")
 	environment.CreateTurtles(int(sliders[population].GetValue()),
 		"",
-		[]universe.TurtleOperation{
-			// universe.SetColor(environment.ColorHueMap["red"]),
-			// universe.SetSize(2),
+		[]model.TurtleOperation{
+			// model.SetColor(environment.ColorHueMap["red"]),
+			// model.SetSize(2),
 		},
 	)
 	setupPatches()
@@ -65,9 +65,9 @@ func setup() {
 }
 
 func setupPatches() {
-	universe.AskPatches(
+	model.AskPatches(
 		environment.Patches,
-		[]universe.PatchOperation{
+		[]model.PatchOperation{
 			setupNest,
 			setupFood,
 			setupNest,
@@ -75,12 +75,12 @@ func setupPatches() {
 	)
 }
 
-func setupNest(p *universe.Patch) {
+func setupNest(p *model.Patch) {
 	p.PatchesOwn[nest] = p.DistanceXY(0, 0) < 5
 	p.PatchesOwn[nestScent] = 200 - p.DistanceXY(0, 0)
 }
 
-func setupFood(p *universe.Patch) {
+func setupFood(p *model.Patch) {
 	// ;; setup food source one on the right
 	if p.DistanceXY(.6*float64(environment.MaxPxCor), 0) < 5 {
 		p.PatchesOwn[foodSourceNumber] = 1
@@ -102,7 +102,7 @@ func setupFood(p *universe.Patch) {
 	}
 }
 
-func recolorPatch(p *universe.Patch) {
+func recolorPatch(p *model.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
@@ -137,10 +137,10 @@ func run() {
 	//   recolor-patch ]
 	// tick
 
-	universe.AskTurtles(
+	model.AskTurtles(
 		environment.Turtles,
-		[]universe.TurtleOperation{
-			func(t *universe.Turtle) {
+		[]model.TurtleOperation{
+			func(t *model.Turtle) {
 				if t.Who >= environment.Ticks {
 					return
 				}
@@ -155,10 +155,10 @@ func run() {
 		},
 	)
 	environment.Diffuse(chemical, sliders[diffusionRate].GetValue()/100)
-	universe.AskPatches(
+	model.AskPatches(
 		environment.Patches,
-		[]universe.PatchOperation{
-			func(p *universe.Patch) {
+		[]model.PatchOperation{
+			func(p *model.Patch) {
 				p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100
 				recolorPatch(p)
 			},
@@ -168,7 +168,7 @@ func run() {
 
 }
 
-func returnToNest(t *universe.Turtle) {
+func returnToNest(t *model.Turtle) {
 	if t.PatchHere().PatchesOwn[nest].(bool) {
 		t.Color.SetColorScale(environment.ColorHueMap["red"])
 		t.Right(180)
@@ -178,7 +178,7 @@ func returnToNest(t *universe.Turtle) {
 	}
 }
 
-func lookForFood(t *universe.Turtle) {
+func lookForFood(t *model.Turtle) {
 	p := t.PatchHere()
 	if p.PatchesOwn[food].(int) > 0 {
 		t.Color.SetColorScale(environment.ColorHueMap["orange"] + 1)
@@ -193,7 +193,7 @@ func lookForFood(t *universe.Turtle) {
 
 }
 
-func uphillChemical(t *universe.Turtle) {
+func uphillChemical(t *model.Turtle) {
 	scentAhead := chemicalScentAtAngle(t, 0)
 	scentRight := chemicalScentAtAngle(t, 45)
 	scentLeft := chemicalScentAtAngle(t, -45)
@@ -206,7 +206,7 @@ func uphillChemical(t *universe.Turtle) {
 	}
 }
 
-func wiggle(t *universe.Turtle) {
+func wiggle(t *model.Turtle) {
 	t.Right(float64(environment.RandomAmount(40)))
 	t.Left(float64(environment.RandomAmount(40)))
 
@@ -215,7 +215,7 @@ func wiggle(t *universe.Turtle) {
 	}
 }
 
-func uphillNestScent(t *universe.Turtle) {
+func uphillNestScent(t *model.Turtle) {
 	scentAhead := nestScentAtAngle(t, 0)
 	scentRight := nestScentAtAngle(t, 45)
 	scentLeft := nestScentAtAngle(t, -45)
@@ -228,7 +228,7 @@ func uphillNestScent(t *universe.Turtle) {
 	}
 }
 
-func nestScentAtAngle(t *universe.Turtle, angle float64) int {
+func nestScentAtAngle(t *model.Turtle, angle float64) int {
 	p := t.PatchRightAndAhead(angle, 1)
 	if p == nil {
 		return 0
@@ -237,7 +237,7 @@ func nestScentAtAngle(t *universe.Turtle, angle float64) int {
 	}
 }
 
-func chemicalScentAtAngle(t *universe.Turtle, angle float64) float64 {
+func chemicalScentAtAngle(t *model.Turtle, angle float64) float64 {
 	p := t.PatchRightAndAhead(angle, 1)
 	if p == nil {
 		return 0

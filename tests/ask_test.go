@@ -3,129 +3,129 @@ package tests
 import (
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/universe"
+	"github.com/nlatham1999/go-agent/internal/model"
 )
 
 func TestAskLink(t *testing.T) {
-	link := &universe.Link{
+	link := &model.Link{
 		End1: nil,
 		End2: nil,
 	}
-	link.Color.SetColorScale(universe.Blue)
+	link.Color.SetColorScale(model.Blue)
 
-	universe.AskLink(link, []universe.LinkOperation{
-		func(link *universe.Link) {
-			link.Color.SetColorScale(universe.Red)
+	model.AskLink(link, []model.LinkOperation{
+		func(link *model.Link) {
+			link.Color.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if link.Color.GetColorScale() != universe.Red {
+	if link.Color.GetColorScale() != model.Red {
 		t.Errorf("Expected red, got %v", link.Color.GetColorScale())
 	}
 }
 
 func TestAskLinks(t *testing.T) {
 	//create a list of *Links
-	link1 := &universe.Link{}
-	link2 := &universe.Link{}
-	link3 := &universe.Link{}
+	link1 := &model.Link{}
+	link2 := &model.Link{}
+	link3 := &model.Link{}
 
 	//create an agentset
-	agentset := universe.LinkSet([]*universe.Link{link1, link2, link3})
+	agentset := model.LinkSet([]*model.Link{link1, link2, link3})
 
 	// ask to change all colors to red
-	universe.AskLinks(*agentset, []universe.LinkOperation{
-		func(link *universe.Link) {
-			link.Color.SetColorScale(universe.Red)
+	model.AskLinks(*agentset, []model.LinkOperation{
+		func(link *model.Link) {
+			link.Color.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
-	if !agentset.All(func(l *universe.Link) bool {
-		return l.Color.GetColorScale() == universe.Red
+	if !agentset.All(func(l *model.Link) bool {
+		return l.Color.GetColorScale() == model.Red
 	}) {
 		t.Errorf("Expected linkset to have all links with shape 'circle'")
 	}
 }
 
 func TestAskPatch(t *testing.T) {
-	patch := &universe.Patch{}
-	patch.PColor.SetColorScale(universe.Blue)
+	patch := &model.Patch{}
+	patch.PColor.SetColorScale(model.Blue)
 
-	universe.AskPatch(patch, []universe.PatchOperation{
-		func(patch *universe.Patch) {
-			patch.PColor.SetColorScale(universe.Red)
+	model.AskPatch(patch, []model.PatchOperation{
+		func(patch *model.Patch) {
+			patch.PColor.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if patch.PColor.GetColorScale() != universe.Red {
+	if patch.PColor.GetColorScale() != model.Red {
 		t.Errorf("Expected red, got %v", patch.PColor.GetColorScale())
 	}
 }
 
 func TestAskPatches(t *testing.T) {
 	//create a list of *Patches
-	patch1 := &universe.Patch{}
-	patch2 := &universe.Patch{}
-	patch3 := &universe.Patch{}
+	patch1 := &model.Patch{}
+	patch2 := &model.Patch{}
+	patch3 := &model.Patch{}
 
 	//create an agentset
-	agentset := universe.PatchSet([]*universe.Patch{patch1, patch2, patch3})
+	agentset := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
 	// ask to change all colors to red
-	universe.AskPatches(agentset, []universe.PatchOperation{
-		func(patch *universe.Patch) {
-			patch.PColor.SetColorScale(universe.Red)
+	model.AskPatches(agentset, []model.PatchOperation{
+		func(patch *model.Patch) {
+			patch.PColor.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
-	if !agentset.All(func(p *universe.Patch) bool {
-		return p.PColor.GetColorScale() == universe.Red
+	if !agentset.All(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Red
 	}) {
 		t.Errorf("Expected patchset to have all patches with color 'red'")
 	}
 }
 
 func TestAskTurtle(t *testing.T) {
-	turtle := &universe.Turtle{
+	turtle := &model.Turtle{
 		Heading: 0,
 	}
-	turtle.Color.SetColorScale(universe.Blue)
+	turtle.Color.SetColorScale(model.Blue)
 
-	universe.AskTurtle(turtle, []universe.TurtleOperation{
-		func(turtle *universe.Turtle) {
-			turtle.Color.SetColorScale(universe.Red)
+	model.AskTurtle(turtle, []model.TurtleOperation{
+		func(turtle *model.Turtle) {
+			turtle.Color.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if turtle.Color.GetColorScale() != universe.Red {
+	if turtle.Color.GetColorScale() != model.Red {
 		t.Errorf("Expected red, got %v", turtle.Color.GetColorScale())
 	}
 }
 
 func TestAskTurtles(t *testing.T) {
 	//create a list of *Turtles
-	turtle1 := &universe.Turtle{}
-	turtle2 := &universe.Turtle{}
-	turtle3 := &universe.Turtle{}
+	turtle1 := &model.Turtle{}
+	turtle2 := &model.Turtle{}
+	turtle3 := &model.Turtle{}
 
 	//create an agentset
-	agentset := universe.TurtleSet([]*universe.Turtle{turtle1, turtle2, turtle3})
+	agentset := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	// ask to change all colors to red
-	universe.AskTurtles(agentset, []universe.TurtleOperation{
-		func(turtle *universe.Turtle) {
-			turtle.Color.SetColorScale(universe.Red)
+	model.AskTurtles(agentset, []model.TurtleOperation{
+		func(turtle *model.Turtle) {
+			turtle.Color.SetColorScale(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
-	if !agentset.All(func(t *universe.Turtle) bool {
-		return t.Color.GetColorScale() == universe.Red
+	if !agentset.All(func(t *model.Turtle) bool {
+		return t.Color.GetColorScale() == model.Red
 	}) {
 		t.Errorf("Expected turtleset to have all turtles with color 'red'")
 	}

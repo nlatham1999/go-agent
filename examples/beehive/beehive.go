@@ -4,12 +4,12 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/nlatham1999/go-agent/internal/model"
 	"github.com/nlatham1999/go-agent/internal/slider"
-	"github.com/nlatham1999/go-agent/internal/universe"
 )
 
 var (
-	environment *universe.Universe
+	environment *model.Model
 
 	sliders map[string]*slider.Slider
 
@@ -18,14 +18,14 @@ var (
 	qualityList     []int     // quality of hives
 	showDancePath   bool
 	scoutsVisible   bool
-	watchDanceTask  []universe.TurtleOperation
-	discoverTask    universe.TurtleOperation
-	inspectHiveTask universe.TurtleOperation
-	goHomeTask      universe.TurtleOperation
-	danceTask       universe.TurtleOperation
-	reVisitTask     universe.TurtleOperation
-	pipeTask        universe.TurtleOperation
-	takeOffTask     universe.TurtleOperation
+	watchDanceTask  []model.TurtleOperation
+	discoverTask    model.TurtleOperation
+	inspectHiveTask model.TurtleOperation
+	goHomeTask      model.TurtleOperation
+	danceTask       model.TurtleOperation
+	reVisitTask     model.TurtleOperation
+	pipeTask        model.TurtleOperation
+	takeOffTask     model.TurtleOperation
 )
 
 const (
@@ -97,7 +97,7 @@ func Init() {
 		scout: scoutsOwn,
 	}
 
-	environment = universe.NewUniverse(nil, nil, breedsOwn, []string{"site", "scouts"}, nil, nil, false)
+	environment = model.NewModel(nil, nil, breedsOwn, []string{"site", "scouts"}, nil, nil, false)
 
 	sliders = map[string]*slider.Slider{
 		hiveNumber:         slider.NewSlider(4, 1, 10, 10),
@@ -154,10 +154,10 @@ func setupHives() {
 	colorList = []float64{97.9, 94.5, 57.5, 63.8, 17.6, 14.9, 27.5, 25.1, 117.9, 114.4}
 	qualityList = []int{100, 75, 50, 1, 54, 48, 40, 32, 24, 16}
 
-	universe.AskPatches(
+	model.AskPatches(
 		environment.Patches,
-		[]universe.PatchOperation{
-			func(p *universe.Patch) {
+		[]model.PatchOperation{
+			func(p *model.Patch) {
 				// p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100
 				// recolorPatch(p)
 			},

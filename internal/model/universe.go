@@ -1,4 +1,4 @@
-package universe
+package model
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 )
 
-type Universe struct {
+type Model struct {
 	Ticks   int
 	TicksOn bool
 
@@ -45,7 +45,7 @@ type Universe struct {
 	GlobalBools  map[string]bool
 }
 
-func NewUniverse(
+func NewModel(
 	patchesOwn map[string]interface{},
 	turtlesOwn map[string]interface{},
 	turtleBreedsOwn map[string]map[string]interface{},
@@ -53,13 +53,13 @@ func NewUniverse(
 	directedLinkBreeds []string,
 	undirectedLinkBreeds []string,
 	wrapping bool,
-) *Universe {
+) *Model {
 	maxPxCor := 15
 	maxPyCor := 15
 	minPxCor := -15
 	minPyCor := -15
 
-	universe := &Universe{
+	model := &Model{
 		MaxPxCor:        maxPxCor,
 		MaxPyCor:        maxPyCor,
 		MinPxCor:        minPxCor,
@@ -83,7 +83,7 @@ func NewUniverse(
 			DefaultShape: "",
 		}
 	}
-	universe.Breeds = turtleBreedsMap
+	model.Breeds = turtleBreedsMap
 
 	//construct directed link breeds
 	directedLinkBreedsMap := make(map[string]*LinkBreed)
@@ -94,7 +94,7 @@ func NewUniverse(
 			DefaultShape: "",
 		}
 	}
-	universe.DirectedLinkBreeds = directedLinkBreedsMap
+	model.DirectedLinkBreeds = directedLinkBreedsMap
 
 	//construct undirected link breeds
 	undirectedLinkBreedsMap := make(map[string]*LinkBreed)
@@ -105,120 +105,120 @@ func NewUniverse(
 			DefaultShape: "",
 		}
 	}
-	universe.UndirectedLinkBreed = undirectedLinkBreedsMap
+	model.UndirectedLinkBreed = undirectedLinkBreedsMap
 
 	//construct general turtle set
-	universe.Turtles = &TurtleAgentSet{
+	model.Turtles = &TurtleAgentSet{
 		turtles: make(map[*Turtle]interface{}),
 	}
 
 	//construct general link set
-	universe.Links = &LinkAgentSet{
+	model.Links = &LinkAgentSet{
 		links: make(map[*Link]interface{}),
 	}
 
-	universe.buildPatches()
+	model.buildPatches()
 
-	return universe
+	return model
 }
 
 // builds an array of patches and links them togethor
-func (u *Universe) buildPatches() {
-	u.Patches = &PatchAgentSet{
+func (m *Model) buildPatches() {
+	m.Patches = &PatchAgentSet{
 		patches: map[*Patch]interface{}{},
 	}
-	u.posOfPatches = make(map[int]*Patch)
-	for i := 0; i < u.WorldHeight; i++ {
-		for j := 0; j < u.WorldWidth; j++ {
-			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
-			u.Patches.patches[p] = nil
-			u.posOfPatches[j*u.WorldWidth+i] = p
+	m.posOfPatches = make(map[int]*Patch)
+	for i := 0; i < m.WorldHeight; i++ {
+		for j := 0; j < m.WorldWidth; j++ {
+			p := NewPatch(m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
+			m.Patches.patches[p] = nil
+			m.posOfPatches[j*m.WorldWidth+i] = p
 		}
 	}
 }
 
 // @TODO implement
-func (u *Universe) BothEnds(link *Link) []*Turtle {
+func (m *Model) BothEnds(link *Link) []*Turtle {
 	return nil
 }
 
-func (u *Universe) ClearAll() {
-	u.ClearGlobals()
-	u.ClearTicks()
-	u.ClearPatches()
-	u.ClearDrawing()
-	u.ClearAllPlots()
-	u.ClearOutput()
+func (m *Model) ClearAll() {
+	m.ClearGlobals()
+	m.ClearTicks()
+	m.ClearPatches()
+	m.ClearDrawing()
+	m.ClearAllPlots()
+	m.ClearOutput()
 }
 
-func (u *Universe) ClearGlobals() {
-	for g := range u.GlobalBools {
-		u.GlobalBools[g] = false
+func (m *Model) ClearGlobals() {
+	for g := range m.GlobalBools {
+		m.GlobalBools[g] = false
 	}
-	for g := range u.GlobalFloats {
-		u.GlobalFloats[g] = 0
+	for g := range m.GlobalFloats {
+		m.GlobalFloats[g] = 0
 	}
 }
 
 // @TODO implement
-func (u *Universe) ClearLinks() {
+func (m *Model) ClearLinks() {
 
 }
 
-func (u *Universe) ClearTicks() {
-	u.TicksOn = false
+func (m *Model) ClearTicks() {
+	m.TicksOn = false
 }
 
-func (u *Universe) ClearPatches() {
-	for patch := range u.Patches.patches {
-		patch.Reset(u.PatchesOwn)
+func (m *Model) ClearPatches() {
+	for patch := range m.Patches.patches {
+		patch.Reset(m.PatchesOwn)
 	}
 }
 
 // @TODO Implement
-func (u *Universe) ClearDrawing() {
+func (m *Model) ClearDrawing() {
 
 }
 
 // @TODO Implement
-func (u *Universe) ClearAllPlots() {
+func (m *Model) ClearAllPlots() {
 
 }
 
 // @TODO Implement
-func (u *Universe) ClearOutput() {
+func (m *Model) ClearOutput() {
 
 }
 
 // @TODO Implement
-func (u *Universe) ClearTurtles() {
+func (m *Model) ClearTurtles() {
 
 }
 
 // @TODO Implement
 // idea is that if an empty string is passed then it will be for the general population
-func (u *Universe) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation) {
+func (m *Model) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation) {
 
 }
 
-func (u *Universe) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
+func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
-	agentSet := u.Turtles
+	agentSet := m.Turtles
 	var agentSet2 *TurtleAgentSet = nil
 	if breed != "" {
-		breed, found := u.Breeds[breed]
+		breed, found := m.Breeds[breed]
 		if !found {
 			return errors.New("breed not found")
 		}
 		agentSet2 = breed.Turtles
 	}
 
-	end := amount + u.turtlesWhoNumber
-	for u.turtlesWhoNumber < end {
-		newTurtle := NewTurtle(u, u.turtlesWhoNumber, breed)
+	end := amount + m.turtlesWhoNumber
+	for m.turtlesWhoNumber < end {
+		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed)
 
 		agentSet.turtles[newTurtle] = nil
-		u.whoToTurtles[u.turtlesWhoNumber] = newTurtle
+		m.whoToTurtles[m.turtlesWhoNumber] = newTurtle
 
 		if agentSet2 != nil {
 			agentSet2.turtles[newTurtle] = nil
@@ -228,21 +228,21 @@ func (u *Universe) CreateTurtles(amount int, breed string, operations []TurtleOp
 			operations[i](newTurtle)
 		}
 
-		u.turtlesWhoNumber++
+		m.turtlesWhoNumber++
 	}
 
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) DieTurtle(turtle *Turtle) {
+func (m *Model) DieTurtle(turtle *Turtle) {
 }
 
 // @TODO implement
-func (u *Universe) DieLink(link *Link) {
+func (m *Model) DieLink(link *Link) {
 }
 
-func (u *Universe) Diffuse(patchVariable string, percent float64) error {
+func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	if percent > 1 || percent < 0 {
 		return errors.New("percent amount was outside bounds")
@@ -251,18 +251,18 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 	diffusions := make(map[*Patch]float64)
 
 	//go through each patch and calculate the diffusion amount
-	for patch := range u.Patches.patches {
+	for patch := range m.Patches.patches {
 		patchAmount := patch.PatchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for patch := range u.Patches.patches {
+	for patch := range m.Patches.patches {
 
 		amountFromNeighbors := 0.0
-		x := u.WorldHeight*patch.x + patch.y
-		neighbors := u.Neighbors(x)
+		x := m.WorldHeight*patch.x + patch.y
+		neighbors := m.Neighbors(x)
 		if len(neighbors) > 8 || len(neighbors) < 3 {
 			return errors.New("invalid amount of neighbors")
 		}
@@ -280,11 +280,11 @@ func (u *Universe) Diffuse(patchVariable string, percent float64) error {
 }
 
 // @TODO implement
-func (u *Universe) Diffuse4(patchVariable string, percent float64) error {
+func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
-func (u *Universe) LayoutCircle(turtles []*Turtle, radius float64) {
+func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 	amount := len(turtles)
 	for i := 0; i < amount; i++ {
 		agent := turtles[i]
@@ -294,124 +294,124 @@ func (u *Universe) LayoutCircle(turtles []*Turtle, radius float64) {
 }
 
 // @TODO implement
-func (u *Universe) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle) {
+func (m *Model) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle) {
 
 }
 
 // @TODO implement
-func (u *Universe) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64) {
+func (m *Model) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64) {
 
 }
 
 // @TODO implement
-func (u *Universe) LayoutTutte(turtles []*Turtle, links []*Link, radius float64) {
+func (m *Model) LayoutTutte(turtles []*Turtle, links []*Link, radius float64) {
 
 }
 
 // @TODO implement
-func (u *Universe) Link(breed string, turtle1 int, turtle2 int) *Link {
+func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link {
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
+func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) LinkShapes() []string {
+func (m *Model) LinkShapes() []string {
 	return []string{}
 }
 
-func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
-	if x < u.MinPxCor || x > u.MaxPxCor || y < u.MinPyCor || y > u.MaxPyCor {
+func (m *Model) getPatchAtCoords(x int, y int) *Patch {
+	if x < m.MinPxCor || x > m.MaxPxCor || y < m.MinPyCor || y > m.MaxPyCor {
 		return nil
 	}
 
-	offsetX := x - u.MinPxCor
-	offsetY := y - u.MinPyCor
+	offsetX := x - m.MinPxCor
+	offsetY := y - m.MinPyCor
 
-	pos := offsetY*u.WorldWidth + offsetX
+	pos := offsetY*m.WorldWidth + offsetX
 
-	return u.posOfPatches[pos]
+	return m.posOfPatches[pos]
 }
 
-func (u *Universe) OneOfInt(arr []int) interface{} {
+func (m *Model) OneOfInt(arr []int) interface{} {
 
 	return arr[rand.Intn(len(arr))-1]
 }
 
-func (u *Universe) RandomAmount(n int) int {
+func (m *Model) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
 
-func (u *Universe) topLeftNeighbor(x int) *Patch {
-	return u.safeGetPatch(x - u.WorldWidth - 1)
+func (m *Model) topLeftNeighbor(x int) *Patch {
+	return m.safeGetPatch(x - m.WorldWidth - 1)
 }
 
-func (u *Universe) topNeighbor(x int) *Patch {
-	return u.safeGetPatch(x - u.WorldWidth)
+func (m *Model) topNeighbor(x int) *Patch {
+	return m.safeGetPatch(x - m.WorldWidth)
 }
 
-func (u *Universe) topRightNeighbor(x int) *Patch {
-	return u.safeGetPatch(x - u.WorldWidth + 1)
+func (m *Model) topRightNeighbor(x int) *Patch {
+	return m.safeGetPatch(x - m.WorldWidth + 1)
 }
 
-func (u *Universe) leftNeighbor(x int) *Patch {
-	return u.safeGetPatch(x - 1)
+func (m *Model) leftNeighbor(x int) *Patch {
+	return m.safeGetPatch(x - 1)
 }
 
-func (u *Universe) rightNeighbor(x int) *Patch {
-	return u.safeGetPatch(x + 1)
+func (m *Model) rightNeighbor(x int) *Patch {
+	return m.safeGetPatch(x + 1)
 }
 
-func (u *Universe) bottomLeftNeighbor(x int) *Patch {
-	return u.safeGetPatch(x + u.WorldWidth - 1)
+func (m *Model) bottomLeftNeighbor(x int) *Patch {
+	return m.safeGetPatch(x + m.WorldWidth - 1)
 }
 
-func (u *Universe) bottomNeighbor(x int) *Patch {
-	return u.safeGetPatch(x + u.WorldWidth)
+func (m *Model) bottomNeighbor(x int) *Patch {
+	return m.safeGetPatch(x + m.WorldWidth)
 }
 
-func (u *Universe) bottomRightNeighbor(x int) *Patch {
-	return u.safeGetPatch(x + u.WorldWidth + 1)
+func (m *Model) bottomRightNeighbor(x int) *Patch {
+	return m.safeGetPatch(x + m.WorldWidth + 1)
 }
 
 // @TODO check to see if we are wrapping around
-func (u *Universe) Neighbors(x int) []*Patch {
+func (m *Model) Neighbors(x int) []*Patch {
 	n := []*Patch{}
 
-	topLeft := u.topLeftNeighbor(x)
+	topLeft := m.topLeftNeighbor(x)
 	if topLeft != nil {
 		n = append(n, topLeft)
 	}
 
-	bottomLeft := u.bottomLeftNeighbor(x)
+	bottomLeft := m.bottomLeftNeighbor(x)
 	if bottomLeft != nil {
 		n = append(n, bottomLeft)
 	}
 
-	top := u.topNeighbor(x)
+	top := m.topNeighbor(x)
 	if top != nil {
 		n = append(n, top)
 	}
 
-	topRight := u.topRightNeighbor(x)
+	topRight := m.topRightNeighbor(x)
 	if topRight != nil {
 		n = append(n, topRight)
 	}
 
-	right := u.rightNeighbor(x)
+	right := m.rightNeighbor(x)
 	if right != nil {
 		n = append(n, right)
 	}
 
-	bottomRight := u.bottomRightNeighbor(x)
+	bottomRight := m.bottomRightNeighbor(x)
 	if bottomRight != nil {
 		n = append(n, bottomRight)
 	}
 
-	bottom := u.bottomNeighbor(x)
+	bottom := m.bottomNeighbor(x)
 	if bottom != nil {
 		n = append(n, bottom)
 	}
@@ -420,25 +420,25 @@ func (u *Universe) Neighbors(x int) []*Patch {
 }
 
 // @TODO check to see if we are wrapping around
-func (u *Universe) Neighbors4(x int) []*Patch {
+func (m *Model) Neighbors4(x int) []*Patch {
 	n := []*Patch{}
 
-	top := u.topNeighbor(x)
+	top := m.topNeighbor(x)
 	if top != nil {
 		n = append(n, top)
 	}
 
-	left := u.leftNeighbor(x)
+	left := m.leftNeighbor(x)
 	if left != nil {
 		n = append(n, left)
 	}
 
-	right := u.rightNeighbor(x)
+	right := m.rightNeighbor(x)
 	if right != nil {
 		n = append(n, right)
 	}
 
-	bottom := u.bottomNeighbor(x)
+	bottom := m.bottomNeighbor(x)
 	if bottom != nil {
 		n = append(n, bottom)
 	}
@@ -446,83 +446,83 @@ func (u *Universe) Neighbors4(x int) []*Patch {
 	return n
 }
 
-func (u *Universe) safeGetPatch(x int) *Patch {
-	if x < 0 || x > len(u.Patches.patches) {
+func (m *Model) safeGetPatch(x int) *Patch {
+	if x < 0 || x > len(m.Patches.patches) {
 		return nil
 	}
 
-	return u.posOfPatches[x]
+	return m.posOfPatches[x]
 }
 
-func (u *Universe) Patch(pxcor float64, pycor float64) *Patch {
+func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 	//round to get x and y
 	x := int(math.Round(pxcor))
 	y := int(math.Round(pycor))
 
-	return u.getPatchAtCoords(x, y)
+	return m.getPatchAtCoords(x, y)
 }
 
-func (u *Universe) ResetTicks() {
-	u.Ticks = 0
+func (m *Model) ResetTicks() {
+	m.Ticks = 0
 }
 
 // @TODO implement
-func (u *Universe) ResetTimer() {
+func (m *Model) ResetTimer() {
 
 }
 
-func (u *Universe) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
-	u.MinPxCor = minPxcor
-	u.MaxPxCor = maxPxcor
-	u.MinPyCor = minPycor
-	u.MaxPyCor = maxPycor
-	u.WorldWidth = maxPxcor - minPxcor + 1
-	u.WorldHeight = maxPycor - minPycor + 1
+func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
+	m.MinPxCor = minPxcor
+	m.MaxPxCor = maxPxcor
+	m.MinPyCor = minPycor
+	m.MaxPyCor = maxPycor
+	m.WorldWidth = maxPxcor - minPxcor + 1
+	m.WorldHeight = maxPycor - minPycor + 1
 
-	u.buildPatches()
+	m.buildPatches()
 }
 
-func (u *Universe) SetDefaultShapeLinks(shape string) {
-	u.DefaultShapeLinks = shape
+func (m *Model) SetDefaultShapeLinks(shape string) {
+	m.DefaultShapeLinks = shape
 }
 
-func (u *Universe) SetDefaultShapeTurtles(shape string) {
-	u.DefaultShapeTurtles = shape
+func (m *Model) SetDefaultShapeTurtles(shape string) {
+	m.DefaultShapeTurtles = shape
 }
 
-func (u *Universe) SetDefaultShapeLinkBreed(breed string, shape string) {
-	u.DirectedLinkBreeds[breed].DefaultShape = shape
+func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
+	m.DirectedLinkBreeds[breed].DefaultShape = shape
 }
 
-func (u *Universe) SetDefaultShapeTurtleBreed(breed string, shape string) {
-	u.Breeds[breed].DefaultShape = shape
+func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {
+	m.Breeds[breed].DefaultShape = shape
 }
 
-func (u *Universe) Tick() {
-	if u.TicksOn {
-		u.Ticks++
+func (m *Model) Tick() {
+	if m.TicksOn {
+		m.Ticks++
 	}
 }
 
-func (u *Universe) TickAdvance(amount int) {
-	if u.TicksOn {
-		u.Ticks += amount
+func (m *Model) TickAdvance(amount int) {
+	if m.TicksOn {
+		m.Ticks += amount
 	}
 }
 
-// provides a turtle from the universe given a breed and who number
+// provides a turtle from the model given a breed and who number
 // if the breed is empty then selects from the general population
 // if the breed or who number is not found then returns nil
-func (u *Universe) Turtle(breed string, who int) *Turtle {
+func (m *Model) Turtle(breed string, who int) *Turtle {
 
-	t := u.whoToTurtles[who]
+	t := m.whoToTurtles[who]
 	if t == nil {
 		return nil //turtle not found
 	}
 	if breed == "" {
 		return t
 	} else {
-		if u.Breeds[breed] == nil {
+		if m.Breeds[breed] == nil {
 			return nil //breed not found
 		}
 		if t.breed != breed {
@@ -533,11 +533,11 @@ func (u *Universe) Turtle(breed string, who int) *Turtle {
 }
 
 // @TODO implement
-func (u *Universe) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
+func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
 	x := int(math.Round(pxcor))
 	y := int(math.Round(pycor))
 
-	patch := u.getPatchAtCoords(x, y)
+	patch := m.getPatchAtCoords(x, y)
 
 	if patch == nil {
 		return nil
@@ -547,21 +547,21 @@ func (u *Universe) TurtlesAt(breed string, pxcor float64, pycor float64) *Turtle
 }
 
 // @TODO implement
-func (u *Universe) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
+func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
+func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
+func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
 	return nil
 }
 
 // @TODO implement
-func (u *Universe) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
+func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 	return nil
 }

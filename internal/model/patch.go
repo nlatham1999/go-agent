@@ -1,4 +1,4 @@
-package universe
+package model
 
 import (
 	"math"
@@ -9,7 +9,7 @@ type Patch struct {
 	y     int
 	index int
 
-	parent *Universe
+	parent *Model
 
 	//we have float54 versions of the variables so that we don't have to do a bunch of conversions
 	xFloat64 float64

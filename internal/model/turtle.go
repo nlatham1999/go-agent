@@ -1,4 +1,4 @@
-package universe
+package model
 
 import "math"
 
@@ -15,7 +15,7 @@ type Turtle struct {
 	Shape   string
 	Size    float64
 
-	parent *Universe //universe the turtle belongs too
+	parent *Model //model the turtle belongs too
 
 	Label      interface{}
 	LabelColor Color
@@ -23,22 +23,22 @@ type Turtle struct {
 	patch *Patch //patch the turtle is on
 }
 
-func NewTurtle(u *Universe, who int, breed string) *Turtle {
+func NewTurtle(m *Model, who int, breed string) *Turtle {
 
-	if u == nil {
+	if m == nil {
 		return nil
 	}
 
 	//if the breed is nonexistent then return nil
 	if breed != "" {
-		if _, found := u.Breeds[breed]; !found {
+		if _, found := m.Breeds[breed]; !found {
 			return nil
 		}
 	}
 
 	t := &Turtle{
 		Who:    who,
-		parent: u,
+		parent: m,
 		xcor:   0,
 		ycor:   0,
 		breed:  breed,

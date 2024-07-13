@@ -1,6 +1,6 @@
 //breeds are groups of turtles
 
-package universe
+package model
 
 type LinkBreed struct {
 	Links []*Link

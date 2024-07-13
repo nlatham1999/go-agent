@@ -1,4 +1,4 @@
-package universe
+package model
 
 type Coordinate struct {
 	X float64

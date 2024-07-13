@@ -3,31 +3,31 @@ package tests
 import (
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/universe"
+	"github.com/nlatham1999/go-agent/internal/model"
 )
 
 func TestAllPatch(t *testing.T) {
-	patch1 := universe.NewPatch(nil, 0, 0)
-	patch2 := universe.NewPatch(nil, 0, 0)
-	patch3 := universe.NewPatch(nil, 0, 0)
+	patch1 := model.NewPatch(nil, 0, 0)
+	patch2 := model.NewPatch(nil, 0, 0)
+	patch3 := model.NewPatch(nil, 0, 0)
 
-	patchSet := universe.PatchSet([]*universe.Patch{patch1, patch2, patch3})
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
-	patch1.PColor.SetColorScale(universe.Blue)
-	patch2.PColor.SetColorScale(universe.Blue)
-	patch3.PColor.SetColorScale(universe.Blue)
+	patch1.PColor.SetColorScale(model.Blue)
+	patch2.PColor.SetColorScale(model.Blue)
+	patch3.PColor.SetColorScale(model.Blue)
 
 	// assert that patchset has All of shape "circle"
-	if !patchSet.All(func(p *universe.Patch) bool {
-		return p.PColor.GetColorScale() == universe.Blue
+	if !patchSet.All(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Blue
 	}) {
 		t.Errorf("Expected patchset to have all patches with color 'blue'")
 	}
 
-	patch2.PColor.SetColorScale(universe.Red)
+	patch2.PColor.SetColorScale(model.Red)
 
-	if patchSet.All(func(p *universe.Patch) bool {
-		return p.PColor.GetColorScale() == universe.Blue
+	if patchSet.All(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Blue
 	}) {
 		t.Errorf("Expected patchset to not have all patches with color 'blue'")
 	}
@@ -36,44 +36,44 @@ func TestAllPatch(t *testing.T) {
 
 func TestAnyPatch(t *testing.T) {
 
-	patch1 := universe.NewPatch(nil, 0, 0)
-	patch2 := universe.NewPatch(nil, 0, 0)
-	patch3 := universe.NewPatch(nil, 0, 0)
+	patch1 := model.NewPatch(nil, 0, 0)
+	patch2 := model.NewPatch(nil, 0, 0)
+	patch3 := model.NewPatch(nil, 0, 0)
 
-	patchSet := universe.PatchSet([]*universe.Patch{patch1, patch2, patch3})
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
-	patch1.PColor.SetColorScale(universe.Blue)
+	patch1.PColor.SetColorScale(model.Blue)
 
 	// assert that patchset has Any of shape "circle"
-	if !patchSet.Any(func(p *universe.Patch) bool {
-		return p.PColor.GetColorScale() == universe.Blue
+	if !patchSet.Any(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Blue
 	}) {
 		t.Errorf("Expected patchset to have a patch with color 'blue'")
 	}
 
-	patch1.PColor.SetColorScale(universe.Red)
+	patch1.PColor.SetColorScale(model.Red)
 
-	if patchSet.Any(func(p *universe.Patch) bool {
-		return p.PColor.GetColorScale() == universe.Blue
+	if patchSet.Any(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Blue
 	}) {
 		t.Errorf("Expected patchset to not have a patch with color 'blue'")
 	}
 }
 
 func TestAtPointsPatch(t *testing.T) {
-	//create basic universe
-	u := universe.NewUniverse(nil, nil, nil, nil, nil, nil, false)
+	//create basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
 
-	//get some random patches from the universe
-	patch1 := u.Patch(0, 0)
-	patch2 := u.Patch(1, 1)
-	patch3 := u.Patch(2, 2)
+	//get some random patches from the model
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(1, 1)
+	patch3 := m.Patch(2, 2)
 
 	//create a patchset
-	patchSet := universe.PatchSet([]*universe.Patch{patch1, patch2, patch3})
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
 	//get the patchset at the points
-	patchSetAtPoints := patchSet.AtPoints(u, []universe.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}, {X: 5, Y: 5}, {X: 100, Y: 0}})
+	patchSetAtPoints := patchSet.AtPoints(m, []model.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}, {X: 5, Y: 5}, {X: 100, Y: 0}})
 	if patchSetAtPoints.Count() != 2 {
 		t.Errorf("Expected 2 patches, got %d", patchSetAtPoints.Count())
 	}

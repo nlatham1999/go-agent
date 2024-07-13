@@ -1,4 +1,4 @@
-package universe
+package model
 
 import "math"
 
@@ -35,11 +35,11 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	return false
 }
 
-func (p *PatchAgentSet) AtPoints(u *Universe, points []Coordinate) *PatchAgentSet {
+func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	// create a map of the patches
 	pointsMap := make(map[*Patch]interface{})
 	for _, point := range points {
-		patch := u.Patch(point.X, point.Y)
+		patch := m.Patch(point.X, point.Y)
 		if patch != nil {
 			if _, ok := p.patches[patch]; ok {
 				pointsMap[patch] = nil

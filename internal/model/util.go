@@ -1,4 +1,4 @@
-package universe
+package model
 
 // @TODO implement
 func ApproximateHSB(hue int, saturation int, brightness int) float64 {

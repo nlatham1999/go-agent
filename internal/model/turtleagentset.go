@@ -1,4 +1,4 @@
-package universe
+package model
 
 import "math"
 
@@ -46,11 +46,11 @@ func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
 	return false
 }
 
-func (t *TurtleAgentSet) AtPoints(u *Universe, points []Coordinate) *TurtleAgentSet {
+func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {
 	//get the turtles at the patches
 	turtlesAtPatches := []*Turtle{}
 	for _, point := range points {
-		patch := u.Patch(point.X, point.Y)
+		patch := m.Patch(point.X, point.Y)
 		if patch != nil && patch.turtles[""] != nil {
 			for turtle := range patch.turtles[""].turtles {
 				if _, ok := t.turtles[turtle]; ok {

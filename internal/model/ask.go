@@ -1,5 +1,5 @@
-// universe functions that deal with patches
-package universe
+// model functions that deal with patches
+package model
 
 //ask functions
 

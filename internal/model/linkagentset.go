@@ -1,4 +1,4 @@
-package universe
+package model
 
 import "math"
 

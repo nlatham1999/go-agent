@@ -38,16 +38,16 @@
 ``` ApproximateRGB(red float64, green float64, blue float64) int```
 
 ### ask
-```(u *Universe) AskLinks(agentset LinkSet, operations []LinkOperation)```  
-```(u *Universe) AskLink(agent *Link, operations []LinkOperation)```
-```(u *Universe) AskPatches(agentset PatchSet, operations []PatchOperation)```
-```(u *Universe) AskPatch(agent *Patch, operations []PatchOperation)```
-```(u *Universe) AskTurtles(agentset TurtleSet, operations []TurtleOperation)```
-```(u *Universe) AskTurtle(agent *Turtle, operations []TurtleOperation)```
+```(m *Model) AskLinks(agentset LinkSet, operations []LinkOperation)```  
+```(m *Model) AskLink(agent *Link, operations []LinkOperation)```
+```(m *Model) AskPatches(agentset PatchSet, operations []PatchOperation)```
+```(m *Model) AskPatch(agent *Patch, operations []PatchOperation)```
+```(m *Model) AskTurtles(agentset TurtleSet, operations []TurtleOperation)```
+```(m *Model) AskTurtle(agent *Turtle, operations []TurtleOperation)```
 
 ### at-points
-```(t *TurtleAgentSet) AtPoints(u *Universe, points []Coordinate) *TurtleAgentSet```
-```(p *PatchAgentSet) AtPoints(u *Universe, points []Coordinate) *PatchAgentSet```
+```(t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet```
+```(p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet```
 
 
 ### autoplot?
@@ -75,7 +75,7 @@ implement?
 implement?
 
 ### both-ends
-```(u *Universe) BothEnds(link *Link) []*Turtle```
+```(m *Model) BothEnds(link *Link) []*Turtle```
 
 ### breed
 ```(t *Link) GetBreedName() string```
@@ -98,7 +98,7 @@ implement?
 implement?
 
 ### clear-all
-```(u *Universe) ClearAll()```
+```(m *Model) ClearAll()```
 
 ### clear-all-plots
 implement?
@@ -107,25 +107,25 @@ implement?
 implement?
 
 ### clear-globals
-```(u *Universe) ClearGlobals()```
+```(m *Model) ClearGlobals()```
 
 ### clear-links
-```(u *Universe) ClearLinks()```
+```(m *Model) ClearLinks()```
 
 ### clear-output
-```(u *Universe) ClearOutput()```
+```(m *Model) ClearOutput()```
 
 ### clear-patches, cp
-```(u *Universe) ClearPatches()```  
+```(m *Model) ClearPatches()```  
 
 ### clear-plot
 implement?
 
 ### clear-ticks
-```(u *Universe) ClearLinks()```
+```(m *Model) ClearLinks()```
 
 ### clear-turtles, ct
-```(u *Universe) ClearTurtles()```
+```(m *Model) ClearTurtles()```
 
 ### Color
 turtles and links have a color struct
@@ -139,7 +139,7 @@ math library
 ```(t *TurtleAgentSet) Count()```
 
 ### create ordered turtles
-```(u *Universe) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation)```
+```(m *Model) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation)```
 
 ### create-\<breed\>-to 
 ```(t *Turtle) CreateBreedTo(breed string, turtle *Turtle, operations []TurtleOperation)```
@@ -178,7 +178,7 @@ math library
 ```(t *Turtle) CreateLinksWith(turtles []*Turtle, operations []TurtleOperation)```
 
 ### create-turtles
-(u *Universe) CreateTurtles(amount int, operations []TurtleOperation)
+(m *Model) CreateTurtles(amount int, operations []TurtleOperation)
 
 ### create-temporary-plot-pen
 implement?
@@ -187,17 +187,17 @@ implement?
 just use the date time library
 
 ### die
-```(u *Universe) DieTurtle(turtle *Turtle)```
-```(u *Universe) DieLink(link *Link)```
+```(m *Model) DieTurtle(turtle *Turtle)```
+```(m *Model) DieLink(link *Link)```
 
 ### diffuse 
-```(u *Universe) Diffuse(patchVariable string, percent float64) error```
+```(m *Model) Diffuse(patchVariable string, percent float64) error```
 
 ### diffuse4
-```(u *Universe) Diffuse4(patchVariable string, percent float64) error```
+```(m *Model) Diffuse4(patchVariable string, percent float64) error```
 
 ### directed-link-breed
-```Universe.DirectedLinkBreeds```
+```Model.DirectedLinkBreeds```
 
 ### display
 implement?
@@ -442,16 +442,16 @@ we have indeces on slices
 last element in slice
 
 ### layout-circle
-```(u *Universe) LayoutCircle(turtles []*Turtle, radius float64)```
+```(m *Model) LayoutCircle(turtles []*Turtle, radius float64)```
 
 ### layout-radial
-```(u *Universe) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle)```
+```(m *Model) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle)```
 
 ### layout-spring
-```(u *Universe) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64)```
+```(m *Model) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64)```
 
 ### layout-tutte
-```(u *Universe) LayoutTutte(turtles []*Turtle, links []*Link, radius float64)```
+```(m *Model) LayoutTutte(turtles []*Turtle, links []*Link, radius float64)```
 
 ### left
 ```(t *Turtle) Left(number float64)```
@@ -463,8 +463,8 @@ use the length of the slice
 not necessary
 
 ### link
-```(u *Universe) Link(breed string, turtle1 int, turtle2 int) *Link```
-```(u *Universe) LinkDirected(breed string, turtle1 int, turtle2 int) *Link```
+```(m *Model) Link(breed string, turtle1 int, turtle2 int) *Link```
+```(m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link```
 
 ### link-heading
 ```(t *Link) Heading() float64```
@@ -476,11 +476,11 @@ not necessary
 ```LinkSet(links []*Link) *LinkAgentSet```
 
 ### link-shapes
-```u *Universe) LinkShapes() []string```
+```m *Model) LinkShapes() []string```
 
 ### links-own
-Universe.LinksOwn
-Universe.LinkBreedsOwn
+Model.LinksOwn
+Model.LinkBreedsOwn
 
 ### list
 implement?
@@ -514,10 +514,10 @@ implement?
 ```(t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle```
 
 ### max-pxcor
-```Universe.MaxPxCor```
+```Model.MaxPxCor```
 
 ### max-pycor
-```Universe.MaxPyCor```
+```Model.MaxPyCor```
 
 ### mean
 probably a built in function that does this
@@ -542,10 +542,10 @@ built in
 ```(t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle```
 
 ### min-pxcor
-```Universe.MinPxCor```
+```Model.MinPxCor```
 
 ### min-pycor
-```Universe.MinPyCor```
+```Model.MinPyCor```
 
 ### mod
 %
@@ -653,7 +653,7 @@ this is the . operator
 ```(t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link```
 
 ### patch
-```(u *Universe) Patch(pxcor float64, pycor float64) *Patch```
+```(m *Model) Patch(pxcor float64, pycor float64) *Patch```
 
 ### patch-ahead
 ```(t *Turtle) PatchAhead(distance float64) *Patch```
@@ -683,11 +683,11 @@ this is the . operator
 implement?
 
 ### patches
-```Universe.Patches```
+```Model.Patches```
 
 
 ### patches-own
-```Universe.PatchesOwn```
+```Model.PatchesOwn```
 
 ### pcolor
 ```Patch.PColor```
@@ -809,13 +809,13 @@ return
 implement?
 
 ### reset-ticks
-```(u *Universe) ResetTicks()```
+```(m *Model) ResetTicks()```
 
 ### reset-timer
-```(u *Universe) ResetTimer()```
+```(m *Model) ResetTimer()```
 
 ### resize-world
-```(u *Universe) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int)```
+```(m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int)```
 
 ### reverse
 implement?
@@ -857,10 +857,10 @@ implement?
 implement?
 
 ### set-default-shape
-```(u *Universe) SetDefaultShapeLinks(shape string)```
-```(u *Universe) SetDefaultShapeTurtles(shape string)```
-```(u *Universe) SetDefaultShapeLinkBreed(breed string, shape string)```
-```(u *Universe) SetDefaultShapeTurtleBreed(breed string, shape string)```
+```(m *Model) SetDefaultShapeLinks(shape string)```
+```(m *Model) SetDefaultShapeTurtles(shape string)```
+```(m *Model) SetDefaultShapeLinkBreed(breed string, shape string)```
+```(m *Model) SetDefaultShapeTurtleBreed(breed string, shape string)```
 
 ### set-histogram-num-bars
 implement?
@@ -981,13 +981,13 @@ implement?
 ```Link.Thickness```
 
 ### tick
-```(u *Universe) Tick()```
+```(m *Model) Tick()```
 
 ### tick-advance
-```(u *Universe) TickAdvance(amount int)```
+```(m *Model) TickAdvance(amount int)```
 
 ### ticks
-```Universe.Ticks```
+```Model.Ticks```
 
 ### tie
 ```(l *Link) Tie()```
@@ -1015,13 +1015,13 @@ func
 ```(t *Turtle) TowardsXY(x float64, y float64) float64```
 
 ### turtle
-```(u *Universe) Turtle(breed string) *Turtle```
+```(m *Model) Turtle(breed string) *Turtle```
 
 ### turtle-set
 ```TurtleSet(turtles []*Turtle) *TurtleAgentSet```
 
 ### turtles
-```Universe.Turtles```
+```Model.Turtles```
 
 ### turtles-at
 ```(t *TurtleAgentSet) AtPoints(points []Coordinate) *TurtleAgentSet```
@@ -1031,20 +1031,20 @@ func
 ```(t *Turtle) TurtlesHere(breed string) *TurtleAgentSet```
 
 ### turtles-on
-```(u *Universe) TurtlesOnPatch(patch *Patch) *TurtleAgentSet```
-```(u *Universe) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet```
-```(u *Universe) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet```
-```(u *Universe) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet```
+```(m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet```
+```(m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet```
+```(m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet```
+```(m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet```
 
 ### turtles-own
-```Universe.TurtlesOwn```
-```Universe.TurtleBreedsOwn```
+```Model.TurtlesOwn```
+```Model.TurtleBreedsOwn```
 
 ### type
 implement?
 
 ### undirected-link-breed
-```Universe.UndirectedLinkBreeds```
+```Model.UndirectedLinkBreeds```
 
 ### untie
 ```(l *Link) Untie()```
@@ -1121,10 +1121,10 @@ implement?
 implement?
 
 ### world-width
-```Universe.WorldWidth```
+```Model.WorldWidth```
 
 ### world-height
-```Universe.WorldHeight```
+```Model.WorldHeight```
 
 ### wrap-color
 ```WrapColor(color float64) float64```

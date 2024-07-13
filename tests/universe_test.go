@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/universe"
+	"github.com/nlatham1999/go-agent/internal/model"
 )
 
 func TestCreateTurtles(t *testing.T) {
@@ -11,7 +11,7 @@ func TestCreateTurtles(t *testing.T) {
 		"ants",
 	}
 
-	environment := universe.NewUniverse(nil, nil, nil, breeds, nil, nil, false)
+	environment := model.NewModel(nil, nil, nil, breeds, nil, nil, false)
 
 	// creating turtles without a breed should add them to the default breed
 	environment.CreateTurtles(5, "", nil)
@@ -40,7 +40,7 @@ func TestTurtle(t *testing.T) {
 		"ants",
 	}
 
-	environment := universe.NewUniverse(nil, nil, nil, breeds, nil, nil, false)
+	environment := model.NewModel(nil, nil, nil, breeds, nil, nil, false)
 
 	// create 5 general turtle and five ants
 	environment.CreateTurtles(5, "", nil)
