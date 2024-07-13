@@ -130,7 +130,7 @@ func (m *Model) buildPatches() {
 	m.posOfPatches = make(map[int]*Patch)
 	for i := 0; i < m.WorldHeight; i++ {
 		for j := 0; j < m.WorldWidth; j++ {
-			p := NewPatch(m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
+			p := NewPatch(m, m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
 			m.Patches.patches[p] = nil
 			m.posOfPatches[j*m.WorldWidth+i] = p
 		}
@@ -284,6 +284,26 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
+func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
+	deltaX := x1 - x2
+	deltaY := y1 - y2
+
+	distance := math.Abs(math.Sqrt(deltaX*deltaX + deltaY*deltaY))
+
+	if !m.wrapping {
+		return distance
+	}
+
+	deltaXInverse := float64(m.WorldWidth) - math.Abs(deltaX)
+	deltaYInverse := float64(m.WorldHeight) - math.Abs(deltaY)
+
+	distance = math.Min(distance, math.Abs(math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse)))
+	distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY)))
+	distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+
+	return distance
+}
+
 func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 	amount := len(turtles)
 	for i := 0; i < amount; i++ {
@@ -331,7 +351,7 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	offsetX := x - m.MinPxCor
 	offsetY := y - m.MinPyCor
 
-	pos := offsetY*m.WorldWidth + offsetX
+	pos := offsetX*m.WorldWidth + offsetY
 
 	return m.posOfPatches[pos]
 }

@@ -7,3 +7,10 @@ where should n-of functions be placed? At the model level? General (util) level?
 AtPoints will always be use absolute coordinates since the caller will always be the observer
 
 what if we stored the neighbors as pointers in each Patch
+
+patch coordinates store the middle of the patch
+ - minp(x)(y)cor being -15 means that the min coord is -15.5
+ - maxp(x)(y)cor being 15 means that the max coord is 15.5
+ - each patch goes +- .5
+
+ 

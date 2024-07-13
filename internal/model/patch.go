@@ -27,7 +27,7 @@ type Patch struct {
 	turtles map[string]*TurtleAgentSet // sets of turtles keyed by breed
 }
 
-func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
+func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch {
 
 	patch := &Patch{
 		x:        x,
@@ -36,6 +36,7 @@ func NewPatch(patchesOwn map[string]interface{}, x int, y int) *Patch {
 		yFloat64: float64(y),
 		PColor:   Color{},
 		turtles:  make(map[string]*TurtleAgentSet),
+		parent:   m,
 	}
 
 	patch.PColor.SetColorScale(Black)
@@ -77,45 +78,19 @@ func (p *Patch) removeTurtle(t *Turtle) {
 	}
 }
 
-// @TODO implement
+// returns the distance of this patch to the provided turtle
 func (p *Patch) DistanceTurtle(t *Turtle) float64 {
-	return 0
+	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, t.xcor, t.ycor)
 }
 
-// @TODO implement
+// returns the distance of this patch to the provided patch
 func (p *Patch) DistancePatch(patch *Patch) float64 {
-	return 0
-}
-
-func (p *Patch) Reset(patchesOwn map[string]interface{}) {
-	p.PColor.SetColorScale(Black)
-
-	for key, value := range patchesOwn {
-		p.PatchesOwn[key] = value
-	}
+	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, patch.xFloat64, patch.yFloat64)
 }
 
 // Returns the distance of this patch from the provided x y coordinates
-// @TODO Implement wrapping if wrapping is enabled and it is shorter
 func (p *Patch) DistanceXY(x float64, y float64) float64 {
-
-	deltaX := x - p.xFloat64
-	deltaY := y - p.yFloat64
-
-	distance := math.Sqrt(deltaX*deltaX - deltaY*deltaY)
-
-	if !p.parent.wrapping {
-		return distance
-	}
-
-	deltaXInverse := float64(p.parent.WorldWidth) - math.Abs(deltaX)
-	deltaYInverse := float64(p.parent.WorldHeight) - math.Abs(deltaY)
-
-	distance = math.Min(distance, math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse))
-	distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY))
-	distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse))
-
-	return distance
+	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
 }
 
 // @TODO implement
@@ -180,6 +155,14 @@ func (p *Patch) PXCor() int {
 
 func (p *Patch) PYCor() int {
 	return p.y
+}
+
+func (p *Patch) Reset(patchesOwn map[string]interface{}) {
+	p.PColor.SetColorScale(Black)
+
+	for key, value := range patchesOwn {
+		p.PatchesOwn[key] = value
+	}
 }
 
 // @TODO implement

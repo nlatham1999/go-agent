@@ -7,9 +7,13 @@ import (
 )
 
 func TestAllPatch(t *testing.T) {
-	patch1 := model.NewPatch(nil, 0, 0)
-	patch2 := model.NewPatch(nil, 0, 0)
-	patch3 := model.NewPatch(nil, 0, 0)
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(0, 1)
+	patch3 := m.Patch(0, 2)
 
 	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
@@ -36,9 +40,12 @@ func TestAllPatch(t *testing.T) {
 
 func TestAnyPatch(t *testing.T) {
 
-	patch1 := model.NewPatch(nil, 0, 0)
-	patch2 := model.NewPatch(nil, 0, 0)
-	patch3 := model.NewPatch(nil, 0, 0)
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(0, 1)
+	patch3 := m.Patch(0, 2)
 
 	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
