@@ -114,7 +114,7 @@ func NewUniverse(
 
 	//construct general link set
 	universe.Links = &LinkAgentSet{
-		links: []*Link{},
+		links: make(map[*Link]interface{}),
 	}
 
 	universe.buildPatches()

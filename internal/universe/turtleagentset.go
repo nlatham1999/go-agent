@@ -29,7 +29,7 @@ func (t *TurtleAgentSet) Remove(turtle *Turtle) {
 }
 
 func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
-	for turtle, _ := range t.turtles {
+	for turtle := range t.turtles {
 		if !operation(turtle) {
 			return false
 		}
@@ -38,7 +38,7 @@ func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
 }
 
 func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
-	for turtle, _ := range t.turtles {
+	for turtle := range t.turtles {
 		if operation(turtle) {
 			return true
 		}
@@ -52,7 +52,7 @@ func (t *TurtleAgentSet) AtPoints(u *Universe, points []Coordinate) *TurtleAgent
 	for _, point := range points {
 		patch := u.Patch(point.X, point.Y)
 		if patch != nil && patch.turtles[""] != nil {
-			for turtle, _ := range patch.turtles[""].turtles {
+			for turtle := range patch.turtles[""].turtles {
 				if _, ok := t.turtles[turtle]; ok {
 					turtlesAtPatches = append(turtlesAtPatches, turtle)
 				}

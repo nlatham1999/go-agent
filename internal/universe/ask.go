@@ -4,9 +4,9 @@ package universe
 //ask functions
 
 func AskLinks(agentset LinkAgentSet, operations []LinkOperation) {
-	for i := 0; i < len(agentset.links); i++ {
+	for link := range agentset.links {
 		for j := 0; j < len(operations); j++ {
-			operations[j](agentset.links[i])
+			operations[j](link)
 		}
 	}
 }

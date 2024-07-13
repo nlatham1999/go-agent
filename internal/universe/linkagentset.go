@@ -3,12 +3,14 @@ package universe
 import "math"
 
 type LinkAgentSet struct {
-	links []*Link
+	links map[*Link]interface{}
 }
 
 func LinkSet(links []*Link) *LinkAgentSet {
-	newLinks := make([]*Link, len(links))
-	copy(newLinks, links)
+	newLinks := make(map[*Link]interface{})
+	for _, link := range links {
+		newLinks[link] = nil
+	}
 
 	return &LinkAgentSet{
 		links: newLinks,
@@ -16,7 +18,7 @@ func LinkSet(links []*Link) *LinkAgentSet {
 }
 
 func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
-	for _, link := range l.links {
+	for link := range l.links {
 		if !operation(link) {
 			return false
 		}
@@ -25,7 +27,7 @@ func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
 }
 
 func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) {
 			return true
 		}
@@ -45,7 +47,7 @@ func (l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet
 func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {
 	max := math.MaxFloat64 * -1
 	var maxLink *Link
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) > max {
 			max = operation(link)
 			maxLink = link
@@ -62,7 +64,7 @@ func (l *LinkAgentSet) MinNOf(n int, operation LinkFloatOperation) *LinkAgentSet
 func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {
 	min := math.MaxFloat64
 	var minLink *Link
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) < min {
 			min = operation(link)
 			minLink = link
@@ -93,7 +95,7 @@ func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
 
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
 	links := make([]*Link, 0)
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) {
 			links = append(links, link)
 		}
@@ -103,7 +105,7 @@ func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
 
 func (l *LinkAgentSet) WithMax(operation LinkFloatOperation) *LinkAgentSet {
 	max := math.MaxFloat64 * -1
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) > max {
 			max = operation(link)
 		}
@@ -111,7 +113,7 @@ func (l *LinkAgentSet) WithMax(operation LinkFloatOperation) *LinkAgentSet {
 
 	//get all links where the float operation is equal to the max
 	links := make([]*Link, 0)
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) == max {
 			links = append(links, link)
 		}
@@ -122,7 +124,7 @@ func (l *LinkAgentSet) WithMax(operation LinkFloatOperation) *LinkAgentSet {
 
 func (l *LinkAgentSet) WithMin(operation LinkFloatOperation) *LinkAgentSet {
 	min := math.MaxFloat64
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) < min {
 			min = operation(link)
 		}
@@ -130,7 +132,7 @@ func (l *LinkAgentSet) WithMin(operation LinkFloatOperation) *LinkAgentSet {
 
 	//get all links where the float operation is equal to the min
 	links := make([]*Link, 0)
-	for _, link := range l.links {
+	for link := range l.links {
 		if operation(link) == min {
 			links = append(links, link)
 		}
