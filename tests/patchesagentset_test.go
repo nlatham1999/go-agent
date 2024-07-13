@@ -84,5 +84,116 @@ func TestAtPointsPatch(t *testing.T) {
 	if patchSetAtPoints.Count() != 2 {
 		t.Errorf("Expected 2 patches, got %d", patchSetAtPoints.Count())
 	}
+}
 
+func TestPatchesInRadiusPatch(t *testing.T) {
+	//create basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	//get some random patches from the model
+	patch1 := m.Patch(-15, -15)
+	patch2 := m.Patch(-15, -14)
+	patch3 := m.Patch(-14, -15)
+	patch4 := m.Patch(-14, -14)
+	patch5 := m.Patch(15, 15)
+	patch6 := m.Patch(15, 14)
+	patch7 := m.Patch(14, 15)
+	patch8 := m.Patch(14, 14)
+
+	//create a patchset
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+
+	//get the patches in radius
+	patchSetInRadius := patchSet.InRadiusPatch(1, patch2)
+
+	if patchSetInRadius.Count() != 3 {
+		t.Errorf("Expected 3 patches, got %d", patchSetInRadius.Count())
+	}
+
+	// create a model that has wrapping
+	m = model.NewModel(nil, nil, nil, nil, nil, nil, true)
+
+	// get some random patches from the model
+	patch1 = m.Patch(-15, -15)
+	patch2 = m.Patch(-15, -14)
+	patch3 = m.Patch(-14, -15)
+	patch4 = m.Patch(-14, -14)
+	patch5 = m.Patch(-15, 15)
+	patch6 = m.Patch(-15, 14)
+	patch7 = m.Patch(-14, 15)
+	patch8 = m.Patch(-14, 14)
+
+	//create a patchset
+	patchSet = model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+
+	//get the patches in radius
+	patchSetInRadius = patchSet.InRadiusPatch(1, patch1)
+
+	if patchSetInRadius.Count() != 4 {
+		t.Errorf("Expected 4 patches, got %d", patchSetInRadius.Count())
+	}
+}
+
+func TestPatchesInRadiusTurtle(t *testing.T) {
+	//create basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	//get some random patches from the model
+	patch1 := m.Patch(-15, -15)
+	patch2 := m.Patch(-15, -14)
+	patch3 := m.Patch(-14, -15)
+	patch4 := m.Patch(-14, -14)
+	patch5 := m.Patch(15, 15)
+	patch6 := m.Patch(15, 14)
+	patch7 := m.Patch(14, 15)
+	patch8 := m.Patch(14, 14)
+
+	//create a patchset
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+
+	m.CreateTurtles(1, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetXY(-15, -14)
+		},
+	})
+
+	turtle := m.Turtle("", 0)
+
+	//get the patches in radius
+	patchSetInRadius := patchSet.InRadiusTurtle(1, turtle)
+
+	if patchSetInRadius.Count() != 3 {
+		t.Errorf("Expected 3 patches, got %d", patchSetInRadius.Count())
+	}
+
+	// create a model that has wrapping
+	m = model.NewModel(nil, nil, nil, nil, nil, nil, true)
+
+	// get some random patches from the model
+	patch1 = m.Patch(-15, -15)
+	patch2 = m.Patch(-15, -14)
+	patch3 = m.Patch(-14, -15)
+	patch4 = m.Patch(-14, -14)
+	patch5 = m.Patch(-15, 15)
+	patch6 = m.Patch(-15, 14)
+	patch7 = m.Patch(-14, 15)
+	patch8 = m.Patch(-14, 14)
+
+	//create a patchset
+	patchSet = model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+
+	m.CreateTurtles(1, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetXY(-15, -15)
+		},
+	})
+
+	turtle = m.Turtle("", 0)
+
+	//get the patches in radius
+	patchSetInRadius = patchSet.InRadiusTurtle(1, turtle)
+
+	if patchSetInRadius.Count() != 4 {
+		t.Errorf("Expected 4 patches, got %d", patchSetInRadius.Count())
+	}
 }

@@ -93,16 +93,6 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
 }
 
-// @TODO implement
-func (p *Patch) InRadiusPatches(radius float64) []*Patch {
-	return nil
-}
-
-// @TODO implement
-func (p *Patch) InRadiusTurtles(radius float64) []*Turtle {
-	return nil
-}
-
 func (p *Patch) Neighbors() []*Patch {
 	neighbors := p.parent.Neighbors(p.index)
 

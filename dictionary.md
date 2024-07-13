@@ -404,10 +404,10 @@ implement?
 implement?
 
 ### in-radius
-```(p *Patch) InRadiusPatches(radius float64) []*Patch```
-```(p *Patch) InRadiusTurtles(radius float64) []*Turtle```
-```(t *Turtle) InRadiusPatches(distance float64) []*Patch```
-```(t *Turtle) InRadiusTurtles(distance float64) []*Turtle```
+```(p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet```
+```(p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet```
+```(t *TurtleAgentSet) InRadiusPatch(radius float64, patch *Patch) *TurtleAgentSet```
+```(t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet```
 
 ### insert-item
 use slice functions

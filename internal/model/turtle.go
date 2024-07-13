@@ -290,16 +290,6 @@ func (t *Turtle) InLinkFrom(turtle *Turtle) *Link {
 	return nil
 }
 
-// @TODO implement
-func (t *Turtle) InRadiusPatches(distance float64) []*Patch {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) InRadiusTurtles(distance float64) []*Turtle {
-	return nil
-}
-
 // jumps ahead by the distance, if it cannot then it returns false
 func (t *Turtle) Jump(distance float64) {
 

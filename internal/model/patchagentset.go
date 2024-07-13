@@ -56,6 +56,35 @@ func (p *PatchAgentSet) Count() int {
 	return len(p.patches)
 }
 
+func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet {
+	patchMap := make(map[*Patch]interface{})
+
+	for p := range p.patches {
+		distance := p.DistancePatch(patch)
+		if distance <= radius {
+			patchMap[p] = nil
+		}
+	}
+
+	return &PatchAgentSet{
+		patches: patchMap,
+	}
+}
+
+func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgentSet {
+	patchMap := make(map[*Patch]interface{})
+
+	for p := range p.patches {
+		if p.DistanceTurtle(turtle) <= radius {
+			patchMap[p] = nil
+		}
+	}
+
+	return &PatchAgentSet{
+		patches: patchMap,
+	}
+}
+
 func (p *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
 	return nil
 }

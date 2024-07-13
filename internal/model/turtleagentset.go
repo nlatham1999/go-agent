@@ -68,6 +68,16 @@ func (t *TurtleAgentSet) Count() int {
 }
 
 // @TODO implement
+func (t *TurtleAgentSet) InRadiusPatch(radius float64, patch *Patch) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
+func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet {
+	return nil
+}
+
+// @TODO implement
 func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
 	return nil
 }
