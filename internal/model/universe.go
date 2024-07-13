@@ -289,7 +289,7 @@ func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 	for i := 0; i < amount; i++ {
 		agent := turtles[i]
 		agent.SetXY(radius*math.Cos(2*math.Pi*float64(i)/float64(amount)), radius*math.Sin(2*math.Pi*float64(i)/float64(amount)))
-		agent.Heading = 2 * math.Pi * float64(i) / float64(amount)
+		agent.heading = 2 * math.Pi * float64(i) / float64(amount)
 	}
 }
 

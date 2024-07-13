@@ -90,9 +90,7 @@ func TestAskPatches(t *testing.T) {
 }
 
 func TestAskTurtle(t *testing.T) {
-	turtle := &model.Turtle{
-		Heading: 0,
-	}
+	turtle := &model.Turtle{}
 	turtle.Color.SetColorScale(model.Blue)
 
 	model.AskTurtle(turtle, []model.TurtleOperation{

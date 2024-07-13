@@ -9,7 +9,7 @@ type Turtle struct {
 	size int
 
 	Color   Color
-	Heading float64 //direction the turtle is facing in degrees
+	heading float64 //direction the turtle is facing in radians
 	Hidden  bool    //if the turtle is hidden
 	breed   string
 	Shape   string
@@ -53,7 +53,7 @@ func NewTurtle(m *Model, who int, breed string) *Turtle {
 
 // @TODO Implement
 func (t *Turtle) Back(distance float64) {
-
+	t.Forward(-distance)
 }
 
 // @TODO implement
@@ -74,17 +74,17 @@ func (t *Turtle) SetBreed(name string) {
 // @TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice
 func (t *Turtle) CanMove(distance float64) bool {
 
-	newX := t.xcor + distance*math.Cos(t.Heading)
-	newY := t.ycor + distance*math.Sin(t.Heading)
+	newX := t.xcor + distance*math.Cos(t.heading)
+	newY := t.ycor + distance*math.Sin(t.heading)
 
-	patchX := math.Round(newX)
-	patchY := math.Round(newY)
+	// patchX := math.Round(newX)
+	// patchY := math.Round(newY)
 
-	if t.parent.getPatchAtCoords(int(patchX), int(patchY)) != nil {
+	if t.parent.Patch(newX, newY) != nil {
 		return true
 	}
 
-	return true
+	return false
 }
 
 // @TODO implement
@@ -199,7 +199,7 @@ func (t *Turtle) FacePatch(patch *Patch) {
 
 // @TODO implement
 func (t *Turtle) FaceXY(x float64, y float64) {
-	t.Heading = math.Atan2(y-t.ycor, x-t.xcor)
+	t.heading = math.Atan2(y-t.ycor, x-t.xcor)
 }
 
 // @TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
@@ -214,7 +214,7 @@ func (t *Turtle) Forward(distance float64) {
 	}
 
 	for i := 0; i < intPart; i++ {
-		t.Jump(float64(intPart) * float64(direction))
+		t.Jump(1 * float64(direction))
 	}
 
 	if decimalPart != 0 {
@@ -230,6 +230,16 @@ func (t *Turtle) Hatch(amount int, operations []TurtleOperation) {
 // @TODO implement
 func (t *Turtle) HatchBreed(breed string, amount int, operations []TurtleOperation) {
 
+}
+
+func (t *Turtle) GetHeading() float64 {
+	// return heading in degrees
+	return t.heading * (180 / math.Pi)
+}
+
+func (t *Turtle) SetHeading(heading float64) {
+	//convert heading to radians
+	t.heading = heading * (math.Pi / 180)
 }
 
 func (t *Turtle) Hide() {
@@ -294,14 +304,19 @@ func (t *Turtle) InRadiusTurtles(distance float64) []*Turtle {
 func (t *Turtle) Jump(distance float64) {
 
 	if t.CanMove(distance) {
-		xcor := t.xcor + distance*math.Cos(t.Heading)
-		ycor := t.ycor + distance*math.Sin(t.Heading)
+		xcor := t.xcor + distance*math.Cos(t.heading)
+		ycor := t.ycor + distance*math.Sin(t.heading)
 		t.SetXY(xcor, ycor)
 	}
 }
 
 func (t *Turtle) Left(number float64) {
-	t.Heading = math.Mod((t.Heading + number), 360)
+
+	//convert number to radians
+	number = number * (math.Pi / 180)
+
+	//add the number to the heading
+	t.heading = math.Mod((t.heading + number), 2*math.Pi)
 }
 
 // @TODO implement
@@ -397,8 +412,8 @@ func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
 }
 
 func (t *Turtle) PatchAhead(distance float64) *Patch {
-	distX := t.xcor + distance*math.Cos(t.Heading)
-	distY := t.ycor + distance*math.Sin(t.Heading)
+	distX := t.xcor + distance*math.Cos(t.heading)
+	distY := t.ycor + distance*math.Sin(t.heading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
@@ -431,14 +446,14 @@ func (t *Turtle) PatchHere() *Patch {
 }
 
 func (t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch {
-	rightHeading := t.Heading + angle
+	rightHeading := t.heading + angle
 	distX := t.xcor + distance*math.Cos(rightHeading)
 	distY := t.ycor + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
 }
 
 func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
-	rightHeading := t.Heading - angle
+	rightHeading := t.heading - angle
 	distX := t.xcor + distance*math.Cos(rightHeading)
 	distY := t.ycor + distance*math.Sin(rightHeading)
 	return t.parent.getPatchAtCoords(int(distX), int(distY))
@@ -446,10 +461,7 @@ func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
 
 // it might be faster to not use mods, the only danger is possible overflow
 func (t *Turtle) Right(number float64) {
-	t.Heading = math.Mod((t.Heading - number), 360)
-	if t.Heading < 0 {
-		t.Heading += 360
-	}
+	t.Left(-number)
 }
 
 func (t *Turtle) SetXY(x float64, y float64) {
