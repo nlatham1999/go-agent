@@ -23,7 +23,8 @@ type Universe struct {
 	DirectedLinkBreeds  map[string]*LinkBreed
 	UndirectedLinkBreed map[string]*LinkBreed
 
-	PosOfPatches map[int]*Patch //map of patches by their index
+	posOfPatches map[int]*Patch  //map of patches by their index
+	whoToTurtles map[int]*Turtle //map of turtles by their who number
 
 	MaxPxCor    int
 	MaxPyCor    int
@@ -69,6 +70,7 @@ func NewUniverse(
 		TurtlesOwn:      turtlesOwn,
 		TurtleBreedsOwn: turtleBreedsOwn,
 		wrapping:        wrapping,
+		whoToTurtles:    make(map[int]*Turtle),
 	}
 
 	//construct turtle breeds
@@ -76,8 +78,7 @@ func NewUniverse(
 	for i := 0; i < len(turtleBreeds); i++ {
 		turtleBreedsMap[turtleBreeds[i]] = &TurtleBreed{
 			Turtles: &TurtleAgentSet{
-				turtles:      make(map[*Turtle]interface{}),
-				whoToTurtles: map[int]*Turtle{},
+				turtles: make(map[*Turtle]interface{}),
 			},
 			DefaultShape: "",
 		}
@@ -108,8 +109,7 @@ func NewUniverse(
 
 	//construct general turtle set
 	universe.Turtles = &TurtleAgentSet{
-		turtles:      make(map[*Turtle]interface{}),
-		whoToTurtles: map[int]*Turtle{},
+		turtles: make(map[*Turtle]interface{}),
 	}
 
 	//construct general link set
@@ -127,12 +127,12 @@ func (u *Universe) buildPatches() {
 	u.Patches = &PatchAgentSet{
 		patches: map[*Patch]interface{}{},
 	}
-	u.PosOfPatches = make(map[int]*Patch)
+	u.posOfPatches = make(map[int]*Patch)
 	for i := 0; i < u.WorldHeight; i++ {
 		for j := 0; j < u.WorldWidth; j++ {
 			p := NewPatch(u.PatchesOwn, j+u.MinPxCor, i+u.MinPyCor)
 			u.Patches.patches[p] = nil
-			u.PosOfPatches[j*u.WorldWidth+i] = p
+			u.posOfPatches[j*u.WorldWidth+i] = p
 		}
 	}
 }
@@ -218,11 +218,10 @@ func (u *Universe) CreateTurtles(amount int, breed string, operations []TurtleOp
 		newTurtle := NewTurtle(u, u.turtlesWhoNumber, breed)
 
 		agentSet.turtles[newTurtle] = nil
-		agentSet.whoToTurtles[u.turtlesWhoNumber] = newTurtle
+		u.whoToTurtles[u.turtlesWhoNumber] = newTurtle
 
 		if agentSet2 != nil {
 			agentSet2.turtles[newTurtle] = nil
-			agentSet2.whoToTurtles[u.turtlesWhoNumber] = newTurtle
 		}
 
 		for i := 0; i < len(operations); i++ {
@@ -334,7 +333,7 @@ func (u *Universe) getPatchAtCoords(x int, y int) *Patch {
 
 	pos := offsetY*u.WorldWidth + offsetX
 
-	return u.PosOfPatches[pos]
+	return u.posOfPatches[pos]
 }
 
 func (u *Universe) OneOfInt(arr []int) interface{} {
@@ -452,7 +451,7 @@ func (u *Universe) safeGetPatch(x int) *Patch {
 		return nil
 	}
 
-	return u.PosOfPatches[x]
+	return u.posOfPatches[x]
 }
 
 func (u *Universe) Patch(pxcor float64, pycor float64) *Patch {
@@ -515,13 +514,21 @@ func (u *Universe) TickAdvance(amount int) {
 // if the breed is empty then selects from the general population
 // if the breed or who number is not found then returns nil
 func (u *Universe) Turtle(breed string, who int) *Turtle {
+
+	t := u.whoToTurtles[who]
+	if t == nil {
+		return nil //turtle not found
+	}
 	if breed == "" {
-		return u.Turtles.whoToTurtles[who]
+		return t
 	} else {
 		if u.Breeds[breed] == nil {
 			return nil //breed not found
 		}
-		return u.Breeds[breed].Turtles.whoToTurtles[who]
+		if t.breed != breed {
+			return nil //turtle not found for that breed
+		}
+		return t
 	}
 }
 

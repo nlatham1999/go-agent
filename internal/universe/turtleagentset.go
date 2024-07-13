@@ -4,8 +4,6 @@ import "math"
 
 type TurtleAgentSet struct {
 	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
-
-	whoToTurtles map[int]*Turtle
 }
 
 // @TODO implement
