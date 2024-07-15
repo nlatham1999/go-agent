@@ -344,34 +344,28 @@ func (t *Turtle) MyOutLinks(breed string) []*Link {
 	return nil
 }
 
-func (t *Turtle) Neighbors() []*Patch {
+func (t *Turtle) Neighbors() *PatchAgentSet {
 	//get the patch the turtle is on
 	p := t.PatchHere()
 	if p == nil {
 		return nil
 	}
 
-	//get the index of the patch
-	index := p.index
-
 	//get the neighbors of the patch
-	neighbors := t.parent.Neighbors(index)
+	neighbors := t.parent.neighbors(p)
 
 	return neighbors
 }
 
-func (t *Turtle) Neighbors4() []*Patch {
+func (t *Turtle) Neighbors4() *PatchAgentSet {
 	//get the patch the turtle is on
 	p := t.PatchHere()
 	if p == nil {
 		return nil
 	}
 
-	//get the index of the patch
-	index := p.index
-
 	//get the neighbors of the patch
-	neighbors := t.parent.Neighbors4(index)
+	neighbors := t.parent.neighbors4(p)
 
 	return neighbors
 }

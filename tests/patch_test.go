@@ -138,3 +138,77 @@ func TestPatchDistanceToXY(t *testing.T) {
 		t.Errorf("Expected 4, got %v", distance)
 	}
 }
+
+func TestPatchNeighbors(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	//get a patch
+	patch := m.Patch(0, 0)
+
+	//get the neighbors of the patch
+	neighbors := patch.Neighbors()
+
+	//make sure the neighbors are correct
+	if neighbors.Count() != 8 {
+		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
+	}
+
+	model.AskPatches(neighbors,
+		[]model.PatchOperation{
+			func(p *model.Patch) {
+				p.PColor.SetColorScale(model.Red)
+			},
+		},
+	)
+
+	//make sure that the patches around the patch are red
+	p1 := m.Patch(1, 0)
+	p2 := m.Patch(1, 1)
+	p3 := m.Patch(0, 1)
+	p4 := m.Patch(-1, 1)
+	p5 := m.Patch(-1, 0)
+	p6 := m.Patch(-1, -1)
+	p7 := m.Patch(0, -1)
+	p8 := m.Patch(1, -1)
+	patchSet := model.PatchSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
+
+	if !patchSet.All(func(p *model.Patch) bool {
+		return p.PColor.GetColorScale() == model.Red
+	}) {
+		t.Errorf("Expected all neighbors to be red")
+	}
+
+	// get the top left patch and make sure we only get 3 neighbors
+	patch = m.Patch(-15, -15)
+	neighbors = patch.Neighbors()
+
+	if neighbors.Count() != 3 {
+		t.Errorf("Expected 3 neighbors, got %d", neighbors.Count())
+	}
+
+	// get the bottom right patch and make sure we only get 3 neighbors
+	patch = m.Patch(15, 15)
+	neighbors = patch.Neighbors()
+
+	if neighbors.Count() != 3 {
+		t.Errorf("Expected 3 neighbors, got %d", neighbors.Count())
+	}
+
+	// get the top right patch and make sure we only get 3 neighbors
+	patch = m.Patch(15, -15)
+	neighbors = patch.Neighbors()
+
+	if neighbors.Count() != 3 {
+		t.Errorf("Expected 3 neighbors, got %d", neighbors.Count())
+	}
+
+	// get the bottom left patch and make sure we only get 3 neighbors
+	patch = m.Patch(-15, 15)
+	neighbors = patch.Neighbors()
+
+	if neighbors.Count() != 3 {
+		t.Errorf("Expected 3 neighbors, got %d", neighbors.Count())
+	}
+}

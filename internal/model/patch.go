@@ -5,8 +5,12 @@ import (
 )
 
 type Patch struct {
-	x     int
-	y     int
+	x int
+	y int
+
+	// this corresponds to the position in the patches array
+	// set as x*m.WorldWidth + y
+	// maps to parent.posOfPatches[index]
 	index int
 
 	parent *Model
@@ -93,14 +97,14 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
 }
 
-func (p *Patch) Neighbors() []*Patch {
-	neighbors := p.parent.Neighbors(p.index)
+func (p *Patch) Neighbors() *PatchAgentSet {
+	neighbors := p.parent.neighbors(p)
 
 	return neighbors
 }
 
-func (p *Patch) Neighbors4() []*Patch {
-	neighbors := p.parent.Neighbors4(p.index)
+func (p *Patch) Neighbors4() *PatchAgentSet {
+	neighbors := p.parent.neighbors4(p)
 
 	return neighbors
 }

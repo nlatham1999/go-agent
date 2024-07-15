@@ -132,7 +132,9 @@ func (m *Model) buildPatches() {
 		for j := 0; j < m.WorldWidth; j++ {
 			p := NewPatch(m, m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
 			m.Patches.patches[p] = nil
-			m.posOfPatches[j*m.WorldWidth+i] = p
+			index := i*m.WorldWidth + j
+			m.posOfPatches[index] = p
+			p.index = index
 		}
 	}
 }
@@ -261,17 +263,16 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 	for patch := range m.Patches.patches {
 
 		amountFromNeighbors := 0.0
-		x := m.WorldHeight*patch.x + patch.y
-		neighbors := m.Neighbors(x)
-		if len(neighbors) > 8 || len(neighbors) < 3 {
+		neighbors := m.neighbors(patch)
+		if neighbors.Count() > 8 || neighbors.Count() < 3 {
 			return errors.New("invalid amount of neighbors")
 		}
-		for n := range neighbors {
-			amountFromNeighbors += diffusions[neighbors[n]]
+		for n := range neighbors.patches {
+			amountFromNeighbors += diffusions[n]
 		}
 
 		patchAmount := patch.PatchesOwn[patchVariable].(float64)
-		amountToKeep := 1 - (patchAmount * percent) + (float64(8-len(neighbors)) * (patchAmount * percent / 8))
+		amountToKeep := 1 - (patchAmount * percent) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
 
 		patch.PatchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
 	}
@@ -365,105 +366,186 @@ func (m *Model) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
 
-func (m *Model) topLeftNeighbor(x int) *Patch {
-	return m.safeGetPatch(x - m.WorldWidth - 1)
+func (m *Model) topLeftNeighbor(p *Patch) *Patch {
+	if p.x == m.MinPxCor || p.y == m.MinPyCor {
+		return nil
+	}
+
+	n := p.index - m.WorldWidth - 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) topNeighbor(x int) *Patch {
-	return m.safeGetPatch(x - m.WorldWidth)
+func (m *Model) topNeighbor(p *Patch) *Patch {
+	if p.y == m.MinPyCor {
+		return nil
+	}
+
+	n := p.index - m.WorldWidth
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) topRightNeighbor(x int) *Patch {
-	return m.safeGetPatch(x - m.WorldWidth + 1)
+func (m *Model) topRightNeighbor(p *Patch) *Patch {
+	if p.x == m.MaxPxCor || p.y == m.MinPyCor {
+		return nil
+	}
+
+	n := p.index - m.WorldWidth + 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) leftNeighbor(x int) *Patch {
-	return m.safeGetPatch(x - 1)
+func (m *Model) leftNeighbor(p *Patch) *Patch {
+	if p.x == m.MinPxCor {
+		return nil
+	}
+
+	n := p.index - 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) rightNeighbor(x int) *Patch {
-	return m.safeGetPatch(x + 1)
+func (m *Model) rightNeighbor(p *Patch) *Patch {
+	if p.x == m.MaxPxCor {
+		return nil
+	}
+
+	n := p.index + 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) bottomLeftNeighbor(x int) *Patch {
-	return m.safeGetPatch(x + m.WorldWidth - 1)
+func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
+	if p.x == m.MinPxCor || p.y == m.MaxPyCor {
+		return nil
+	}
+
+	n := p.index + m.WorldWidth - 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) bottomNeighbor(x int) *Patch {
-	return m.safeGetPatch(x + m.WorldWidth)
+func (m *Model) bottomNeighbor(p *Patch) *Patch {
+	if p.y == m.MaxPyCor {
+		return nil
+	}
+
+	n := p.index + m.WorldWidth
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
-func (m *Model) bottomRightNeighbor(x int) *Patch {
-	return m.safeGetPatch(x + m.WorldWidth + 1)
+func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
+	if p.x == m.MaxPxCor || p.y == m.MaxPyCor {
+		return nil
+	}
+
+	n := p.index + m.WorldWidth + 1
+	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
+		n = n % len(m.Patches.patches)
+	}
+
+	return m.safeGetPatch(n)
 }
 
 // @TODO check to see if we are wrapping around
-func (m *Model) Neighbors(x int) []*Patch {
-	n := []*Patch{}
+func (m *Model) neighbors(p *Patch) *PatchAgentSet {
+	n := make(map[*Patch]interface{})
 
-	topLeft := m.topLeftNeighbor(x)
+	topLeft := m.topLeftNeighbor(p)
 	if topLeft != nil {
-		n = append(n, topLeft)
+		n[topLeft] = nil
 	}
 
-	bottomLeft := m.bottomLeftNeighbor(x)
+	left := m.leftNeighbor(p)
+	if left != nil {
+		n[left] = nil
+	}
+
+	bottomLeft := m.bottomLeftNeighbor(p)
 	if bottomLeft != nil {
-		n = append(n, bottomLeft)
+		n[bottomLeft] = nil
 	}
 
-	top := m.topNeighbor(x)
+	top := m.topNeighbor(p)
 	if top != nil {
-		n = append(n, top)
+		n[top] = nil
 	}
 
-	topRight := m.topRightNeighbor(x)
+	topRight := m.topRightNeighbor(p)
 	if topRight != nil {
-		n = append(n, topRight)
+		n[topRight] = nil
 	}
 
-	right := m.rightNeighbor(x)
+	right := m.rightNeighbor(p)
 	if right != nil {
-		n = append(n, right)
+		n[right] = nil
 	}
 
-	bottomRight := m.bottomRightNeighbor(x)
+	bottomRight := m.bottomRightNeighbor(p)
 	if bottomRight != nil {
-		n = append(n, bottomRight)
+		n[bottomRight] = nil
 	}
 
-	bottom := m.bottomNeighbor(x)
+	bottom := m.bottomNeighbor(p)
 	if bottom != nil {
-		n = append(n, bottom)
+		n[bottom] = nil
 	}
 
-	return n
+	return &PatchAgentSet{
+		patches: n,
+	}
 }
 
 // @TODO check to see if we are wrapping around
-func (m *Model) Neighbors4(x int) []*Patch {
-	n := []*Patch{}
+func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
+	n := make(map[*Patch]interface{})
 
-	top := m.topNeighbor(x)
+	top := m.topNeighbor(p)
 	if top != nil {
-		n = append(n, top)
+		n[top] = nil
 	}
 
-	left := m.leftNeighbor(x)
+	left := m.leftNeighbor(p)
 	if left != nil {
-		n = append(n, left)
+		n[left] = nil
 	}
 
-	right := m.rightNeighbor(x)
+	right := m.rightNeighbor(p)
 	if right != nil {
-		n = append(n, right)
+		n[right] = nil
 	}
 
-	bottom := m.bottomNeighbor(x)
+	bottom := m.bottomNeighbor(p)
 	if bottom != nil {
-		n = append(n, bottom)
+		n[bottom] = nil
 	}
 
-	return n
+	return &PatchAgentSet{
+		patches: n,
+	}
 }
 
 func (m *Model) safeGetPatch(x int) *Patch {
