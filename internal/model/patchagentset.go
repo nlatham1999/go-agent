@@ -52,6 +52,11 @@ func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	}
 }
 
+func (p *PatchAgentSet) Contains(patch *Patch) bool {
+	_, ok := p.patches[patch]
+	return ok
+}
+
 func (p *PatchAgentSet) Count() int {
 	return len(p.patches)
 }

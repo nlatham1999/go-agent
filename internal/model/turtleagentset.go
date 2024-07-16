@@ -63,6 +63,11 @@ func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet
 	return TurtleSet(turtlesAtPatches)
 }
 
+func (t *TurtleAgentSet) Contains(turtle *Turtle) bool {
+	_, ok := t.turtles[turtle]
+	return ok
+}
+
 func (t *TurtleAgentSet) Count() int {
 	return len(t.turtles)
 }

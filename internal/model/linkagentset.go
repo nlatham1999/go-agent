@@ -35,6 +35,11 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 	return false
 }
 
+func (l *LinkAgentSet) Contains(link *Link) bool {
+	_, ok := l.links[link]
+	return ok
+}
+
 func (l *LinkAgentSet) Count() int {
 	return len(l.links)
 }
