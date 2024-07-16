@@ -132,11 +132,17 @@ func (m *Model) buildPatches() {
 		for j := 0; j < m.WorldWidth; j++ {
 			p := NewPatch(m, m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
 			m.Patches.patches[p] = nil
-			index := i*m.WorldWidth + j
+			index := i*m.WorldHeight + j
 			m.posOfPatches[index] = p
 			p.index = index
 		}
 	}
+}
+
+func (m *Model) patchIndex(x int, y int) int {
+	x = x - m.MinPxCor
+	y = y - m.MinPyCor
+	return y*m.WorldHeight + x
 }
 
 // @TODO implement
@@ -352,7 +358,7 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	offsetX := x - m.MinPxCor
 	offsetY := y - m.MinPyCor
 
-	pos := offsetX*m.WorldWidth + offsetY
+	pos := offsetY*m.WorldHeight + offsetX
 
 	return m.posOfPatches[pos]
 }
@@ -367,105 +373,165 @@ func (m *Model) RandomAmount(n int) int {
 }
 
 func (m *Model) topLeftNeighbor(p *Patch) *Patch {
-	if p.x == m.MinPxCor || p.y == m.MinPyCor {
-		return nil
+	x := p.x - 1
+	y := p.y - 1
+
+	if x < m.MinPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MaxPxCor
+		}
 	}
 
-	n := p.index - m.WorldWidth - 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
+	if y < m.MinPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MaxPyCor
+		}
 	}
+
+	n := m.patchIndex(x, y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) topNeighbor(p *Patch) *Patch {
-	if p.y == m.MinPyCor {
-		return nil
+	y := p.y - 1
+
+	if y < m.MinPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MaxPyCor
+		}
 	}
 
-	n := p.index - m.WorldWidth
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
-	}
+	n := m.patchIndex(p.x, y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) topRightNeighbor(p *Patch) *Patch {
-	if p.x == m.MaxPxCor || p.y == m.MinPyCor {
-		return nil
+	x := p.x + 1
+	y := p.y - 1
+
+	if x > m.MaxPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MinPxCor
+		}
 	}
 
-	n := p.index - m.WorldWidth + 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
+	if y < m.MinPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MaxPyCor
+		}
 	}
+
+	n := m.patchIndex(x, y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) leftNeighbor(p *Patch) *Patch {
-	if p.x == m.MinPxCor {
-		return nil
+	x := p.x - 1
+
+	if x < m.MinPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MaxPxCor
+		}
 	}
 
-	n := p.index - 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
-	}
+	n := m.patchIndex(x, p.y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) rightNeighbor(p *Patch) *Patch {
-	if p.x == m.MaxPxCor {
-		return nil
+	x := p.x + 1
+
+	if x > m.MaxPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MinPxCor
+		}
 	}
 
-	n := p.index + 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
-	}
+	n := m.patchIndex(x, p.y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
-	if p.x == m.MinPxCor || p.y == m.MaxPyCor {
-		return nil
+	x := p.x - 1
+	y := p.y + 1
+
+	if x < m.MinPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MaxPxCor
+		}
 	}
 
-	n := p.index + m.WorldWidth - 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
+	if y > m.MaxPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MinPyCor
+		}
 	}
+
+	n := m.patchIndex(x, y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) bottomNeighbor(p *Patch) *Patch {
-	if p.y == m.MaxPyCor {
-		return nil
+	y := p.y + 1
+
+	if y > m.MaxPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MinPyCor
+		}
 	}
 
-	n := p.index + m.WorldWidth
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
-	}
+	n := m.patchIndex(p.x, y)
 
 	return m.safeGetPatch(n)
 }
 
 func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
-	if p.x == m.MaxPxCor || p.y == m.MaxPyCor {
-		return nil
+	x := p.x + 1
+	y := p.y + 1
+
+	if x > m.MaxPxCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			x = m.MinPxCor
+		}
 	}
 
-	n := p.index + m.WorldWidth + 1
-	if m.wrapping && (n < 0 || n > len(m.Patches.patches)) {
-		n = n % len(m.Patches.patches)
+	if y > m.MaxPyCor {
+		if !m.wrapping {
+			return nil
+		} else {
+			y = m.MinPyCor
+		}
 	}
+
+	n := m.patchIndex(x, y)
 
 	return m.safeGetPatch(n)
 }
