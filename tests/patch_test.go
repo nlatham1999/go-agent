@@ -346,3 +346,54 @@ func TestPatchNeighbors4(t *testing.T) {
 		t.Errorf("Expected all neighbors to be red")
 	}
 }
+
+func TestPatchPatchAt(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	//get a patch
+	patch := m.Patch(0, 0)
+
+	//get the patch at the given dx dy
+	patchAt := patch.PatchAt(1, 1)
+
+	//make sure the patch is correct
+	if patchAt.PXCor() != 1 || patchAt.PYCor() != 1 {
+		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	}
+
+	// get patch outside of world
+	patchAt = patch.PatchAt(16, 16)
+
+	if patchAt != nil {
+		t.Errorf("Expected patch to be nil")
+	}
+
+	//create model that has wrapping
+	m = model.NewModel(nil, nil, nil, nil, nil, nil, true)
+
+	//get a patch
+	patch = m.Patch(-15, -15)
+
+	//get the patch at the given dx dy
+	patchAt = patch.PatchAt(-1, -1)
+
+	//make sure the patch is correct
+	if patchAt.PXCor() != 15 || patchAt.PYCor() != 15 {
+		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	}
+
+	// get patch outside of world
+	patchAt = patch.PatchAt(16, 16)
+
+	if patchAt.PXCor() != 1 || patchAt.PYCor() != 1 {
+		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	}
+
+	patchAt = patch.PatchAt(-32, -32)
+
+	if patchAt.PXCor() != 15 || patchAt.PYCor() != 15 {
+		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	}
+}
