@@ -190,7 +190,6 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 	}
 }
 
-// @TODO implement
 func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 
 	turtlesAdded := TurtleSet([]*Turtle{})
@@ -235,7 +234,6 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	return math.Atan2(deltaY, deltaX)
 }
 
-// @TODO implement
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 
 	//is the breed valid

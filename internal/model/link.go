@@ -16,12 +16,12 @@ type Link struct {
 }
 
 // @TODO implement
-func (l *Link) GetBreedName() string {
+func (l *Link) BreedName() string {
 	return ""
 }
 
 // @TODO implement
-func (l *Link) GetBreedSet() []*Link {
+func (l *Link) BreedSet() []*Link {
 	return nil
 }
 

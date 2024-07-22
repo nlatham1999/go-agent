@@ -78,11 +78,11 @@ implement?
 ```(m *Model) BothEnds(link *Link) []*Turtle```
 
 ### breed
-```(t *Link) GetBreedName() string```
-```(t *Link) GetBreedSet() []*Link```
+```(t *Link) BreedName() string```
+```(t *Link) BreedSet() []*Link```
 ```(t *Link) SetBreed(name string)```
-```(t *Turtle) GetBreedName() string```  
-```(t *Turtle) GetBreedSet() []*Turtle```
+```(t *Turtle) BreedName() string```  
+```(t *Turtle) BreedSet() []*Turtle```
 ```(t *Turtle) SetBreed(name string)```
 
 ### but-first, butfirst, bf

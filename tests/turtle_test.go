@@ -31,5 +31,19 @@ func TestTurtleBack(t *testing.T) {
 	if turtle.YCor() != -15 && turtle.XCor() != 0 {
 		t.Errorf("Expected turtle to move back 10")
 	}
+}
 
+func TestTurtleBreedName(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, []string{"ants"}, nil, nil, false)
+
+	//create a turtle
+	m.CreateTurtles(1, "ants", nil)
+
+	turtle := m.Turtle("ants", 0)
+	//assert that the turtle's breed is "ants"
+	if turtle.BreedName() != "ants" {
+		t.Errorf("Expected turtle to have breed 'ants'")
+	}
 }

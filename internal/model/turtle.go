@@ -61,18 +61,16 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	return t
 }
 
-// @TODO Implement
 func (t *Turtle) Back(distance float64) {
 	t.Forward(-distance)
 }
 
-// @TODO implement
-func (t *Turtle) GetBreedName() string {
-	return ""
+func (t *Turtle) BreedName() string {
+	return t.breed
 }
 
 // @TODO implement
-func (t *Turtle) GetBreedSet() []*Turtle {
+func (t *Turtle) BreedSet() []*Turtle {
 	return nil
 }
 
