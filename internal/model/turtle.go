@@ -20,6 +20,8 @@ type Turtle struct {
 	Label      interface{}
 	LabelColor Color
 
+	turtlesOwn map[string]interface{} // turtles own variables
+
 	patch *Patch //patch the turtle is on
 }
 
@@ -57,6 +59,20 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	//link the turtle to the patch
 	t.patch = t.PatchHere()
 	t.patch.addTurtle(t)
+
+	//set the turtle own variables
+	//breed specific variables can override general variables
+	t.turtlesOwn = make(map[string]interface{})
+	generalTemplate := m.Breeds[""].turtlesOwnTemplate
+	for key, value := range generalTemplate {
+		t.turtlesOwn[key] = value
+	}
+	if breedSet != nil {
+		breedTemplate := breedSet.turtlesOwnTemplate
+		for key, value := range breedTemplate {
+			t.turtlesOwn[key] = value
+		}
+	}
 
 	return t
 }
@@ -413,6 +429,17 @@ func (t *Turtle) OutLinkNeighbors(breed string, turtle *Turtle) *TurtleAgentSet 
 // @TODO implement
 func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
 	return nil
+}
+
+// returns the turtle own variable
+func (t *Turtle) GetOwn(key string) interface{} {
+	return t.turtlesOwn[key]
+}
+
+// sets the turtle own variable
+// this can create a new variable if it doesn't exist, but i don't think this is bad
+func (t *Turtle) SetOwn(key string, value interface{}) {
+	t.turtlesOwn[key] = value
 }
 
 func (t *Turtle) PatchAhead(distance float64) *Patch {

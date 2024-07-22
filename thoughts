@@ -13,4 +13,8 @@ patch coordinates store the middle of the patch
  - maxp(x)(y)cor being 15 means that the max coord is 15.5
  - each patch goes +- .5
 
- 
+A turtles own variable for a breed has precedence over the general turtles own
+for example if there is a starting variable of x = 30 for general and x = "test" for ants, a turtle of ants will have x = "test"
+
+when changing the breed should the turtles own change?
+

@@ -62,7 +62,7 @@ func TestTurtleBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have a breed")
 	}
 
-	if turtle.Breed().Name != "ants" {
+	if turtle.Breed().Name() != "ants" {
 		t.Errorf("Expected turtle to have breed 'ants'")
 	}
 }
@@ -113,5 +113,66 @@ func TestTurtleSetBreed(t *testing.T) {
 
 	if turtle == nil {
 		t.Errorf("Expected turtle to exist in breed 'ants'")
+	}
+}
+
+func TestTurtlesOwn(t *testing.T) {
+
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	turtle := m.Turtle("", 0)
+
+	// get the turtle's own
+	mood := turtle.GetOwn("mood")
+
+	if mood != nil {
+		t.Errorf("Expected turtle to not have own 'mood'")
+	}
+
+	// set the turtle's own
+	turtle.SetOwn("mood", 5)
+
+	mood = turtle.GetOwn("mood")
+
+	if mood != 5 {
+		t.Errorf("Expected turtle to have own 'mood' with value 5")
+	}
+
+	// create a second model
+	turtlesOwn := map[string]interface{}{
+		"mood": "happy",
+		"age":  5,
+	}
+
+	antsOwn := map[string]interface{}{
+		"mood": 0,
+	}
+
+	breedsOwn := map[string]map[string]interface{}{
+		"ants": antsOwn,
+	}
+
+	m2 := model.NewModel(nil, turtlesOwn, breedsOwn, []string{"ants"}, nil, nil, false)
+
+	// create a turtle
+	m2.CreateTurtles(1, "ants", nil)
+
+	turtle = m2.Turtle("", 0)
+
+	// get the turtle's own
+	mood = turtle.GetOwn("mood")
+
+	if mood != 0 {
+		t.Errorf("Expected turtle to have own 'mood' with value 0, got %v", mood)
+	}
+
+	age := turtle.GetOwn("age")
+
+	if age != 5 {
+		t.Errorf("Expected turtle to have own 'age' with value 5")
 	}
 }

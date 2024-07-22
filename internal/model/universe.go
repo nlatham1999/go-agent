@@ -10,11 +10,9 @@ type Model struct {
 	Ticks   int
 	TicksOn bool
 
-	LinksOwn        map[string]interface{}            //additional variables for each link
-	LinkBreedsOwn   map[string]map[string]interface{} //additional variables for each link breed. The first key is the breed name
-	PatchesOwn      map[string]interface{}            //additional variables for each patch
-	TurtlesOwn      map[string]interface{}            //additional variables for each turtle
-	TurtleBreedsOwn map[string]map[string]interface{} //additional variables for each turtle breed. The first key is the breed name
+	linksOwnTemplate      map[string]interface{}            //additional variables for each link
+	linkBreedsOwnTemplate map[string]map[string]interface{} //additional variables for each link breed. The first key is the breed name
+	patchesOwnTemplate    map[string]interface{}            //additional variables for each patch
 
 	Patches             *PatchAgentSet
 	Turtles             *TurtleAgentSet         //all the turtles
@@ -60,17 +58,15 @@ func NewModel(
 	minPyCor := -15
 
 	model := &Model{
-		MaxPxCor:        maxPxCor,
-		MaxPyCor:        maxPyCor,
-		MinPxCor:        minPxCor,
-		MinPyCor:        minPyCor,
-		WorldWidth:      maxPxCor - minPxCor + 1,
-		WorldHeight:     maxPyCor - minPyCor + 1,
-		PatchesOwn:      patchesOwn,
-		TurtlesOwn:      turtlesOwn,
-		TurtleBreedsOwn: turtleBreedsOwn,
-		wrapping:        wrapping,
-		whoToTurtles:    make(map[int]*Turtle),
+		MaxPxCor:           maxPxCor,
+		MaxPyCor:           maxPyCor,
+		MinPxCor:           minPxCor,
+		MinPyCor:           minPyCor,
+		WorldWidth:         maxPxCor - minPxCor + 1,
+		WorldHeight:        maxPyCor - minPyCor + 1,
+		patchesOwnTemplate: patchesOwn,
+		wrapping:           wrapping,
+		whoToTurtles:       make(map[int]*Turtle),
 	}
 
 	//construct turtle breeds
@@ -80,8 +76,18 @@ func NewModel(
 			Turtles: &TurtleAgentSet{
 				turtles: make(map[*Turtle]interface{}),
 			},
-			Name:         turtleBreeds[i],
-			DefaultShape: "",
+			name:         turtleBreeds[i],
+			defaultShape: "",
+		}
+
+		//copy the turtles breeds own template
+		if turtleBreedsOwn != nil && turtleBreedsOwn[turtleBreeds[i]] != nil {
+			turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
+			for key, value := range turtleBreedsOwn[turtleBreeds[i]] {
+				turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate[key] = value
+			}
+		} else {
+			turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
 		}
 	}
 	model.Breeds = turtleBreedsMap
@@ -112,10 +118,20 @@ func NewModel(
 	model.Turtles = &TurtleAgentSet{
 		turtles: make(map[*Turtle]interface{}),
 	}
+
+	// create a breed with no name for the general population
 	model.Breeds[""] = &TurtleBreed{
-		Turtles:      model.Turtles,
-		Name:         "",
-		DefaultShape: "",
+		Turtles:            model.Turtles,
+		name:               "",
+		defaultShape:       "",
+		turtlesOwnTemplate: make(map[string]interface{}),
+	}
+	if turtlesOwn != nil {
+		for key, value := range turtlesOwn {
+			model.Breeds[""].turtlesOwnTemplate[key] = value
+		}
+	} else {
+		model.Breeds[""].turtlesOwnTemplate = make(map[string]interface{})
 	}
 
 	//construct general link set
@@ -136,7 +152,7 @@ func (m *Model) buildPatches() {
 	m.posOfPatches = make(map[int]*Patch)
 	for i := 0; i < m.WorldHeight; i++ {
 		for j := 0; j < m.WorldWidth; j++ {
-			p := NewPatch(m, m.PatchesOwn, j+m.MinPxCor, i+m.MinPyCor)
+			p := NewPatch(m, m.patchesOwnTemplate, j+m.MinPxCor, i+m.MinPyCor)
 			m.Patches.patches[p] = nil
 			index := i*m.WorldHeight + j
 			m.posOfPatches[index] = p
@@ -185,7 +201,7 @@ func (m *Model) ClearTicks() {
 
 func (m *Model) ClearPatches() {
 	for patch := range m.Patches.patches {
-		patch.Reset(m.PatchesOwn)
+		patch.Reset(m.patchesOwnTemplate)
 	}
 }
 
@@ -659,7 +675,7 @@ func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
 }
 
 func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {
-	m.Breeds[breed].DefaultShape = shape
+	m.Breeds[breed].defaultShape = shape
 }
 
 func (m *Model) Tick() {
