@@ -23,6 +23,12 @@ type Turtle struct {
 	turtlesOwnGeneral map[string]interface{} // turtles own variables
 	turtlesOwnBreed   map[string]interface{} // turtles own variables
 
+	// 3D map of the links the turtle is involved in
+	// the first bool is if the link is directed
+	// the string is the breed of the link - the empty string key is all the links
+	// the third map is the turtles the link is connected to
+	linkedTurtles map[bool]map[string]map[*Turtle]*Link
+
 	patch *Patch //patch the turtle is on
 }
 
@@ -137,69 +143,69 @@ func (t *Turtle) CanMove(distance float64) bool {
 	return false
 }
 
-// @TODO implement
-// creates a directed breed link from the current turtle to the turtle passed in
-func (t *Turtle) CreateBreedTo(breed string, turtle *Turtle, operations []TurtleOperation) {
+// creates a directed link from the current turtle to the turtle passed in
+func (t *Turtle) CreateLinkTo(breed string, turtle *Turtle, operations []LinkOperation) {
+	l := NewLink(t.parent, breed, t, turtle, true)
 
+	for _, operation := range operations {
+		operation(l)
+	}
 }
 
-// @TODO implement
-// creates a directed breed link from the current turtle to the turtles passed in
-func (t *Turtle) CreateBreedsTo(breed string, turtles []*Turtle, operations []TurtleOperation) {
+// creates a directed link from the current turtle to the turtles passed in
+func (t *Turtle) CreateLinkToSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+	if breed == "" {
+		return
+	}
 
+	linksAdded := LinkSet([]*Link{})
+	for turtle := range turtles.turtles {
+		l := NewLink(t.parent, breed, t, turtle, true)
+		linksAdded.Add(l)
+	}
+
+	AskLinks(linksAdded, operations)
 }
 
-// @TODO implement
 // creates an undirected breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateBreedWith(breed string, turtle Turtle, operations []TurtleOperation) {
+func (t *Turtle) CreateLinkWith(breed string, turtle *Turtle, operations []LinkOperation) {
+	l := NewLink(t.parent, breed, t, turtle, false)
+
+	for _, operation := range operations {
+		operation(l)
+	}
 
 }
 
-// @TODO implement
 // creates an undirected breed link from the current turtle with the turtles passed in
-func (t *Turtle) CreateBreedsWith(breed string, turtles []*Turtle, operations []TurtleOperation) {
+func (t *Turtle) CreateLinkWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+	linksAdded := LinkSet([]*Link{})
+	for turtle := range turtles.turtles {
+		l := NewLink(t.parent, breed, t, turtle, false)
+		linksAdded.Add(l)
+	}
 
+	AskLinks(linksAdded, operations)
 }
 
-// @TODO implement
 // creates a directed breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateBreedFrom(breed string, turtle *Turtle, operations []TurtleOperation) {
+func (t *Turtle) CreateBreedFrom(breed string, turtle *Turtle, operations []LinkOperation) {
+	l := NewLink(t.parent, breed, turtle, t, true)
 
+	for _, operation := range operations {
+		operation(l)
+	}
 }
 
-// @TODO implement
-func (t *Turtle) CreateBreedsFrom(breed string, turtles []*Turtle, operations []TurtleOperation) {
+// creates a directed breed link from the turtles passed in to the current turtle
+func (t *Turtle) CreateBreedsFrom(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+	linksAdded := LinkSet([]*Link{})
+	for turtle := range turtles.turtles {
+		l := NewLink(t.parent, breed, turtle, t, true)
+		linksAdded.Add(l)
+	}
 
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinkTo(turtle *Turtle, operations []TurtleOperation) {
-
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinksTo(turtles []*Turtle, operations []TurtleOperation) {
-
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinkWith(turtle *Turtle, operations []TurtleOperation) {
-
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinksWith(turtles []*Turtle, operations []TurtleOperation) {
-
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinkFrom(turtle *Turtle, operations []TurtleOperation) {
-
-}
-
-// @TODO implement
-func (t *Turtle) CreateLinksFrom(turtles []*Turtle, operations []TurtleOperation) {
-
+	AskLinks(linksAdded, operations)
 }
 
 // @TODO implement
@@ -330,13 +336,28 @@ func (t *Turtle) InLinkNeighbors(turtle *Turtle) []*Turtle {
 	return nil
 }
 
-// @TODO implement
-func (t *Turtle) InLinkBreedFrom(breed string, turtle *Turtle) *Link {
-	return nil
-}
+// finds a
+func (t *Turtle) InLinkFrom(breed string, turtle *Turtle) *Link {
 
-// @TODO implement
-func (t *Turtle) InLinkFrom(turtle *Turtle) *Link {
+	if turtle.linkedTurtles != nil {
+		// look in the directed links
+		if turtle.linkedTurtles[true] != nil {
+			if turtle.linkedTurtles[true][breed] != nil {
+				if link, found := turtle.linkedTurtles[true][breed][t]; found {
+					return link
+				}
+			}
+		}
+		// look in the undirected links
+		if turtle.linkedTurtles[false] != nil {
+			if turtle.linkedTurtles[false][breed] != nil {
+				if link, found := turtle.linkedTurtles[false][breed][t]; found {
+					return link
+				}
+			}
+		}
+	}
+
 	return nil
 }
 

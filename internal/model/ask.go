@@ -3,7 +3,7 @@ package model
 
 //ask functions
 
-func AskLinks(agentset LinkAgentSet, operations []LinkOperation) {
+func AskLinks(agentset *LinkAgentSet, operations []LinkOperation) {
 	for link := range agentset.links {
 		for j := 0; j < len(operations); j++ {
 			operations[j](link)

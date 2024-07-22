@@ -41,6 +41,21 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		model.UndirectedLinkBreeds[""].Links.Add(l)
 	}
 
+	// add the link to the turtle's link map
+	if directed {
+		end1.linkedTurtles[true][""][end2] = l
+		if breed != "" {
+			end1.linkedTurtles[true][breed][end2] = l
+		}
+	} else {
+		end1.linkedTurtles[false][""][end2] = l
+		end2.linkedTurtles[false][""][end1] = l
+		if breed != "" {
+			end2.linkedTurtles[false][breed][end1] = l
+			end1.linkedTurtles[false][breed][end2] = l
+		}
+	}
+
 	return l
 }
 

@@ -35,7 +35,7 @@ func TestAskLinks(t *testing.T) {
 	agentset := model.LinkSet([]*model.Link{link1, link2, link3})
 
 	// ask to change all colors to red
-	model.AskLinks(*agentset, []model.LinkOperation{
+	model.AskLinks(agentset, []model.LinkOperation{
 		func(link *model.Link) {
 			link.Color.SetColorScale(model.Red)
 		},

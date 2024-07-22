@@ -124,3 +124,25 @@ func TestLinkSetBreed(t *testing.T) {
 		t.Errorf("Link should have been added to person-pet")
 	}
 }
+
+func TestLinkCreateLinkToTurtle(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	t1.CreateLinkTo("parent-children", t2, nil)
+
+	// make sure the link exists
+	l := t1.InLinkFrom("parent-children", t2)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+}
