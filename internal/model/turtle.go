@@ -73,9 +73,22 @@ func (t *Turtle) Breed() *TurtleBreed {
 	return t.parent.Breeds[t.breed]
 }
 
-// @TODO implement
+// Sets the breed of the turtle to the name passed in
 func (t *Turtle) SetBreed(name string) {
 
+	if t.breed == name {
+		return
+	}
+
+	if t.breed != "" {
+		delete(t.parent.Breeds[t.breed].Turtles.turtles, t)
+	}
+
+	t.breed = name
+
+	if name != "" {
+		t.parent.Breeds[name].Turtles.turtles[t] = nil
+	}
 }
 
 // @TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice

@@ -112,6 +112,11 @@ func NewModel(
 	model.Turtles = &TurtleAgentSet{
 		turtles: make(map[*Turtle]interface{}),
 	}
+	model.Breeds[""] = &TurtleBreed{
+		Turtles:      model.Turtles,
+		Name:         "",
+		DefaultShape: "",
+	}
 
 	//construct general link set
 	model.Links = &LinkAgentSet{
