@@ -6,7 +6,7 @@ type Link struct {
 	End2      *Turtle
 	Hidden    bool
 	Directed  bool
-	Breed     string
+	breed     string
 	Shape     string
 	Thickness float64
 	TieMode   string
@@ -21,7 +21,7 @@ func (l *Link) BreedName() string {
 }
 
 // @TODO implement
-func (l *Link) BreedSet() []*Link {
+func (l *Link) Breed() []*Link {
 	return nil
 }
 

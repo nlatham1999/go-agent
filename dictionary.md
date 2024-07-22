@@ -79,10 +79,10 @@ implement?
 
 ### breed
 ```(t *Link) BreedName() string```
-```(t *Link) BreedSet() []*Link```
+```(t *Link) Breed() []*Link```
 ```(t *Link) SetBreed(name string)```
 ```(t *Turtle) BreedName() string```  
-```(t *Turtle) BreedSet() []*Turtle```
+```(t *Turtle) Breed() []*Turtle```
 ```(t *Turtle) SetBreed(name string)```
 
 ### but-first, butfirst, bf

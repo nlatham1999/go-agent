@@ -69,9 +69,8 @@ func (t *Turtle) BreedName() string {
 	return t.breed
 }
 
-// @TODO implement
-func (t *Turtle) BreedSet() []*Turtle {
-	return nil
+func (t *Turtle) Breed() *TurtleBreed {
+	return t.parent.Breeds[t.breed]
 }
 
 // @TODO implement

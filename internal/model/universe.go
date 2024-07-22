@@ -80,6 +80,7 @@ func NewModel(
 			Turtles: &TurtleAgentSet{
 				turtles: make(map[*Turtle]interface{}),
 			},
+			Name:         turtleBreeds[i],
 			DefaultShape: "",
 		}
 	}

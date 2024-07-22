@@ -47,3 +47,22 @@ func TestTurtleBreedName(t *testing.T) {
 		t.Errorf("Expected turtle to have breed 'ants'")
 	}
 }
+
+func TestTurtleBreed(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, []string{"ants"}, nil, nil, false)
+
+	//create a turtle
+	m.CreateTurtles(1, "ants", nil)
+
+	turtle := m.Turtle("ants", 0)
+
+	if turtle.Breed() == nil {
+		t.Errorf("Expected turtle to have a breed")
+	}
+
+	if turtle.Breed().Name != "ants" {
+		t.Errorf("Expected turtle to have breed 'ants'")
+	}
+}
