@@ -14,12 +14,12 @@ type Model struct {
 	linkBreedsOwnTemplate map[string]map[string]interface{} //additional variables for each link breed. The first key is the breed name
 	patchesOwnTemplate    map[string]interface{}            //additional variables for each patch
 
-	Patches             *PatchAgentSet
-	Turtles             *TurtleAgentSet         //all the turtles
-	Breeds              map[string]*TurtleBreed //turtles that are part of specific breeds
-	Links               *LinkAgentSet           //all the links
-	DirectedLinkBreeds  map[string]*LinkBreed
-	UndirectedLinkBreed map[string]*LinkBreed
+	Patches              *PatchAgentSet
+	Turtles              *TurtleAgentSet         //all the turtles
+	Breeds               map[string]*TurtleBreed //turtles that are part of specific breeds
+	Links                *LinkAgentSet           //all the links
+	DirectedLinkBreeds   map[string]*LinkBreed
+	UndirectedLinkBreeds map[string]*LinkBreed
 
 	posOfPatches map[int]*Patch  //map of patches by their index
 	whoToTurtles map[int]*Turtle //map of turtles by their who number
@@ -94,25 +94,33 @@ func NewModel(
 
 	//construct directed link breeds
 	directedLinkBreedsMap := make(map[string]*LinkBreed)
+	directedLinkBreeds = append(directedLinkBreeds, "") // add the general population
 	for i := 0; i < len(directedLinkBreeds); i++ {
 		directedLinkBreedsMap[directedLinkBreeds[i]] = &LinkBreed{
-			Links:        []*Link{},
+			Links: &LinkAgentSet{
+				links: make(map[*Link]interface{}),
+			},
 			Directed:     true,
 			DefaultShape: "",
+			name:         directedLinkBreeds[i],
 		}
 	}
 	model.DirectedLinkBreeds = directedLinkBreedsMap
 
 	//construct undirected link breeds
 	undirectedLinkBreedsMap := make(map[string]*LinkBreed)
+	undirectedLinkBreeds = append(undirectedLinkBreeds, "") // add the general population
 	for i := 0; i < len(undirectedLinkBreeds); i++ {
 		undirectedLinkBreedsMap[undirectedLinkBreeds[i]] = &LinkBreed{
-			Links:        []*Link{},
+			Links: &LinkAgentSet{
+				links: make(map[*Link]interface{}),
+			},
 			Directed:     false,
 			DefaultShape: "",
+			name:         undirectedLinkBreeds[i],
 		}
 	}
-	model.UndirectedLinkBreed = undirectedLinkBreedsMap
+	model.UndirectedLinkBreeds = undirectedLinkBreedsMap
 
 	//construct general turtle set
 	model.Turtles = &TurtleAgentSet{
@@ -362,6 +370,7 @@ func (m *Model) LinkShapes() []string {
 	return []string{}
 }
 
+// does not implement wrappimg, that is the responsibilty of the caller
 func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	if x < m.MinPxCor || x > m.MaxPxCor || y < m.MinPyCor || y > m.MaxPyCor {
 		return nil

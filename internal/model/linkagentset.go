@@ -17,6 +17,10 @@ func LinkSet(links []*Link) *LinkAgentSet {
 	}
 }
 
+func (l *LinkAgentSet) Add(link *Link) {
+	l.links[link] = nil
+}
+
 func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
 	for link := range l.links {
 		if !operation(link) {

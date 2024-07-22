@@ -1,10 +1,14 @@
 package model
 
 type LinkBreed struct {
-	Links []*Link
+	Links *LinkAgentSet
 
-	Name string
+	name string
 
 	Directed     bool
 	DefaultShape string
+}
+
+func (l *LinkBreed) Name() string {
+	return l.name
 }

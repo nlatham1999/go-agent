@@ -118,8 +118,11 @@ func (t *Turtle) SetBreed(name string) {
 	}
 }
 
-// @TODO make a secondary position that just checks the new coords so that we don't have to do the move calcs twice
 func (t *Turtle) CanMove(distance float64) bool {
+
+	if t.parent.wrapping {
+		return true
+	}
 
 	newX := t.xcor + distance*math.Cos(t.heading)
 	newY := t.ycor + distance*math.Sin(t.heading)
@@ -338,8 +341,8 @@ func (t *Turtle) InLinkFrom(turtle *Turtle) *Link {
 }
 
 // jumps ahead by the distance, if it cannot then it returns false
+// @TODO implement - wrapping and don't call Can Move since that is expensive
 func (t *Turtle) Jump(distance float64) {
-
 	if t.CanMove(distance) {
 		xcor := t.xcor + distance*math.Cos(t.heading)
 		ycor := t.ycor + distance*math.Sin(t.heading)

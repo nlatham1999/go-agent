@@ -10,24 +10,90 @@ type Link struct {
 	Shape     string
 	Thickness float64
 	TieMode   string
+	parent    *Model
 
 	Label      interface{}
 	LabelColor Color
 }
 
-// @TODO implement
+func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) *Link {
+
+	// make sure the breed exists
+	if _, ok := model.DirectedLinkBreeds[breed]; !ok {
+		return nil
+	}
+
+	l := &Link{
+		breed:    breed,
+		End1:     end1,
+		End2:     end2,
+		Directed: directed,
+		parent:   model,
+	}
+
+	model.Links.Add(l)
+
+	if directed {
+		model.DirectedLinkBreeds[breed].Links.Add(l)
+		model.DirectedLinkBreeds[""].Links.Add(l)
+	} else {
+		model.UndirectedLinkBreeds[breed].Links.Add(l)
+		model.UndirectedLinkBreeds[""].Links.Add(l)
+	}
+
+	return l
+}
+
 func (l *Link) BreedName() string {
-	return ""
+	return l.breed
 }
 
-// @TODO implement
-func (l *Link) Breed() []*Link {
-	return nil
+func (l *Link) Breed() *LinkBreed {
+	if l.breed == "" {
+		return nil
+	}
+
+	if l.Directed {
+		return l.parent.DirectedLinkBreeds[l.breed]
+	} else {
+		return l.parent.UndirectedLinkBreeds[l.breed]
+	}
 }
 
-// @TODO implement
 func (l *Link) SetBreed(name string) {
 
+	// make sure the breed exists
+	if l.Directed {
+		if _, ok := l.parent.DirectedLinkBreeds[name]; !ok {
+			return
+		}
+	} else {
+		if _, ok := l.parent.UndirectedLinkBreeds[name]; !ok {
+			return
+		}
+	}
+
+	// remove the link from the old breed if it exists
+	if l.breed != "" {
+		var breed *LinkBreed
+		if l.Directed {
+			breed = l.parent.DirectedLinkBreeds[l.breed]
+		} else {
+			breed = l.parent.UndirectedLinkBreeds[l.breed]
+		}
+
+		delete(breed.Links.links, l)
+	}
+
+	l.breed = name
+
+	if l.breed != "" {
+		if l.Directed {
+			l.parent.DirectedLinkBreeds[name].Links.Add(l)
+		} else {
+			l.parent.UndirectedLinkBreeds[name].Links.Add(l)
+		}
+	}
 }
 
 func (l *Link) Hide() {
