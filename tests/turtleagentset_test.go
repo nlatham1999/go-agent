@@ -11,9 +11,9 @@ func TestAllTurtle(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(nil, nil, nil, nil, nil, nil, false)
 
-	turtle1 := model.NewTurtle(u, 0, "")
-	turtle2 := model.NewTurtle(u, 1, "")
-	turtle3 := model.NewTurtle(u, 2, "")
+	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
+	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
+	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
 	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
@@ -42,9 +42,9 @@ func TestAnyTurtle(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(nil, nil, nil, nil, nil, nil, false)
 
-	turtle1 := model.NewTurtle(u, 0, "")
-	turtle2 := model.NewTurtle(u, 1, "")
-	turtle3 := model.NewTurtle(u, 2, "")
+	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
+	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
+	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
 	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 

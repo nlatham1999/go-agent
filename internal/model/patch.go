@@ -2,6 +2,7 @@ package model
 
 import (
 	"math"
+	"math/rand"
 )
 
 type Patch struct {
@@ -109,7 +110,6 @@ func (p *Patch) Neighbors4() *PatchAgentSet {
 	return neighbors
 }
 
-// @TODO implement
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 	other := &PatchAgentSet{
 		patches: make(map[*Patch]interface{}),
@@ -124,7 +124,7 @@ func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 	return other
 }
 
-//gets the patch relavitve to this patch at the given dx dy
+// gets the patch relavitve to this patch at the given dx dy
 func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 
 	//round the coords
@@ -193,6 +193,22 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 // @TODO implement
 func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 
+	turtlesAdded := TurtleSet([]*Turtle{})
+	for i := 0; i < number; i++ {
+
+		t := NewTurtle(p.parent, p.parent.turtlesWhoNumber, breed, p.xFloat64, p.yFloat64)
+		p.parent.turtlesWhoNumber++
+
+		//set the heading to be between 0 and 360
+		heading := rand.Intn(360)
+
+		//convert to radians
+		t.SetHeading(float64(heading) * math.Pi / 180)
+
+		turtlesAdded.Add(t)
+	}
+
+	AskTurtles(turtlesAdded, operations)
 }
 
 func (p *Patch) TowardsPatch(patch *Patch) float64 {

@@ -211,26 +211,16 @@ func (m *Model) CreateOrderedTurtles(breed string, amount float64, operations []
 
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
-	agentSet := m.Turtles
-	var agentSet2 *TurtleAgentSet = nil
 	if breed != "" {
-		breed, found := m.Breeds[breed]
+		_, found := m.Breeds[breed]
 		if !found {
 			return errors.New("breed not found")
 		}
-		agentSet2 = breed.Turtles
 	}
 
 	end := amount + m.turtlesWhoNumber
 	for m.turtlesWhoNumber < end {
-		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed)
-
-		agentSet.turtles[newTurtle] = nil
-		m.whoToTurtles[m.turtlesWhoNumber] = newTurtle
-
-		if agentSet2 != nil {
-			agentSet2.turtles[newTurtle] = nil
-		}
+		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
 
 		for i := 0; i < len(operations); i++ {
 			operations[i](newTurtle)

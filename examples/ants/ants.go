@@ -141,7 +141,7 @@ func run() {
 		environment.Turtles,
 		[]model.TurtleOperation{
 			func(t *model.Turtle) {
-				if t.Who >= environment.Ticks {
+				if t.Who() >= environment.Ticks {
 					return
 				}
 				if t.Color.GetColorScale() == environment.ColorHueMap["red"] {

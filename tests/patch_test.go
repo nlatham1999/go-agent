@@ -397,3 +397,50 @@ func TestPatchPatchAt(t *testing.T) {
 		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
 	}
 }
+
+func TestPatchSprout(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	//get a patch
+	patch := m.Patch(0, 0)
+
+	//sprout a patch
+	patch.Sprout("", 5, []model.TurtleOperation{
+		func(t *model.Turtle) {
+			switch t.Who() {
+			case 0:
+				t.Color.SetColorScale(model.Red)
+			case 1:
+				t.Color.SetColorScale(model.Blue)
+			case 2:
+				t.Color.SetColorScale(model.Green)
+			case 3:
+				t.Color.SetColorScale(model.Yellow)
+			case 4:
+				t.Color.SetColorScale(model.Pink)
+			}
+		},
+	})
+
+	if m.Turtle("", 0).Color.GetColorScale() != model.Red {
+		t.Errorf("Expected red turtle")
+	}
+
+	if m.Turtle("", 1).Color.GetColorScale() != model.Blue {
+		t.Errorf("Expected blue turtle")
+	}
+
+	if m.Turtle("", 2).Color.GetColorScale() != model.Green {
+		t.Errorf("Expected green turtle")
+	}
+
+	if m.Turtle("", 3).Color.GetColorScale() != model.Yellow {
+		t.Errorf("Expected yellow turtle")
+	}
+
+	if m.Turtle("", 4).Color.GetColorScale() != model.Pink {
+		t.Errorf("Expected pink turtle")
+	}
+}

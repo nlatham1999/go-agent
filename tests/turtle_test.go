@@ -12,7 +12,7 @@ func TestTurtleBack(t *testing.T) {
 	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
 
 	//create a turtle
-	turtle := model.NewTurtle(m, 0, "")
+	turtle := model.NewTurtle(m, 0, "", 0, 0)
 
 	//set the turtle's heading
 	turtle.SetHeading(90)

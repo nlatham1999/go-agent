@@ -5,7 +5,7 @@ import "math"
 type Turtle struct {
 	xcor float64
 	ycor float64
-	Who  int //the id of the turtle
+	who  int //the id of the turtle
 	size int
 
 	Color   Color
@@ -23,25 +23,35 @@ type Turtle struct {
 	patch *Patch //patch the turtle is on
 }
 
-func NewTurtle(m *Model, who int, breed string) *Turtle {
+// @TODO might be faster having the patch passed in as a parameter instead of having to calculate it
+func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 
 	if m == nil {
 		return nil
 	}
 
 	//if the breed is nonexistent then return nil
+	var breedSet *TurtleBreed = nil
 	if breed != "" {
-		if _, found := m.Breeds[breed]; !found {
+		found := false
+		if breedSet, found = m.Breeds[breed]; !found {
 			return nil
 		}
 	}
 
 	t := &Turtle{
-		Who:    who,
+		who:    who,
 		parent: m,
-		xcor:   0,
-		ycor:   0,
+		xcor:   x,
+		ycor:   y,
 		breed:  breed,
+	}
+
+	m.Turtles.turtles[t] = nil
+	m.whoToTurtles[m.turtlesWhoNumber] = t
+
+	if breedSet != nil {
+		breedSet.Turtles.turtles[t] = nil
 	}
 
 	//link the turtle to the patch
@@ -498,6 +508,10 @@ func (t *Turtle) Uphill4(patchVariable string) {
 // @TODO implement
 func (t *Turtle) LinkWith(turtle *Turtle) *Link {
 	return nil
+}
+
+func (t *Turtle) Who() int {
+	return t.who
 }
 
 func (t *Turtle) XCor() float64 {
