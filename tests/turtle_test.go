@@ -133,16 +133,7 @@ func TestTurtlesOwn(t *testing.T) {
 		t.Errorf("Expected turtle to not have own 'mood'")
 	}
 
-	// set the turtle's own
-	turtle.SetOwn("mood", 5)
-
-	mood = turtle.GetOwn("mood")
-
-	if mood != 5 {
-		t.Errorf("Expected turtle to have own 'mood' with value 5")
-	}
-
-	// create a second model
+	// create a second model with ants breed
 	turtlesOwn := map[string]interface{}{
 		"mood": "happy",
 		"age":  5,
@@ -175,4 +166,39 @@ func TestTurtlesOwn(t *testing.T) {
 	if age != 5 {
 		t.Errorf("Expected turtle to have own 'age' with value 5")
 	}
+
+	// test changing breed
+	// create a second model with ants and beetles breeds
+	beetlesOwn := map[string]interface{}{
+		"wingspan": 10,
+	}
+
+	breedsOwn["beetles"] = beetlesOwn
+
+	m3 := model.NewModel(nil, turtlesOwn, breedsOwn, []string{"ants", "beetles"}, nil, nil, false)
+
+	// create a turtle
+	m3.CreateTurtles(1, "beetles", nil)
+
+	turtle = m3.Turtle("beetles", 0)
+
+	//change the breed
+	turtle.SetBreed("ants")
+
+	wingspan := turtle.GetOwn("wingspan")
+
+	if wingspan != nil {
+		t.Errorf("Expected turtle to not have own 'wingspan'")
+	}
+
+	mood = turtle.GetOwn("mood")
+
+	if mood == nil {
+		t.Errorf("Expected turtle to have own 'mood'")
+	}
+
+	if mood != 0 {
+		t.Errorf("Expected turtle to have own 'mood' with value 0, got %v", mood)
+	}
+
 }

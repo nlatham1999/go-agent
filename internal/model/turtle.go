@@ -20,7 +20,8 @@ type Turtle struct {
 	Label      interface{}
 	LabelColor Color
 
-	turtlesOwn map[string]interface{} // turtles own variables
+	turtlesOwnGeneral map[string]interface{} // turtles own variables
+	turtlesOwnBreed   map[string]interface{} // turtles own variables
 
 	patch *Patch //patch the turtle is on
 }
@@ -62,15 +63,16 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 
 	//set the turtle own variables
 	//breed specific variables can override general variables
-	t.turtlesOwn = make(map[string]interface{})
+	t.turtlesOwnGeneral = make(map[string]interface{})
+	t.turtlesOwnBreed = make(map[string]interface{})
 	generalTemplate := m.Breeds[""].turtlesOwnTemplate
 	for key, value := range generalTemplate {
-		t.turtlesOwn[key] = value
+		t.turtlesOwnGeneral[key] = value
 	}
 	if breedSet != nil {
 		breedTemplate := breedSet.turtlesOwnTemplate
 		for key, value := range breedTemplate {
-			t.turtlesOwn[key] = value
+			t.turtlesOwnBreed[key] = value
 		}
 	}
 
@@ -104,6 +106,15 @@ func (t *Turtle) SetBreed(name string) {
 
 	if name != "" {
 		t.parent.Breeds[name].Turtles.turtles[t] = nil
+	}
+
+	// switch the turtles own variables to the new breed
+	t.turtlesOwnBreed = make(map[string]interface{})
+	if name != "" {
+		breedTemplate := t.parent.Breeds[name].turtlesOwnTemplate
+		for key, value := range breedTemplate {
+			t.turtlesOwnBreed[key] = value
+		}
 	}
 }
 
@@ -433,13 +444,25 @@ func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
 
 // returns the turtle own variable
 func (t *Turtle) GetOwn(key string) interface{} {
-	return t.turtlesOwn[key]
+	if val, found := t.turtlesOwnBreed[key]; found {
+		return val
+	}
+	if val, found := t.turtlesOwnGeneral[key]; found {
+		return val
+	}
+	return nil
 }
 
 // sets the turtle own variable
-// this can create a new variable if it doesn't exist, but i don't think this is bad
 func (t *Turtle) SetOwn(key string, value interface{}) {
-	t.turtlesOwn[key] = value
+	if _, found := t.turtlesOwnBreed[key]; found {
+		t.turtlesOwnBreed[key] = value
+		return
+	} else {
+		if _, found := t.turtlesOwnGeneral[key]; found {
+			t.turtlesOwnGeneral[key] = value
+		}
+	}
 }
 
 func (t *Turtle) PatchAhead(distance float64) *Patch {
