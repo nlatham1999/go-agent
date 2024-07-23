@@ -145,7 +145,7 @@ func (t *Turtle) CanMove(distance float64) bool {
 }
 
 // creates a directed link from the current turtle to the turtle passed in
-func (t *Turtle) CreateLinkTo(breed string, turtle *Turtle, operations []LinkOperation) {
+func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []LinkOperation) {
 	l := NewLink(t.parent, breed, t, turtle, true)
 
 	for _, operation := range operations {
@@ -154,7 +154,7 @@ func (t *Turtle) CreateLinkTo(breed string, turtle *Turtle, operations []LinkOpe
 }
 
 // creates a directed link from the current turtle to the turtles passed in
-func (t *Turtle) CreateLinkToSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
 	if breed == "" {
 		return
 	}
@@ -169,7 +169,7 @@ func (t *Turtle) CreateLinkToSet(breed string, turtles *TurtleAgentSet, operatio
 }
 
 // creates an undirected breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkWith(breed string, turtle *Turtle, operations []LinkOperation) {
+func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations []LinkOperation) {
 	l := NewLink(t.parent, breed, t, turtle, false)
 
 	for _, operation := range operations {
@@ -179,7 +179,7 @@ func (t *Turtle) CreateLinkWith(breed string, turtle *Turtle, operations []LinkO
 }
 
 // creates an undirected breed link from the current turtle with the turtles passed in
-func (t *Turtle) CreateLinkWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
 	linksAdded := LinkSet([]*Link{})
 	for turtle := range turtles.turtles {
 		l := NewLink(t.parent, breed, t, turtle, false)
@@ -190,7 +190,7 @@ func (t *Turtle) CreateLinkWithSet(breed string, turtles *TurtleAgentSet, operat
 }
 
 // creates a directed breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateBreedFrom(breed string, turtle *Turtle, operations []LinkOperation) {
+func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations []LinkOperation) {
 	l := NewLink(t.parent, breed, turtle, t, true)
 
 	for _, operation := range operations {
@@ -199,7 +199,7 @@ func (t *Turtle) CreateBreedFrom(breed string, turtle *Turtle, operations []Link
 }
 
 // creates a directed breed link from the turtles passed in to the current turtle
-func (t *Turtle) CreateBreedsFrom(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
 	linksAdded := LinkSet([]*Link{})
 	for turtle := range turtles.turtles {
 		l := NewLink(t.parent, breed, turtle, t, true)

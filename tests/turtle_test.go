@@ -202,3 +202,232 @@ func TestTurtlesOwn(t *testing.T) {
 	}
 
 }
+
+func TestTurtleCreateLinkToTurtle(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	t1.CreateLinkToTurtle("parent-children", t2, nil)
+
+	// make sure the link exists from t1 to t2
+	l := t2.InLinkFrom("parent-children", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+}
+
+func TestTurtleCreateLinkToSet(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(3, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+
+	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+
+	t1.CreateLinksToSet("parent-children", agentSet, nil)
+
+	// make sure the link exists from t1 to t2
+	l := t2.InLinkFrom("parent-children", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t1 to t3
+	l = t3.InLinkFrom("parent-children", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link does not exist from t2 to t3
+	l = t3.InLinkFrom("parent-children", t2)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+}
+
+func TestTurtleCreateLinkWithTurtle(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	t1.CreateLinkWithTurtle("coworkers", t2, nil)
+
+	// make sure the link exists from t1 to t2
+	l := t2.InLinkFrom("coworkers", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t2 to t1
+	l = t1.InLinkFrom("coworkers", t2)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link does not exist from t1 to t2 for parent-children
+	l = t2.InLinkFrom("parent-children", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+}
+
+func TestTurtleCreateLinkWithSet(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(3, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+
+	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+
+	t1.CreateLinksWithSet("coworkers", agentSet, nil)
+
+	// make sure the link exists from t1 to t2
+	l := t2.InLinkFrom("coworkers", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t1 to t3
+	l = t3.InLinkFrom("coworkers", t1)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t2 to t1
+	l = t1.InLinkFrom("coworkers", t2)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t3 to t1
+	l = t1.InLinkFrom("coworkers", t3)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link does not exist from t1 to t2 for parent-children
+	l = t2.InLinkFrom("parent-children", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+}
+
+func TestTurtleCreateLinkFromTurtle(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	t1.CreateLinkFromTurtle("parent-children", t2, nil)
+
+	// make sure the link exists from t2 to t1
+	l := t1.InLinkFrom("parent-children", t2)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link does not exist from t1 to t2
+	l = t2.InLinkFrom("parent-children", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+}
+
+func TestTurtleCreateLinkFromSet(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(3, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+
+	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+
+	t1.CreateLinksFromSet("parent-children", agentSet, nil)
+
+	// make sure the link exists from t2 to t1
+	l := t1.InLinkFrom("parent-children", t2)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link exists from t3 to t1
+	l = t1.InLinkFrom("parent-children", t3)
+
+	if l == nil {
+		t.Errorf("Link should have been created")
+	}
+
+	// make sure the link does not exist from t1 to t2
+	l = t2.InLinkFrom("parent-children", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+
+	// make sure the link does not exist from t1 to t3
+	l = t3.InLinkFrom("parent-children", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+
+	// make sure the link does not exist from t1 to t2 for parent-children
+	l = t2.InLinkFrom("coworkers", t1)
+
+	if l != nil {
+		t.Errorf("Link should not have been created")
+	}
+}

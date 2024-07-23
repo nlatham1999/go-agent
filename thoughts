@@ -18,3 +18,6 @@ for example if there is a starting variable of x = 30 for general and x = "test"
 
 when changing the breed should the turtles own change?
 
+change the linkedTurtles map in turtles to be flat
+    - use a struct as a key
+

@@ -19,8 +19,14 @@ type Link struct {
 func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) *Link {
 
 	// make sure the breed exists
-	if _, ok := model.DirectedLinkBreeds[breed]; !ok {
-		return nil
+	if directed {
+		if _, ok := model.DirectedLinkBreeds[breed]; !ok {
+			return nil
+		}
+	} else {
+		if _, ok := model.UndirectedLinkBreeds[breed]; !ok {
+			return nil
+		}
 	}
 
 	l := &Link{
