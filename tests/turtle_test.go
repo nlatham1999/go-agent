@@ -431,3 +431,72 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 		t.Errorf("Link should not have been created")
 	}
 }
+
+// test the Turtle.DistanceTurtle method
+func TestTurtleDistanceTurtle(t *testing.T) {
+
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	// create two turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// set the position of the turtles
+	t1.SetXY(0, 0)
+	t2.SetXY(0, 10)
+
+	// get the distance between the turtles
+	distance := t1.DistanceTurtle(t2)
+
+	// assert that the distance is 10
+	if distance != 10 {
+		t.Errorf("Expected distance to be 10, got %v", distance)
+	}
+}
+
+func TestTurtleDistancePatch(t *testing.T) {
+
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	t1 := m.Turtle("", 0)
+
+	// set the position of the turtle
+	t1.SetXY(0, 0)
+
+	// get the distance between the turtle and the patch (0, 10)
+	distance := t1.DistancePatch(m.Patch(0, 10))
+
+	// assert that the distance is 10
+	if distance != 10 {
+		t.Errorf("Expected distance to be 10, got %v", distance)
+	}
+}
+
+func TestTurtleDistanceXY(t *testing.T) {
+
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	t1 := m.Turtle("", 0)
+
+	// set the position of the turtle
+	t1.SetXY(0, 0)
+
+	// get the distance between the turtle and the point (0, 10)
+	distance := t1.DistanceXY(0, 10)
+
+	// assert that the distance is 10
+	if distance != 10 {
+		t.Errorf("Expected distance to be 10, got %v", distance)
+	}
+}

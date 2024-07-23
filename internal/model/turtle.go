@@ -209,19 +209,19 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 	AskLinks(linksAdded, operations)
 }
 
-// @TODO implement
+// returns the distance between the two turtles
 func (t *Turtle) DistanceTurtle(turtle *Turtle) float64 {
-	return 0
+	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, turtle.xcor, turtle.ycor)
 }
 
-// @TODO implement
+// returns the distance between the turtle and the middle of the patch
 func (t *Turtle) DistancePatch(patch *Patch) float64 {
-	return 0
+	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, patch.xFloat64, patch.yFloat64)
 }
 
-// @TODO implement
+// returns the distance between the turtle and the x y coordinates
 func (t *Turtle) DistanceXY(x float64, y float64) float64 {
-	return 0
+	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, x, y)
 }
 
 // @TODO implement
