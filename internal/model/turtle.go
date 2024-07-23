@@ -49,11 +49,12 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	}
 
 	t := &Turtle{
-		who:    who,
-		parent: m,
-		xcor:   x,
-		ycor:   y,
-		breed:  breed,
+		who:           who,
+		parent:        m,
+		xcor:          x,
+		ycor:          y,
+		breed:         breed,
+		linkedTurtles: make(map[bool]map[string]map[*Turtle]*Link),
 	}
 
 	m.Turtles.turtles[t] = nil

@@ -43,14 +43,41 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	// add the link to the turtle's link map
 	if directed {
+		if end1.linkedTurtles[true] == nil {
+			end1.linkedTurtles[true] = make(map[string]map[*Turtle]*Link)
+		}
+		if end1.linkedTurtles[true][""] == nil {
+			end1.linkedTurtles[true][""] = make(map[*Turtle]*Link)
+		}
 		end1.linkedTurtles[true][""][end2] = l
 		if breed != "" {
+			if end1.linkedTurtles[true][breed] == nil {
+				end1.linkedTurtles[true][breed] = make(map[*Turtle]*Link)
+			}
 			end1.linkedTurtles[true][breed][end2] = l
 		}
 	} else {
+		if end1.linkedTurtles[false] == nil {
+			end1.linkedTurtles[false] = make(map[string]map[*Turtle]*Link)
+		}
+		if end1.linkedTurtles[false][""] == nil {
+			end1.linkedTurtles[false][""] = make(map[*Turtle]*Link)
+		}
+		if end2.linkedTurtles[false] == nil {
+			end2.linkedTurtles[false] = make(map[string]map[*Turtle]*Link)
+		}
+		if end2.linkedTurtles[false][""] == nil {
+			end2.linkedTurtles[false][""] = make(map[*Turtle]*Link)
+		}
 		end1.linkedTurtles[false][""][end2] = l
 		end2.linkedTurtles[false][""][end1] = l
 		if breed != "" {
+			if end1.linkedTurtles[false][breed] == nil {
+				end1.linkedTurtles[false][breed] = make(map[*Turtle]*Link)
+			}
+			if end2.linkedTurtles[false][breed] == nil {
+				end2.linkedTurtles[false][breed] = make(map[*Turtle]*Link)
+			}
 			end2.linkedTurtles[false][breed][end1] = l
 			end1.linkedTurtles[false][breed][end2] = l
 		}
