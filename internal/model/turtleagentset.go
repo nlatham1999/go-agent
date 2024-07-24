@@ -125,14 +125,34 @@ func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {
 	return nil
 }
 
-// @TODO implement
+// returns a new TurtleAgentSet with all the turtles that are not in the given TurtleAgentSet
 func (t *TurtleAgentSet) WhoAreNot(turtles *TurtleAgentSet) *TurtleAgentSet {
-	return nil
+	turtleMap := make(map[*Turtle]interface{})
+
+	for turtle := range t.turtles {
+		if _, ok := turtles.turtles[turtle]; !ok {
+			turtleMap[turtle] = nil
+		}
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtleMap,
+	}
 }
 
-// @TODO implement
+// returns a new TurtleAgentSet with all the turtles that are not the given turtle
 func (t *TurtleAgentSet) WhoAreNotTurtle(turtle *Turtle) *TurtleAgentSet {
-	return nil
+	turtleMap := make(map[*Turtle]interface{})
+
+	for t1 := range t.turtles {
+		if t1 != turtle {
+			turtleMap[t1] = nil
+		}
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtleMap,
+	}
 }
 
 func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {

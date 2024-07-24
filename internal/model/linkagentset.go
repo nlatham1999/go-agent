@@ -92,14 +92,34 @@ func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 	return nil
 }
 
-// @TODO implement
+// returns a new LinkAgentSet with all the links that are not in the given LinkAgentSet
 func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
-	return nil
+	linkMap := make(map[*Link]interface{})
+
+	for link := range l.links {
+		if _, ok := links.links[link]; !ok {
+			linkMap[link] = nil
+		}
+	}
+
+	return &LinkAgentSet{
+		links: linkMap,
+	}
 }
 
-// @TODO implement
+// returns a new LinkAgentSet with all the links that are not the given link
 func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
-	return nil
+	linkMap := make(map[*Link]interface{})
+
+	for l1 := range l.links {
+		if l1 != link {
+			linkMap[l1] = nil
+		}
+	}
+
+	return &LinkAgentSet{
+		links: linkMap,
+	}
 }
 
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {

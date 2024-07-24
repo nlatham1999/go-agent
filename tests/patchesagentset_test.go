@@ -197,3 +197,45 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 		t.Errorf("Expected 4 patches, got %d", patchSetInRadius.Count())
 	}
 }
+
+func TestPatchesWhoAreNotInPatches(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(0, 1)
+	patch3 := m.Patch(0, 2)
+
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+
+	patchSet2 := model.PatchSet([]*model.Patch{patch1, patch2})
+
+	patchSet3 := patchSet.WhoAreNot(patchSet2)
+
+	if patchSet3.Count() != 1 {
+		t.Errorf("Expected patchSet3 to have 1 patch")
+	}
+
+	if !patchSet3.Contains(patch3) {
+		t.Errorf("Expected patchSet3 to have patch3")
+	}
+}
+
+func TestPatchesWhoAreNotPatch(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(0, 1)
+	patch3 := m.Patch(0, 2)
+
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+
+	patchSet2 := patchSet.WhoAreNotPatch(patch1)
+
+	if patchSet2.Count() != 2 {
+		t.Errorf("Expected patchSet2 to have 2 patches")
+	}
+}

@@ -131,14 +131,34 @@ func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
 	return nil
 }
 
-// @TODO implement
+// returns a new PatchAgentSet with all the patches that are not in the given PatchAgentSet
 func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
-	return nil
+	patchMap := make(map[*Patch]interface{})
+
+	for patch := range p.patches {
+		if _, ok := patches.patches[patch]; !ok {
+			patchMap[patch] = nil
+		}
+	}
+
+	return &PatchAgentSet{
+		patches: patchMap,
+	}
 }
 
-// @TODO implement
+// returns a new PatchAgentSet with all the patches that are not the given patch
 func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
-	return nil
+	patchMap := make(map[*Patch]interface{})
+
+	for p1 := range p.patches {
+		if p1 != patch {
+			patchMap[p1] = nil
+		}
+	}
+
+	return &PatchAgentSet{
+		patches: patchMap,
+	}
 }
 
 func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {

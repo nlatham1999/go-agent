@@ -310,10 +310,6 @@ func TestPatchNeighbors4(t *testing.T) {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	// get the bottom left patch and make sure we only get 2 neighbors
-	patch = m.Patch(-15, 15)
-	neighbors = patch.Neighbors4()
-
 	// create model that has wrapping
 	m = model.NewModel(nil, nil, nil, nil, nil, nil, true)
 

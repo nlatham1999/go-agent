@@ -61,3 +61,54 @@ func TestAnyLink(t *testing.T) {
 	}
 
 }
+
+func TestLinksWhoAreNotLinks(t *testing.T) {
+
+	// create links
+	link1 := &model.Link{}
+	link2 := &model.Link{}
+	link3 := &model.Link{}
+
+	// create linkset
+	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+
+	// create a second linkset
+	linkSet2 := model.LinkSet([]*model.Link{link1, link2})
+
+	// create a third linkset that is the difference between the first and second linkset
+	linkSet3 := linkSet.WhoAreNot(linkSet2)
+
+	// assert that the third linkset has only one link
+	if linkSet3.Count() != 1 {
+		t.Errorf("Expected linkset3 to have 1 link")
+	}
+
+	// assert that the third linkset has link3
+	if !linkSet3.Contains(link3) {
+		t.Errorf("Expected linkset3 to have link3")
+	}
+}
+
+func TestLinksWhoAreNotLink(t *testing.T) {
+
+	// create links
+	link1 := &model.Link{}
+	link2 := &model.Link{}
+	link3 := &model.Link{}
+
+	// create linkset
+	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+
+	// create a second linkset
+	linkSet2 := linkSet.WhoAreNotLink(link1)
+
+	// assert that the second linkset has only two links
+	if linkSet2.Count() != 2 {
+		t.Errorf("Expected linkset2 to have 2 links")
+	}
+
+	// assert that the second linkset does not have link1
+	if linkSet2.Contains(link1) {
+		t.Errorf("Expected linkset2 to not have link1")
+	}
+}

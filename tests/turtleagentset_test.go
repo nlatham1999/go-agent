@@ -98,3 +98,45 @@ func TestAtPointsTurtle(t *testing.T) {
 	}
 
 }
+
+func TestTurtlesWhoAreNotInTurtles(t *testing.T) {
+
+	//create a basic model
+	u := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
+	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
+	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+
+	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+
+	turtleSet2 := model.TurtleSet([]*model.Turtle{turtle1, turtle2})
+
+	turtleSet3 := turtleSet.WhoAreNot(turtleSet2)
+
+	if turtleSet3.Count() != 1 {
+		t.Errorf("Expected turtleSet3 to have 1 turtle")
+	}
+
+	if !turtleSet3.Contains(turtle3) {
+		t.Errorf("Expected turtleSet3 to have turtle3")
+	}
+}
+
+func TestTurtlesWhoAreNotTurtle(t *testing.T) {
+
+	//create a basic model
+	u := model.NewModel(nil, nil, nil, nil, nil, nil, false)
+
+	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
+	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
+	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+
+	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+
+	turtleSet2 := turtleSet.WhoAreNotTurtle(turtle1)
+
+	if turtleSet2.Count() != 2 {
+		t.Errorf("Expected turtleSet2 to have 2 turtles")
+	}
+}
