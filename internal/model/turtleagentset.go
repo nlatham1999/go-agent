@@ -6,7 +6,6 @@ type TurtleAgentSet struct {
 	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
 }
 
-// @TODO implement
 func TurtleSet(turtles []*Turtle) *TurtleAgentSet {
 	turtleSet := make(map[*Turtle]interface{})
 	for _, turtle := range turtles {

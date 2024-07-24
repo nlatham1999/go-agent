@@ -108,6 +108,11 @@ func (l *Link) Breed() *LinkBreed {
 	}
 }
 
+// returns an agentset of the turtles at the ends of the link
+func (l *Link) BothEnds() *TurtleAgentSet {
+	return TurtleSet([]*Turtle{l.End1, l.End2})
+}
+
 func (l *Link) SetBreed(name string) {
 
 	// make sure the breed exists

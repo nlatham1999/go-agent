@@ -124,3 +124,30 @@ func TestLinkSetBreed(t *testing.T) {
 		t.Errorf("Link should have been added to person-pet")
 	}
 }
+
+func TestLinkBothEnds(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	l := model.NewLink(m, "parent-children", t1, t2, true)
+
+	// get the both ends
+	ends := l.BothEnds()
+
+	// make sure both ends are in the set
+	if !ends.Contains(t1) {
+		t.Errorf("Link should have turtle 1")
+	}
+
+	if !ends.Contains(t2) {
+		t.Errorf("Link should have turtle 2")
+	}
+}

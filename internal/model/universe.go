@@ -175,11 +175,6 @@ func (m *Model) patchIndex(x int, y int) int {
 	return y*m.WorldHeight + x
 }
 
-// @TODO implement
-func (m *Model) BothEnds(link *Link) []*Turtle {
-	return nil
-}
-
 func (m *Model) ClearAll() {
 	m.ClearGlobals()
 	m.ClearTicks()
