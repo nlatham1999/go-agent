@@ -27,9 +27,15 @@ type Turtle struct {
 	// the first bool is if the link is directed
 	// the string is the breed of the link - the empty string key is all the links
 	// the third map is the turtles the link is connected to
-	linkedTurtles map[bool]map[string]map[*Turtle]*Link
+	linkedTurtles map[linkedTurtle]*Link
 
 	patch *Patch //patch the turtle is on
+}
+
+type linkedTurtle struct {
+	directed bool
+	breed    string
+	turtle   *Turtle
 }
 
 // @TODO might be faster having the patch passed in as a parameter instead of having to calculate it
@@ -54,7 +60,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		xcor:          x,
 		ycor:          y,
 		breed:         breed,
-		linkedTurtles: make(map[bool]map[string]map[*Turtle]*Link),
+		linkedTurtles: make(map[linkedTurtle]*Link),
 	}
 
 	m.Turtles.turtles[t] = nil
@@ -352,25 +358,20 @@ func (t *Turtle) InLinkNeighbors(turtle *Turtle) []*Turtle {
 	return nil
 }
 
-// finds a
+// finds a link from the current turtle to the turtle passed in
 func (t *Turtle) InLinkFrom(breed string, turtle *Turtle) *Link {
 
 	if turtle.linkedTurtles != nil {
 		// look in the directed links
-		if turtle.linkedTurtles[true] != nil {
-			if turtle.linkedTurtles[true][breed] != nil {
-				if link, found := turtle.linkedTurtles[true][breed][t]; found {
-					return link
-				}
-			}
+		s := linkedTurtle{true, breed, t}
+		if link, found := turtle.linkedTurtles[s]; found {
+			return link
 		}
+
 		// look in the undirected links
-		if turtle.linkedTurtles[false] != nil {
-			if turtle.linkedTurtles[false][breed] != nil {
-				if link, found := turtle.linkedTurtles[false][breed][t]; found {
-					return link
-				}
-			}
+		s = linkedTurtle{false, breed, t}
+		if link, found := turtle.linkedTurtles[s]; found {
+			return link
 		}
 	}
 
