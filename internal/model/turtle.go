@@ -266,7 +266,7 @@ func (t *Turtle) FacePatch(patch *Patch) {
 
 // @TODO implement
 func (t *Turtle) FaceXY(x float64, y float64) {
-	t.heading = math.Atan2(y-t.ycor, x-t.xcor)
+	t.setHeadingRadians(math.Atan2(y-t.ycor, x-t.xcor))
 }
 
 // @TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
@@ -304,6 +304,7 @@ func (t *Turtle) GetHeading() float64 {
 	return t.heading * (180 / math.Pi)
 }
 
+// takes in a heading in degrees and sets the heading in radians
 func (t *Turtle) SetHeading(heading float64) {
 
 	//make sure the heading is between -360 and 360
@@ -317,7 +318,11 @@ func (t *Turtle) SetHeading(heading float64) {
 	}
 
 	//convert heading to radians
-	t.heading = heading * (math.Pi / 180)
+	t.setHeadingRadians(heading * (math.Pi / 180))
+}
+
+func (t *Turtle) setHeadingRadians(heading float64) {
+	t.heading = heading
 }
 
 func (t *Turtle) Hide() {
@@ -394,7 +399,9 @@ func (t *Turtle) Left(number float64) {
 	number = number * (math.Pi / 180)
 
 	//add the number to the heading
-	t.heading = math.Mod((t.heading + number), 2*math.Pi)
+	heading := math.Mod((t.heading + number), 2*math.Pi)
+
+	t.setHeadingRadians(heading)
 }
 
 // @TODO implement
@@ -408,13 +415,11 @@ func (t *Turtle) LinkNeighbor(turtle *Turtle) bool {
 }
 
 func (t *Turtle) MoveToPatch(patch *Patch) {
-	t.xcor = patch.xFloat64
-	t.ycor = patch.yFloat64
+	t.SetXY(patch.xFloat64, patch.yFloat64)
 }
 
 func (t *Turtle) MoveToTurtle(turtle *Turtle) {
-	t.xcor = turtle.xcor
-	t.ycor = turtle.ycor
+	t.SetXY(turtle.xcor, turtle.ycor)
 }
 
 // @TODO implement
@@ -563,6 +568,9 @@ func (t *Turtle) Right(number float64) {
 }
 
 func (t *Turtle) SetXY(x float64, y float64) {
+
+	//move all
+
 	t.xcor = x
 	t.ycor = y
 

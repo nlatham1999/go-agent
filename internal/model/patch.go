@@ -201,7 +201,7 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 		heading := rand.Intn(360)
 
 		//convert to radians
-		t.SetHeading(float64(heading) * math.Pi / 180)
+		t.SetHeading(float64(heading))
 
 		turtlesAdded.Add(t)
 	}

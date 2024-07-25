@@ -26,3 +26,4 @@ having colors be rbg, hsb, or a scale color is too complicated for  a backend, t
 
 wrapping should have vertical and horizontal options
 
+the only place the the heading and x,y should be changed should be in SetXY and setHeadingRadians
