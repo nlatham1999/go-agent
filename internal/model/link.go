@@ -1,5 +1,10 @@
 package model
 
+import (
+	"fmt"
+	"math"
+)
+
 type Link struct {
 	Color     Color
 	End1      *Turtle
@@ -153,9 +158,24 @@ func (l *Link) Hide() {
 	l.Hidden = true
 }
 
-// @TODO implement
-func (l *Link) Heading() float64 {
-	return 0
+// returns the heading in degrees from end1 to end2. Returns an error if the link has zero length
+func (l *Link) Heading() (float64, error) {
+	if l.End1.xcor == l.End2.xcor && l.End1.ycor == l.End2.ycor {
+		return 0, fmt.Errorf("Link has zero length")
+	}
+
+	// get the heading which is in radians
+	heading := l.End1.heading - l.End2.heading
+
+	// convert to degrees
+	heading = heading * 180 / math.Pi
+
+	// if negative, add 360 to make it positive
+	if heading < 0 {
+		heading += 360
+	}
+
+	return heading, nil
 }
 
 // @TODO implement

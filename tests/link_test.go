@@ -151,3 +151,55 @@ func TestLinkBothEnds(t *testing.T) {
 		t.Errorf("Link should have turtle 2")
 	}
 }
+
+func TestLinkHeading(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	l := model.NewLink(m, "parent-children", t1, t2, true)
+
+	_, err := l.Heading()
+
+	//err should not be nil since the turtles are at the same location
+	if err == nil {
+		t.Errorf("Error should not be nil, got %v", err)
+	}
+
+	t1.SetXY(0, 0)
+	t2.SetXY(1, 1)
+
+	t1.SetHeading(0)
+	t2.SetHeading(90)
+
+	heading, _ := l.Heading()
+
+	if heading != 270 {
+		t.Errorf("Heading should be 180, got %f", heading)
+	}
+
+	t1.SetHeading(90)
+	t2.SetHeading(0)
+
+	heading, _ = l.Heading()
+
+	if heading != 90 {
+		t.Errorf("Heading should be 90, got %f", heading)
+	}
+
+	t1.SetHeading(0)
+	t2.SetHeading(450)
+
+	heading, _ = l.Heading()
+
+	if heading != 270 {
+		t.Errorf("Heading should be 270, got %f", heading)
+	}
+}

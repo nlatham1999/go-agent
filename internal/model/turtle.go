@@ -291,6 +291,17 @@ func (t *Turtle) GetHeading() float64 {
 }
 
 func (t *Turtle) SetHeading(heading float64) {
+
+	//make sure the heading is between -360 and 360
+	if heading > 360 || heading < -360 {
+		heading = math.Mod(heading, 360)
+	}
+
+	//make sure the heading is between 0 and 360
+	if heading < 0 {
+		heading += 360
+	}
+
 	//convert heading to radians
 	t.heading = heading * (math.Pi / 180)
 }
