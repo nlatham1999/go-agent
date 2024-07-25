@@ -1,15 +1,5 @@
 package model
 
-// @TODO implement
-func ApproximateHSB(hue int, saturation int, brightness int) float64 {
-	return 0.0
-}
-
-// @TODO implement
-func ApproximateRGB(red int, green int, blue int) float64 {
-	return 0.0
-}
-
 func BaseColors() []Color {
 	return []Color{
 		Black,
@@ -40,21 +30,6 @@ func ButLast(arr []interface{}) []interface{} {
 	return arr[:len(arr)-1]
 }
 
-// @TODO implement
-func ExtractHSBFromScale(scale float64) (int, int, int) {
-	return 0, 0, 0
-}
-
-// @TODO implement
-func ExtractHSBFromRBG(red int, green int, blue int) (int, int, int) {
-	return 0, 0, 0
-}
-
-// @TODO implement
-func ExtractRGBFromScale(scale float64) (int, int, int) {
-	return 0, 0, 0
-}
-
 func Filter(arr []interface{}, pred func(interface{}) bool) []interface{} {
 	var result []interface{}
 	for _, elem := range arr {
@@ -63,20 +38,6 @@ func Filter(arr []interface{}, pred func(interface{}) bool) []interface{} {
 		}
 	}
 	return result
-}
-
-func HSB(hue int, saturation int, brightness int) (int, int, int) {
-	return 0, 0, 0
-}
-
-// @TODO implement
-func ScaleColor(color Color, number float64, range1 float64, range2 float64) Color {
-	return color
-}
-
-// @TODO implement
-func ShadeOf(color1 float64, color2 float64) bool {
-	return false
 }
 
 // @TODO implement

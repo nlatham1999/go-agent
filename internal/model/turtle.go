@@ -137,11 +137,7 @@ func (t *Turtle) CanMove(distance float64) bool {
 	// patchX := math.Round(newX)
 	// patchY := math.Round(newY)
 
-	if t.parent.Patch(newX, newY) != nil {
-		return true
-	}
-
-	return false
+	return t.parent.Patch(newX, newY) != nil
 }
 
 // creates a directed link from the current turtle to the turtle passed in

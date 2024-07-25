@@ -32,10 +32,10 @@
 ```(t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool```  
 
 ### approximate-hsb
-```ApproximateHSB(hue float64, saturation float64, brightness float64) int```
+no need
 
 ### approximate-rgb
-``` ApproximateRGB(red float64, green float64, blue float64) int```
+no need
 
 ### ask
 ```(m *Model) AskLinks(agentset LinkSet, operations []LinkOperation)```  
@@ -252,11 +252,10 @@ not needed
 not needed
 
 ### extract-hsb
-```ExtractHSBFromScale(scale float64) (int, int, int)```
-```ExtractHSBFromRBG(red int, green int, blue int) (int, int, int)```
+not going to be implemented
 
 ### extract-rbg
-```ExtractRGBFromScale(scale float64) (int, int, int)```
+not going to be implemented
 
 ### face
 ```(t *Turtle) FaceTurtle(turtle *Turtle)```
@@ -361,7 +360,7 @@ implement?
 ```(t *Turtle) Home()```
 
 ### hsb
-```HSB(hue int, saturation int, brightness int) (int, int, int)```
+not going to be implemented
 
 ### hubnet-*
 implement?
@@ -896,7 +895,7 @@ implement?
 ```(t *Turtle) SetXY(x float64, y float64)```
 
 ### shade-of?
-```ShadeOf(color1 float64, color2 float64) bool```
+not going to be implemented
 
 ### shape
 ```Link.Shape```

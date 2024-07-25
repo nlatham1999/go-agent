@@ -22,9 +22,7 @@ func (t *TurtleAgentSet) Add(turtle *Turtle) {
 }
 
 func (t *TurtleAgentSet) Remove(turtle *Turtle) {
-	if _, ok := t.turtles[turtle]; ok {
-		delete(t.turtles, turtle)
-	}
+	delete(t.turtles, turtle)
 }
 
 func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
