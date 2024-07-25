@@ -40,7 +40,7 @@ func Init() {
 		foodSourceNumber: 0,
 	}
 
-	environment = model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false)
+	environment = model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
 
 	sliders = map[string]*slider.Slider{
 		population:      slider.NewSlider(0, 1, 200, 125),

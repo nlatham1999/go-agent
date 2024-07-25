@@ -9,7 +9,7 @@ import (
 func TestLinkCreation(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -50,7 +50,7 @@ func TestLinkCreation(t *testing.T) {
 func TestLinkBreedName(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -69,7 +69,7 @@ func TestLinkBreedName(t *testing.T) {
 func TestLinkBreed(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -88,7 +88,7 @@ func TestLinkBreed(t *testing.T) {
 func TestLinkSetBreed(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -128,7 +128,7 @@ func TestLinkSetBreed(t *testing.T) {
 func TestLinkBothEnds(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -155,7 +155,7 @@ func TestLinkBothEnds(t *testing.T) {
 func TestLinkHeading(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -207,7 +207,7 @@ func TestLinkHeading(t *testing.T) {
 func TestLinkOtherEnd(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)

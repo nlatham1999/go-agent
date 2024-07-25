@@ -24,3 +24,5 @@ change the linkedTurtles map in turtles to be flat
 having colors be rbg, hsb, or a scale color is too complicated for  a backend, this is more frontend material
     - all colors should just be rgb
 
+wrapping should have vertical and horizontal options
+

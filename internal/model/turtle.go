@@ -127,12 +127,20 @@ func (t *Turtle) SetBreed(name string) {
 
 func (t *Turtle) CanMove(distance float64) bool {
 
-	if t.parent.wrapping {
+	if t.parent.wrappingY && t.parent.wrappingX {
 		return true
 	}
 
 	newX := t.xcor + distance*math.Cos(t.heading)
 	newY := t.ycor + distance*math.Sin(t.heading)
+
+	if !t.parent.wrappingX && (newX < float64(t.parent.MinPxCor) || newX >= float64(t.parent.MaxPxCor)) {
+		return false
+	}
+
+	if !t.parent.wrappingY && (newY < float64(t.parent.MinPyCor) || newY >= float64(t.parent.MaxPyCor)) {
+		return false
+	}
 
 	// patchX := math.Round(newX)
 	// patchY := math.Round(newY)

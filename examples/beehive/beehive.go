@@ -97,7 +97,7 @@ func Init() {
 		scout: scoutsOwn,
 	}
 
-	environment = model.NewModel(nil, nil, breedsOwn, []string{"site", "scouts"}, nil, nil, false)
+	environment = model.NewModel(nil, nil, breedsOwn, []string{"site", "scouts"}, nil, nil, false, false)
 
 	sliders = map[string]*slider.Slider{
 		hiveNumber:         slider.NewSlider(4, 1, 10, 10),

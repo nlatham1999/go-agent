@@ -30,7 +30,8 @@ type Model struct {
 	MinPyCor    int
 	WorldWidth  int
 	WorldHeight int
-	wrapping    bool
+	wrappingX   bool
+	wrappingY   bool
 
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
@@ -48,7 +49,8 @@ func NewModel(
 	turtleBreeds []string,
 	directedLinkBreeds []string,
 	undirectedLinkBreeds []string,
-	wrapping bool,
+	wrappingX bool,
+	wrappingY bool,
 ) *Model {
 	maxPxCor := 15
 	maxPyCor := 15
@@ -63,7 +65,8 @@ func NewModel(
 		WorldWidth:         maxPxCor - minPxCor + 1,
 		WorldHeight:        maxPyCor - minPyCor + 1,
 		patchesOwnTemplate: patchesOwn,
-		wrapping:           wrapping,
+		wrappingX:          wrappingX,
+		wrappingY:          wrappingY,
 		whoToTurtles:       make(map[int]*Turtle),
 	}
 
@@ -310,16 +313,24 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 
 	distance := math.Abs(math.Sqrt(deltaX*deltaX + deltaY*deltaY))
 
-	if !m.wrapping {
+	if !m.wrappingX && !m.wrappingY {
 		return distance
 	}
 
 	deltaXInverse := float64(m.WorldWidth) - math.Abs(deltaX)
 	deltaYInverse := float64(m.WorldHeight) - math.Abs(deltaY)
 
-	distance = math.Min(distance, math.Abs(math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse)))
-	distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY)))
-	distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+	if m.wrappingX {
+		distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY)))
+	}
+
+	if m.wrappingY {
+		distance = math.Min(distance, math.Abs(math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse)))
+	}
+
+	if m.wrappingX && m.wrappingY {
+		distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+	}
 
 	return distance
 }
@@ -391,7 +402,7 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 	y := p.y - 1
 
 	if x < m.MinPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MaxPxCor
@@ -399,7 +410,7 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 	}
 
 	if y < m.MinPyCor {
-		if !m.wrapping {
+		if !m.wrappingY {
 			return nil
 		} else {
 			y = m.MaxPyCor
@@ -415,7 +426,7 @@ func (m *Model) topNeighbor(p *Patch) *Patch {
 	y := p.y - 1
 
 	if y < m.MinPyCor {
-		if !m.wrapping {
+		if !m.wrappingY {
 			return nil
 		} else {
 			y = m.MaxPyCor
@@ -432,7 +443,7 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 	y := p.y - 1
 
 	if x > m.MaxPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MinPxCor
@@ -440,7 +451,7 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 	}
 
 	if y < m.MinPyCor {
-		if !m.wrapping {
+		if !m.wrappingY {
 			return nil
 		} else {
 			y = m.MaxPyCor
@@ -456,7 +467,7 @@ func (m *Model) leftNeighbor(p *Patch) *Patch {
 	x := p.x - 1
 
 	if x < m.MinPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MaxPxCor
@@ -472,7 +483,7 @@ func (m *Model) rightNeighbor(p *Patch) *Patch {
 	x := p.x + 1
 
 	if x > m.MaxPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MinPxCor
@@ -489,7 +500,7 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 	y := p.y + 1
 
 	if x < m.MinPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MaxPxCor
@@ -497,7 +508,7 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 	}
 
 	if y > m.MaxPyCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			y = m.MinPyCor
@@ -513,7 +524,7 @@ func (m *Model) bottomNeighbor(p *Patch) *Patch {
 	y := p.y + 1
 
 	if y > m.MaxPyCor {
-		if !m.wrapping {
+		if !m.wrappingY {
 			return nil
 		} else {
 			y = m.MinPyCor
@@ -530,7 +541,7 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 	y := p.y + 1
 
 	if x > m.MaxPxCor {
-		if !m.wrapping {
+		if !m.wrappingX {
 			return nil
 		} else {
 			x = m.MinPxCor
@@ -538,7 +549,7 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 	}
 
 	if y > m.MaxPyCor {
-		if !m.wrapping {
+		if !m.wrappingY {
 			return nil
 		} else {
 			y = m.MinPyCor

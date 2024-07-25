@@ -132,7 +132,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	y := int(math.Round(p.yFloat64 + dy))
 
 	if x < p.parent.MinPxCor {
-		if p.parent.wrapping {
+		if p.parent.wrappingX {
 			x = p.parent.MaxPxCor + 1 + ((x - p.parent.MinPxCor) % p.parent.WorldWidth)
 		} else {
 			return nil
@@ -140,7 +140,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	}
 
 	if y < p.parent.MinPyCor {
-		if p.parent.wrapping {
+		if p.parent.wrappingY {
 			y = p.parent.MaxPyCor + 1 + ((y - p.parent.MinPyCor) % p.parent.WorldHeight)
 		} else {
 			return nil
@@ -148,8 +148,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	}
 
 	if x > p.parent.MaxPxCor {
-		if p.parent.wrapping {
-
+		if p.parent.wrappingX {
 			x = (x-p.parent.MaxPxCor)%p.parent.WorldWidth + p.parent.MinPxCor - 1
 		} else {
 			return nil
@@ -157,7 +156,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	}
 
 	if y > p.parent.MaxPyCor {
-		if p.parent.wrapping {
+		if p.parent.wrappingY {
 			y = (y-p.parent.MaxPyCor)%p.parent.WorldHeight + p.parent.MinPyCor - 1
 		} else {
 			return nil
