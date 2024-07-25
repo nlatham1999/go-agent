@@ -500,3 +500,34 @@ func TestTurtleDistanceXY(t *testing.T) {
 		t.Errorf("Expected distance to be 10, got %v", distance)
 	}
 }
+
+func TestTurtleOtherEnd(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	l := model.NewLink(m, "parent-children", t1, t2, true)
+
+	// get the other end of the link
+	otherEnd := t1.OtherEnd(l)
+
+	// make sure the other end is t2
+	if otherEnd != t2 {
+		t.Errorf("Expected other end to be t2")
+	}
+
+	// get the other end of the link
+	otherEnd = t2.OtherEnd(l)
+
+	// make sure the other end is t1
+	if otherEnd != t1 {
+		t.Errorf("Expected other end to be t1")
+	}
+}

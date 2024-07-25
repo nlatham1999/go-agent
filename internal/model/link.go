@@ -183,9 +183,13 @@ func (l *Link) Length() float64 {
 	return l.parent.DistanceBetweenPoints(l.End1.xcor, l.End1.ycor, l.End2.xcor, l.End2.ycor)
 }
 
-// @TODO implement
+// returns the other end of the link that is not the given turtle
 func (l *Link) OtherEnd(t *Turtle) *Turtle {
-	return nil
+	if t == l.End1 {
+		return l.End2
+	} else {
+		return l.End1
+	}
 }
 
 func (l *Link) Show() {

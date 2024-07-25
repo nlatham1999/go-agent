@@ -203,3 +203,26 @@ func TestLinkHeading(t *testing.T) {
 		t.Errorf("Heading should be 270, got %f", heading)
 	}
 }
+
+func TestLinkOtherEnd(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	l := model.NewLink(m, "parent-children", t1, t2, true)
+
+	if l.OtherEnd(t1) != t2 {
+		t.Errorf("Other end should be turtle 2")
+	}
+
+	if l.OtherEnd(t2) != t1 {
+		t.Errorf("Other end should be turtle 1")
+	}
+}
