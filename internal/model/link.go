@@ -178,9 +178,9 @@ func (l *Link) Heading() (float64, error) {
 	return heading, nil
 }
 
-// @TODO implement
+// returns the distance between the two ends of the link
 func (l *Link) Length() float64 {
-	return 0
+	return l.parent.DistanceBetweenPoints(l.End1.xcor, l.End1.ycor, l.End2.xcor, l.End2.ycor)
 }
 
 // @TODO implement
