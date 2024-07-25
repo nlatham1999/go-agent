@@ -44,7 +44,7 @@ func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch 
 		parent:   m,
 	}
 
-	patch.PColor.SetColorScale(Black)
+	patch.PColor.SetColor(Black)
 
 	patch.PatchesOwn = map[string]interface{}{}
 	for key, value := range patchesOwn {
@@ -183,7 +183,7 @@ func (p *Patch) PYCor() int {
 }
 
 func (p *Patch) Reset(patchesOwn map[string]interface{}) {
-	p.PColor.SetColorScale(Black)
+	p.PColor.SetColor(Black)
 
 	for key, value := range patchesOwn {
 		p.PatchesOwn[key] = value

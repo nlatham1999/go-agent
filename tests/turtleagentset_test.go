@@ -17,21 +17,21 @@ func TestAllTurtle(t *testing.T) {
 
 	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
-	turtle1.Color.SetColorScale(1.0)
-	turtle2.Color.SetColorScale(1.0)
-	turtle3.Color.SetColorScale(1.0)
+	turtle1.Color.SetColor(model.Lime)
+	turtle2.Color.SetColor(model.Lime)
+	turtle3.Color.SetColor(model.Lime)
 
 	// assert that turtleset has All of shape "circle"
 	if !turtleSet.All(func(t *model.Turtle) bool {
-		return t.Color.GetColorScale() == 1.0
+		return t.Color == model.Lime
 	}) {
 		t.Errorf("Expected turtleset to have all turtles with color '1.0'")
 	}
 
-	turtle2.Color.SetColorScale(2.0)
+	turtle2.Color.SetColor(model.Blue)
 
 	if turtleSet.All(func(t *model.Turtle) bool {
-		return t.Color.GetColorScale() == 1.0
+		return t.Color == model.Lime
 	}) {
 		t.Errorf("Expected turtleset to not have all turtles with color '1.0'")
 	}
@@ -48,19 +48,19 @@ func TestAnyTurtle(t *testing.T) {
 
 	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
-	turtle1.Color.SetColorScale(1.0)
+	turtle1.Color.SetColor(model.Lime)
 
 	// assert that turtleset has Any of shape "circle"
 	if !turtleSet.Any(func(t *model.Turtle) bool {
-		return t.Color.GetColorScale() == 1.0
+		return t.Color == model.Lime
 	}) {
 		t.Errorf("Expected turtleset to have a turtle with color '1.0'")
 	}
 
-	turtle1.Color.SetColorScale(2.0)
+	turtle1.Color.SetColor(model.Blue)
 
 	if turtleSet.Any(func(t *model.Turtle) bool {
-		return t.Color.GetColorScale() == 1.0
+		return t.Color == model.Lime
 	}) {
 		t.Errorf("Expected turtleset to not have a turtle with color '1.0'")
 	}

@@ -158,7 +158,7 @@ func TestPatchNeighbors(t *testing.T) {
 	model.AskPatches(neighbors,
 		[]model.PatchOperation{
 			func(p *model.Patch) {
-				p.PColor.SetColorScale(model.Red)
+				p.PColor.SetColor(model.Red)
 			},
 		},
 	)
@@ -175,7 +175,7 @@ func TestPatchNeighbors(t *testing.T) {
 	patchSet := model.PatchSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Red
+		return p.PColor == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -235,7 +235,7 @@ func TestPatchNeighbors(t *testing.T) {
 	model.AskPatches(neighbors,
 		[]model.PatchOperation{
 			func(p *model.Patch) {
-				p.PColor.SetColorScale(model.Red)
+				p.PColor.SetColor(model.Red)
 			},
 		},
 	)
@@ -243,7 +243,7 @@ func TestPatchNeighbors(t *testing.T) {
 	patchSet = model.PatchSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Red
+		return p.PColor == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -268,7 +268,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	model.AskPatches(neighbors,
 		[]model.PatchOperation{
 			func(p *model.Patch) {
-				p.PColor.SetColorScale(model.Red)
+				p.PColor.SetColor(model.Red)
 			},
 		},
 	)
@@ -281,7 +281,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	patchSet := model.PatchSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Red
+		return p.PColor == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -329,7 +329,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	model.AskPatches(neighbors,
 		[]model.PatchOperation{
 			func(p *model.Patch) {
-				p.PColor.SetColorScale(model.Red)
+				p.PColor.SetColor(model.Red)
 			},
 		},
 	)
@@ -337,7 +337,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	patchSet = model.PatchSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Red
+		return p.PColor == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -407,36 +407,36 @@ func TestPatchSprout(t *testing.T) {
 		func(t *model.Turtle) {
 			switch t.Who() {
 			case 0:
-				t.Color.SetColorScale(model.Red)
+				t.Color.SetColor(model.Red)
 			case 1:
-				t.Color.SetColorScale(model.Blue)
+				t.Color.SetColor(model.Blue)
 			case 2:
-				t.Color.SetColorScale(model.Green)
+				t.Color.SetColor(model.Green)
 			case 3:
-				t.Color.SetColorScale(model.Yellow)
+				t.Color.SetColor(model.Yellow)
 			case 4:
-				t.Color.SetColorScale(model.Pink)
+				t.Color.SetColor(model.Pink)
 			}
 		},
 	})
 
-	if m.Turtle("", 0).Color.GetColorScale() != model.Red {
+	if m.Turtle("", 0).Color != model.Red {
 		t.Errorf("Expected red turtle")
 	}
 
-	if m.Turtle("", 1).Color.GetColorScale() != model.Blue {
+	if m.Turtle("", 1).Color != model.Blue {
 		t.Errorf("Expected blue turtle")
 	}
 
-	if m.Turtle("", 2).Color.GetColorScale() != model.Green {
+	if m.Turtle("", 2).Color != model.Green {
 		t.Errorf("Expected green turtle")
 	}
 
-	if m.Turtle("", 3).Color.GetColorScale() != model.Yellow {
+	if m.Turtle("", 3).Color != model.Yellow {
 		t.Errorf("Expected yellow turtle")
 	}
 
-	if m.Turtle("", 4).Color.GetColorScale() != model.Pink {
+	if m.Turtle("", 4).Color != model.Pink {
 		t.Errorf("Expected pink turtle")
 	}
 }

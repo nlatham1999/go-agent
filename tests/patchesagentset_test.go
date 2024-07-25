@@ -17,21 +17,21 @@ func TestAllPatch(t *testing.T) {
 
 	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
-	patch1.PColor.SetColorScale(model.Blue)
-	patch2.PColor.SetColorScale(model.Blue)
-	patch3.PColor.SetColorScale(model.Blue)
+	patch1.PColor.SetColor(model.Blue)
+	patch2.PColor.SetColor(model.Blue)
+	patch3.PColor.SetColor(model.Blue)
 
 	// assert that patchset has All of shape "circle"
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Blue
+		return p.PColor == model.Blue
 	}) {
 		t.Errorf("Expected patchset to have all patches with color 'blue'")
 	}
 
-	patch2.PColor.SetColorScale(model.Red)
+	patch2.PColor.SetColor(model.Red)
 
 	if patchSet.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Blue
+		return p.PColor == model.Blue
 	}) {
 		t.Errorf("Expected patchset to not have all patches with color 'blue'")
 	}
@@ -49,19 +49,19 @@ func TestAnyPatch(t *testing.T) {
 
 	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
-	patch1.PColor.SetColorScale(model.Blue)
+	patch1.PColor.SetColor(model.Blue)
 
 	// assert that patchset has Any of shape "circle"
 	if !patchSet.Any(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Blue
+		return p.PColor == model.Blue
 	}) {
 		t.Errorf("Expected patchset to have a patch with color 'blue'")
 	}
 
-	patch1.PColor.SetColorScale(model.Red)
+	patch1.PColor.SetColor(model.Red)
 
 	if patchSet.Any(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Blue
+		return p.PColor == model.Blue
 	}) {
 		t.Errorf("Expected patchset to not have a patch with color 'blue'")
 	}

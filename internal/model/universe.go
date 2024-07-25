@@ -37,8 +37,6 @@ type Model struct {
 
 	turtlesWhoNumber int //who number of the next turtle to be created
 
-	ColorHueMap map[string]float64
-
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
 }

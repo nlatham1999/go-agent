@@ -1,47 +1,28 @@
 package model
 
 type Color struct {
-	usingScaleColor bool
-	scaleColor      float64
-	rbg             RGB
-	alpha           int //used with rbg it is the transparency
+	Red   int
+	Blue  int
+	Green int
+	Alpha int //used with rbg it is the transparency
 }
 
-type RGB struct {
-	red   int
-	blue  int
-	green int
-}
-
-func (c *Color) SetColorScale(val float64) {
-	c.scaleColor = val
-	c.usingScaleColor = true
+func (c *Color) SetColor(c2 Color) {
+	c.Red = c2.Red
+	c.Blue = c2.Blue
+	c.Green = c2.Green
+	c.Alpha = c2.Alpha
 }
 
 func (c *Color) SetColorRGB(red int, blue int, green int) {
-	c.rbg = RGB{
-		red:   red,
-		blue:  blue,
-		green: green,
-	}
-	c.alpha = 0
-	c.usingScaleColor = false
+	c.Red = red
+	c.Blue = blue
+	c.Green = green
 }
 
 func (c *Color) SetColorRGBA(red int, blue int, green int, alpha int) {
-	c.rbg = RGB{
-		red:   red,
-		green: green,
-		blue:  blue,
-	}
-	c.alpha = alpha
-	c.usingScaleColor = false
-}
-
-func (c *Color) GetColorScale() float64 {
-	if c.usingScaleColor {
-		return c.scaleColor
-	} else {
-		return ApproximateRGB(c.rbg.red, c.rbg.green, c.rbg.blue)
-	}
+	c.Red = red
+	c.Blue = blue
+	c.Green = green
+	c.Alpha = alpha
 }

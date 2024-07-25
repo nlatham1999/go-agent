@@ -10,8 +10,8 @@ func ApproximateRGB(red int, green int, blue int) float64 {
 	return 0.0
 }
 
-func BaseColors() []float64 {
-	return []float64{
+func BaseColors() []Color {
+	return []Color{
 		Black,
 		White,
 		Grey,

@@ -106,15 +106,15 @@ func recolorPatch(p *model.Patch) {
 
 	// ;; give color to nest and food sources
 	if p.PatchesOwn[nest].(bool) {
-		p.PColor.SetColorScale(environment.ColorHueMap["violet"])
+		p.PColor.SetColor(model.Violet)
 	} else {
 		if p.PatchesOwn[food].(int) > 0 {
 			if p.PatchesOwn[foodSourceNumber].(int) == 1 {
-				p.PColor.SetColorScale(environment.ColorHueMap["cyan"])
+				p.PColor.SetColor(model.Cyan)
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 2 {
-				p.PColor.SetColorScale(environment.ColorHueMap["sky"])
+				p.PColor.SetColor(model.Sky)
 			} else if p.PatchesOwn[foodSourceNumber].(int) == 3 {
-				p.PColor.SetColorScale(environment.ColorHueMap["blue"])
+				p.PColor.SetColor(model.Blue)
 			}
 		} else {
 			// p.SetColorAndScale(p.PatchesOwn[chemical].(float64), .1, 5)
@@ -144,7 +144,7 @@ func run() {
 				if t.Who() >= environment.Ticks {
 					return
 				}
-				if t.Color.GetColorScale() == environment.ColorHueMap["red"] {
+				if t.Color == model.Red {
 					lookForFood(t)
 				} else {
 					returnToNest(t)
@@ -170,7 +170,7 @@ func run() {
 
 func returnToNest(t *model.Turtle) {
 	if t.PatchHere().PatchesOwn[nest].(bool) {
-		t.Color.SetColorScale(environment.ColorHueMap["red"])
+		t.Color.SetColor(model.Red)
 		t.Right(180)
 	} else {
 		t.PatchHere().PatchesOwn[chemical] = t.PatchHere().PatchesOwn[chemical].(int) + 60
@@ -181,7 +181,7 @@ func returnToNest(t *model.Turtle) {
 func lookForFood(t *model.Turtle) {
 	p := t.PatchHere()
 	if p.PatchesOwn[food].(int) > 0 {
-		t.Color.SetColorScale(environment.ColorHueMap["orange"] + 1)
+		t.Color.SetColor(model.Orange)
 		p.PatchesOwn[food] = p.PatchesOwn[food].(int) - 1
 		t.Right(180)
 		return

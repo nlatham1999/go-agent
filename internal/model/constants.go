@@ -1,22 +1,21 @@
 package model
 
-const (
-	//color constants
-	Black     float64 = 0
-	White     float64 = 9.9
-	Grey      float64 = 5
-	Gray      float64 = 5
-	Red       float64 = 15
-	Orange    float64 = 25
-	Brown     float64 = 35
-	Yellow    float64 = 45
-	Green     float64 = 55
-	Lime      float64 = 65
-	Turquoise float64 = 75
-	Cyan      float64 = 85
-	Sky       float64 = 95
-	Blue      float64 = 105
-	Violet    float64 = 115
-	Magenta   float64 = 125
-	Pink      float64 = 135
+var (
+	Black     = Color{Red: 0, Green: 0, Blue: 0}
+	White     = Color{Red: 255, Green: 255, Blue: 255}
+	Grey      = Color{Red: 128, Green: 128, Blue: 128}
+	Gray      = Color{Red: 128, Green: 128, Blue: 128}
+	Red       = Color{Red: 255, Green: 0, Blue: 0}
+	Orange    = Color{Red: 255, Green: 165, Blue: 0}
+	Brown     = Color{Red: 165, Green: 42, Blue: 42}
+	Yellow    = Color{Red: 255, Green: 255, Blue: 0}
+	Green     = Color{Red: 0, Green: 128, Blue: 0}
+	Lime      = Color{Red: 0, Green: 255, Blue: 0}
+	Turquoise = Color{Red: 64, Green: 224, Blue: 208}
+	Cyan      = Color{Red: 0, Green: 255, Blue: 255}
+	Sky       = Color{Red: 135, Green: 206, Blue: 235}
+	Blue      = Color{Red: 0, Green: 0, Blue: 255}
+	Violet    = Color{Red: 238, Green: 130, Blue: 238}
+	Magenta   = Color{Red: 255, Green: 0, Blue: 255}
+	Pink      = Color{Red: 255, Green: 192, Blue: 203}
 )

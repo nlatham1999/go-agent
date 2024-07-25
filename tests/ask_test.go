@@ -11,17 +11,17 @@ func TestAskLink(t *testing.T) {
 		End1: nil,
 		End2: nil,
 	}
-	link.Color.SetColorScale(model.Blue)
+	link.Color.SetColor(model.Blue)
 
 	model.AskLink(link, []model.LinkOperation{
 		func(link *model.Link) {
-			link.Color.SetColorScale(model.Red)
+			link.Color.SetColor(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if link.Color.GetColorScale() != model.Red {
-		t.Errorf("Expected red, got %v", link.Color.GetColorScale())
+	if link.Color != model.Red {
+		t.Errorf("Expected red, got %v", link.Color)
 	}
 }
 
@@ -37,13 +37,13 @@ func TestAskLinks(t *testing.T) {
 	// ask to change all colors to red
 	model.AskLinks(agentset, []model.LinkOperation{
 		func(link *model.Link) {
-			link.Color.SetColorScale(model.Red)
+			link.Color.SetColor(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
 	if !agentset.All(func(l *model.Link) bool {
-		return l.Color.GetColorScale() == model.Red
+		return l.Color == model.Red
 	}) {
 		t.Errorf("Expected linkset to have all links with shape 'circle'")
 	}
@@ -51,17 +51,17 @@ func TestAskLinks(t *testing.T) {
 
 func TestAskPatch(t *testing.T) {
 	patch := &model.Patch{}
-	patch.PColor.SetColorScale(model.Blue)
+	patch.PColor.SetColor(model.Blue)
 
 	model.AskPatch(patch, []model.PatchOperation{
 		func(patch *model.Patch) {
-			patch.PColor.SetColorScale(model.Red)
+			patch.PColor.SetColor(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if patch.PColor.GetColorScale() != model.Red {
-		t.Errorf("Expected red, got %v", patch.PColor.GetColorScale())
+	if patch.PColor != model.Red {
+		t.Errorf("Expected red, got %v", patch.PColor)
 	}
 }
 
@@ -77,13 +77,13 @@ func TestAskPatches(t *testing.T) {
 	// ask to change all colors to red
 	model.AskPatches(agentset, []model.PatchOperation{
 		func(patch *model.Patch) {
-			patch.PColor.SetColorScale(model.Red)
+			patch.PColor.SetColor(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
 	if !agentset.All(func(p *model.Patch) bool {
-		return p.PColor.GetColorScale() == model.Red
+		return p.PColor == model.Red
 	}) {
 		t.Errorf("Expected patchset to have all patches with color 'red'")
 	}
@@ -91,17 +91,17 @@ func TestAskPatches(t *testing.T) {
 
 func TestAskTurtle(t *testing.T) {
 	turtle := &model.Turtle{}
-	turtle.Color.SetColorScale(model.Blue)
+	turtle.Color.SetColor(model.Blue)
 
 	model.AskTurtle(turtle, []model.TurtleOperation{
 		func(turtle *model.Turtle) {
-			turtle.Color.SetColorScale(model.Red)
+			turtle.Color.SetColor(model.Red)
 		},
 	})
 
 	//make sure that the color is red
-	if turtle.Color.GetColorScale() != model.Red {
-		t.Errorf("Expected red, got %v", turtle.Color.GetColorScale())
+	if turtle.Color != model.Red {
+		t.Errorf("Expected red, got %v", turtle.Color)
 	}
 }
 
@@ -117,13 +117,13 @@ func TestAskTurtles(t *testing.T) {
 	// ask to change all colors to red
 	model.AskTurtles(agentset, []model.TurtleOperation{
 		func(turtle *model.Turtle) {
-			turtle.Color.SetColorScale(model.Red)
+			turtle.Color.SetColor(model.Red)
 		},
 	})
 
 	//make sure that all colors are red
 	if !agentset.All(func(t *model.Turtle) bool {
-		return t.Color.GetColorScale() == model.Red
+		return t.Color == model.Red
 	}) {
 		t.Errorf("Expected turtleset to have all turtles with color 'red'")
 	}
