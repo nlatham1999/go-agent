@@ -159,14 +159,25 @@ func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
 	return minTurtle
 }
 
-// @TODO implement
 func (t *TurtleAgentSet) OneOf() *Turtle {
+	for turtle := range t.turtles {
+		return turtle
+	}
+
 	return nil
 }
 
-// @TODO implement
 func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {
-	return nil
+	turtles := []*Turtle{}
+
+	for turtle := range t.turtles {
+		turtles = append(turtles, turtle)
+		if len(turtles) == n {
+			break
+		}
+	}
+
+	return TurtleSet(turtles)
 }
 
 // returns a new TurtleAgentSet with all the turtles that are not in the given TurtleAgentSet

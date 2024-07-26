@@ -88,7 +88,6 @@ func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {
 	return maxLink
 }
 
-// @TODO implement
 func (l *LinkAgentSet) MinNOf(n int, operation LinkFloatOperation) *LinkAgentSet {
 	if n < 0 {
 		return nil
@@ -117,14 +116,26 @@ func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {
 	return minLink
 }
 
-// @TODO implement
 func (l *LinkAgentSet) OneOf() *Link {
+	for link := range l.links {
+		return link
+	}
+
 	return nil
 }
 
 // @TODO implement
 func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
-	return nil
+	links := []*Link{}
+
+	for link := range l.links {
+		links = append(links, link)
+		if len(links) == n {
+			break
+		}
+	}
+
+	return LinkSet(links)
 }
 
 // returns a new LinkAgentSet with all the links that are not in the given LinkAgentSet

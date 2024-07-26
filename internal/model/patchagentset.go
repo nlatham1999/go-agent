@@ -170,13 +170,25 @@ func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {
 	return minPatch
 }
 
-// @TODO implement
 func (p *PatchAgentSet) OneOf() *Patch {
+	for patch := range p.patches {
+		return patch
+	}
+
 	return nil
 }
 
 func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
-	return nil
+	patches := []*Patch{}
+
+	for patch := range p.patches {
+		patches = append(patches, patch)
+		if len(patches) == n {
+			break
+		}
+	}
+
+	return PatchSet(patches)
 }
 
 // returns a new PatchAgentSet with all the patches that are not in the given PatchAgentSet
