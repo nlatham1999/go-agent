@@ -180,12 +180,10 @@ func (l *Link) Show() {
 	l.Hidden = false
 }
 
-// @TODO implement
 func (l *Link) Tie() {
-
+	l.TieMode = TieModeFixed
 }
 
-// @TODO implement
 func (l *Link) Untie() {
-
+	l.TieMode = TieModeNone
 }
