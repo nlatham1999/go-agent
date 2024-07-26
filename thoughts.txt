@@ -28,3 +28,6 @@ wrapping should have vertical and horizontal options
 
 the only place the the heading and x,y should be changed should be in SetXY and setHeadingRadians
  - this will make it easier for moving tied turtles
+
+should we store a list in the agentset structs as well?
+    this would not improve things a lot since the List() funcs would still need to return a copy of the list instead of a reference to it

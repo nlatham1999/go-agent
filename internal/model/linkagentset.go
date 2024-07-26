@@ -124,7 +124,6 @@ func (l *LinkAgentSet) OneOf() *Link {
 	return nil
 }
 
-// @TODO implement
 func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 	links := []*Link{}
 
