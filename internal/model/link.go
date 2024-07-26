@@ -5,6 +5,8 @@ import (
 	"math"
 )
 
+type TieMode string
+
 type Link struct {
 	Color     Color
 	End1      *Turtle
@@ -14,7 +16,7 @@ type Link struct {
 	breed     string
 	Shape     string
 	Thickness float64
-	TieMode   string
+	TieMode   TieMode
 	parent    *Model
 
 	Label      interface{}

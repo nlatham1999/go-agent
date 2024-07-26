@@ -226,3 +226,145 @@ func TestLinkOtherEnd(t *testing.T) {
 		t.Errorf("Other end should be turtle 1")
 	}
 }
+
+func TestRotatingTiedTurtles(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(3, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+
+	t1.SetHeading(30)
+	t1.SetXY(0, 0)
+
+	t2.SetHeading(60)
+	t2.SetXY(3, 4)
+
+	t3.SetHeading(90)
+	t3.SetXY(5, 1)
+
+	// create a new link
+	l1 := model.NewLink(m, "parent-children", t1, t2, true)
+	l1.TieMode = model.TieModeFixed
+
+	l2 := model.NewLink(m, "parent-children", t2, t3, true)
+	l2.TieMode = model.TieModeFixed
+
+	l3 := model.NewLink(m, "parent-children", t3, t1, true)
+	l3.TieMode = model.TieModeFixed
+
+	// rotate the turtles
+	t1.Right(10)
+
+	// make sure the heading of each has increased by 10
+	if t1.GetHeading() != 40 {
+		t.Errorf("Turtle 1 heading should be 40, got %f", t1.GetHeading())
+	}
+
+	if t2.GetHeading() != 70 {
+		t.Errorf("Turtle 2 heading should be 70, got %f", t2.GetHeading())
+	}
+
+	if t3.GetHeading() != 100 {
+		t.Errorf("Turtle 3 heading should be 100, got %f", t3.GetHeading())
+	}
+
+	// make sure that t1 has not moved
+	if t1.XCor() != 0 {
+		t.Errorf("Turtle 1 x should be 0, got %f", t1.YCor())
+	}
+
+	if t1.YCor() != 0 {
+		t.Errorf("Turtle 1 y should be 0, got %f", t1.XCor())
+	}
+
+	if t2.XCor() != 3.6490159697043456 || t2.YCor() != 3.4182864790480414 {
+		t.Errorf("Turtle 2 x should be 3.6490159697043456 and y should be 3.4182864790480414, got %f and %f", t2.XCor(), t2.YCor())
+	}
+
+	if t3.XCor() != 5.097686942727971 || t3.YCor() != 0.11656686467755639 {
+		t.Errorf("Turtle 3 x should be 5.097686942727971 and y should be 0.11656686467755639, got %f and %f", t3.XCor(), t3.YCor())
+	}
+
+	// rotate the second turtle
+	t2.Left(20)
+
+	if t1.GetHeading()-20 > .00001 {
+		t.Errorf("Turtle 1 heading should be 20, got %f", t1.GetHeading())
+	}
+
+	if t2.GetHeading()-50 > .00001 {
+		t.Errorf("Turtle 2 heading should be 50, got %f", t2.GetHeading())
+	}
+
+	if t3.GetHeading() != 80 {
+		t.Errorf("Turtle 3 heading should be 80, got %f", t3.GetHeading())
+	}
+
+	// make sure that t2 has not moved
+	if t2.XCor() != 3.6490159697043456 || t2.YCor() != 3.4182864790480414 {
+		t.Errorf("Turtle 2 x should be 3.6490159697043456, got %f", t2.XCor())
+	}
+
+	if t1.XCor() != 1.3891854213354429 || t1.YCor() != -1.0418890660015827 {
+		t.Errorf("Turtle 1 x should be 1.3891854213354429 and y should be 0=-1.0418890660015827, got %f and %f", t1.XCor(), t1.YCor())
+	}
+
+	if t3.XCor() != 6.139576008729553 || t3.YCor() != 0.8111595753452776 {
+		t.Errorf("Turtle 3 x should be 6.139576008729553 and y should be 0.8111595753452776, got %f and %f", t3.XCor(), t3.YCor())
+	}
+
+	// create another turtle at 14, 14 that is fixed to t1
+	m.CreateTurtles(2, "", nil)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t4.SetXY(0, 0)
+	t5.SetXY(14, 14)
+	l4 := model.NewLink(m, "parent-children", t4, t5, true)
+	l4.TieMode = model.TieModeFixed
+
+	// rotate t1
+	t4.Right(20)
+
+	// t5 should not move because it would be off the world
+	if t5.XCor() != 14 || t5.YCor() != 14 {
+		t.Errorf("Turtle 5 should not have moved, got %f and %f", t5.XCor(), t5.YCor())
+	}
+
+	// revert the rotation
+	l4.TieMode = model.TieModeNone
+	t4.Left(10)
+	l4.TieMode = model.TieModeFixed
+
+	m.WrappingXOn()
+
+	t4.Right(20)
+
+	if t5.XCor() != -13.05602130243792 || t5.YCor() != 8.367414684443355 {
+		t.Errorf("Turtle 5 should not have moved, got %f and %f", t5.XCor(), t5.YCor())
+	}
+
+	// create another 2 turtles, t6 at 0,0 and t7 at -14, 14 that is fixed to t6
+	m.CreateTurtles(2, "", nil)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+
+	t6.SetXY(0, 0)
+	t7.SetXY(-14, 14)
+
+	l5 := model.NewLink(m, "parent-children", t6, t7, true)
+	l5.TieMode = model.TieModeFixed
+
+	// rotate t6
+	t6.Left(20)
+
+	if t7.XCor() != 13.05602130243792 || t7.YCor() != 8.367414684443355 {
+		t.Errorf("Turtle 7 should not have moved, got %f and %f", t7.XCor(), t7.YCor())
+	}
+
+}

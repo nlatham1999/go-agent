@@ -1,5 +1,6 @@
 package model
 
+// colors
 var (
 	Black     = Color{Red: 0, Green: 0, Blue: 0}
 	White     = Color{Red: 255, Green: 255, Blue: 255}
@@ -18,4 +19,10 @@ var (
 	Violet    = Color{Red: 238, Green: 130, Blue: 238}
 	Magenta   = Color{Red: 255, Green: 0, Blue: 255}
 	Pink      = Color{Red: 255, Green: 192, Blue: 203}
+)
+
+var (
+	TieModeFixed = TieMode("fixed")
+	TieModeFree  = TieMode("free")
+	TieModeNone  = TieMode("none")
 )

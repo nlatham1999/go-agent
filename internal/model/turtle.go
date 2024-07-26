@@ -140,18 +140,26 @@ func (t *Turtle) CanMove(distance float64) bool {
 	newX := t.xcor + distance*math.Cos(t.heading)
 	newY := t.ycor + distance*math.Sin(t.heading)
 
-	if !t.parent.wrappingX && (newX < float64(t.parent.MinPxCor) || newX >= float64(t.parent.MaxPxCor)) {
-		return false
+	if newX < float64(t.parent.MinPxCor) || newX >= float64(t.parent.MaxPxCor) {
+		if !t.parent.wrappingX {
+			return false
+		} else {
+			return true
+		}
 	}
 
-	if !t.parent.wrappingY && (newY < float64(t.parent.MinPyCor) || newY >= float64(t.parent.MaxPyCor)) {
-		return false
+	if newY < float64(t.parent.MinPyCor) || newY >= float64(t.parent.MaxPyCor) {
+		if !t.parent.wrappingY {
+			return false
+		} else {
+			return true
+		}
 	}
 
 	// patchX := math.Round(newX)
 	// patchY := math.Round(newY)
 
-	return t.parent.Patch(newX, newY) != nil
+	return true
 }
 
 // creates a directed link from the current turtle to the turtle passed in
@@ -322,7 +330,96 @@ func (t *Turtle) SetHeading(heading float64) {
 }
 
 func (t *Turtle) setHeadingRadians(heading float64) {
+
+	headingDifference := heading - t.heading
+
 	t.heading = heading
+
+	if len(t.linkedTurtles) == 0 {
+		return
+	}
+
+	// rotate all descendent linked turtles that are tied
+	tiedTurtlesMap := make(map[*Turtle]interface{})
+	tiedTurtles := []*Turtle{}
+	for _, l := range t.linkedTurtles {
+		if l.TieMode != TieModeNone {
+			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
+		}
+	}
+	for len(tiedTurtles) > 0 {
+		for _, turtle := range tiedTurtles {
+			tiedTurtlesMap[turtle] = nil
+		}
+		newTiedTurtles := []*Turtle{}
+		for _, turtle := range tiedTurtles {
+			for _, l := range turtle.linkedTurtles {
+				if l.TieMode != TieModeNone {
+					otherEnd := l.OtherEnd(turtle)
+					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+						newTiedTurtles = append(newTiedTurtles, otherEnd)
+					}
+				}
+			}
+		}
+		tiedTurtles = newTiedTurtles
+	}
+	for turtle := range tiedTurtlesMap {
+		t.rotateTiedTurtle(turtle, headingDifference)
+	}
+
+	// rotate the heading for all descendents where the tiemode is fixed
+	tiedTurtlesMap = make(map[*Turtle]interface{})
+	tiedTurtles = []*Turtle{}
+	for _, l := range t.linkedTurtles {
+		if l.TieMode == TieModeFixed {
+			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
+		}
+	}
+	for len(tiedTurtles) > 0 {
+		for _, turtle := range tiedTurtles {
+			tiedTurtlesMap[turtle] = nil
+		}
+		newTiedTurtles := []*Turtle{}
+		for _, turtle := range tiedTurtles {
+			for _, l := range turtle.linkedTurtles {
+				if l.TieMode == TieModeFixed {
+					otherEnd := l.OtherEnd(turtle)
+					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+						newTiedTurtles = append(newTiedTurtles, otherEnd)
+					}
+				}
+			}
+		}
+		tiedTurtles = newTiedTurtles
+	}
+	for turtle := range tiedTurtlesMap {
+		turtle.heading += headingDifference
+	}
+}
+
+// swivvels the turtle to the left or right by the amount passed in
+// the turtle passed in will maintain the same distance from the current turtle
+func (t *Turtle) rotateTiedTurtle(turtle *Turtle, amount float64) {
+	if t == turtle {
+		return
+	}
+
+	// get the distance between the two turtles
+	distanceX := turtle.xcor - t.xcor
+	distanceY := turtle.ycor - t.ycor
+
+	// get the new x and y coordinates
+	newX := t.xcor + distanceX*math.Cos(-amount) - distanceY*math.Sin(-amount)
+	newY := t.ycor + distanceX*math.Sin(-amount) + distanceY*math.Cos(-amount)
+
+	newX, newY, allowed := t.convertXYToInBounds(newX, newY)
+	if !allowed {
+		return
+	}
+
+	turtle.xcor = newX
+	turtle.ycor = newY
 }
 
 func (t *Turtle) Hide() {
@@ -394,14 +491,14 @@ func (t *Turtle) Jump(distance float64) {
 }
 
 func (t *Turtle) Left(number float64) {
+	// convert number to radians
+	number = -number * (math.Pi / 180)
 
-	//convert number to radians
-	number = number * (math.Pi / 180)
-
-	//add the number to the heading
+	// add the number to the heading
 	heading := math.Mod((t.heading + number), 2*math.Pi)
 
 	t.setHeadingRadians(heading)
+
 }
 
 // @TODO implement
@@ -567,9 +664,53 @@ func (t *Turtle) Right(number float64) {
 	t.Left(-number)
 }
 
+// if the topology allows it then convert the x y to within bounds if it is outside of the world
+// returns the new x y and if it is in bounds
+// returns false if the x y is not in bounds and the topology does not allow it
+func (t *Turtle) convertXYToInBounds(x float64, y float64) (float64, float64, bool) {
+
+	if x < float64(t.parent.MinPxCor) {
+		if t.parent.wrappingX {
+			x = float64(t.parent.MaxPxCor) - math.Mod(float64(t.parent.MinPxCor)-x, float64(t.parent.WorldWidth)) + 1
+		} else {
+			return x, y, false
+		}
+	}
+
+	if x > float64(t.parent.MaxPxCor) {
+		if t.parent.wrappingX {
+			x = float64(t.parent.MinPxCor) + math.Mod(x-float64(t.parent.MinPxCor), float64(t.parent.WorldWidth))
+		} else {
+			return x, y, false
+		}
+	}
+
+	if y < float64(t.parent.MinPyCor) {
+		if t.parent.wrappingY {
+			y = float64(t.parent.MaxPyCor) - math.Mod(float64(t.parent.MinPyCor)-y, float64(t.parent.WorldHeight)) + 1
+		} else {
+			return x, y, false
+		}
+	}
+
+	if y > float64(t.parent.MaxPyCor) {
+		if t.parent.wrappingY {
+			y = float64(t.parent.MinPyCor) + math.Mod(y-float64(t.parent.MinPyCor), float64(t.parent.WorldHeight))
+		} else {
+			return x, y, false
+		}
+
+	}
+
+	return x, y, true
+}
+
 func (t *Turtle) SetXY(x float64, y float64) {
 
-	//move all
+	x, y, allowed := t.convertXYToInBounds(x, y)
+	if !allowed {
+		return
+	}
 
 	t.xcor = x
 	t.ycor = y

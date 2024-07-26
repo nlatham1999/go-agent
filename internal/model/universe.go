@@ -759,3 +759,19 @@ func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
 func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 	return nil
 }
+
+func (m *Model) WrappingXOn() {
+	m.wrappingX = true
+}
+
+func (m *Model) WrappingYOn() {
+	m.wrappingY = true
+}
+
+func (m *Model) WrappingXOff() {
+	m.wrappingX = false
+}
+
+func (m *Model) WrappingYOff() {
+	m.wrappingY = false
+}
