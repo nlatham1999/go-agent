@@ -413,7 +413,7 @@ func (t *Turtle) rotateTiedTurtle(turtle *Turtle, amount float64) {
 	newX := t.xcor + distanceX*math.Cos(-amount) - distanceY*math.Sin(-amount)
 	newY := t.ycor + distanceX*math.Sin(-amount) + distanceY*math.Cos(-amount)
 
-	newX, newY, allowed := t.convertXYToInBounds(newX, newY)
+	newX, newY, allowed := t.parent.convertXYToInBounds(newX, newY)
 	if !allowed {
 		return
 	}
@@ -664,50 +664,9 @@ func (t *Turtle) Right(number float64) {
 	t.Left(-number)
 }
 
-// if the topology allows it then convert the x y to within bounds if it is outside of the world
-// returns the new x y and if it is in bounds
-// returns false if the x y is not in bounds and the topology does not allow it
-func (t *Turtle) convertXYToInBounds(x float64, y float64) (float64, float64, bool) {
-
-	if x < float64(t.parent.MinPxCor) {
-		if t.parent.wrappingX {
-			x = float64(t.parent.MaxPxCor) - math.Mod(float64(t.parent.MinPxCor)-x, float64(t.parent.WorldWidth)) + 1
-		} else {
-			return x, y, false
-		}
-	}
-
-	if x > float64(t.parent.MaxPxCor) {
-		if t.parent.wrappingX {
-			x = float64(t.parent.MinPxCor) + math.Mod(x-float64(t.parent.MinPxCor), float64(t.parent.WorldWidth))
-		} else {
-			return x, y, false
-		}
-	}
-
-	if y < float64(t.parent.MinPyCor) {
-		if t.parent.wrappingY {
-			y = float64(t.parent.MaxPyCor) - math.Mod(float64(t.parent.MinPyCor)-y, float64(t.parent.WorldHeight)) + 1
-		} else {
-			return x, y, false
-		}
-	}
-
-	if y > float64(t.parent.MaxPyCor) {
-		if t.parent.wrappingY {
-			y = float64(t.parent.MinPyCor) + math.Mod(y-float64(t.parent.MinPyCor), float64(t.parent.WorldHeight))
-		} else {
-			return x, y, false
-		}
-
-	}
-
-	return x, y, true
-}
-
 func (t *Turtle) SetXY(x float64, y float64) {
 
-	x, y, allowed := t.convertXYToInBounds(x, y)
+	x, y, allowed := t.parent.convertXYToInBounds(x, y)
 	if !allowed {
 		return
 	}

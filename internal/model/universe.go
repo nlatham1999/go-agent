@@ -28,6 +28,10 @@ type Model struct {
 	MaxPyCor    int
 	MinPxCor    int
 	MinPyCor    int
+	MaxXCor     float64
+	MaxYCor     float64
+	MinXCor     float64
+	MinYCor     float64
 	WorldWidth  int
 	WorldHeight int
 	wrappingX   bool
@@ -62,6 +66,10 @@ func NewModel(
 		MaxPyCor:           maxPyCor,
 		MinPxCor:           minPxCor,
 		MinPyCor:           minPyCor,
+		MaxXCor:            float64(maxPxCor) + .5,
+		MaxYCor:            float64(maxPyCor) + .5,
+		MinXCor:            float64(minPxCor) - .5,
+		MinYCor:            float64(minPyCor) - .5,
 		WorldWidth:         maxPxCor - minPxCor + 1,
 		WorldHeight:        maxPyCor - minPyCor + 1,
 		patchesOwnTemplate: patchesOwn,
@@ -256,6 +264,47 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 	}
 
 	return nil
+}
+
+// if the topology allows it then convert the x y to within bounds if it is outside of the world
+// returns the new x y and if it is in bounds
+// returns false if the x y is not in bounds and the topology does not allow it
+func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, bool) {
+
+	if x < m.MinXCor {
+		if m.wrappingX {
+			x = m.MaxXCor - math.Mod(m.MinXCor-x, float64(m.WorldWidth)) + 1
+		} else {
+			return x, y, false
+		}
+	}
+
+	if x >= m.MaxXCor {
+		if m.wrappingX {
+			x = m.MinXCor + math.Mod(x-m.MinXCor, float64(m.WorldWidth))
+		} else {
+			return x, y, false
+		}
+	}
+
+	if y < m.MinYCor {
+		if m.wrappingY {
+			y = m.MaxYCor - math.Mod(m.MinYCor-y, float64(m.WorldHeight)) + 1
+		} else {
+			return x, y, false
+		}
+	}
+
+	if y >= m.MaxYCor {
+		if m.wrappingY {
+			y = m.MinYCor + math.Mod(y-m.MinYCor, float64(m.WorldHeight))
+		} else {
+			return x, y, false
+		}
+
+	}
+
+	return x, y, true
 }
 
 // @TODO implement
@@ -649,9 +698,22 @@ func (m *Model) safeGetPatch(x int) *Patch {
 }
 
 func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
-	//round to get x and y
-	x := int(math.Round(pxcor))
-	y := int(math.Round(pycor))
+
+	// round the x and y except in cases where the x or y is the min value
+	// since the min value will be -*.5 and we want to round up in that case
+	var x int
+	var y int
+	if pxcor == m.MinXCor {
+		x = int(math.Ceil(pxcor))
+	} else {
+		x = int(math.Round(pxcor))
+	}
+
+	if pycor == m.MinYCor {
+		y = int(math.Ceil(pycor))
+	} else {
+		y = int(math.Round(pycor))
+	}
 
 	return m.getPatchAtCoords(x, y)
 }

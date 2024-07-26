@@ -531,3 +531,33 @@ func TestTurtleOtherEnd(t *testing.T) {
 		t.Errorf("Expected other end to be t1")
 	}
 }
+
+func TestTurtleSetXY(t *testing.T) {
+
+	// create a model with wrapping
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	turtle := m.Turtle("", 0)
+
+	turtle.SetXY(15.4999, 15.4999)
+
+	if turtle.XCor() != 15.4999 || turtle.YCor() != 15.4999 {
+		t.Errorf("Expected turtle to be at position (15.4999, 15.4999)")
+	}
+
+	// set the position of the turtle
+	turtle.SetXY(15.5, 15.5)
+
+	if turtle.XCor() != -15.5 || turtle.YCor() != -15.5 {
+		t.Errorf("Expected turtle to be at position (15.5, 15.5)")
+	}
+
+	turtle.SetXY(15.51, 15.51)
+
+	if turtle.XCor()+15.49 > .0001 || turtle.YCor()+15.49 > .0001 {
+		t.Errorf("Expected turtle to be at position (-15.49, -15.49), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
+}
