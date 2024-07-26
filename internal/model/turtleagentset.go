@@ -1,6 +1,9 @@
 package model
 
-import "math"
+import (
+	"math"
+	"sort"
+)
 
 type TurtleAgentSet struct {
 	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
@@ -79,9 +82,31 @@ func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleA
 	return nil
 }
 
-// @TODO implement
+func (t *TurtleAgentSet) List() []*Turtle {
+	turtles := make([]*Turtle, 0)
+	for turtle := range t.turtles {
+		turtles = append(turtles, turtle)
+	}
+	return turtles
+}
+
 func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
-	return nil
+
+	turtles := t.List()
+
+	//sort the turtles
+	sorter := &TurtleSorter{
+		turtles: turtles,
+		f:       operation,
+	}
+	sort.Sort(sorter)
+
+	if n > len(turtles) {
+		n = len(turtles)
+	}
+
+	//get the n turtles with the highest float operation
+	return TurtleSet(sorter.turtles[:n])
 }
 
 func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle {

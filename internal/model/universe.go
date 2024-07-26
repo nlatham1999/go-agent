@@ -44,6 +44,8 @@ type Model struct {
 
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
+
+	Seed int64 //seed for the random number generator
 }
 
 func NewModel(

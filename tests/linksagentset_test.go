@@ -112,3 +112,30 @@ func TestLinksWhoAreNotLink(t *testing.T) {
 		t.Errorf("Expected linkset2 to not have link1")
 	}
 }
+
+func TestLinksMaxNOf(t *testing.T) {
+
+	// create links
+	link1 := &model.Link{Thickness: 1}
+	link2 := &model.Link{Thickness: 2}
+	link3 := &model.Link{Thickness: .5}
+	link4 := &model.Link{Thickness: 3}
+
+	// create linkset
+	linkSet := model.LinkSet([]*model.Link{link1, link2, link3, link4})
+
+	// create a second linkset
+	linkSet2 := linkSet.MaxNOf(2, func(l *model.Link) float64 {
+		return l.Thickness
+	})
+
+	// assert that the second linkset has only two links
+	if linkSet2.Count() != 2 {
+		t.Errorf("Expected linkset2 to have 2 links")
+	}
+
+	// assert that the second linkset has link1 and link2
+	if !linkSet2.Contains(link2) || !linkSet2.Contains(link4) {
+		t.Errorf("Expected linkset2 to have link1 and link2")
+	}
+}

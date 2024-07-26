@@ -1,6 +1,9 @@
 package model
 
-import "math"
+import (
+	"math"
+	"sort"
+)
 
 type LinkAgentSet struct {
 	links map[*Link]interface{}
@@ -48,9 +51,25 @@ func (l *LinkAgentSet) Count() int {
 	return len(l.links)
 }
 
-// @TODO implement
+func (l *LinkAgentSet) List() []*Link {
+	links := make([]*Link, 0)
+	for link := range l.links {
+		links = append(links, link)
+	}
+	return links
+}
+
+// gets the top n links based on the float operation
 func (l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet {
-	return nil
+	links := l.List()
+	sorter := &LinkSorter{links, operation}
+	sort.Sort(sorter)
+
+	if n > len(links) {
+		n = len(links)
+	}
+
+	return LinkSet(links[:n])
 }
 
 func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {

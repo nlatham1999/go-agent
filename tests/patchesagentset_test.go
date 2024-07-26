@@ -239,3 +239,23 @@ func TestPatchesWhoAreNotPatch(t *testing.T) {
 		t.Errorf("Expected patchSet2 to have 2 patches")
 	}
 }
+
+func TestPatchesMaxNOf(t *testing.T) {
+
+	//create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	patch1 := m.Patch(0, 0)
+	patch2 := m.Patch(0, 1)
+	patch3 := m.Patch(0, 2)
+
+	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+
+	patchSet2 := patchSet.MaxNOf(2, func(p *model.Patch) float64 {
+		return float64(p.PYCor())
+	})
+
+	if patchSet2.Count() != 2 {
+		t.Errorf("Expected patchSet2 to have 2 patches")
+	}
+}

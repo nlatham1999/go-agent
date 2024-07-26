@@ -482,7 +482,7 @@ Model.LinksOwn
 Model.LinkBreedsOwn
 
 ### list
-implement?
+```(l *LinkAgentSet) List() []*Link```
 
 ### ln
 math library

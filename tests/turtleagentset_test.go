@@ -140,3 +140,24 @@ func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 		t.Errorf("Expected turtleSet2 to have 2 turtles")
 	}
 }
+
+func TestTurtlesMaxNOf(t *testing.T) {
+
+	//create a basic model
+	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
+	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
+	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+	turtle4 := model.NewTurtle(u, 3, "", 0, 0)
+
+	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4})
+
+	turtleSet2 := turtleSet.MaxNOf(2, func(t *model.Turtle) float64 {
+		return float64(t.Who())
+	})
+
+	if turtleSet2.Count() != 2 {
+		t.Errorf("Expected turtleSet2 to have 2 turtles")
+	}
+}
