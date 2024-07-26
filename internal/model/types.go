@@ -30,8 +30,9 @@ type TurtleBoolOperation func(t *Turtle) bool
 type TurtleFloatOperation func(t *Turtle) float64
 
 type LinkSorter struct {
-	links []*Link
-	f     LinkFloatOperation
+	links   []*Link
+	f       LinkFloatOperation
+	reverse bool
 }
 
 func (l *LinkSorter) Len() int {
@@ -39,6 +40,9 @@ func (l *LinkSorter) Len() int {
 }
 
 func (l *LinkSorter) Less(i, j int) bool {
+	if l.reverse {
+		return l.f(l.links[i]) < l.f(l.links[j])
+	}
 	return l.f(l.links[i]) > l.f(l.links[j])
 }
 
@@ -49,6 +53,7 @@ func (l *LinkSorter) Swap(i, j int) {
 type PatchSorter struct {
 	patches []*Patch
 	f       PatchFloatOperation
+	reverse bool
 }
 
 func (p *PatchSorter) Len() int {
@@ -56,6 +61,9 @@ func (p *PatchSorter) Len() int {
 }
 
 func (p *PatchSorter) Less(i, j int) bool {
+	if p.reverse {
+		return p.f(p.patches[i]) < p.f(p.patches[j])
+	}
 	return p.f(p.patches[i]) > p.f(p.patches[j])
 }
 
@@ -66,6 +74,7 @@ func (p *PatchSorter) Swap(i, j int) {
 type TurtleSorter struct {
 	turtles []*Turtle
 	f       TurtleFloatOperation
+	reverse bool
 }
 
 func (t *TurtleSorter) Len() int {
@@ -73,6 +82,9 @@ func (t *TurtleSorter) Len() int {
 }
 
 func (t *TurtleSorter) Less(i, j int) bool {
+	if t.reverse {
+		return t.f(t.turtles[i]) < t.f(t.turtles[j])
+	}
 	return t.f(t.turtles[i]) > t.f(t.turtles[j])
 }
 

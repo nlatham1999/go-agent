@@ -61,8 +61,12 @@ func (l *LinkAgentSet) List() []*Link {
 
 // gets the top n links based on the float operation
 func (l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet {
+	if n < 0 {
+		return nil
+	}
+
 	links := l.List()
-	sorter := &LinkSorter{links, operation}
+	sorter := &LinkSorter{links, operation, false}
 	sort.Sort(sorter)
 
 	if n > len(links) {
@@ -86,7 +90,19 @@ func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {
 
 // @TODO implement
 func (l *LinkAgentSet) MinNOf(n int, operation LinkFloatOperation) *LinkAgentSet {
-	return nil
+	if n < 0 {
+		return nil
+	}
+
+	links := l.List()
+	sorter := &LinkSorter{links, operation, true}
+	sort.Sort(sorter)
+
+	if n > len(links) {
+		n = len(links)
+	}
+
+	return LinkSet(links[:n])
 }
 
 func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {

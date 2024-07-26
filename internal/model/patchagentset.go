@@ -102,6 +102,10 @@ func (p *PatchAgentSet) List() []*Patch {
 }
 
 func (p *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
+	if n < 1 {
+		return nil
+	}
+
 	// get all the patches
 	patches := p.List()
 
@@ -132,7 +136,26 @@ func (p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) *Patch {
 }
 
 func (p *PatchAgentSet) MinNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
-	return nil
+	if n < 1 {
+		return nil
+	}
+
+	// get all the patches
+	patches := p.List()
+
+	// sort the patches based on the float operation
+	sorter := &PatchSorter{
+		patches: patches,
+		f:       operation,
+		reverse: true,
+	}
+	sort.Sort(sorter)
+
+	if n > len(patches) {
+		n = len(patches)
+	}
+
+	return PatchSet(patches[:n])
 }
 
 func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {

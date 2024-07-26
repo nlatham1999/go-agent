@@ -91,6 +91,9 @@ func (t *TurtleAgentSet) List() []*Turtle {
 }
 
 func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
+	if n < 0 {
+		return nil
+	}
 
 	turtles := t.List()
 
@@ -122,7 +125,26 @@ func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle {
 }
 
 func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
-	return nil
+	if n < 0 {
+		return nil
+	}
+
+	turtles := t.List()
+
+	//sort the turtles
+	sorter := &TurtleSorter{
+		turtles: turtles,
+		f:       operation,
+		reverse: true,
+	}
+	sort.Sort(sorter)
+
+	if n > len(turtles) {
+		n = len(turtles)
+	}
+
+	//get the n turtles with the lowest float operation
+	return TurtleSet(sorter.turtles[:n])
 }
 
 func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
