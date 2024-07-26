@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-type TieMode string
+type TieMode int
 
 type Link struct {
 	Color     Color

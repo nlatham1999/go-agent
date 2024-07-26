@@ -227,6 +227,36 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 	AskLinks(linksAdded, operations)
 }
 
+// returns an agentset of the node turtles that are tied to the current turtle
+func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
+	tiedTurtlesMap := make(map[*Turtle]interface{})
+	tiedTurtles := []*Turtle{}
+	for _, l := range t.linkedTurtles {
+		if l.TieMode >= minTieMode {
+			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
+		}
+	}
+	for len(tiedTurtles) > 0 {
+		for _, turtle := range tiedTurtles {
+			tiedTurtlesMap[turtle] = nil
+		}
+		newTiedTurtles := []*Turtle{}
+		for _, turtle := range tiedTurtles {
+			for _, l := range turtle.linkedTurtles {
+				if l.TieMode != TieModeNone {
+					otherEnd := l.OtherEnd(turtle)
+					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+						newTiedTurtles = append(newTiedTurtles, otherEnd)
+					}
+				}
+			}
+		}
+		tiedTurtles = newTiedTurtles
+	}
+
+	return &TurtleAgentSet{tiedTurtlesMap}
+}
+
 // returns the distance between the two turtles
 func (t *Turtle) DistanceTurtle(turtle *Turtle) float64 {
 	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, turtle.xcor, turtle.ycor)
@@ -339,61 +369,13 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 		return
 	}
 
-	// rotate all descendent linked turtles that are tied
-	tiedTurtlesMap := make(map[*Turtle]interface{})
-	tiedTurtles := []*Turtle{}
-	for _, l := range t.linkedTurtles {
-		if l.TieMode != TieModeNone {
-			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
-		}
-	}
-	for len(tiedTurtles) > 0 {
-		for _, turtle := range tiedTurtles {
-			tiedTurtlesMap[turtle] = nil
-		}
-		newTiedTurtles := []*Turtle{}
-		for _, turtle := range tiedTurtles {
-			for _, l := range turtle.linkedTurtles {
-				if l.TieMode != TieModeNone {
-					otherEnd := l.OtherEnd(turtle)
-					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
-						newTiedTurtles = append(newTiedTurtles, otherEnd)
-					}
-				}
-			}
-		}
-		tiedTurtles = newTiedTurtles
-	}
-	for turtle := range tiedTurtlesMap {
+	// rotate the heading for all descendents where the tiemode is at least free
+	for turtle := range t.descendents(TieModeFree).turtles {
 		t.rotateTiedTurtle(turtle, headingDifference)
 	}
 
 	// rotate the heading for all descendents where the tiemode is fixed
-	tiedTurtlesMap = make(map[*Turtle]interface{})
-	tiedTurtles = []*Turtle{}
-	for _, l := range t.linkedTurtles {
-		if l.TieMode == TieModeFixed {
-			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
-		}
-	}
-	for len(tiedTurtles) > 0 {
-		for _, turtle := range tiedTurtles {
-			tiedTurtlesMap[turtle] = nil
-		}
-		newTiedTurtles := []*Turtle{}
-		for _, turtle := range tiedTurtles {
-			for _, l := range turtle.linkedTurtles {
-				if l.TieMode == TieModeFixed {
-					otherEnd := l.OtherEnd(turtle)
-					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
-						newTiedTurtles = append(newTiedTurtles, otherEnd)
-					}
-				}
-			}
-		}
-		tiedTurtles = newTiedTurtles
-	}
-	for turtle := range tiedTurtlesMap {
+	for turtle := range t.descendents(TieModeFixed).turtles {
 		turtle.heading += headingDifference
 	}
 }
@@ -666,6 +648,9 @@ func (t *Turtle) Right(number float64) {
 
 func (t *Turtle) SetXY(x float64, y float64) {
 
+	dx := x - t.xcor
+	dy := y - t.ycor
+
 	x, y, allowed := t.parent.convertXYToInBounds(x, y)
 	if !allowed {
 		return
@@ -674,6 +659,19 @@ func (t *Turtle) SetXY(x float64, y float64) {
 	t.xcor = x
 	t.ycor = y
 
+	t.transferPatchOwnership()
+
+	if len(t.linkedTurtles) == 0 {
+		return
+	}
+
+	// move the linked turtles
+	for turtle := range t.descendents(TieModeFree).turtles {
+		t.moveTiedTurtle(turtle, dx, dy)
+	}
+}
+
+func (t *Turtle) transferPatchOwnership() {
 	oldPatch := t.patch
 	t.patch = nil
 	t.patch = t.PatchHere()
@@ -681,6 +679,26 @@ func (t *Turtle) SetXY(x float64, y float64) {
 		oldPatch.removeTurtle(t)
 		t.patch.addTurtle(t)
 	}
+}
+
+func (t *Turtle) moveTiedTurtle(turtle *Turtle, dx float64, dy float64) {
+	if t == turtle {
+		return
+	}
+
+	newX := turtle.xcor + dx
+	newY := turtle.ycor + dy
+
+	newX, newY, allowed := t.parent.convertXYToInBounds(newX, newY)
+	if !allowed {
+		return
+	}
+
+	turtle.xcor = newX
+	turtle.ycor = newY
+
+	t.transferPatchOwnership()
+
 }
 
 func (t *Turtle) Show() {

@@ -363,8 +363,64 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	// rotate t6
 	t6.Left(20)
 
-	if t7.XCor() != 13.05602130243792 || t7.YCor() != 8.367414684443355 {
-		t.Errorf("Turtle 7 should not have moved, got %f and %f", t7.XCor(), t7.YCor())
+	if t7.XCor() != 14.05602130243792 || t7.YCor() != 8.367414684443355 {
+		t.Errorf("Turtle 7 should be at 14.05602130243792 and 8.367414684443355, got %f and %f", t7.XCor(), t7.YCor())
+	}
+}
+
+// test that when a turtle is tied to another turtle, it moves with it, when the turtle moves forward, back or setxy
+func TestMovingTiedTurtles(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	t1.SetXY(0, 0)
+	t2.SetXY(3, 4)
+
+	// create a new link
+	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l.TieMode = model.TieModeFixed
+
+	// move t1 forward
+	t1.Forward(5)
+
+	if t2.XCor() != 8 || t2.YCor() != 4 {
+		t.Errorf("Turtle 2 should have moved to 8, 4, got %f, %f", t2.XCor(), t2.YCor())
 	}
 
+	// move t1 back
+	t1.Back(5)
+
+	if t2.XCor() != 3 || t2.YCor() != 4 {
+		t.Errorf("Turtle 2 should have moved to 3, 4, got %f, %f", t2.XCor(), t2.YCor())
+	}
+
+	// set t1 to 10, 10
+	t1.SetXY(10, 10)
+
+	if t2.XCor() != 13 || t2.YCor() != 14 {
+		t.Errorf("Turtle 2 should have moved to 15, 10, got %f, %f", t2.XCor(), t2.YCor())
+	}
+
+	t1.SetXY(15, 15)
+
+	// should not move since it would be off the world
+	if t2.XCor() != 13 || t2.YCor() != 14 {
+		t.Errorf("Turtle 2 should not have moved, got %f, %f", t2.XCor(), t2.YCor())
+	}
+
+	m.WrappingXOn()
+	m.WrappingYOn()
+
+	t1.SetXY(16, 16)
+
+	if t2.XCor() != 14 || t2.YCor() != 15 {
+		t.Errorf("Turtle 2 should have moved to 14, 15, got %f, %f", t2.XCor(), t2.YCor())
+	}
 }

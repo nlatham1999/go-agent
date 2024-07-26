@@ -22,7 +22,7 @@ var (
 )
 
 var (
-	TieModeFixed = TieMode("fixed")
-	TieModeFree  = TieMode("free")
-	TieModeNone  = TieMode("none")
+	TieModeFixed = TieMode(2)
+	TieModeFree  = TieMode(1)
+	TieModeNone  = TieMode(0)
 )
