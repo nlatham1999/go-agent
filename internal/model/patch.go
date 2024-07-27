@@ -24,12 +24,16 @@ type Patch struct {
 	PColor Color
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
-	PatchesOwn map[string]interface{}
+	patchesOwn map[string]interface{}
 
 	Label       interface{}
 	PLabelColor Color
 
 	turtles map[string]*TurtleAgentSet // sets of turtles keyed by breed
+
+	// patch to string and string to patch for the neighbors
+	patchNeighborsMap map[*Patch]string
+	neighborsPatchMap map[string]*Patch
 }
 
 func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch {
@@ -46,9 +50,9 @@ func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch 
 
 	patch.PColor.SetColor(Black)
 
-	patch.PatchesOwn = map[string]interface{}{}
+	patch.patchesOwn = map[string]interface{}{}
 	for key, value := range patchesOwn {
-		patch.PatchesOwn[key] = value
+		patch.patchesOwn[key] = value
 	}
 
 	return patch
@@ -185,7 +189,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 	p.PColor.SetColor(Black)
 
 	for key, value := range patchesOwn {
-		p.PatchesOwn[key] = value
+		p.patchesOwn[key] = value
 	}
 }
 
@@ -248,4 +252,15 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 	}
 
 	return &TurtleAgentSet{}
+}
+
+func (p *Patch) GetOwn(key string) interface{} {
+	return p.patchesOwn[key]
+}
+
+func (p *Patch) SetOwn(key string, value interface{}) {
+	if _, ok := p.patchesOwn[key]; !ok {
+		return
+	}
+	p.patchesOwn[key] = value
 }

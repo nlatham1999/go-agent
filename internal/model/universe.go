@@ -178,6 +178,43 @@ func (m *Model) buildPatches() {
 			p.index = index
 		}
 	}
+
+	for p := range m.Patches.patches {
+		p.patchNeighborsMap = map[*Patch]string{}
+		p.neighborsPatchMap = map[string]*Patch{}
+
+		left := m.leftNeighbor(p)
+		p.patchNeighborsMap[left] = "left"
+		p.neighborsPatchMap["left"] = left
+
+		topLeft := m.topLeftNeighbor(p)
+		p.patchNeighborsMap[topLeft] = "topLeft"
+		p.neighborsPatchMap["topLeft"] = topLeft
+
+		top := m.topNeighbor(p)
+		p.patchNeighborsMap[top] = "top"
+		p.neighborsPatchMap["top"] = top
+
+		topRight := m.topRightNeighbor(p)
+		p.patchNeighborsMap[topRight] = "topRight"
+		p.neighborsPatchMap["topRight"] = topRight
+
+		right := m.rightNeighbor(p)
+		p.patchNeighborsMap[right] = "right"
+		p.neighborsPatchMap["right"] = right
+
+		bottomRight := m.bottomRightNeighbor(p)
+		p.patchNeighborsMap[bottomRight] = "bottomRight"
+		p.neighborsPatchMap["bottomRight"] = bottomRight
+
+		bottom := m.bottomNeighbor(p)
+		p.patchNeighborsMap[bottom] = "bottom"
+		p.neighborsPatchMap["bottom"] = bottom
+
+		bottomLeft := m.bottomLeftNeighbor(p)
+		p.patchNeighborsMap[bottomLeft] = "bottomLeft"
+		p.neighborsPatchMap["bottomLeft"] = bottomLeft
+	}
 }
 
 func (m *Model) patchIndex(x int, y int) int {
@@ -327,7 +364,7 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	//go through each patch and calculate the diffusion amount
 	for patch := range m.Patches.patches {
-		patchAmount := patch.PatchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
 	}
@@ -344,10 +381,10 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 			amountFromNeighbors += diffusions[n]
 		}
 
-		patchAmount := patch.PatchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToKeep := 1 - (patchAmount * percent) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
 
-		patch.PatchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
 	}
 
 	return nil
@@ -617,42 +654,42 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	n := make(map[*Patch]interface{})
 
-	topLeft := m.topLeftNeighbor(p)
+	topLeft := p.neighborsPatchMap["topLeft"]
 	if topLeft != nil {
 		n[topLeft] = nil
 	}
 
-	left := m.leftNeighbor(p)
+	left := p.neighborsPatchMap["left"]
 	if left != nil {
 		n[left] = nil
 	}
 
-	bottomLeft := m.bottomLeftNeighbor(p)
+	bottomLeft := p.neighborsPatchMap["bottomLeft"]
 	if bottomLeft != nil {
 		n[bottomLeft] = nil
 	}
 
-	top := m.topNeighbor(p)
+	top := p.neighborsPatchMap["top"]
 	if top != nil {
 		n[top] = nil
 	}
 
-	topRight := m.topRightNeighbor(p)
+	topRight := p.neighborsPatchMap["topRight"]
 	if topRight != nil {
 		n[topRight] = nil
 	}
 
-	right := m.rightNeighbor(p)
+	right := p.neighborsPatchMap["right"]
 	if right != nil {
 		n[right] = nil
 	}
 
-	bottomRight := m.bottomRightNeighbor(p)
+	bottomRight := p.neighborsPatchMap["bottomRight"]
 	if bottomRight != nil {
 		n[bottomRight] = nil
 	}
 
-	bottom := m.bottomNeighbor(p)
+	bottom := p.neighborsPatchMap["bottom"]
 	if bottom != nil {
 		n[bottom] = nil
 	}
@@ -666,22 +703,22 @@ func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
 	n := make(map[*Patch]interface{})
 
-	top := m.topNeighbor(p)
+	top := p.neighborsPatchMap["top"]
 	if top != nil {
 		n[top] = nil
 	}
 
-	left := m.leftNeighbor(p)
+	left := p.neighborsPatchMap["left"]
 	if left != nil {
 		n[left] = nil
 	}
 
-	right := m.rightNeighbor(p)
+	right := p.neighborsPatchMap["right"]
 	if right != nil {
 		n[right] = nil
 	}
 
-	bottom := m.bottomNeighbor(p)
+	bottom := p.neighborsPatchMap["bottom"]
 	if bottom != nil {
 		n[bottom] = nil
 	}

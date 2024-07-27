@@ -26,3 +26,15 @@ var (
 	TieModeFree  = TieMode(1)
 	TieModeNone  = TieMode(0)
 )
+
+// angles
+var (
+	RightAngle        float64 = 0
+	UpAndRightAngle   float64 = 45.0
+	UpAngle           float64 = 90.0
+	UpAndLeftAngle    float64 = 135.0
+	LeftAngle         float64 = 180.0
+	DownAndLeftAngle  float64 = 225.0
+	DownAngle         float64 = 270.0
+	DownAndRightAngle float64 = 315.0
+)

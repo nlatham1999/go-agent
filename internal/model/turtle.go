@@ -275,11 +275,113 @@ func (t *Turtle) DistanceXY(x float64, y float64) float64 {
 // @TODO implement
 func (t *Turtle) Downhill(patchVariable string) {
 
+	p := t.PatchHere()
+
+	// if the patch variable is not a number then return
+	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+		return
+	}
+
+	minPatch := p
+	minValue := minPatch.patchesOwn[patchVariable].(float64)
+
+	for patch := range p.patchNeighborsMap {
+		if patch == nil {
+			continue
+		}
+		if patch.patchesOwn[patchVariable].(float64) < minValue {
+			minPatch = patch
+			minValue = patch.patchesOwn[patchVariable].(float64)
+		}
+	}
+
+	if minPatch != p {
+
+		pos := p.patchNeighborsMap[minPatch]
+
+		switch pos {
+		case "left":
+			t.SetHeading(LeftAngle)
+		case "topLeft":
+			t.SetHeading(UpAndLeftAngle)
+		case "top":
+			t.SetHeading(UpAngle)
+		case "topRight":
+			t.SetHeading(UpAndRightAngle)
+		case "right":
+			t.SetHeading(RightAngle)
+		case "bottomRight":
+			t.SetHeading(DownAndRightAngle)
+		case "bottom":
+			t.SetHeading(DownAngle)
+		case "bottomLeft":
+			t.SetHeading(DownAndLeftAngle)
+		}
+
+		t.MoveToPatch(minPatch)
+
+	}
 }
 
 // @TODO implement
 func (t *Turtle) Downhill4(patchVariable string) {
 
+	neighborsMap := make(map[*Patch]string)
+
+	p := t.PatchHere()
+
+	topNeighbor := p.neighborsPatchMap["top"]
+	if topNeighbor != nil {
+		neighborsMap[topNeighbor] = "top"
+	}
+
+	bottomNeighbor := p.neighborsPatchMap["bottom"]
+	if bottomNeighbor != nil {
+		neighborsMap[bottomNeighbor] = "bottom"
+	}
+
+	leftNeighbor := p.neighborsPatchMap["left"]
+	if leftNeighbor != nil {
+		neighborsMap[leftNeighbor] = "left"
+	}
+
+	rightNeighbor := p.neighborsPatchMap["right"]
+	if rightNeighbor != nil {
+		neighborsMap[rightNeighbor] = "right"
+	}
+
+	// if the patch variable is not a number then return
+	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+		return
+	}
+
+	minPatch := t.PatchHere()
+	minValue := minPatch.patchesOwn[patchVariable].(float64)
+
+	for patch := range neighborsMap {
+		if patch.patchesOwn[patchVariable].(float64) < minValue {
+			minPatch = patch
+			minValue = patch.patchesOwn[patchVariable].(float64)
+		}
+	}
+
+	if minPatch != t.PatchHere() {
+
+		pos := neighborsMap[minPatch]
+		switch pos {
+		case "top":
+			t.SetHeading(UpAngle)
+		case "bottom":
+			t.SetHeading(DownAngle)
+		case "left":
+			t.SetHeading(LeftAngle)
+		case "right":
+			t.SetHeading(RightAngle)
+		}
+
+		t.MoveToPatch(minPatch)
+
+	}
 }
 
 // @TODO implement

@@ -76,44 +76,44 @@ func setupPatches() {
 }
 
 func setupNest(p *model.Patch) {
-	p.PatchesOwn[nest] = p.DistanceXY(0, 0) < 5
-	p.PatchesOwn[nestScent] = 200 - p.DistanceXY(0, 0)
+	p.SetOwn(nest, p.DistanceXY(0, 0) < 5)
+	p.SetOwn(nestScent, 200-p.DistanceXY(0, 0))
 }
 
 func setupFood(p *model.Patch) {
 	// ;; setup food source one on the right
 	if p.DistanceXY(.6*float64(environment.MaxPxCor), 0) < 5 {
-		p.PatchesOwn[foodSourceNumber] = 1
+		p.SetOwn(foodSourceNumber, 1)
 	}
 
 	// ;; setup food source two on the lower-left
 	if p.DistanceXY(-.6*float64(environment.MaxPxCor), -.6*float64(environment.MaxPxCor)) < 5 {
-		p.PatchesOwn[foodSourceNumber] = 2
+		p.SetOwn(foodSourceNumber, 2)
 	}
 
 	// ;; setup food source three on the upper-left
 	if p.DistanceXY(-.8*float64(environment.MaxPxCor), .8*float64(environment.MaxPxCor)) < 5 {
-		p.PatchesOwn[foodSourceNumber] = 3
+		p.SetOwn(foodSourceNumber, 3)
 	}
 
 	// ;; set "food" at sources to either 1 or 2, randomly
-	if p.PatchesOwn[foodSourceNumber].(int) > 0 {
-		p.PatchesOwn[food] = environment.OneOfInt([]int{1, 2})
+	if p.GetOwn(foodSourceNumber).(int) > 0 {
+		p.SetOwn(food, environment.OneOfInt([]int{1, 2}))
 	}
 }
 
 func recolorPatch(p *model.Patch) {
 
 	// ;; give color to nest and food sources
-	if p.PatchesOwn[nest].(bool) {
+	if p.GetOwn(nest).(bool) {
 		p.PColor.SetColor(model.Violet)
 	} else {
-		if p.PatchesOwn[food].(int) > 0 {
-			if p.PatchesOwn[foodSourceNumber].(int) == 1 {
+		if p.GetOwn(food).(int) > 0 {
+			if p.GetOwn(foodSourceNumber).(int) == 1 {
 				p.PColor.SetColor(model.Cyan)
-			} else if p.PatchesOwn[foodSourceNumber].(int) == 2 {
+			} else if p.GetOwn(foodSourceNumber).(int) == 2 {
 				p.PColor.SetColor(model.Sky)
-			} else if p.PatchesOwn[foodSourceNumber].(int) == 3 {
+			} else if p.GetOwn(foodSourceNumber).(int) == 3 {
 				p.PColor.SetColor(model.Blue)
 			}
 		} else {
@@ -159,7 +159,7 @@ func run() {
 		environment.Patches,
 		[]model.PatchOperation{
 			func(p *model.Patch) {
-				p.PatchesOwn[chemical] = p.PatchesOwn[chemical].(float64) * (100 - sliders[evaporationRate].GetValue()) / 100
+				p.SetOwn(chemical, p.GetOwn(chemical).(float64)*(100-sliders[evaporationRate].GetValue())/100)
 				recolorPatch(p)
 			},
 		},
@@ -169,25 +169,25 @@ func run() {
 }
 
 func returnToNest(t *model.Turtle) {
-	if t.PatchHere().PatchesOwn[nest].(bool) {
+	if t.PatchHere().GetOwn(nest).(bool) {
 		t.Color.SetColor(model.Red)
 		t.Right(180)
 	} else {
-		t.PatchHere().PatchesOwn[chemical] = t.PatchHere().PatchesOwn[chemical].(int) + 60
+		t.PatchHere().SetOwn(chemical, t.PatchHere().GetOwn(chemical).(int)+60)
 		uphillNestScent(t)
 	}
 }
 
 func lookForFood(t *model.Turtle) {
 	p := t.PatchHere()
-	if p.PatchesOwn[food].(int) > 0 {
+	if p.GetOwn(food).(int) > 0 {
 		t.Color.SetColor(model.Orange)
-		p.PatchesOwn[food] = p.PatchesOwn[food].(int) - 1
+		p.SetOwn(food, p.GetOwn(food).(int)-1)
 		t.Right(180)
 		return
 	}
 
-	if p.PatchesOwn[chemical].(float64) >= .05 && p.PatchesOwn[chemical].(float64) < 2 {
+	if p.GetOwn(chemical).(float64) >= .05 && p.GetOwn(chemical).(float64) < 2 {
 		uphillChemical(t)
 	}
 
@@ -233,7 +233,7 @@ func nestScentAtAngle(t *model.Turtle, angle float64) int {
 	if p == nil {
 		return 0
 	} else {
-		return p.PatchesOwn[nestScent].(int)
+		return p.GetOwn(nestScent).(int)
 	}
 }
 
@@ -242,6 +242,6 @@ func chemicalScentAtAngle(t *model.Turtle, angle float64) float64 {
 	if p == nil {
 		return 0
 	} else {
-		return p.PatchesOwn[chemical].(float64)
+		return p.GetOwn(chemical).(float64)
 	}
 }
