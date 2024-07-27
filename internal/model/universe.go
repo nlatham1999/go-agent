@@ -171,12 +171,19 @@ func (m *Model) buildPatches() {
 	m.posOfPatches = make(map[int]*Patch)
 	for i := 0; i < m.WorldHeight; i++ {
 		for j := 0; j < m.WorldWidth; j++ {
-			p := NewPatch(m, m.patchesOwnTemplate, j+m.MinPxCor, i+m.MinPyCor)
+			x := j + m.MinPxCor
+			y := (i + m.MinPyCor) * -1
+			p := NewPatch(m, m.patchesOwnTemplate, x, y)
 			m.Patches.patches[p] = nil
-			index := i*m.WorldHeight + j
+			index := y*m.WorldHeight + x
 			m.posOfPatches[index] = p
 			p.index = index
 		}
+	}
+
+	p0 := m.posOfPatches[0]
+	l := m.leftNeighbor(p0)
+	if l == nil {
 	}
 
 	for p := range m.Patches.patches {
@@ -218,8 +225,6 @@ func (m *Model) buildPatches() {
 }
 
 func (m *Model) patchIndex(x int, y int) int {
-	x = x - m.MinPxCor
-	y = y - m.MinPyCor
 	return y*m.WorldHeight + x
 }
 
@@ -469,10 +474,7 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 		return nil
 	}
 
-	offsetX := x - m.MinPxCor
-	offsetY := y - m.MinPyCor
-
-	pos := offsetY*m.WorldHeight + offsetX
+	pos := y*m.WorldHeight + x
 
 	return m.posOfPatches[pos]
 }
@@ -508,7 +510,7 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) topNeighbor(p *Patch) *Patch {
@@ -524,7 +526,7 @@ func (m *Model) topNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(p.x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) topRightNeighbor(p *Patch) *Patch {
@@ -549,7 +551,7 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) leftNeighbor(p *Patch) *Patch {
@@ -565,7 +567,7 @@ func (m *Model) leftNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, p.y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) rightNeighbor(p *Patch) *Patch {
@@ -581,7 +583,7 @@ func (m *Model) rightNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, p.y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
@@ -606,7 +608,7 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) bottomNeighbor(p *Patch) *Patch {
@@ -622,7 +624,7 @@ func (m *Model) bottomNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(p.x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
@@ -647,7 +649,7 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 
 	n := m.patchIndex(x, y)
 
-	return m.safeGetPatch(n)
+	return m.getPatchAtPos(n)
 }
 
 // @TODO check to see if we are wrapping around
@@ -728,11 +730,7 @@ func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
 	}
 }
 
-func (m *Model) safeGetPatch(x int) *Patch {
-	if x < 0 || x > len(m.Patches.patches) {
-		return nil
-	}
-
+func (m *Model) getPatchAtPos(x int) *Patch {
 	return m.posOfPatches[x]
 }
 

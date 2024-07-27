@@ -610,7 +610,7 @@ func TestTurtleDownhill(t *testing.T) {
 
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value
 	if turtle.XCor() != 0 || turtle.YCor() != 1 {
-		t.Errorf("Expected turtle to move to patch (0, 1)")
+		t.Errorf("Expected turtle to move to patch (0, 1), got (%v, %v)", turtle.XCor(), turtle.YCor())
 	}
 }
 
