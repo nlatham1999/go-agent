@@ -418,8 +418,66 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 	*turtle = Turtle{}
 }
 
-// @TODO implement
-func (m *Model) DieLink(link *Link) {
+// kills a link
+func (m *Model) KillLink(link *Link) {
+
+	delete(m.Links.links, link)
+
+	if link.breed != "" {
+		if link.Directed {
+			delete(m.DirectedLinkBreeds[link.breed].Links.links, link)
+		} else {
+			delete(m.UndirectedLinkBreeds[link.breed].Links.links, link)
+		}
+	}
+
+	// remove the link from the turtles
+	if link.Directed {
+		key := linkedTurtle{
+			true,
+			"",
+			link.end2,
+		}
+		delete(link.end1.linkedTurtles, key)
+		delete(link.end2.linkedTurtlesConnectedFrom, link.end1)
+		if link.end1.breed != "" {
+			key = linkedTurtle{
+				true,
+				link.breed,
+				link.end2,
+			}
+			delete(link.end1.linkedTurtles, key)
+		}
+	} else {
+		key1 := linkedTurtle{
+			false,
+			"",
+			link.end2,
+		}
+		key2 := linkedTurtle{
+			false,
+			"",
+			link.end1,
+		}
+		delete(link.end1.linkedTurtles, key1)
+		delete(link.end2.linkedTurtles, key2)
+		if link.end1.breed != "" {
+			key1 = linkedTurtle{
+				false,
+				link.breed,
+				link.end2,
+			}
+			key2 = linkedTurtle{
+				false,
+				link.breed,
+				link.end1,
+			}
+			delete(link.end1.linkedTurtles, key1)
+			delete(link.end2.linkedTurtles, key2)
+		}
+	}
+
+	*link = Link{}
 }
 
 func (m *Model) Diffuse(patchVariable string, percent float64) error {

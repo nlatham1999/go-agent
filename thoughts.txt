@@ -32,3 +32,6 @@ the only place the the heading and x,y should be changed should be in SetXY and 
 should we store a list in the agentset structs as well?
     this would not improve things a lot since the List() funcs would still need to return a copy of the list instead of a reference to it
 
+why have linkedTurtles and linkedTurtlesConnectedFrom?
+ - linkedTurtles should only have turtles that have a path to them
+ - so that means we need to store the directed links that are conecting back to the current turtle

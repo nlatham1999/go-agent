@@ -29,7 +29,7 @@ type Turtle struct {
 	// the third map is the turtles the link is connected to
 	linkedTurtles map[linkedTurtle]*Link
 
-	// map of the turtles that are connected to the current turtle
+	// map of the turtles that are connected to the current turtle with a directed link
 	linkedTurtlesConnectedFrom map[*Turtle]*Link
 
 	patch *Patch //patch the turtle is on
