@@ -657,3 +657,58 @@ func TestTurtleDownhill4(t *testing.T) {
 		t.Errorf("Expected turtle to move to patch (0, 1), got (%v, %v)", turtle.XCor(), turtle.YCor())
 	}
 }
+
+func TestTurtleFaceTurtle(t *testing.T) {
+
+	// create a basic model with no wrapping
+
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	// create two turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	t1.SetXY(-14, 14)
+	t2.SetXY(14, -14)
+
+	t1.FaceTurtle(t2)
+
+	// make sure that t1 is facing t2
+	if t1.GetHeading() != 135 {
+		t.Errorf("Expected turtle to face 45 degrees, got %v", t1.GetHeading())
+	}
+
+	m.WrappingXOn()
+	m.WrappingYOn()
+
+	t1.FaceTurtle(t2)
+
+	// expect the turtle to face -45 degrees because of wrapping
+	if t1.GetHeading() != -45 {
+		t.Errorf("Expected turtle to face -45 degrees, got %v", t1.GetHeading())
+	}
+
+	m.WrappingXOff()
+	m.WrappingYOff()
+
+	t1.SetXY(-14, -5)
+	t2.SetXY(14, 5)
+
+	t1.FaceTurtle(t2)
+
+	if t1.GetHeading()-70.3461759419467 > .00001 {
+		t.Errorf("Expected turtle to face 0 degrees, got %v", t1.GetHeading())
+	}
+
+	m.WrappingXOn()
+	m.WrappingYOn()
+
+	t1.FaceTurtle(t2)
+
+	if t1.GetHeading()+16.69924423399362 > .000001 {
+		t.Errorf("Expected turtle to face -16.69924423399362 degrees, got %v", t1.GetHeading())
+	}
+
+}

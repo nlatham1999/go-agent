@@ -384,29 +384,82 @@ func (t *Turtle) Downhill4(patchVariable string) {
 	}
 }
 
-// @TODO implement
 func (t *Turtle) DX() float64 {
-	return 0
+	return math.Cos(t.heading)
 }
 
-// @TODO implement
 func (t *Turtle) DY() float64 {
-	return 0
+	return math.Sin(t.heading)
 }
 
 // @TODO implement
 func (t *Turtle) FaceTurtle(turtle *Turtle) {
-
+	t.FaceXY(turtle.xcor, turtle.ycor)
 }
 
 // @TODO implement
 func (t *Turtle) FacePatch(patch *Patch) {
-
+	t.FaceXY(patch.xFloat64, patch.yFloat64)
 }
 
 // @TODO implement
 func (t *Turtle) FaceXY(x float64, y float64) {
-	t.setHeadingRadians(math.Atan2(y-t.ycor, x-t.xcor))
+	if x == t.xcor && y == t.ycor {
+		return
+	}
+
+	dx := x - t.xcor
+	dy := y - t.ycor
+
+	if !t.parent.wrappingX && !t.parent.wrappingY {
+		t.setHeadingRadians(math.Atan2(dx, dy))
+		return
+	}
+
+	newDx := dx
+	newDy := dy
+
+	dxSign := 1.0
+	if dx < 0 {
+		dxSign = -1.0
+	}
+
+	dySign := 1.0
+	if dy < 0 {
+		dySign = -1.0
+	}
+
+	distance := math.Abs(math.Sqrt(dx*dx + dy*dy))
+
+	deltaXInverse := float64(t.parent.WorldWidth) - math.Abs(dx)
+	deltaYInverse := float64(t.parent.WorldHeight) - math.Abs(dy)
+
+	if t.parent.wrappingX {
+		d := math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+dy*dy)))
+		if d < distance {
+			distance = d
+			newDx = deltaXInverse * dxSign * -1
+		}
+	}
+
+	if t.parent.wrappingY {
+		d := math.Min(distance, math.Abs(math.Sqrt(dx*dx+deltaYInverse*deltaYInverse)))
+		if d < distance {
+			distance = d
+			newDy = deltaYInverse * dySign * -1
+		}
+	}
+
+	if t.parent.wrappingX && t.parent.wrappingY {
+		d := math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+		if d < distance {
+			newDx = deltaXInverse * dxSign * -1
+			newDy = deltaYInverse * dySign * -1
+		}
+	}
+
+	a := math.Atan2(newDx, newDy)
+	t.setHeadingRadians(a)
 }
 
 // @TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
