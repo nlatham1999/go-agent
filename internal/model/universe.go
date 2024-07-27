@@ -293,6 +293,10 @@ func (m *Model) ClearTurtles() {
 	for breed := range m.Breeds {
 		m.Breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
 	}
+
+	m.whoToTurtles = make(map[int]*Turtle)
+
+	m.turtlesWhoNumber = 0
 }
 
 // @TODO Implement

@@ -81,5 +81,44 @@ func TestTurtle(t *testing.T) {
 	if turtle != nil {
 		t.Errorf("Expected nil, got turtle")
 	}
+}
+
+func TestClearTurtles(t *testing.T) {
+	breeds := []string{
+		"ants",
+	}
+
+	m := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+
+	// create 5 general turtle and five ants
+	m.CreateTurtles(5, "", nil)
+	m.CreateTurtles(5, "ants", nil)
+
+	if m.Patch(0, 0).TurtlesHere("").Count() != 10 {
+		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere("").Count())
+	}
+
+	// clear general turtles
+	m.ClearTurtles()
+	if m.Turtles.Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", m.Turtles.Count())
+	}
+
+	t1 := m.Turtle("", 0)
+	if t1 != nil {
+		t.Errorf("Expected nil, got turtle")
+	}
+
+	p := m.Patch(0, 0)
+	if p.TurtlesHere("").Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", p.TurtlesHere("").Count())
+	}
+
+	m.CreateTurtles(1, "", nil)
+
+	t1 = m.Turtle("", 0)
+	if t1 == nil {
+		t.Errorf("Expected turtle, got nil")
+	}
 
 }

@@ -251,7 +251,14 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 		return TurtleSet([]*Turtle{})
 	}
 
-	return &TurtleAgentSet{}
+	turtlesMap := make(map[*Turtle]interface{})
+	for turtle := range turtles.turtles {
+		turtlesMap[turtle] = nil
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtlesMap,
+	}
 }
 
 func (p *Patch) GetOwn(key string) interface{} {
