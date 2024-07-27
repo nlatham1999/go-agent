@@ -272,7 +272,8 @@ func (t *Turtle) DistanceXY(x float64, y float64) float64 {
 	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, x, y)
 }
 
-// @TODO implement
+// moves the turtle to the neighboring patch that has the lowest value of the patch variable
+// if the current patch variable is the lowest then the turtle stays in place
 func (t *Turtle) Downhill(patchVariable string) {
 
 	p := t.PatchHere()
@@ -323,7 +324,8 @@ func (t *Turtle) Downhill(patchVariable string) {
 	}
 }
 
-// @TODO implement
+// moves the turtle to the neighboring4 patch that has the lowest value of the patch variable
+// if the current patch variable is the lowest then the turtle stays in place
 func (t *Turtle) Downhill4(patchVariable string) {
 
 	neighborsMap := make(map[*Patch]string)
@@ -392,17 +394,17 @@ func (t *Turtle) DY() float64 {
 	return math.Sin(t.heading)
 }
 
-// @TODO implement
+// faces the turtle passed in
 func (t *Turtle) FaceTurtle(turtle *Turtle) {
 	t.FaceXY(turtle.xcor, turtle.ycor)
 }
 
-// @TODO implement
+// faces the patch passed in
 func (t *Turtle) FacePatch(patch *Patch) {
 	t.FaceXY(patch.xFloat64, patch.yFloat64)
 }
 
-// @TODO implement
+// faces the x y coordinates passed in
 func (t *Turtle) FaceXY(x float64, y float64) {
 	if x == t.xcor && y == t.ycor {
 		return
@@ -482,14 +484,46 @@ func (t *Turtle) Forward(distance float64) {
 	}
 }
 
-// @TODO implement
-func (t *Turtle) Hatch(amount int, operations []TurtleOperation) {
+// creates new turtles that are a copy of the current turtle
+// if a breed is passed in then the new turtles will be of that breed
+func (t *Turtle) Hatch(breed string, amount int, operations []TurtleOperation) {
 
-}
+	turtles := make([]*Turtle, amount)
+	for i := 0; i < amount; i++ {
+		newBreed := t.breed
+		if breed != "" {
+			newBreed = breed
+		}
+		turtles[i] = NewTurtle(t.parent, t.parent.turtlesWhoNumber, newBreed, t.xcor, t.ycor)
+		t.parent.turtlesWhoNumber++
 
-// @TODO implement
-func (t *Turtle) HatchBreed(breed string, amount int, operations []TurtleOperation) {
+		// copy the variables
+		turtles[i].Color = t.Color
+		turtles[i].heading = t.heading
+		turtles[i].Hidden = t.Hidden
+		turtles[i].Shape = t.Shape
+		turtles[i].Size = t.Size
+		turtles[i].Label = t.Label
+		turtles[i].LabelColor = t.LabelColor
 
+		// copy the own variables
+		for key, value := range t.turtlesOwnGeneral {
+			turtles[i].turtlesOwnGeneral[key] = value
+		}
+
+		// copy the breed variables if the breed is the same
+		if t.breed == newBreed {
+			for key, value := range t.turtlesOwnBreed {
+				turtles[i].turtlesOwnBreed[key] = value
+			}
+		}
+	}
+
+	for _, turtle := range turtles {
+		for _, operation := range operations {
+			operation(turtle)
+		}
+	}
 }
 
 func (t *Turtle) GetHeading() float64 {
