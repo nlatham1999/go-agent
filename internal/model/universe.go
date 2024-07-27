@@ -232,9 +232,6 @@ func (m *Model) ClearAll() {
 	m.ClearGlobals()
 	m.ClearTicks()
 	m.ClearPatches()
-	m.ClearDrawing()
-	m.ClearAllPlots()
-	m.ClearOutput()
 }
 
 func (m *Model) ClearGlobals() {
@@ -246,9 +243,23 @@ func (m *Model) ClearGlobals() {
 	}
 }
 
-// @TODO implement
 func (m *Model) ClearLinks() {
-
+	m.Links = &LinkAgentSet{
+		links: make(map[*Link]interface{}),
+	}
+	for breed := range m.DirectedLinkBreeds {
+		m.DirectedLinkBreeds[breed].Links = &LinkAgentSet{
+			links: make(map[*Link]interface{}),
+		}
+	}
+	for breed := range m.UndirectedLinkBreeds {
+		m.UndirectedLinkBreeds[breed].Links = &LinkAgentSet{
+			links: make(map[*Link]interface{}),
+		}
+	}
+	for turtle := range m.Turtles.turtles {
+		turtle.linkedTurtles = make(map[linkedTurtle]*Link)
+	}
 }
 
 func (m *Model) ClearTicks() {
@@ -261,24 +272,27 @@ func (m *Model) ClearPatches() {
 	}
 }
 
-// @TODO Implement
-func (m *Model) ClearDrawing() {
-
-}
-
-// @TODO Implement
-func (m *Model) ClearAllPlots() {
-
-}
-
-// @TODO Implement
-func (m *Model) ClearOutput() {
-
-}
-
-// @TODO Implement
+// kills all turtles
 func (m *Model) ClearTurtles() {
+	// delete all links since they are linked to turtles
+	m.Links.links = make(map[*Link]interface{})
+	for breed := range m.DirectedLinkBreeds {
+		m.DirectedLinkBreeds[breed].Links.links = make(map[*Link]interface{})
+	}
+	for breed := range m.UndirectedLinkBreeds {
+		m.UndirectedLinkBreeds[breed].Links.links = make(map[*Link]interface{})
+	}
 
+	// remove all turtles from patches
+	for patch := range m.Patches.patches {
+		patch.turtles = make(map[string]*TurtleAgentSet)
+	}
+
+	// clear all turtles
+	m.Turtles.turtles = make(map[*Turtle]interface{})
+	for breed := range m.Breeds {
+		m.Breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
+	}
 }
 
 // @TODO Implement
