@@ -742,10 +742,10 @@ func (t *Turtle) Other(turtles TurtleAgentSet) *TurtleAgentSet {
 
 // returns the end of the given link that is not the current turtle
 func (t *Turtle) OtherEnd(link *Link) *Turtle {
-	if link.End1 == t {
-		return link.End2
+	if link.end1 == t {
+		return link.end2
 	}
-	return link.End1
+	return link.end1
 }
 
 // @TODO implement

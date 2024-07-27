@@ -9,8 +9,8 @@ type TieMode int
 
 type Link struct {
 	Color     Color
-	End1      *Turtle
-	End2      *Turtle
+	end1      *Turtle
+	end2      *Turtle
 	Hidden    bool
 	Directed  bool
 	breed     string
@@ -38,8 +38,8 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	l := &Link{
 		breed:    breed,
-		End1:     end1,
-		End2:     end2,
+		end1:     end1,
+		end2:     end2,
 		Directed: directed,
 		parent:   model,
 	}
@@ -101,7 +101,15 @@ func (l *Link) Breed() *LinkBreed {
 
 // returns an agentset of the turtles at the ends of the link
 func (l *Link) BothEnds() *TurtleAgentSet {
-	return TurtleSet([]*Turtle{l.End1, l.End2})
+	return TurtleSet([]*Turtle{l.end1, l.end2})
+}
+
+func (l *Link) End1() *Turtle {
+	return l.end1
+}
+
+func (l *Link) End2() *Turtle {
+	return l.end2
 }
 
 func (l *Link) SetBreed(name string) {
@@ -146,12 +154,12 @@ func (l *Link) Hide() {
 
 // returns the heading in degrees from end1 to end2. Returns an error if the link has zero length
 func (l *Link) Heading() (float64, error) {
-	if l.End1.xcor == l.End2.xcor && l.End1.ycor == l.End2.ycor {
+	if l.end1.xcor == l.end2.xcor && l.end1.ycor == l.end2.ycor {
 		return 0, fmt.Errorf("Link has zero length")
 	}
 
 	// get the heading which is in radians
-	heading := l.End1.heading - l.End2.heading
+	heading := l.end1.heading - l.end2.heading
 
 	// convert to degrees
 	heading = heading * 180 / math.Pi
@@ -166,15 +174,15 @@ func (l *Link) Heading() (float64, error) {
 
 // returns the distance between the two ends of the link
 func (l *Link) Length() float64 {
-	return l.parent.DistanceBetweenPoints(l.End1.xcor, l.End1.ycor, l.End2.xcor, l.End2.ycor)
+	return l.parent.DistanceBetweenPoints(l.end1.xcor, l.end1.ycor, l.end2.xcor, l.end2.ycor)
 }
 
 // returns the other end of the link that is not the given turtle
 func (l *Link) OtherEnd(t *Turtle) *Turtle {
-	if t == l.End1 {
-		return l.End2
+	if t == l.end1 {
+		return l.end2
 	} else {
-		return l.End1
+		return l.end1
 	}
 }
 

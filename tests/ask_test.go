@@ -7,10 +7,7 @@ import (
 )
 
 func TestAskLink(t *testing.T) {
-	link := &model.Link{
-		End1: nil,
-		End2: nil,
-	}
+	link := &model.Link{}
 	link.Color.SetColor(model.Blue)
 
 	model.AskLink(link, []model.LinkOperation{
