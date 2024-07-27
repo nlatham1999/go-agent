@@ -244,6 +244,9 @@ func (m *Model) ClearGlobals() {
 }
 
 func (m *Model) ClearLinks() {
+	for link := range m.Links.links {
+		*link = Link{}
+	}
 	m.Links = &LinkAgentSet{
 		links: make(map[*Link]interface{}),
 	}
@@ -259,6 +262,7 @@ func (m *Model) ClearLinks() {
 	}
 	for turtle := range m.Turtles.turtles {
 		turtle.linkedTurtles = make(map[linkedTurtle]*Link)
+		turtle.linkedTurtlesConnectedFrom = make(map[*Turtle]*Link)
 	}
 }
 
@@ -289,6 +293,10 @@ func (m *Model) ClearTurtles() {
 	}
 
 	// clear all turtles
+	for turtle := range m.Turtles.turtles {
+		*turtle = Turtle{}
+	}
+
 	m.Turtles.turtles = make(map[*Turtle]interface{})
 	for breed := range m.Breeds {
 		m.Breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
@@ -300,7 +308,6 @@ func (m *Model) ClearTurtles() {
 }
 
 // @TODO Implement
-// idea is that if an empty string is passed then it will be for the general population
 func (m *Model) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation) {
 
 }
@@ -369,8 +376,46 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 	return x, y, true
 }
 
-// @TODO implement
-func (m *Model) DieTurtle(turtle *Turtle) {
+// kills a turtle
+func (m *Model) KillTurtle(turtle *Turtle) {
+
+	delete(m.Turtles.turtles, turtle)
+	if turtle.breed != "" {
+		delete(m.Breeds[turtle.breed].Turtles.turtles, turtle)
+	}
+	delete(m.whoToTurtles, turtle.who)
+
+	p := turtle.PatchHere()
+	if p != nil {
+		delete(p.turtles[""].turtles, turtle)
+		if turtle.breed != "" {
+			delete(p.turtles[turtle.breed].turtles, turtle)
+		}
+	}
+
+	for _, link := range turtle.linkedTurtles {
+		delete(m.Links.links, link)
+		if link.breed != "" {
+			if link.Directed {
+				delete(m.DirectedLinkBreeds[link.breed].Links.links, link)
+			} else {
+				delete(m.UndirectedLinkBreeds[link.breed].Links.links, link)
+			}
+		}
+	}
+
+	for _, link := range turtle.linkedTurtlesConnectedFrom {
+		delete(m.Links.links, link)
+		if link.breed != "" {
+			if link.Directed {
+				delete(m.DirectedLinkBreeds[link.breed].Links.links, link)
+			} else {
+				delete(m.UndirectedLinkBreeds[link.breed].Links.links, link)
+			}
+		}
+	}
+
+	*turtle = Turtle{}
 }
 
 // @TODO implement

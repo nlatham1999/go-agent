@@ -1,0 +1,2 @@
+fix descendents so it doesn't grab so many copies
+make sure when we are creating a link, that it does not already exist

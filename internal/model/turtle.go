@@ -29,6 +29,9 @@ type Turtle struct {
 	// the third map is the turtles the link is connected to
 	linkedTurtles map[linkedTurtle]*Link
 
+	// map of the turtles that are connected to the current turtle
+	linkedTurtlesConnectedFrom map[*Turtle]*Link
+
 	patch *Patch //patch the turtle is on
 }
 
@@ -55,12 +58,13 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	}
 
 	t := &Turtle{
-		who:           who,
-		parent:        m,
-		xcor:          x,
-		ycor:          y,
-		breed:         breed,
-		linkedTurtles: make(map[linkedTurtle]*Link),
+		who:                        who,
+		parent:                     m,
+		xcor:                       x,
+		ycor:                       y,
+		breed:                      breed,
+		linkedTurtles:              make(map[linkedTurtle]*Link),
+		linkedTurtlesConnectedFrom: make(map[*Turtle]*Link),
 	}
 
 	m.Turtles.turtles[t] = nil

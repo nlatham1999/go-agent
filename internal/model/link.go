@@ -59,6 +59,8 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		s := linkedTurtle{true, "", end2}
 		end1.linkedTurtles[s] = l
 
+		end2.linkedTurtlesConnectedFrom[end1] = l
+
 		if breed != "" {
 			s = linkedTurtle{true, breed, end2}
 			end1.linkedTurtles[s] = l

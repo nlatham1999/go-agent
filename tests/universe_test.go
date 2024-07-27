@@ -94,7 +94,10 @@ func TestClearTurtles(t *testing.T) {
 	m.CreateTurtles(5, "", nil)
 	m.CreateTurtles(5, "ants", nil)
 
-	if m.Patch(0, 0).TurtlesHere("").Count() != 10 {
+	ref := m.Turtle("", 0)
+	ref.SetXY(1, 1)
+
+	if m.Patch(0, 0).TurtlesHere("").Count() != 9 {
 		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere("").Count())
 	}
 
@@ -102,6 +105,10 @@ func TestClearTurtles(t *testing.T) {
 	m.ClearTurtles()
 	if m.Turtles.Count() != 0 {
 		t.Errorf("Expected 0 turtles, got %d", m.Turtles.Count())
+	}
+
+	if ref.XCor() != 0 {
+		t.Errorf("Expected turtle to be reset")
 	}
 
 	t1 := m.Turtle("", 0)
@@ -121,4 +128,49 @@ func TestClearTurtles(t *testing.T) {
 		t.Errorf("Expected turtle, got nil")
 	}
 
+}
+
+func TestKillTurtle(t *testing.T) {
+
+	breeds := []string{
+		"ants",
+	}
+
+	m := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+
+	// create 5 general turtle and five ants
+	m.CreateTurtles(5, "", nil)
+	m.CreateTurtles(5, "ants", nil)
+
+	ref := m.Turtle("", 0)
+	ref.SetXY(1, 1)
+
+	if m.Patch(0, 0).TurtlesHere("").Count() != 9 {
+		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere("").Count())
+	}
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("ants", 5)
+	t3 := m.Turtle("ants", 6)
+	t4 := m.Turtle("ants", 7)
+
+	_ = model.NewLink(m, "", t1, t2, true)
+	_ = model.NewLink(m, "", t1, t3, true)
+	_ = model.NewLink(m, "", t1, t4, false)
+	_ = model.NewLink(m, "", t2, t3, false)
+
+	// kill general turtle
+	m.KillTurtle(m.Turtle("", 0))
+	if m.Turtles.Count() != 9 {
+		t.Errorf("Expected 9 turtles, got %d", m.Turtles.Count())
+	}
+
+	if ref.XCor() != 0 {
+		t.Errorf("Expected turtle to be reset")
+	}
+
+	// make sure there's only one link left
+	if m.Links.Count() != 1 {
+		t.Errorf("Expected 1 link, got %d", m.Links.Count())
+	}
 }
