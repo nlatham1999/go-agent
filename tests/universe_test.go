@@ -154,10 +154,22 @@ func TestKillTurtle(t *testing.T) {
 	t3 := m.Turtle("ants", 6)
 	t4 := m.Turtle("ants", 7)
 
-	_ = model.NewLink(m, "", t1, t2, true)
-	_ = model.NewLink(m, "", t1, t3, true)
-	_ = model.NewLink(m, "", t1, t4, false)
-	_ = model.NewLink(m, "", t2, t3, false)
+	_, err := model.NewLink(m, "", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+	_, err = model.NewLink(m, "", t1, t3, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+	_, err = model.NewLink(m, "", t1, t4, false)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+	_, err = model.NewLink(m, "", t2, t3, false)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	// kill general turtle
 	m.KillTurtle(m.Turtle("", 0))

@@ -513,7 +513,10 @@ func TestTurtleOtherEnd(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	// get the other end of the link
 	otherEnd := t1.OtherEnd(l)

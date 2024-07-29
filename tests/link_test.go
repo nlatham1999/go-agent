@@ -18,14 +18,20 @@ func TestLinkCreation(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link that will fail
-	l := model.NewLink(m, "parent-children3", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children3", t1, t2, true)
+	if err == nil {
+		t.Errorf("Error should not be nil")
+	}
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
 	}
 
 	// create a new link that will pass
-	l = model.NewLink(m, "parent-children", t1, t2, true)
+	l, err = model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	if l == nil {
 		t.Errorf("Link should have been created")
@@ -59,7 +65,10 @@ func TestLinkBreedName(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	if l.BreedName() != "parent-children" {
 		t.Errorf("Breed name should be parent-children")
@@ -78,7 +87,10 @@ func TestLinkBreed(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	if l.Breed().Name() != "parent-children" {
 		t.Errorf("Breed name should be parent-children")
@@ -97,7 +109,10 @@ func TestLinkSetBreed(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	// set the breed to coworkers
 	l.SetBreed("coworkers")
@@ -137,7 +152,10 @@ func TestLinkBothEnds(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	// get the both ends
 	ends := l.BothEnds()
@@ -164,9 +182,12 @@ func TestLinkHeading(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
-	_, err := l.Heading()
+	_, err = l.Heading()
 
 	//err should not be nil since the turtles are at the same location
 	if err == nil {
@@ -216,7 +237,10 @@ func TestLinkOtherEnd(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 
 	if l.OtherEnd(t1) != t2 {
 		t.Errorf("Other end should be turtle 2")
@@ -249,13 +273,22 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t3.SetXY(5, 1)
 
 	// create a new link
-	l1 := model.NewLink(m, "parent-children", t1, t2, true)
+	l1, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l1.TieMode = model.TieModeFixed
 
-	l2 := model.NewLink(m, "parent-children", t2, t3, true)
+	l2, err := model.NewLink(m, "parent-children", t2, t3, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l2.TieMode = model.TieModeFixed
 
-	l3 := model.NewLink(m, "parent-children", t3, t1, true)
+	l3, err := model.NewLink(m, "parent-children", t3, t1, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l3.TieMode = model.TieModeFixed
 
 	// rotate the turtles
@@ -325,7 +358,10 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t5 := m.Turtle("", 4)
 	t4.SetXY(0, 0)
 	t5.SetXY(14, 14)
-	l4 := model.NewLink(m, "parent-children", t4, t5, true)
+	l4, err := model.NewLink(m, "parent-children", t4, t5, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l4.TieMode = model.TieModeFixed
 
 	// rotate t1
@@ -357,7 +393,10 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t6.SetXY(0, 0)
 	t7.SetXY(-14, 14)
 
-	l5 := model.NewLink(m, "parent-children", t6, t7, true)
+	l5, err := model.NewLink(m, "parent-children", t6, t7, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l5.TieMode = model.TieModeFixed
 
 	// rotate t6
@@ -384,7 +423,10 @@ func TestMovingTiedTurtles(t *testing.T) {
 	t2.SetXY(3, 4)
 
 	// create a new link
-	l := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
 	l.TieMode = model.TieModeFixed
 
 	// move t1 forward
@@ -422,5 +464,42 @@ func TestMovingTiedTurtles(t *testing.T) {
 
 	if t2.XCor() != 14 || t2.YCor() != 15 {
 		t.Errorf("Turtle 2 should have moved to 14, 15, got %f, %f", t2.XCor(), t2.YCor())
+	}
+}
+
+// make sure that when a links is created that is a duplicate, that it returns an error
+func TestLinkCreationNoDuplicates(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// create a new link
+	_, err := model.NewLink(m, "parent-children", t1, t2, true)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	// create a new link
+	_, err = model.NewLink(m, "parent-children", t1, t2, true)
+	if err == nil {
+		t.Errorf("Error should not be nil")
+	}
+
+	// do the same for undirected links
+	_, err = model.NewLink(m, "coworkers", t1, t2, false)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	// create a new link
+	_, err = model.NewLink(m, "coworkers", t1, t2, false)
+	if err == nil {
+		t.Errorf("Error should not be nil")
 	}
 }

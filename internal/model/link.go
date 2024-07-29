@@ -24,17 +24,23 @@ type Link struct {
 }
 
 // @TODO return an error if the link already exists
-func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) *Link {
+func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
 
 	// make sure the breed exists
 	if directed {
 		if _, ok := model.DirectedLinkBreeds[breed]; !ok {
-			return nil
+			return nil, fmt.Errorf("Directed link breed %s does not exist", breed)
 		}
 	} else {
 		if _, ok := model.UndirectedLinkBreeds[breed]; !ok {
-			return nil
+			return nil, fmt.Errorf("Undirected link breed %s does not exist", breed)
 		}
+	}
+
+	// make sure the link doesn't already exist
+	key := linkedTurtle{directed, breed, end2}
+	if _, ok := end1.linkedTurtles[key]; ok {
+		return nil, fmt.Errorf("Link already exists")
 	}
 
 	l := &Link{
@@ -81,7 +87,7 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		}
 	}
 
-	return l
+	return l, nil
 }
 
 func (l *Link) BreedName() string {
