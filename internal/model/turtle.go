@@ -615,13 +615,22 @@ func (t *Turtle) InConeTurtles(distance float64, angle float64) []*Turtle {
 	return nil
 }
 
-// @TODO implement
-func (t *Turtle) InLinkBreedNeighbor(breed string, turtle *Turtle) bool {
-	return false
-}
+// returns if there is a directed link from turtle to t or an undirected link connecting the two
+func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 
-// @TODO implement
-func (t *Turtle) InLinkNeighbor(turtle *Turtle) bool {
+	// check to see if there is a directed link
+	key := linkedTurtle{true, breed, t}
+	if _, found := turtle.linkedTurtles[key]; found {
+		return true
+	}
+
+	// look for an undirected link from turtle
+	key = linkedTurtle{false, breed, t}
+	if _, found := turtle.linkedTurtles[key]; found {
+		return true
+	}
+
+	// we don't need to look for an undirected link from t to turtle since undirecteds are placed at both turtles
 	return false
 }
 

@@ -388,7 +388,7 @@ implement?
 ```(t *Turtle) InLinkNeighbor(turtle *Turtle) bool```
 
 ### in-\<breed\>-neighbor?
-```(t *Turtle) InLinkBreedNeighbors(breed string, turtle *Turtle) []*Turtle```
+```(t *Turtle) InLinkNeighbor(turtle *Turtle) bool```
 
 ### in-link-neighbor?
 ```(t *Turtle) InLinkNeighbors(turtle *Turtle) []*Turtle```

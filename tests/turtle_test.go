@@ -712,3 +712,84 @@ func TestTurtleFaceTurtle(t *testing.T) {
 	}
 
 }
+
+func TestTurtleInLinkNeighbor(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(8, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+
+	// create a directed link between t1 and t2
+	t1.CreateLinkToTurtle("parent-children", t2, nil)
+
+	// create an undirected link between t3 and t4
+	t3.CreateLinkWithTurtle("coworkers", t4, nil)
+
+	// create a directed link between t5 and t6 that has no breed
+	t5.CreateLinkToTurtle("", t6, nil)
+
+	// create an undirected link between t7 and t8 that has no breed
+	t7.CreateLinkWithTurtle("", t8, nil)
+
+	v := t1.InLinkNeighbor("parent-children", t2)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor")
+	}
+
+	v = t2.InLinkNeighbor("parent-children", t1)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t3.InLinkNeighbor("coworkers", t4)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t4.InLinkNeighbor("coworkers", t3)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t5.InLinkNeighbor("", t6)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor")
+	}
+
+	v = t6.InLinkNeighbor("", t5)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t7.InLinkNeighbor("", t8)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t8.InLinkNeighbor("", t7)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.InLinkNeighbor("", t2)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor")
+	}
+
+	v = t2.InLinkNeighbor("", t1)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+}

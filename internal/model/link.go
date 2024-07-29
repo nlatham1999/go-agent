@@ -23,6 +23,7 @@ type Link struct {
 	LabelColor Color
 }
 
+// @TODO return an error if the link already exists
 func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) *Link {
 
 	// make sure the breed exists
