@@ -163,6 +163,22 @@ func (t turtleLinks) getLink(breed string, turtle *Turtle) *Link {
 	return nil
 }
 
+func (t *turtleLinks) getLinkDirected(breed string, turtle *Turtle) *Link {
+	if breed == "" {
+		// look in all directed
+		for _, link := range t.allTurtlesDirectedOut[turtle] {
+			return link
+		}
+	} else {
+		// look in directed
+		if link, ok := t.turtlesDirectedOutBreed[breed][turtle]; ok {
+			return link
+		}
+	}
+
+	return nil
+}
+
 func (t *turtleLinks) count() int {
 	return len(t.allLinksDirectedOut) + len(t.allLinksUndirected)
 }

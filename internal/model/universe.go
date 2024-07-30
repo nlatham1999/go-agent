@@ -529,14 +529,30 @@ func (m *Model) LayoutTutte(turtles []*Turtle, links []*Link, radius float64) {
 
 }
 
-// @TODO implement
+// returns a link between two turtles that connects from turtle1 to turtle2
+// if the breed is empty then selects from the general population
 func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link {
-	return nil
+	t1 := m.whoToTurtles[turtle1]
+	t2 := m.whoToTurtles[turtle2]
+
+	if t1 == nil || t2 == nil {
+		return nil
+	}
+
+	return t1.linkedTurtles.getLink(breed, t2)
 }
 
-// @TODO implement
+// returns a link that is directed that connects from turtle1 to turtle2
+// if the breed is empty then selects from the general population
 func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
-	return nil
+	t1 := m.whoToTurtles[turtle1]
+	t2 := m.whoToTurtles[turtle2]
+
+	if t1 == nil || t2 == nil {
+		return nil
+	}
+
+	return t1.linkedTurtles.getLinkDirected(breed, t2)
 }
 
 // @TODO implement
