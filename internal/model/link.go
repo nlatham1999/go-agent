@@ -38,8 +38,7 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	}
 
 	// make sure the link doesn't already exist
-	key := linkedTurtle{directed, breed, end2}
-	if _, ok := end1.linkedTurtles[key]; ok {
+	if end1.linkedTurtles.exists(breed, directed, end2) {
 		return nil, fmt.Errorf("Link already exists")
 	}
 
@@ -63,28 +62,11 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	// add the link to the turtle's link map
 	if directed {
-		s := linkedTurtle{true, "", end2}
-		end1.linkedTurtles[s] = l
-
-		end2.linkedTurtlesConnectedFrom[end1] = l
-
-		if breed != "" {
-			s = linkedTurtle{true, breed, end2}
-			end1.linkedTurtles[s] = l
-		}
+		end1.linkedTurtles.addDirectedOutBreed(breed, end2, l)
+		end2.linkedTurtles.addDirectedInBreed(breed, end1, l)
 	} else {
-		s1 := linkedTurtle{false, "", end2}
-		s2 := linkedTurtle{false, "", end1}
-
-		end1.linkedTurtles[s1] = l
-		end2.linkedTurtles[s2] = l
-		if breed != "" {
-			s1 = linkedTurtle{false, breed, end2}
-			s2 = linkedTurtle{false, breed, end1}
-
-			end1.linkedTurtles[s1] = l
-			end2.linkedTurtles[s2] = l
-		}
+		end1.linkedTurtles.addUndirectedBreed(breed, end2, l)
+		end2.linkedTurtles.addUndirectedBreed(breed, end1, l)
 	}
 
 	return l, nil

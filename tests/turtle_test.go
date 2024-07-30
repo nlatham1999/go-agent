@@ -367,7 +367,6 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 
 	// make sure the link exists from t2 to t1
 	l := t1.InLinkFrom("parent-children", t2)
-
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}

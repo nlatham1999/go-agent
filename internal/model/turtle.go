@@ -23,14 +23,8 @@ type Turtle struct {
 	turtlesOwnGeneral map[string]interface{} // turtles own variables
 	turtlesOwnBreed   map[string]interface{} // turtles own variables
 
-	// 3D map of the links the turtle is involved in
-	// the first bool is if the link is directed
-	// the string is the breed of the link - the empty string key is all the links
-	// the third map is the turtles the link is connected to
-	linkedTurtles map[linkedTurtle]*Link
-
-	// map of the turtles that are connected to the current turtle with a directed link
-	linkedTurtlesConnectedFrom map[*Turtle]*Link
+	// turtles the current turtle is linked to/by/with
+	linkedTurtles *turtleLinks
 
 	patch *Patch //patch the turtle is on
 }
@@ -58,13 +52,12 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	}
 
 	t := &Turtle{
-		who:                        who,
-		parent:                     m,
-		xcor:                       x,
-		ycor:                       y,
-		breed:                      breed,
-		linkedTurtles:              make(map[linkedTurtle]*Link),
-		linkedTurtlesConnectedFrom: make(map[*Turtle]*Link),
+		who:           who,
+		parent:        m,
+		xcor:          x,
+		ycor:          y,
+		breed:         breed,
+		linkedTurtles: newTurtleLinks(),
 	}
 
 	m.Turtles.turtles[t] = nil
@@ -259,10 +252,16 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 }
 
 // returns an agentset of the node turtles that are tied to the current turtle
+// TODO cleanup
 func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 	tiedTurtlesMap := make(map[*Turtle]interface{})
 	tiedTurtles := []*Turtle{}
-	for _, l := range t.linkedTurtles {
+	for l := range t.linkedTurtles.getAllDirectedOutLinks() {
+		if l.TieMode >= minTieMode {
+			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
+		}
+	}
+	for l := range t.linkedTurtles.getAllUndirectedLinks() {
 		if l.TieMode >= minTieMode {
 			tiedTurtles = append(tiedTurtles, l.OtherEnd(t))
 		}
@@ -273,7 +272,15 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 		}
 		newTiedTurtles := []*Turtle{}
 		for _, turtle := range tiedTurtles {
-			for _, l := range turtle.linkedTurtles {
+			for l := range turtle.linkedTurtles.getAllDirectedOutLinks() {
+				if l.TieMode != TieModeNone {
+					otherEnd := l.OtherEnd(turtle)
+					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+						newTiedTurtles = append(newTiedTurtles, otherEnd)
+					}
+				}
+			}
+			for l := range turtle.linkedTurtles.getAllUndirectedLinks() {
 				if l.TieMode != TieModeNone {
 					otherEnd := l.OtherEnd(turtle)
 					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
@@ -585,7 +592,7 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 
 	t.heading = heading
 
-	if len(t.linkedTurtles) == 0 {
+	if t.linkedTurtles.count() == 0 {
 		return
 	}
 
@@ -645,20 +652,7 @@ func (t *Turtle) InConeTurtles(distance float64, angle float64) []*Turtle {
 // returns if there is a directed link from turtle to t or an undirected link connecting the two
 func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 
-	// check to see if there is a directed link
-	key := linkedTurtle{true, breed, t}
-	if _, found := turtle.linkedTurtles[key]; found {
-		return true
-	}
-
-	// look for an undirected link from turtle
-	key = linkedTurtle{false, breed, t}
-	if _, found := turtle.linkedTurtles[key]; found {
-		return true
-	}
-
-	// we don't need to look for an undirected link from t to turtle since undirecteds are placed at both turtles
-	return false
+	return turtle.linkedTurtles.exists(breed, true, t) || turtle.linkedTurtles.exists(breed, false, t)
 }
 
 // @TODO implement
@@ -671,24 +665,14 @@ func (t *Turtle) InLinkNeighbors(turtle *Turtle) []*Turtle {
 	return nil
 }
 
-// finds a link from the current turtle to the turtle passed in
+// finds a link from the turtle passed int to the current turtle
 func (t *Turtle) InLinkFrom(breed string, turtle *Turtle) *Link {
 
-	if turtle.linkedTurtles != nil {
-		// look in the directed links
-		s := linkedTurtle{true, breed, t}
-		if link, found := turtle.linkedTurtles[s]; found {
-			return link
-		}
-
-		// look in the undirected links
-		s = linkedTurtle{false, breed, t}
-		if link, found := turtle.linkedTurtles[s]; found {
-			return link
-		}
+	if turtle.linkedTurtles == nil {
+		return nil
 	}
 
-	return nil
+	return turtle.linkedTurtles.getLink(breed, t)
 }
 
 // jumps ahead by the distance, if it cannot then it returns false
@@ -890,7 +874,7 @@ func (t *Turtle) SetXY(x float64, y float64) {
 
 	t.transferPatchOwnership()
 
-	if len(t.linkedTurtles) == 0 {
+	if t.linkedTurtles.count() == 0 {
 		return
 	}
 

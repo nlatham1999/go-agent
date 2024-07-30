@@ -261,8 +261,7 @@ func (m *Model) ClearLinks() {
 		}
 	}
 	for turtle := range m.Turtles.turtles {
-		turtle.linkedTurtles = make(map[linkedTurtle]*Link)
-		turtle.linkedTurtlesConnectedFrom = make(map[*Turtle]*Link)
+		turtle.linkedTurtles = newTurtleLinks()
 	}
 }
 
@@ -393,26 +392,19 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 		}
 	}
 
-	for _, link := range turtle.linkedTurtles {
-		delete(m.Links.links, link)
-		if link.breed != "" {
-			if link.Directed {
-				delete(m.DirectedLinkBreeds[link.breed].Links.links, link)
-			} else {
-				delete(m.UndirectedLinkBreeds[link.breed].Links.links, link)
-			}
-		}
+	// kill all directed out links
+	for link := range turtle.linkedTurtles.getAllDirectedOutLinks() {
+		m.KillLink(link)
 	}
 
-	for _, link := range turtle.linkedTurtlesConnectedFrom {
-		delete(m.Links.links, link)
-		if link.breed != "" {
-			if link.Directed {
-				delete(m.DirectedLinkBreeds[link.breed].Links.links, link)
-			} else {
-				delete(m.UndirectedLinkBreeds[link.breed].Links.links, link)
-			}
-		}
+	// kill all directed in links
+	for link := range turtle.linkedTurtles.getAllDirectedInLinks() {
+		m.KillLink(link)
+	}
+
+	// kill all undirected links
+	for link := range turtle.linkedTurtles.getAllUndirectedLinks() {
+		m.KillLink(link)
 	}
 
 	*turtle = Turtle{}
@@ -433,48 +425,11 @@ func (m *Model) KillLink(link *Link) {
 
 	// remove the link from the turtles
 	if link.Directed {
-		key := linkedTurtle{
-			true,
-			"",
-			link.end2,
-		}
-		delete(link.end1.linkedTurtles, key)
-		delete(link.end2.linkedTurtlesConnectedFrom, link.end1)
-		if link.end1.breed != "" {
-			key = linkedTurtle{
-				true,
-				link.breed,
-				link.end2,
-			}
-			delete(link.end1.linkedTurtles, key)
-		}
+		link.end1.linkedTurtles.removeDirectedOutBreed(link.breed, link.end2, link)
+		link.end2.linkedTurtles.removeDirectedInBreed(link.breed, link.end1, link)
 	} else {
-		key1 := linkedTurtle{
-			false,
-			"",
-			link.end2,
-		}
-		key2 := linkedTurtle{
-			false,
-			"",
-			link.end1,
-		}
-		delete(link.end1.linkedTurtles, key1)
-		delete(link.end2.linkedTurtles, key2)
-		if link.end1.breed != "" {
-			key1 = linkedTurtle{
-				false,
-				link.breed,
-				link.end2,
-			}
-			key2 = linkedTurtle{
-				false,
-				link.breed,
-				link.end1,
-			}
-			delete(link.end1.linkedTurtles, key1)
-			delete(link.end2.linkedTurtles, key2)
-		}
+		link.end1.linkedTurtles.removeUndirectedBreed(link.breed, link.end2, link)
+		link.end2.linkedTurtles.removeUndirectedBreed(link.breed, link.end1, link)
 	}
 
 	*link = Link{}
