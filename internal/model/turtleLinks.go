@@ -179,6 +179,29 @@ func (t *turtleLinks) getLinkDirected(breed string, turtle *Turtle) *Link {
 	return nil
 }
 
+// get all the turtles that are connected to the current turtle
+func (t *turtleLinks) getTurtlesIncoming(breed string) *TurtleAgentSet {
+	turtles := make([]*Turtle, 0)
+	if breed == "" {
+		for turtle := range t.allTurtlesDirectedIn {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.allTurtlesUndirected {
+			turtles = append(turtles, turtle)
+		}
+	} else {
+		for turtle := range t.turtlesDirectedInBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.turtlesUndirectedBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+	}
+
+	return TurtleSet(turtles)
+
+}
+
 func (t *turtleLinks) count() int {
 	return len(t.allLinksDirectedOut) + len(t.allLinksUndirected)
 }

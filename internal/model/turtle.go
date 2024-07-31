@@ -655,14 +655,11 @@ func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 	return turtle.linkedTurtles.exists(breed, true, t) || turtle.linkedTurtles.exists(breed, false, t)
 }
 
-// @TODO implement
-func (t *Turtle) InLinkBreedNeighbors(breed string, turtle *Turtle) []*Turtle {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) InLinkNeighbors(turtle *Turtle) []*Turtle {
-	return nil
+// returns all turtles that have a directed link to the current turtle
+//  or an undirected link connecting the two
+// basically all turtles where there is a path from the turtle to the current turtle
+func (t *Turtle) InLinkNeighbors(breed string) *TurtleAgentSet {
+	return t.linkedTurtles.getTurtlesIncoming(breed)
 }
 
 // finds a link from the turtle passed int to the current turtle
