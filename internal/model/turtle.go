@@ -652,7 +652,7 @@ func (t *Turtle) InConeTurtles(distance float64, angle float64) []*Turtle {
 // returns if there is a directed link from turtle to t or an undirected link connecting the two
 func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 
-	return turtle.linkedTurtles.exists(breed, true, t) || turtle.linkedTurtles.exists(breed, false, t)
+	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
 
 // returns all turtles that have a directed link to the current turtle
@@ -693,14 +693,15 @@ func (t *Turtle) Left(number float64) {
 
 }
 
-// @TODO implement
-func (t *Turtle) LinkNeighbors(breed string) []*Turtle {
-	return nil
+// returns if there is any sort of link between the current turtle and the turtle passed in
+func (t *Turtle) LinkNeighbor(breed string, turtle *Turtle) bool {
+	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
 
-// @TODO implement
-func (t *Turtle) LinkNeighbor(turtle *Turtle) bool {
-	return false
+// returns all turtles that are linked to the current turtle
+//   incoming, outgoing, or undirected
+func (t *Turtle) LinkNeighbors(breed string) *TurtleAgentSet {
+	return t.linkedTurtles.getTurtlesAll(breed)
 }
 
 func (t *Turtle) MoveToPatch(patch *Patch) {
@@ -765,14 +766,14 @@ func (t *Turtle) OtherEnd(link *Link) *Turtle {
 	return link.end1
 }
 
-// @TODO implement
+// returns whether there is a directed link connecting t to turtle or an undirected link connecting the two
 func (t *Turtle) OutLinkNeighbor(breed string, turtle *Turtle) bool {
-	return false
+	return t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
 
-// @TODO implement
-func (t *Turtle) OutLinkNeighbors(breed string, turtle *Turtle) *TurtleAgentSet {
-	return nil
+// returns all turtles that have a directed link from the current turtle to them
+func (t *Turtle) OutLinkNeighbors(breed string) *TurtleAgentSet {
+	return t.linkedTurtles.getTurtlesOutgoing(breed)
 }
 
 // @TODO implement

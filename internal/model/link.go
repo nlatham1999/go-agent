@@ -38,7 +38,11 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	}
 
 	// make sure the link doesn't already exist
-	if end1.linkedTurtles.exists(breed, directed, end2) {
+	if directed && end1.linkedTurtles.existsOutgoing(breed, end2) {
+		return nil, fmt.Errorf("Link already exists")
+	}
+
+	if !directed && end1.linkedTurtles.existsUndirected(breed, end2) {
 		return nil, fmt.Errorf("Link already exists")
 	}
 

@@ -199,7 +199,54 @@ func (t *turtleLinks) getTurtlesIncoming(breed string) *TurtleAgentSet {
 	}
 
 	return TurtleSet(turtles)
+}
 
+func (t *turtleLinks) getTurtlesOutgoing(breed string) *TurtleAgentSet {
+	turtles := make([]*Turtle, 0)
+	if breed == "" {
+		for turtle := range t.allTurtlesDirectedOut {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.allTurtlesUndirected {
+			turtles = append(turtles, turtle)
+		}
+	} else {
+		for turtle := range t.turtlesDirectedOutBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.turtlesUndirectedBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+	}
+
+	return TurtleSet(turtles)
+}
+
+func (t *turtleLinks) getTurtlesAll(breed string) *TurtleAgentSet {
+	turtles := make([]*Turtle, 0)
+	if breed == "" {
+		for turtle := range t.allTurtlesDirectedOut {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.allTurtlesDirectedIn {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.allTurtlesUndirected {
+			turtles = append(turtles, turtle)
+		}
+	} else {
+		for turtle := range t.turtlesDirectedOutBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.turtlesDirectedInBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+		for turtle := range t.turtlesUndirectedBreed[breed] {
+			turtles = append(turtles, turtle)
+		}
+	}
+
+	return TurtleSet(turtles)
 }
 
 func (t *turtleLinks) count() int {
@@ -218,29 +265,53 @@ func (t *turtleLinks) getAllUndirectedLinks() map[*Link]interface{} {
 	return t.allLinksUndirected
 }
 
-func (t *turtleLinks) exists(breed string, directed bool, turtle *Turtle) bool {
+func (t *turtleLinks) existsOutgoing(breed string, turtle *Turtle) bool {
 	if breed == "" {
-		if directed {
-			if v, ok := t.allTurtlesDirectedOut[turtle]; ok {
-				return len(v) > 0
-			} else {
-				return false
-			}
+		if v, ok := t.allTurtlesDirectedOut[turtle]; ok {
+			return len(v) > 0
 		} else {
-			if v, ok := t.allTurtlesUndirected[turtle]; ok {
-				return len(v) > 0
-			} else {
-				return false
-			}
+			return false
 		}
 	} else {
-		if directed {
-			_, ok := t.turtlesDirectedOutBreed[breed][turtle]
-			return ok
+		// make sure the breed exists
+		if _, ok := t.turtlesDirectedOutBreed[breed]; !ok {
+			return false
 		}
+		_, ok := t.turtlesDirectedOutBreed[breed][turtle]
+		return ok
+	}
+}
 
+func (t *turtleLinks) existsIncoming(breed string, turtle *Turtle) bool {
+	if breed == "" {
+		if v, ok := t.allTurtlesDirectedIn[turtle]; ok {
+			return len(v) > 0
+		} else {
+			return false
+		}
+	} else {
+		// make sure the breed exists
+		if _, ok := t.turtlesDirectedInBreed[breed]; !ok {
+			return false
+		}
+		_, ok := t.turtlesDirectedInBreed[breed][turtle]
+		return ok
+	}
+}
+
+func (t *turtleLinks) existsUndirected(breed string, turtle *Turtle) bool {
+	if breed == "" {
+		if v, ok := t.allTurtlesUndirected[turtle]; ok {
+			return len(v) > 0
+		} else {
+			return false
+		}
+	} else {
+		// make sure the breed exists
+		if _, ok := t.turtlesUndirectedBreed[breed]; !ok {
+			return false
+		}
 		_, ok := t.turtlesUndirectedBreed[breed][turtle]
 		return ok
 	}
-
 }

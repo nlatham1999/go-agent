@@ -853,3 +853,280 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 	}
 
 }
+
+// tests the Turtle.LinkNeighbor which returns whether there is any link connecting the two turtles
+// link can be directed or undirected
+func TestTurtleLinkNeighbor(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(9, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+	t9 := m.Turtle("", 8)
+
+	/// breeded directed link to t1
+	t2.CreateLinkToTurtle("parent-children", t1, nil)
+	t3.CreateLinkToTurtle("parent-children", t1, nil)
+
+	// breeded undirected link to t1
+	t4.CreateLinkWithTurtle("coworkers", t1, nil)
+	t5.CreateLinkWithTurtle("coworkers", t1, nil)
+
+	// directed link to t1
+	t6.CreateLinkToTurtle("", t1, nil)
+	t7.CreateLinkToTurtle("", t1, nil)
+
+	// undirected link to t1
+	t8.CreateLinkWithTurtle("", t1, nil)
+	t9.CreateLinkWithTurtle("", t1, nil)
+
+	v := t1.LinkNeighbor("", t2)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkNeighbor("parent-children", t3)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkNeighbor("", t4)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkNeighbor("parent-childres", t5)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+
+	v = t1.LinkNeighbor("", t6)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkNeighbor("parent-children", t7)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+
+	v = t1.LinkNeighbor("", t8)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkNeighbor("coworkers", t9)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+}
+
+// returns the turtles that are linked to the turtle
+// can be directed or undirected, in either incoming or outgoing
+func TestTurtleLinkNeighbors(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(9, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+	t9 := m.Turtle("", 8)
+
+	/// breeded directed link to t1
+	t2.CreateLinkToTurtle("parent-children", t1, nil)
+	t3.CreateLinkToTurtle("parent-children", t1, nil)
+
+	// breeded undirected link to t1
+	t4.CreateLinkWithTurtle("coworkers", t1, nil)
+	t5.CreateLinkWithTurtle("coworkers", t1, nil)
+
+	// directed link to t1
+	t6.CreateLinkToTurtle("", t1, nil)
+	t7.CreateLinkToTurtle("", t1, nil)
+
+	// undirected link to t1
+	t8.CreateLinkWithTurtle("", t1, nil)
+	t9.CreateLinkWithTurtle("", t1, nil)
+
+	neighbors := t1.LinkNeighbors("")
+	if neighbors.Count() != 8 {
+		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t1.LinkNeighbors("parent-children")
+	if neighbors.Count() != 2 {
+		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t1.LinkNeighbors("coworkers")
+	if neighbors.Count() != 2 {
+		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t2.LinkNeighbors("parent-children")
+	if neighbors.Count() != 1 {
+		t.Errorf("Expected 1 neighbor, got %d", neighbors.Count())
+	}
+	if !neighbors.Contains(t1) {
+		t.Errorf("Expected neighbors to contain t1")
+	}
+}
+
+// tests the Turtle.OutLinkNeighbor function which returns whether there is a link from the turtle to another turtle
+// link can be directed or undirected
+// but unlike LinkNeighbor, this function only checks for outgoing links
+func TestTurtleOutLinkNeighbor(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(9, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+	t9 := m.Turtle("", 8)
+
+	/// breeded directed link to t1
+	t1.CreateLinkToTurtle("parent-children", t2, nil)
+	t1.CreateLinkToTurtle("parent-children", t3, nil)
+
+	// breeded undirected link to t1
+	t1.CreateLinkWithTurtle("coworkers", t4, nil)
+	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+
+	// directed link to t1
+	t1.CreateLinkToTurtle("", t6, nil)
+	t1.CreateLinkToTurtle("", t7, nil)
+
+	// undirected link to t1
+	t1.CreateLinkWithTurtle("", t8, nil)
+	t1.CreateLinkWithTurtle("", t9, nil)
+
+	v := t1.OutLinkNeighbor("", t2)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.OutLinkNeighbor("parent-children", t3)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.OutLinkNeighbor("", t4)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.OutLinkNeighbor("parent-childres", t5)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+
+	v = t1.OutLinkNeighbor("", t6)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.OutLinkNeighbor("parent-children", t7)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+
+	v = t1.OutLinkNeighbor("", t8)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.OutLinkNeighbor("coworkers", t9)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor for that breed")
+	}
+
+	v = t2.OutLinkNeighbor("parent-children", t1)
+	if v {
+		t.Errorf("Expected turtle to not be a neighbor since it is a directed link")
+	}
+}
+
+// tests the Turtle.OutLinkNeighbors function which returns a list of turtles that the turtle has a directed or undirected link to
+// like LinkNeighbors, but only checks for outgoing links
+func TestTurtleOutLinkNeighbors(t *testing.T) {
+
+	// create a new model
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(9, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+	t9 := m.Turtle("", 8)
+
+	/// breeded directed link to t1
+	t1.CreateLinkToTurtle("parent-children", t2, nil)
+	t1.CreateLinkToTurtle("parent-children", t3, nil)
+
+	// breeded undirected link to t1
+	t1.CreateLinkWithTurtle("coworkers", t4, nil)
+	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+
+	// directed link to t1
+	t1.CreateLinkToTurtle("", t6, nil)
+	t1.CreateLinkToTurtle("", t7, nil)
+
+	// undirected link to t1
+	t1.CreateLinkWithTurtle("", t8, nil)
+	t1.CreateLinkWithTurtle("", t9, nil)
+
+	neighbors := t1.OutLinkNeighbors("")
+	if neighbors.Count() != 8 {
+		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t1.OutLinkNeighbors("parent-children")
+	if neighbors.Count() != 2 {
+		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t1.OutLinkNeighbors("coworkers")
+	if neighbors.Count() != 2 {
+		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
+	}
+
+	neighbors = t2.OutLinkNeighbors("parent-children")
+	if neighbors.Count() != 0 {
+		t.Errorf("Expected 0 neighbors, got %d", neighbors.Count())
+	}
+}
