@@ -218,7 +218,7 @@ func TestTurtleCreateLinkToTurtle(t *testing.T) {
 	t1.CreateLinkToTurtle("parent-children", t2, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.InLinkFrom("parent-children", t1)
+	l := t2.LinkFrom("parent-children", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
@@ -242,21 +242,21 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 	t1.CreateLinksToSet("parent-children", agentSet, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.InLinkFrom("parent-children", t1)
+	l := t2.LinkFrom("parent-children", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t1 to t3
-	l = t3.InLinkFrom("parent-children", t1)
+	l = t3.LinkFrom("parent-children", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t2 to t3
-	l = t3.InLinkFrom("parent-children", t2)
+	l = t3.LinkFrom("parent-children", t2)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -278,21 +278,21 @@ func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 	t1.CreateLinkWithTurtle("coworkers", t2, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.InLinkFrom("coworkers", t1)
+	l := t2.LinkFrom("coworkers", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t2 to t1
-	l = t1.InLinkFrom("coworkers", t2)
+	l = t1.LinkFrom("coworkers", t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.InLinkFrom("parent-children", t1)
+	l = t2.LinkFrom("parent-children", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -316,35 +316,35 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 	t1.CreateLinksWithSet("coworkers", agentSet, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.InLinkFrom("coworkers", t1)
+	l := t2.LinkFrom("coworkers", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t1 to t3
-	l = t3.InLinkFrom("coworkers", t1)
+	l = t3.LinkFrom("coworkers", t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t2 to t1
-	l = t1.InLinkFrom("coworkers", t2)
+	l = t1.LinkFrom("coworkers", t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t3 to t1
-	l = t1.InLinkFrom("coworkers", t3)
+	l = t1.LinkFrom("coworkers", t3)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.InLinkFrom("parent-children", t1)
+	l = t2.LinkFrom("parent-children", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -366,13 +366,13 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 	t1.CreateLinkFromTurtle("parent-children", t2, nil)
 
 	// make sure the link exists from t2 to t1
-	l := t1.InLinkFrom("parent-children", t2)
+	l := t1.LinkFrom("parent-children", t2)
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2
-	l = t2.InLinkFrom("parent-children", t1)
+	l = t2.LinkFrom("parent-children", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -396,35 +396,35 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 	t1.CreateLinksFromSet("parent-children", agentSet, nil)
 
 	// make sure the link exists from t2 to t1
-	l := t1.InLinkFrom("parent-children", t2)
+	l := t1.LinkFrom("parent-children", t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t3 to t1
-	l = t1.InLinkFrom("parent-children", t3)
+	l = t1.LinkFrom("parent-children", t3)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2
-	l = t2.InLinkFrom("parent-children", t1)
+	l = t2.LinkFrom("parent-children", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
 	}
 
 	// make sure the link does not exist from t1 to t3
-	l = t3.InLinkFrom("parent-children", t1)
+	l = t3.LinkFrom("parent-children", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.InLinkFrom("coworkers", t1)
+	l = t2.LinkFrom("coworkers", t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")

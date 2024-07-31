@@ -159,98 +159,6 @@ func (t *Turtle) CanMove(distance float64) bool {
 	return true
 }
 
-// creates a directed link from the current turtle to the turtle passed in
-func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
-	l, err := NewLink(t.parent, breed, t, turtle, true)
-	if err != nil {
-		return err
-	}
-
-	for _, operation := range operations {
-		operation(l)
-	}
-
-	return nil
-}
-
-// creates a directed link from the current turtle to the turtles passed in
-// if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
-	if breed == "" {
-		return
-	}
-
-	linksAdded := LinkSet([]*Link{})
-	for turtle := range turtles.turtles {
-		l, err := NewLink(t.parent, breed, t, turtle, true)
-		if err != nil {
-			continue
-		}
-		linksAdded.Add(l)
-	}
-
-	AskLinks(linksAdded, operations)
-}
-
-// creates an undirected breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
-	l, err := NewLink(t.parent, breed, t, turtle, false)
-	if err != nil {
-		return err
-	}
-
-	for _, operation := range operations {
-		operation(l)
-	}
-
-	return nil
-
-}
-
-// creates an undirected breed link from the current turtle with the turtles passed in
-// if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
-	linksAdded := LinkSet([]*Link{})
-	for turtle := range turtles.turtles {
-		l, err := NewLink(t.parent, breed, t, turtle, false)
-		if err != nil {
-			continue
-		}
-		linksAdded.Add(l)
-	}
-
-	AskLinks(linksAdded, operations)
-}
-
-// creates a directed breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
-	l, err := NewLink(t.parent, breed, turtle, t, true)
-	if err != nil {
-		return err
-	}
-
-	for _, operation := range operations {
-		operation(l)
-	}
-
-	return nil
-}
-
-// creates a directed breed link from the turtles passed in to the current turtle
-// if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
-	linksAdded := LinkSet([]*Link{})
-	for turtle := range turtles.turtles {
-		l, err := NewLink(t.parent, breed, turtle, t, true)
-		if err != nil {
-			continue
-		}
-		linksAdded.Add(l)
-	}
-
-	AskLinks(linksAdded, operations)
-}
-
 // returns an agentset of the node turtles that are tied to the current turtle
 // TODO cleanup
 func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
@@ -649,29 +557,6 @@ func (t *Turtle) InConeTurtles(distance float64, angle float64) []*Turtle {
 	return nil
 }
 
-// returns if there is a directed link from turtle to t or an undirected link connecting the two
-func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
-
-	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
-}
-
-// returns all turtles that have a directed link to the current turtle
-//  or an undirected link connecting the two
-// basically all turtles where there is a path from the turtle to the current turtle
-func (t *Turtle) InLinkNeighbors(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesIncoming(breed)
-}
-
-// finds a link from the turtle passed int to the current turtle
-func (t *Turtle) InLinkFrom(breed string, turtle *Turtle) *Link {
-
-	if turtle.linkedTurtles == nil {
-		return nil
-	}
-
-	return turtle.linkedTurtles.getLink(breed, t)
-}
-
 // jumps ahead by the distance, if it cannot then it returns false
 // @TODO implement - wrapping and don't call Can Move since that is expensive
 func (t *Turtle) Jump(distance float64) {
@@ -693,38 +578,12 @@ func (t *Turtle) Left(number float64) {
 
 }
 
-// returns if there is any sort of link between the current turtle and the turtle passed in
-func (t *Turtle) LinkNeighbor(breed string, turtle *Turtle) bool {
-	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
-}
-
-// returns all turtles that are linked to the current turtle
-//   incoming, outgoing, or undirected
-func (t *Turtle) LinkNeighbors(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesAll(breed)
-}
-
 func (t *Turtle) MoveToPatch(patch *Patch) {
 	t.SetXY(patch.xFloat64, patch.yFloat64)
 }
 
 func (t *Turtle) MoveToTurtle(turtle *Turtle) {
 	t.SetXY(turtle.xcor, turtle.ycor)
-}
-
-// @TODO implement
-func (t *Turtle) MyLinks(breed string) []*Link {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) MyInLinks(breed string) []*Link {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) MyOutLinks(breed string) []*Link {
-	return nil
 }
 
 func (t *Turtle) Neighbors() *PatchAgentSet {
@@ -764,21 +623,6 @@ func (t *Turtle) OtherEnd(link *Link) *Turtle {
 		return link.end2
 	}
 	return link.end1
-}
-
-// returns whether there is a directed link connecting t to turtle or an undirected link connecting the two
-func (t *Turtle) OutLinkNeighbor(breed string, turtle *Turtle) bool {
-	return t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
-}
-
-// returns all turtles that have a directed link from the current turtle to them
-func (t *Turtle) OutLinkNeighbors(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesOutgoing(breed)
-}
-
-// @TODO implement
-func (t *Turtle) OutLinkTo(breed string, turtle *Turtle) *Link {
-	return nil
 }
 
 // returns the turtle own variable
@@ -944,11 +788,6 @@ func (t *Turtle) Uphill(patchVariable string) {
 // @TODO implement
 func (t *Turtle) Uphill4(patchVariable string) {
 
-}
-
-// @TODO implement
-func (t *Turtle) LinkWith(turtle *Turtle) *Link {
-	return nil
 }
 
 func (t *Turtle) Who() int {
