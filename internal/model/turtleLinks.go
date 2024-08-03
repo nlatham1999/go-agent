@@ -249,6 +249,79 @@ func (t *turtleLinks) getTurtlesAll(breed string) *TurtleAgentSet {
 	return TurtleSet(turtles)
 }
 
+// returns all links that have an incoming path to the turtle. This includes undirected links
+func (t *turtleLinks) getLinksIncoming(breed string) *LinkAgentSet {
+	if breed == "" {
+		links := make([]*Link, 0)
+		for link := range t.allLinksDirectedIn {
+			links = append(links, link)
+		}
+		for link := range t.allLinksUndirected {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	} else {
+		links := make([]*Link, 0)
+		for _, link := range t.turtlesDirectedInBreed[breed] {
+			links = append(links, link)
+		}
+		for _, link := range t.turtlesUndirectedBreed[breed] {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	}
+}
+
+func (t turtleLinks) getLinksOutgoing(breed string) *LinkAgentSet {
+	if breed == "" {
+		links := make([]*Link, 0)
+		for link := range t.allLinksDirectedOut {
+			links = append(links, link)
+		}
+		for link := range t.allLinksUndirected {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	} else {
+		links := make([]*Link, 0)
+		for _, link := range t.turtlesDirectedOutBreed[breed] {
+			links = append(links, link)
+		}
+		for _, link := range t.turtlesUndirectedBreed[breed] {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	}
+}
+
+func (t *turtleLinks) getLinksAll(breed string) *LinkAgentSet {
+	if breed == "" {
+		links := make([]*Link, 0)
+		for link := range t.allLinksDirectedOut {
+			links = append(links, link)
+		}
+		for link := range t.allLinksDirectedIn {
+			links = append(links, link)
+		}
+		for link := range t.allLinksUndirected {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	} else {
+		links := make([]*Link, 0)
+		for _, link := range t.turtlesDirectedOutBreed[breed] {
+			links = append(links, link)
+		}
+		for _, link := range t.turtlesDirectedInBreed[breed] {
+			links = append(links, link)
+		}
+		for _, link := range t.turtlesUndirectedBreed[breed] {
+			links = append(links, link)
+		}
+		return LinkSet(links)
+	}
+}
+
 func (t *turtleLinks) count() int {
 	return len(t.allLinksDirectedOut) + len(t.allLinksUndirected)
 }

@@ -1130,3 +1130,127 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected 0 neighbors, got %d", neighbors.Count())
 	}
 }
+
+func TestTurtleMyLinks(t *testing.T) {
+
+	// create a basic model with breeds for undirected and directed links
+	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+
+	// create some turtles
+	m.CreateTurtles(9, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+	t7 := m.Turtle("", 6)
+	t8 := m.Turtle("", 7)
+	t9 := m.Turtle("", 8)
+
+	// directed unbreeded link from t1 to t2
+	t1.CreateLinkToTurtle("", t2, nil)
+
+	// directed breeded link from t1 to t3
+	t1.CreateLinkToTurtle("parent-children", t3, nil)
+
+	// undirected unbreeded link from t1 to t4
+	t1.CreateLinkWithTurtle("", t4, nil)
+
+	// undirected breeded link from t1 to t5
+	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+
+	// directed unbreeded link from t6 to t1
+	t1.CreateLinkFromTurtle("", t6, nil)
+
+	// directed breeded link from t7 to t1
+	t1.CreateLinkFromTurtle("parent-children", t7, nil)
+
+	// undirected unbreeded link from t8 to t1
+	t1.CreateLinkWithTurtle("", t8, nil)
+
+	// undirected breeded link from t9 to t1
+	t1.CreateLinkWithTurtle("coworkers", t9, nil)
+
+	l1 := t1.LinkTo("", t2)
+	l2 := t1.LinkTo("parent-children", t3)
+	l3 := t1.LinkWith("", t4)
+	l4 := t1.LinkWith("coworkers", t5)
+	l5 := t1.LinkFrom("", t6)
+	l6 := t1.LinkFrom("parent-children", t7)
+	l7 := t1.LinkWith("", t8)
+	l8 := t1.LinkWith("coworkers", t9)
+
+	links := t1.MyLinks("")
+	if links.Count() != 8 {
+		t.Errorf("Expected 8 links, got %d", links.Count())
+	}
+	if !links.Contains(l1) || !links.Contains(l2) || !links.Contains(l3) || !links.Contains(l4) || !links.Contains(l5) || !links.Contains(l6) || !links.Contains(l7) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain all links")
+	}
+
+	links = t1.MyLinks("parent-children")
+	if links.Count() != 2 {
+		t.Errorf("Expected 2 links, got %d", links.Count())
+	}
+	if !links.Contains(l2) || !links.Contains(l6) {
+		t.Errorf("Expected links to contain l2 and l6")
+	}
+
+	links = t1.MyLinks("coworkers")
+	if links.Count() != 2 {
+		t.Errorf("Expected 2 links, got %d", links.Count())
+	}
+	if !links.Contains(l4) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain l4 and l8")
+	}
+
+	links = t1.MyInLinks("")
+	if links.Count() != 6 {
+		t.Errorf("Expected 6 links, got %d", links.Count())
+	}
+	if !links.Contains(l3) || !links.Contains(l4) || !links.Contains(l5) || !links.Contains(l6) || !links.Contains(l7) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain all links")
+	}
+
+	links = t1.MyInLinks("parent-children")
+	if links.Count() != 1 {
+		t.Errorf("Expected 1 link, got %d", links.Count())
+	}
+	if !links.Contains(l6) {
+		t.Errorf("Expected links to contain l6")
+	}
+
+	links = t1.MyInLinks("coworkers")
+	if links.Count() != 2 {
+		t.Errorf("Expected 2 links, got %d", links.Count())
+	}
+	if !links.Contains(l4) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain l4 and l8")
+	}
+
+	links = t1.MyOutLinks("")
+	if links.Count() != 6 {
+		t.Errorf("Expected 6 links, got %d", links.Count())
+	}
+	if !links.Contains(l1) || !links.Contains(l2) || !links.Contains(l3) || !links.Contains(l4) || !links.Contains(l7) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain all links")
+	}
+
+	links = t1.MyOutLinks("parent-children")
+	if links.Count() != 1 {
+		t.Errorf("Expected 1 link, got %d", links.Count())
+	}
+	if !links.Contains(l2) {
+		t.Errorf("Expected links to contain l2")
+	}
+
+	links = t1.MyOutLinks("coworkers")
+	if links.Count() != 2 {
+		t.Errorf("Expected 2 links, got %d", links.Count())
+	}
+	if !links.Contains(l4) || !links.Contains(l8) {
+		t.Errorf("Expected links to contain l4 and l8")
+	}
+}

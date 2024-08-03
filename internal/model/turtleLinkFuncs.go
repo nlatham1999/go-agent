@@ -164,17 +164,17 @@ func (t *Turtle) LinkWith(breed string, turtle *Turtle) *Link {
 	return nil
 }
 
-// @TODO implement
-func (t *Turtle) MyLinks(breed string) []*Link {
-	return nil
+// returns all links that are connected to a turtle, undirected or directed, incoming or outgoing
+func (t *Turtle) MyLinks(breed string) *LinkAgentSet {
+	return t.linkedTurtles.getLinksAll(breed)
 }
 
-// @TODO implement
-func (t *Turtle) MyInLinks(breed string) []*Link {
-	return nil
+// returns all incoming links that are connected to the turtle
+func (t *Turtle) MyInLinks(breed string) *LinkAgentSet {
+	return t.linkedTurtles.getLinksIncoming(breed)
 }
 
-// @TODO implement
-func (t *Turtle) MyOutLinks(breed string) []*Link {
-	return nil
+// returns all outgoing links that are connected to the turtle
+func (t *Turtle) MyOutLinks(breed string) *LinkAgentSet {
+	return t.linkedTurtles.getLinksOutgoing(breed)
 }
