@@ -1,25 +1,7 @@
 package model
 
 func BaseColors() []Color {
-	return []Color{
-		Black,
-		White,
-		Grey,
-		Gray,
-		Red,
-		Orange,
-		Brown,
-		Yellow,
-		Green,
-		Lime,
-		Turquoise,
-		Cyan,
-		Sky,
-		Blue,
-		Violet,
-		Magenta,
-		Pink,
-	}
+	return baseColorsList
 }
 
 func ButFirst(arr []interface{}) []interface{} {

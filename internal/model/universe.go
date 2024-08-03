@@ -45,7 +45,7 @@ type Model struct {
 	GlobalFloats map[string]float64
 	GlobalBools  map[string]bool
 
-	Seed int64 //seed for the random number generator
+	randomGenerator *rand.Rand
 }
 
 func NewModel(
@@ -78,6 +78,7 @@ func NewModel(
 		wrappingX:          wrappingX,
 		wrappingY:          wrappingY,
 		whoToTurtles:       make(map[int]*Turtle),
+		randomGenerator:    rand.New(rand.NewSource(0)),
 	}
 
 	//construct turtle breeds
@@ -306,9 +307,41 @@ func (m *Model) ClearTurtles() {
 	m.turtlesWhoNumber = 0
 }
 
-// @TODO Implement
-func (m *Model) CreateOrderedTurtles(breed string, amount float64, operations []TurtleOperation) {
+//like create turtles but goes through the list of colors and evenly spaces out the headings
+func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []TurtleOperation) error {
+	if breed != "" {
+		_, found := m.Breeds[breed]
+		if !found {
+			return errors.New("breed not found")
+		}
+	}
 
+	end := amount + m.turtlesWhoNumber
+	count := 0
+	headingAmount := 2 * math.Pi / float64(amount)
+	turtles := []*Turtle{}
+	for m.turtlesWhoNumber < end {
+		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
+
+		// set heading to be random
+		newTurtle.setHeadingRadians(headingAmount * float64(count))
+
+		newTurtle.Color.SetColor(baseColorsList[count%len(baseColorsList)])
+
+		count++
+
+		turtles = append(turtles, newTurtle)
+
+		m.turtlesWhoNumber++
+	}
+
+	for _, turtle := range turtles {
+		for i := 0; i < len(operations); i++ {
+			operations[i](turtle)
+		}
+	}
+
+	return nil
 }
 
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
@@ -320,15 +353,27 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 		}
 	}
 
+	turtles := []*Turtle{}
+
 	end := amount + m.turtlesWhoNumber
 	for m.turtlesWhoNumber < end {
 		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
 
-		for i := 0; i < len(operations); i++ {
-			operations[i](newTurtle)
-		}
+		// set heading to be random
+		newTurtle.setHeadingRadians(m.randomGenerator.Float64() * 2 * math.Pi)
+
+		// get a random color from the base colors and set it
+		newTurtle.Color.SetColor(baseColorsList[rand.Intn(len(baseColorsList))])
+
+		turtles = append(turtles, newTurtle)
 
 		m.turtlesWhoNumber++
+	}
+
+	for _, turtle := range turtles {
+		for i := 0; i < len(operations); i++ {
+			operations[i](turtle)
+		}
 	}
 
 	return nil

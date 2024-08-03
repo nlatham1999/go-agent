@@ -19,6 +19,26 @@ var (
 	Violet    = Color{Red: 238, Green: 130, Blue: 238}
 	Magenta   = Color{Red: 255, Green: 0, Blue: 255}
 	Pink      = Color{Red: 255, Green: 192, Blue: 203}
+
+	baseColorsList = []Color{
+		Black,
+		White,
+		Grey,
+		Gray,
+		Red,
+		Orange,
+		Brown,
+		Yellow,
+		Green,
+		Lime,
+		Turquoise,
+		Cyan,
+		Sky,
+		Blue,
+		Violet,
+		Magenta,
+		Pink,
+	}
 )
 
 var (

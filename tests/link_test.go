@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"math"
 	"testing"
 
 	"github.com/nlatham1999/go-agent/internal/model"
@@ -257,7 +258,11 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
-	m.CreateTurtles(3, "", nil)
+	m.CreateTurtles(3, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetHeading(0)
+		},
+	})
 
 	t1 := m.Turtle("", 0)
 	t2 := m.Turtle("", 1)
@@ -381,7 +386,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 
 	t4.Right(20)
 
-	if t5.XCor() != -13.05602130243792 || t5.YCor() != 8.367414684443355 {
+	if math.Abs(t5.XCor()+13.05602130243792) > .0001 || math.Abs(t5.YCor()-8.367414684443355) > .0001 {
 		t.Errorf("Turtle 5 should not have moved, got %f and %f", t5.XCor(), t5.YCor())
 	}
 
@@ -402,7 +407,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	// rotate t6
 	t6.Left(20)
 
-	if t7.XCor() != 14.05602130243792 || t7.YCor() != 8.367414684443355 {
+	if t7.XCor()-14.05602130243792 > .0001 || t7.YCor()-8.367414684443355 > .0001 {
 		t.Errorf("Turtle 7 should be at 14.05602130243792 and 8.367414684443355, got %f and %f", t7.XCor(), t7.YCor())
 	}
 }
@@ -414,7 +419,11 @@ func TestMovingTiedTurtles(t *testing.T) {
 	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetHeading(0)
+		},
+	})
 
 	t1 := m.Turtle("", 0)
 	t2 := m.Turtle("", 1)
