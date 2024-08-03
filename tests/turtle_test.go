@@ -1321,3 +1321,99 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t4")
 	}
 }
+
+func TestTurtleUphill(t *testing.T) {
+
+	// create a model with patches own of chemical
+
+	patchesOwn := map[string]interface{}{
+		"chemical": 0.0,
+	}
+
+	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	// get the 9 patches around the turtle
+	p1 := m.Patch(0, 0)
+	p2 := m.Patch(0, 1)
+	p3 := m.Patch(0, -1)
+	p4 := m.Patch(1, 0)
+	p5 := m.Patch(1, 1)
+	p6 := m.Patch(1, -1)
+	p7 := m.Patch(-1, 0)
+	p8 := m.Patch(-1, 1)
+	p9 := m.Patch(-1, -1)
+
+	// set the chemical value of the patches
+	p1.SetOwn("chemical", 10.0)
+	p2.SetOwn("chemical", 1.0)
+	p3.SetOwn("chemical", 2.0)
+	p4.SetOwn("chemical", 3.0)
+	p5.SetOwn("chemical", 4.0)
+	p6.SetOwn("chemical", 0.0)
+	p7.SetOwn("chemical", 6.0)
+	p8.SetOwn("chemical", 7.0)
+	p9.SetOwn("chemical", 8.0)
+
+	turtle := m.Turtle("", 0)
+	turtle.Uphill("chemical")
+
+	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
+	if turtle.XCor() != 0 || turtle.YCor() != 0 {
+		t.Errorf("Expected turtle to stay in place")
+	}
+
+	p1.SetOwn("chemical", -5.0)
+	turtle.Uphill("chemical")
+
+	// make sure that the turtle's position has changed to the patch with the lowest chemical value
+	if turtle.XCor() != -1 || turtle.YCor() != -1 {
+		t.Errorf("Expected turtle to move to patch (-1, -1), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
+}
+
+func TestTurtleUphill4(t *testing.T) {
+
+	// create a model with patches own of chemical
+
+	patchesOwn := map[string]interface{}{
+		"chemical": 0.0,
+	}
+
+	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	// get the 5 patches around the turtle
+	p1 := m.Patch(0, 0)
+	p2 := m.Patch(0, 1)
+	p3 := m.Patch(0, -1)
+	p4 := m.Patch(1, 0)
+	p5 := m.Patch(-1, 0)
+
+	// set the chemical value of the patches
+	p1.SetOwn("chemical", 14.0)
+	p2.SetOwn("chemical", 11.0)
+	p3.SetOwn("chemical", 2.0)
+	p4.SetOwn("chemical", 3.0)
+	p5.SetOwn("chemical", 4.0)
+
+	turtle := m.Turtle("", 0)
+	turtle.Uphill4("chemical")
+
+	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
+	if turtle.XCor() != 0 || turtle.YCor() != 0 {
+		t.Errorf("Expected turtle to stay in place")
+	}
+
+	p1.SetOwn("chemical", 4.0)
+	turtle.Uphill4("chemical")
+
+	// make sure that the turtle's position has changed to the patch with the lowest chemical value
+	if turtle.XCor() != 0 || turtle.YCor() != 1 {
+		t.Errorf("Expected turtle to move to patch (0, 1), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
+}
