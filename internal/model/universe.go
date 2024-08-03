@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"math/rand"
+	"time"
 )
 
 type Model struct {
@@ -46,6 +47,8 @@ type Model struct {
 	GlobalBools  map[string]bool
 
 	randomGenerator *rand.Rand
+
+	modelStart time.Time
 }
 
 func NewModel(
@@ -79,6 +82,7 @@ func NewModel(
 		wrappingY:          wrappingY,
 		whoToTurtles:       make(map[int]*Turtle),
 		randomGenerator:    rand.New(rand.NewSource(0)),
+		modelStart:         time.Now(),
 	}
 
 	//construct turtle breeds
@@ -784,7 +788,6 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 	return m.getPatchAtPos(n)
 }
 
-// @TODO check to see if we are wrapping around
 func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	n := make(map[*Patch]interface{})
 
@@ -833,7 +836,6 @@ func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	}
 }
 
-// @TODO check to see if we are wrapping around
 func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
 	n := make(map[*Patch]interface{})
 
@@ -891,9 +893,8 @@ func (m *Model) ResetTicks() {
 	m.Ticks = 0
 }
 
-// @TODO implement
 func (m *Model) ResetTimer() {
-
+	m.modelStart = time.Now()
 }
 
 func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
@@ -933,6 +934,10 @@ func (m *Model) TickAdvance(amount int) {
 	if m.TicksOn {
 		m.Ticks += amount
 	}
+}
+
+func (m *Model) Timer() int64 {
+	return time.Since(m.modelStart).Milliseconds()
 }
 
 // provides a turtle from the model given a breed and who number
