@@ -22,7 +22,8 @@ func Filter(arr []interface{}, pred func(interface{}) bool) []interface{} {
 	return result
 }
 
-// @TODO implement
-func SubtractHeadings(h1 float64, h2 float64) float64 {
-	return 0.0
+func LinkShapes() []string {
+	return []string{
+		"line", "curve", "arrow", "arrow2", "arrow3", "arrow4", "arrow5", "arrow6", "arrow7", "arrow8", "arrow9", "arrow10",
+	}
 }

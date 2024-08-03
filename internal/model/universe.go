@@ -600,11 +600,6 @@ func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 	return t1.linkedTurtles.getLinkDirected(breed, t2)
 }
 
-// @TODO implement
-func (m *Model) LinkShapes() []string {
-	return []string{}
-}
-
 // does not implement wrappimg, that is the responsibilty of the caller
 func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	if x < m.MinPxCor || x > m.MaxPxCor || y < m.MinPyCor || y > m.MaxPyCor {
