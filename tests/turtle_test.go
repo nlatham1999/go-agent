@@ -1254,3 +1254,70 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l4 and l8")
 	}
 }
+
+func TestTurtleTurtlesHere(t *testing.T) {
+
+	turtleBreeds := []string{"ants"}
+
+	// create a basic model with an ants breed for turtles
+	m := model.NewModel(nil, nil, nil, turtleBreeds, nil, nil, false, false)
+
+	// create some turtles
+	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, "ants", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("ants", 2)
+	t4 := m.Turtle("ants", 3)
+
+	t1.SetXY(1, 1)
+	t2.SetXY(2, 2)
+	t3.SetXY(2, 2)
+	t4.SetXY(3, 3)
+
+	turtles := t1.TurtlesHere("")
+	if turtles.Count() != 1 {
+		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
+	}
+	if !turtles.Contains(t1) {
+		t.Errorf("Expected turtles to contain t1")
+	}
+
+	turtles = t1.TurtlesHere("ants")
+	if turtles.Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", turtles.Count())
+	}
+
+	turtles = t2.TurtlesHere("")
+	if turtles.Count() != 2 {
+		t.Errorf("Expected 2 turtles, got %d", turtles.Count())
+	}
+	if !turtles.Contains(t2) || !turtles.Contains(t3) {
+		t.Errorf("Expected turtles to contain t2 and t3")
+	}
+
+	turtles = t2.TurtlesHere("ants")
+	if turtles.Count() != 1 {
+		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
+	}
+	if !turtles.Contains(t3) {
+		t.Errorf("Expected turtles to contain t3")
+	}
+
+	turtles = t3.TurtlesHere("ants")
+	if turtles.Count() != 1 {
+		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
+	}
+	if !turtles.Contains(t3) {
+		t.Errorf("Expected turtles to contain t3")
+	}
+
+	turtles = t4.TurtlesHere("")
+	if turtles.Count() != 1 {
+		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
+	}
+	if !turtles.Contains(t4) {
+		t.Errorf("Expected turtles to contain t4")
+	}
+}

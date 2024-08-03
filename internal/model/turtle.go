@@ -775,9 +775,9 @@ func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 	return math.Atan2(y-t.ycor, x-t.xcor)
 }
 
-// @TODO implement
+// returns the turtles that are on the patch
 func (t *Turtle) TurtlesHere(breed string) *TurtleAgentSet {
-	return nil
+	return t.PatchHere().TurtlesHere(breed)
 }
 
 // @TODO implement
