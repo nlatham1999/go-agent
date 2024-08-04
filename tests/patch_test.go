@@ -440,3 +440,20 @@ func TestPatchSprout(t *testing.T) {
 		t.Errorf("Expected pink turtle")
 	}
 }
+
+func TestPatchTowardsXY(t *testing.T) {
+
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	// get a patch
+	patch := m.Patch(0, 0)
+
+	// get the heading towards the xy coordinates
+	heading := patch.TowardsXY(1, -1)
+
+	// make sure the heading is correct
+	if heading != 315 {
+		t.Errorf("Expected 315, got %v", heading)
+	}
+}

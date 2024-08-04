@@ -1,6 +1,8 @@
 package model
 
-import "math"
+import (
+	"math"
+)
 
 type Turtle struct {
 	xcor float64
@@ -360,7 +362,7 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 	dy := y - t.ycor
 
 	if !t.parent.wrappingX && !t.parent.wrappingY {
-		t.setHeadingRadians(math.Atan2(dx, dy))
+		t.setHeadingRadians(math.Atan2(dy, dx))
 		return
 	}
 
@@ -406,7 +408,7 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 		}
 	}
 
-	a := math.Atan2(newDx, newDy)
+	a := math.Atan2(newDy, newDx)
 	t.setHeadingRadians(a)
 }
 
@@ -474,7 +476,7 @@ func (t *Turtle) Hatch(breed string, amount int, operations []TurtleOperation) {
 
 func (t *Turtle) GetHeading() float64 {
 	// return heading in degrees
-	return t.heading * (180 / math.Pi)
+	return radiansToDegrees(t.heading)
 }
 
 // takes in a heading in degrees and sets the heading in radians
@@ -762,17 +764,17 @@ func (t *Turtle) Show() {
 
 func (t *Turtle) TowardsPatch(patch *Patch) float64 {
 	//returns heading that faces the patch
-	return math.Atan2(patch.yFloat64-t.ycor, patch.xFloat64-t.xcor)
+	return t.TowardsXY(patch.xFloat64, patch.yFloat64)
 }
 
 func (t *Turtle) TowardsTurtle(turtle *Turtle) float64 {
 	//returns heading that faces the turtle
-	return math.Atan2(turtle.ycor-t.ycor, turtle.xcor-t.xcor)
+	return t.TowardsXY(turtle.xcor, turtle.ycor)
 }
 
 func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 	//returns heading that faces the x y coordinates
-	return math.Atan2(y-t.ycor, x-t.xcor)
+	return radiansToDegrees(math.Atan2(y-t.ycor, x-t.xcor))
 }
 
 // returns the turtles that are on the patch

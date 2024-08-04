@@ -678,8 +678,8 @@ func TestTurtleFaceTurtle(t *testing.T) {
 	t1.FaceTurtle(t2)
 
 	// make sure that t1 is facing t2
-	if t1.GetHeading() != 135 {
-		t.Errorf("Expected turtle to face 45 degrees, got %v", t1.GetHeading())
+	if t1.GetHeading() != 315 {
+		t.Errorf("Expected turtle to face 315 degrees, got %v", t1.GetHeading())
 	}
 
 	m.WrappingXOn()
@@ -688,7 +688,7 @@ func TestTurtleFaceTurtle(t *testing.T) {
 	t1.FaceTurtle(t2)
 
 	// expect the turtle to face -45 degrees because of wrapping
-	if t1.GetHeading() != -45 {
+	if t1.GetHeading() != 315 {
 		t.Errorf("Expected turtle to face -45 degrees, got %v", t1.GetHeading())
 	}
 
@@ -709,8 +709,35 @@ func TestTurtleFaceTurtle(t *testing.T) {
 
 	t1.FaceTurtle(t2)
 
-	if t1.GetHeading()+16.69924423399362 > .000001 {
+	if t1.GetHeading()-343.3007557660064 > .000001 {
 		t.Errorf("Expected turtle to face -16.69924423399362 degrees, got %v", t1.GetHeading())
+	}
+
+}
+
+func TestFaceXY(t *testing.T) {
+
+	// create a basic model with no wrapping
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetXY(0, 5)
+			t.SetHeading(270)
+		},
+	})
+
+	if m.Turtle("", 0).GetHeading() != 270 {
+		t.Errorf("Expected turtle to face 270 degrees, got %v", m.Turtle("", 0).GetHeading())
+	}
+
+	// face the turtle towards the point (5, 0)
+	m.Turtle("", 0).FaceXY(5, 0)
+
+	// make sure the turtle is facing 0 degrees
+	if m.Turtle("", 0).GetHeading() != 315 {
+		t.Errorf("Expected turtle to face 315 degrees, got %v", m.Turtle("", 0).GetHeading())
 	}
 
 }
@@ -1415,5 +1442,23 @@ func TestTurtleUphill4(t *testing.T) {
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value
 	if turtle.XCor() != 0 || turtle.YCor() != 1 {
 		t.Errorf("Expected turtle to move to patch (0, 1), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
+}
+
+func TestTurtleTowardsXY(t *testing.T) {
+	// create a basic model
+	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	turtle := m.Turtle("", 0)
+
+	turtle.SetXY(0, 0)
+
+	h := turtle.TowardsXY(1, -1)
+
+	if h != 315 {
+		t.Errorf("Expected heading to be 315 degrees, got %v", h)
 	}
 }

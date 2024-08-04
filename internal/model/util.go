@@ -1,5 +1,7 @@
 package model
 
+import "math"
+
 func BaseColors() []Color {
 	return baseColorsList
 }
@@ -26,4 +28,12 @@ func LinkShapes() []string {
 	return []string{
 		"line", "curve", "arrow", "arrow2", "arrow3", "arrow4", "arrow5", "arrow6", "arrow7", "arrow8", "arrow9", "arrow10",
 	}
+}
+
+func radiansToDegrees(radians float64) float64 {
+	degrees := radians * (180 / math.Pi)
+	if degrees < 0 {
+		degrees += 360
+	}
+	return degrees
 }

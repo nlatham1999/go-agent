@@ -67,6 +67,7 @@ func NewModel(
 	minPyCor := -15
 
 	model := &Model{
+		TicksOn:            true,
 		MaxPxCor:           maxPxCor,
 		MaxPyCor:           maxPyCor,
 		MinPxCor:           minPxCor,
@@ -887,6 +888,30 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 	}
 
 	return m.getPatchAtCoords(x, y)
+}
+
+// If number is positive, reports a random floating point number greater than or equal to 0 but strictly less than number.
+// If number is negative, reports a random floating point number less than or equal to 0, but strictly greater than number.
+// If number is zero, the result is always 0.
+func (m *Model) RandomFloat(number float64) float64 {
+	return m.randomGenerator.Float64() * number
+}
+
+// If number is positive, reports a random integer greater than or equal to 0, but strictly less than number.
+// If number is negative, reports a random integer less than or equal to 0, but strictly greater than number.
+// If number is zero, the result is always 0 as well.
+func (m *Model) RandomInt(number int) int {
+	if number == 0 {
+		return 0
+	}
+
+	sign := 1
+	if number < 0 {
+		sign = -1
+		number = number * -1
+	}
+
+	return m.randomGenerator.Intn(number) * sign
 }
 
 func (m *Model) ResetTicks() {

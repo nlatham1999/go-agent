@@ -215,18 +215,12 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 
 func (p *Patch) TowardsPatch(patch *Patch) float64 {
 	//returns heading that points towards the patch
-	deltaX := patch.xFloat64 - p.xFloat64
-	deltaY := patch.yFloat64 - p.yFloat64
-
-	return math.Atan2(deltaY, deltaX)
+	return p.TowardsXY(patch.xFloat64, patch.yFloat64)
 }
 
 func (p *Patch) TowardsTurtle(t *Turtle) float64 {
 	//returns heading that points towards the turtle
-	deltaX := t.xcor - p.xFloat64
-	deltaY := t.ycor - p.yFloat64
-
-	return math.Atan2(deltaY, deltaX)
+	return p.TowardsXY(t.xcor, t.ycor)
 }
 
 func (p *Patch) TowardsXY(x float64, y float64) float64 {
@@ -234,7 +228,7 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	deltaX := x - p.xFloat64
 	deltaY := y - p.yFloat64
 
-	return math.Atan2(deltaY, deltaX)
+	return radiansToDegrees(math.Atan2(deltaY, deltaX))
 }
 
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
