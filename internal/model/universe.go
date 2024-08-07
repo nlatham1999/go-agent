@@ -16,8 +16,8 @@ type Model struct {
 	patchesOwnTemplate    map[string]interface{}            //additional variables for each patch
 
 	Patches              *PatchAgentSet
-	Turtles              *TurtleAgentSet         //all the turtles
-	Breeds               map[string]*TurtleBreed //turtles that are part of specific breeds
+	turtles              *TurtleAgentSet         //all the turtles
+	breeds               map[string]*TurtleBreed //turtles that are part of specific breeds
 	Links                *LinkAgentSet           //all the links
 	DirectedLinkBreeds   map[string]*LinkBreed
 	UndirectedLinkBreeds map[string]*LinkBreed
@@ -107,7 +107,7 @@ func NewModel(
 			turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
 		}
 	}
-	model.Breeds = turtleBreedsMap
+	model.breeds = turtleBreedsMap
 
 	//construct directed link breeds
 	directedLinkBreedsMap := make(map[string]*LinkBreed)
@@ -140,23 +140,23 @@ func NewModel(
 	model.UndirectedLinkBreeds = undirectedLinkBreedsMap
 
 	//construct general turtle set
-	model.Turtles = &TurtleAgentSet{
+	model.turtles = &TurtleAgentSet{
 		turtles: make(map[*Turtle]interface{}),
 	}
 
 	// create a breed with no name for the general population
-	model.Breeds[""] = &TurtleBreed{
-		Turtles:            model.Turtles,
+	model.breeds[""] = &TurtleBreed{
+		Turtles:            model.turtles,
 		name:               "",
 		defaultShape:       "",
 		turtlesOwnTemplate: make(map[string]interface{}),
 	}
 	if turtlesOwn != nil {
 		for key, value := range turtlesOwn {
-			model.Breeds[""].turtlesOwnTemplate[key] = value
+			model.breeds[""].turtlesOwnTemplate[key] = value
 		}
 	} else {
-		model.Breeds[""].turtlesOwnTemplate = make(map[string]interface{})
+		model.breeds[""].turtlesOwnTemplate = make(map[string]interface{})
 	}
 
 	//construct general link set
@@ -266,7 +266,7 @@ func (m *Model) ClearLinks() {
 			links: make(map[*Link]interface{}),
 		}
 	}
-	for turtle := range m.Turtles.turtles {
+	for turtle := range m.turtles.turtles {
 		turtle.linkedTurtles = newTurtleLinks()
 	}
 }
@@ -298,13 +298,13 @@ func (m *Model) ClearTurtles() {
 	}
 
 	// clear all turtles
-	for turtle := range m.Turtles.turtles {
+	for turtle := range m.turtles.turtles {
 		*turtle = Turtle{}
 	}
 
-	m.Turtles.turtles = make(map[*Turtle]interface{})
-	for breed := range m.Breeds {
-		m.Breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
+	m.turtles.turtles = make(map[*Turtle]interface{})
+	for breed := range m.breeds {
+		m.breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
 	}
 
 	m.whoToTurtles = make(map[int]*Turtle)
@@ -315,7 +315,7 @@ func (m *Model) ClearTurtles() {
 //like create turtles but goes through the list of colors and evenly spaces out the headings
 func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []TurtleOperation) error {
 	if breed != "" {
-		_, found := m.Breeds[breed]
+		_, found := m.breeds[breed]
 		if !found {
 			return errors.New("breed not found")
 		}
@@ -352,7 +352,7 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
 	if breed != "" {
-		_, found := m.Breeds[breed]
+		_, found := m.breeds[breed]
 		if !found {
 			return errors.New("breed not found")
 		}
@@ -428,9 +428,9 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 // kills a turtle
 func (m *Model) KillTurtle(turtle *Turtle) {
 
-	delete(m.Turtles.turtles, turtle)
+	delete(m.turtles.turtles, turtle)
 	if turtle.breed != "" {
-		delete(m.Breeds[turtle.breed].Turtles.turtles, turtle)
+		delete(m.breeds[turtle.breed].Turtles.turtles, turtle)
 	}
 	delete(m.whoToTurtles, turtle.who)
 
@@ -946,7 +946,7 @@ func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
 }
 
 func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {
-	m.Breeds[breed].defaultShape = shape
+	m.breeds[breed].defaultShape = shape
 }
 
 func (m *Model) Tick() {
@@ -977,7 +977,7 @@ func (m *Model) Turtle(breed string, who int) *Turtle {
 	if breed == "" {
 		return t
 	} else {
-		if m.Breeds[breed] == nil {
+		if m.breeds[breed] == nil {
 			return nil //breed not found
 		}
 		if t.breed != breed {
@@ -985,6 +985,13 @@ func (m *Model) Turtle(breed string, who int) *Turtle {
 		}
 		return t
 	}
+}
+
+func (m *Model) Turtles(breed string) *TurtleAgentSet {
+	if breed == "" {
+		return m.turtles
+	}
+	return m.breeds[breed].Turtles
 }
 
 // @TODO implement

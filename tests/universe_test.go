@@ -15,17 +15,17 @@ func TestCreateTurtles(t *testing.T) {
 
 	// creating turtles without a breed should add them to the default breed
 	environment.CreateTurtles(5, "", nil)
-	if environment.Turtles.Count() != 5 {
-		t.Errorf("Expected 5 turtles, got %d", environment.Turtles.Count())
+	if environment.Turtles("").Count() != 5 {
+		t.Errorf("Expected 5 turtles, got %d", environment.Turtles("").Count())
 	}
 
 	// creating turtles with a breed should add them to that breed and the default breed
 	environment.CreateTurtles(5, "ants", nil)
-	if environment.Turtles.Count() != 10 {
-		t.Errorf("Expected 10 turtles, got %d", environment.Turtles.Count())
+	if environment.Turtles("").Count() != 10 {
+		t.Errorf("Expected 10 turtles, got %d", environment.Turtles("").Count())
 	}
-	if environment.Breeds["ants"].Turtles.Count() != 5 {
-		t.Errorf("Expected 5 ants, got %d", environment.Breeds["ants"].Turtles.Count())
+	if environment.Turtles("ants").Count() != 5 {
+		t.Errorf("Expected 5 ants, got %d", environment.Turtles("ants").Count())
 	}
 
 	// creating a turtle with a nonexistent breed should return an error
@@ -103,8 +103,8 @@ func TestClearTurtles(t *testing.T) {
 
 	// clear general turtles
 	m.ClearTurtles()
-	if m.Turtles.Count() != 0 {
-		t.Errorf("Expected 0 turtles, got %d", m.Turtles.Count())
+	if m.Turtles("").Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", m.Turtles("").Count())
 	}
 
 	if ref.XCor() != 0 {
@@ -173,8 +173,8 @@ func TestKillTurtle(t *testing.T) {
 
 	// kill general turtle
 	m.KillTurtle(m.Turtle("", 0))
-	if m.Turtles.Count() != 9 {
-		t.Errorf("Expected 9 turtles, got %d", m.Turtles.Count())
+	if m.Turtles("").Count() != 9 {
+		t.Errorf("Expected 9 turtles, got %d", m.Turtles("").Count())
 	}
 
 	if ref.XCor() != 0 {

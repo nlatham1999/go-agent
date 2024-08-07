@@ -48,7 +48,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	var breedSet *TurtleBreed = nil
 	if breed != "" {
 		found := false
-		if breedSet, found = m.Breeds[breed]; !found {
+		if breedSet, found = m.breeds[breed]; !found {
 			return nil
 		}
 	}
@@ -62,7 +62,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		linkedTurtles: newTurtleLinks(),
 	}
 
-	m.Turtles.turtles[t] = nil
+	m.turtles.turtles[t] = nil
 	m.whoToTurtles[m.turtlesWhoNumber] = t
 
 	if breedSet != nil {
@@ -77,7 +77,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	//breed specific variables can override general variables
 	t.turtlesOwnGeneral = make(map[string]interface{})
 	t.turtlesOwnBreed = make(map[string]interface{})
-	generalTemplate := m.Breeds[""].turtlesOwnTemplate
+	generalTemplate := m.breeds[""].turtlesOwnTemplate
 	for key, value := range generalTemplate {
 		t.turtlesOwnGeneral[key] = value
 	}
@@ -106,7 +106,7 @@ func (t *Turtle) BreedName() string {
 }
 
 func (t *Turtle) Breed() *TurtleBreed {
-	return t.parent.Breeds[t.breed]
+	return t.parent.breeds[t.breed]
 }
 
 // Sets the breed of the turtle to the name passed in
@@ -117,19 +117,19 @@ func (t *Turtle) SetBreed(name string) {
 	}
 
 	if t.breed != "" {
-		delete(t.parent.Breeds[t.breed].Turtles.turtles, t)
+		delete(t.parent.breeds[t.breed].Turtles.turtles, t)
 	}
 
 	t.breed = name
 
 	if name != "" {
-		t.parent.Breeds[name].Turtles.turtles[t] = nil
+		t.parent.breeds[name].Turtles.turtles[t] = nil
 	}
 
 	// switch the turtles own variables to the new breed
 	t.turtlesOwnBreed = make(map[string]interface{})
 	if name != "" {
-		breedTemplate := t.parent.Breeds[name].turtlesOwnTemplate
+		breedTemplate := t.parent.breeds[name].turtlesOwnTemplate
 		for key, value := range breedTemplate {
 			t.turtlesOwnBreed[key] = value
 		}

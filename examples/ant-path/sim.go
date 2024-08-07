@@ -48,7 +48,7 @@ func SetUp() {
 		},
 	})
 
-	m.Turtles.MaxOneOf(func(t *model.Turtle) float64 {
+	m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
 		return float64(t.Who())
 	}).Ask(
 		[]model.TurtleOperation{
@@ -58,7 +58,7 @@ func SetUp() {
 		},
 	)
 
-	m.Turtles.Ask([]model.TurtleOperation{
+	m.Turtles("").Ask([]model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.SetXY(nestX, nestY)
 		},
@@ -69,7 +69,7 @@ func SetUp() {
 
 func Go() {
 	for {
-		if m.Turtles.All(func(t *model.Turtle) bool {
+		if m.Turtles("").All(func(t *model.Turtle) bool {
 			return t.XCor() >= foodX
 		}) {
 			fmt.Println("All ants have reached the food")
@@ -79,7 +79,7 @@ func Go() {
 			return
 		}
 
-		m.Breeds["leader"].Turtles.Ask([]model.TurtleOperation{
+		m.Turtles("leader").Ask([]model.TurtleOperation{
 			func(t *model.Turtle) {
 				wiggle(t, 45)
 				correctPath(t)
@@ -92,7 +92,7 @@ func Go() {
 			},
 		})
 
-		m.Breeds["follower"].Turtles.Ask([]model.TurtleOperation{
+		m.Turtles("follower").Ask([]model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.FaceTurtle(m.Turtle("", t.Who()-1))
 				if timeToStart(t) && t.XCor() < foodX {
