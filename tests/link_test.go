@@ -10,7 +10,11 @@ import (
 func TestLinkCreation(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -57,7 +61,11 @@ func TestLinkCreation(t *testing.T) {
 func TestLinkBreedName(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -79,7 +87,11 @@ func TestLinkBreedName(t *testing.T) {
 func TestLinkBreed(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -101,7 +113,11 @@ func TestLinkBreed(t *testing.T) {
 func TestLinkSetBreed(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -144,7 +160,11 @@ func TestLinkSetBreed(t *testing.T) {
 func TestLinkBothEnds(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -174,7 +194,11 @@ func TestLinkBothEnds(t *testing.T) {
 func TestLinkHeading(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -229,7 +253,11 @@ func TestLinkHeading(t *testing.T) {
 func TestLinkOtherEnd(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -255,7 +283,11 @@ func TestLinkOtherEnd(t *testing.T) {
 func TestRotatingTiedTurtles(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(3, "", []model.TurtleOperation{
@@ -416,7 +448,11 @@ func TestRotatingTiedTurtles(t *testing.T) {
 func TestMovingTiedTurtles(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", []model.TurtleOperation{
@@ -480,7 +516,11 @@ func TestMovingTiedTurtles(t *testing.T) {
 func TestLinkCreationNoDuplicates(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children", "person-pet"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)

@@ -52,15 +52,9 @@ type Model struct {
 }
 
 func NewModel(
-	patchesOwn map[string]interface{},
-	turtlesOwn map[string]interface{},
-	turtleBreedsOwn map[string]map[string]interface{},
-	turtleBreeds []string,
-	directedLinkBreeds []string,
-	undirectedLinkBreeds []string,
-	wrappingX bool,
-	wrappingY bool,
+	settings ModelSettings,
 ) *Model {
+
 	maxPxCor := 15
 	maxPyCor := 15
 	minPxCor := -15
@@ -78,9 +72,9 @@ func NewModel(
 		MinYCor:            float64(minPyCor) - .5,
 		WorldWidth:         maxPxCor - minPxCor + 1,
 		WorldHeight:        maxPyCor - minPyCor + 1,
-		patchesOwnTemplate: patchesOwn,
-		wrappingX:          wrappingX,
-		wrappingY:          wrappingY,
+		patchesOwnTemplate: settings.PatchesOwn,
+		wrappingX:          settings.WrappingX,
+		wrappingY:          settings.WrappingY,
 		whoToTurtles:       make(map[int]*Turtle),
 		randomGenerator:    rand.New(rand.NewSource(0)),
 		modelStart:         time.Now(),
@@ -88,53 +82,53 @@ func NewModel(
 
 	//construct turtle breeds
 	turtleBreedsMap := make(map[string]*TurtleBreed)
-	for i := 0; i < len(turtleBreeds); i++ {
-		turtleBreedsMap[turtleBreeds[i]] = &TurtleBreed{
+	for i := 0; i < len(settings.TurtleBreeds); i++ {
+		turtleBreedsMap[settings.TurtleBreeds[i]] = &TurtleBreed{
 			Turtles: &TurtleAgentSet{
 				turtles: make(map[*Turtle]interface{}),
 			},
-			name:         turtleBreeds[i],
+			name:         settings.TurtleBreeds[i],
 			defaultShape: "",
 		}
 
 		//copy the turtles breeds own template
-		if turtleBreedsOwn != nil && turtleBreedsOwn[turtleBreeds[i]] != nil {
-			turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
-			for key, value := range turtleBreedsOwn[turtleBreeds[i]] {
-				turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate[key] = value
+		if settings.TurtleBreedsOwn != nil && settings.TurtleBreedsOwn[settings.TurtleBreeds[i]] != nil {
+			turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
+			for key, value := range settings.TurtleBreedsOwn[settings.TurtleBreeds[i]] {
+				turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate[key] = value
 			}
 		} else {
-			turtleBreedsMap[turtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
+			turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
 		}
 	}
 	model.breeds = turtleBreedsMap
 
 	//construct directed link breeds
 	directedLinkBreedsMap := make(map[string]*LinkBreed)
-	directedLinkBreeds = append(directedLinkBreeds, "") // add the general population
-	for i := 0; i < len(directedLinkBreeds); i++ {
-		directedLinkBreedsMap[directedLinkBreeds[i]] = &LinkBreed{
+	settings.DirectedLinkBreeds = append(settings.DirectedLinkBreeds, "") // add the general population
+	for i := 0; i < len(settings.DirectedLinkBreeds); i++ {
+		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &LinkBreed{
 			Links: &LinkAgentSet{
 				links: make(map[*Link]interface{}),
 			},
 			Directed:     true,
 			DefaultShape: "",
-			name:         directedLinkBreeds[i],
+			name:         settings.DirectedLinkBreeds[i],
 		}
 	}
 	model.DirectedLinkBreeds = directedLinkBreedsMap
 
 	//construct undirected link breeds
 	undirectedLinkBreedsMap := make(map[string]*LinkBreed)
-	undirectedLinkBreeds = append(undirectedLinkBreeds, "") // add the general population
-	for i := 0; i < len(undirectedLinkBreeds); i++ {
-		undirectedLinkBreedsMap[undirectedLinkBreeds[i]] = &LinkBreed{
+	settings.UndirectedLinkBreeds = append(settings.UndirectedLinkBreeds, "") // add the general population
+	for i := 0; i < len(settings.UndirectedLinkBreeds); i++ {
+		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &LinkBreed{
 			Links: &LinkAgentSet{
 				links: make(map[*Link]interface{}),
 			},
 			Directed:     false,
 			DefaultShape: "",
-			name:         undirectedLinkBreeds[i],
+			name:         settings.UndirectedLinkBreeds[i],
 		}
 	}
 	model.UndirectedLinkBreeds = undirectedLinkBreedsMap
@@ -151,8 +145,8 @@ func NewModel(
 		defaultShape:       "",
 		turtlesOwnTemplate: make(map[string]interface{}),
 	}
-	if turtlesOwn != nil {
-		for key, value := range turtlesOwn {
+	if settings.TurtlesOwn != nil {
+		for key, value := range settings.TurtlesOwn {
 			model.breeds[""].turtlesOwnTemplate[key] = value
 		}
 	} else {

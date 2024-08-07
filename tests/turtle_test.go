@@ -9,7 +9,8 @@ import (
 func TestTurtleBack(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//create a turtle
 	turtle := model.NewTurtle(m, 0, "", 0, 0)
@@ -36,7 +37,10 @@ func TestTurtleBack(t *testing.T) {
 func TestTurtleBreedName(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, []string{"ants"}, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: []string{"ants"},
+	}
+	m := model.NewModel(settings)
 
 	//create a turtle
 	m.CreateTurtles(1, "ants", nil)
@@ -51,7 +55,10 @@ func TestTurtleBreedName(t *testing.T) {
 func TestTurtleBreed(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, []string{"ants"}, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: []string{"ants"},
+	}
+	m := model.NewModel(settings)
 
 	//create a turtle
 	m.CreateTurtles(1, "ants", nil)
@@ -70,7 +77,10 @@ func TestTurtleBreed(t *testing.T) {
 func TestTurtleSetBreed(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, []string{"ants", "beetles"}, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: []string{"ants", "beetles"},
+	}
+	m := model.NewModel(settings)
 
 	//create a turtle
 	m.CreateTurtles(5, "ants", nil)
@@ -119,7 +129,8 @@ func TestTurtleSetBreed(t *testing.T) {
 func TestTurtlesOwn(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -147,7 +158,12 @@ func TestTurtlesOwn(t *testing.T) {
 		"ants": antsOwn,
 	}
 
-	m2 := model.NewModel(nil, turtlesOwn, breedsOwn, []string{"ants"}, nil, nil, false, false)
+	settings = model.ModelSettings{
+		TurtlesOwn:      turtlesOwn,
+		TurtleBreedsOwn: breedsOwn,
+		TurtleBreeds:    []string{"ants"},
+	}
+	m2 := model.NewModel(settings)
 
 	// create a turtle
 	m2.CreateTurtles(1, "ants", nil)
@@ -175,7 +191,12 @@ func TestTurtlesOwn(t *testing.T) {
 
 	breedsOwn["beetles"] = beetlesOwn
 
-	m3 := model.NewModel(nil, turtlesOwn, breedsOwn, []string{"ants", "beetles"}, nil, nil, false, false)
+	settings = model.ModelSettings{
+		TurtlesOwn:      turtlesOwn,
+		TurtleBreedsOwn: breedsOwn,
+		TurtleBreeds:    []string{"ants", "beetles"},
+	}
+	m3 := model.NewModel(settings)
 
 	// create a turtle
 	m3.CreateTurtles(1, "beetles", nil)
@@ -206,7 +227,11 @@ func TestTurtlesOwn(t *testing.T) {
 func TestTurtleCreateLinkToTurtle(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -228,7 +253,11 @@ func TestTurtleCreateLinkToTurtle(t *testing.T) {
 func TestTurtleCreateLinkToSet(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(3, "", nil)
@@ -266,7 +295,11 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -302,7 +335,11 @@ func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 func TestTurtleCreateLinkWithSet(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(3, "", nil)
@@ -354,7 +391,11 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -382,7 +423,11 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 func TestTurtleCreateLinkFromSet(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(3, "", nil)
@@ -435,7 +480,8 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 func TestTurtleDistanceTurtle(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	// create two turtles
 	m.CreateTurtles(2, "", nil)
@@ -459,7 +505,7 @@ func TestTurtleDistanceTurtle(t *testing.T) {
 func TestTurtleDistancePatch(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -481,7 +527,7 @@ func TestTurtleDistancePatch(t *testing.T) {
 func TestTurtleDistanceXY(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -503,7 +549,11 @@ func TestTurtleDistanceXY(t *testing.T) {
 func TestTurtleOtherEnd(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -537,7 +587,11 @@ func TestTurtleOtherEnd(t *testing.T) {
 func TestTurtleSetXY(t *testing.T) {
 
 	// create a model with wrapping
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings := model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -572,7 +626,10 @@ func TestTurtleDownhill(t *testing.T) {
 		"chemical": 0.0,
 	}
 
-	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -624,7 +681,10 @@ func TestTurtleDownhill4(t *testing.T) {
 		"chemical": 0.0,
 	}
 
-	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -664,7 +724,8 @@ func TestTurtleFaceTurtle(t *testing.T) {
 
 	// create a basic model with no wrapping
 
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	// create two turtles
 	m.CreateTurtles(2, "", nil)
@@ -718,7 +779,7 @@ func TestTurtleFaceTurtle(t *testing.T) {
 func TestFaceXY(t *testing.T) {
 
 	// create a basic model with no wrapping
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
 	m.CreateTurtles(1, "", []model.TurtleOperation{
@@ -745,7 +806,11 @@ func TestFaceXY(t *testing.T) {
 func TestTurtleInLinkNeighbor(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(8, "", nil)
@@ -827,7 +892,11 @@ func TestTurtleInLinkNeighbor(t *testing.T) {
 func TestTurtleInLinkNeighbors(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -886,7 +955,11 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 func TestTurtleLinkNeighbor(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -963,7 +1036,11 @@ func TestTurtleLinkNeighbor(t *testing.T) {
 func TestTurtleLinkNeighbors(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -1024,7 +1101,11 @@ func TestTurtleLinkNeighbors(t *testing.T) {
 func TestTurtleOutLinkNeighbor(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -1106,7 +1187,11 @@ func TestTurtleOutLinkNeighbor(t *testing.T) {
 func TestTurtleOutLinkNeighbors(t *testing.T) {
 
 	// create a new model
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -1161,7 +1246,11 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 func TestTurtleMyLinks(t *testing.T) {
 
 	// create a basic model with breeds for undirected and directed links
-	m := model.NewModel(nil, nil, nil, nil, []string{"parent-children"}, []string{"coworkers"}, false, false)
+	settings := model.ModelSettings{
+		DirectedLinkBreeds:   []string{"parent-children"},
+		UndirectedLinkBreeds: []string{"coworkers"},
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(9, "", nil)
@@ -1287,7 +1376,10 @@ func TestTurtleTurtlesHere(t *testing.T) {
 	turtleBreeds := []string{"ants"}
 
 	// create a basic model with an ants breed for turtles
-	m := model.NewModel(nil, nil, nil, turtleBreeds, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: turtleBreeds,
+	}
+	m := model.NewModel(settings)
 
 	// create some turtles
 	m.CreateTurtles(2, "", nil)
@@ -1357,7 +1449,10 @@ func TestTurtleUphill(t *testing.T) {
 		"chemical": 0.0,
 	}
 
-	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -1409,7 +1504,10 @@ func TestTurtleUphill4(t *testing.T) {
 		"chemical": 0.0,
 	}
 
-	m := model.NewModel(patchesOwn, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)
@@ -1447,7 +1545,8 @@ func TestTurtleUphill4(t *testing.T) {
 
 func TestTurtleTowardsXY(t *testing.T) {
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	// create a turtle
 	m.CreateTurtles(1, "", nil)

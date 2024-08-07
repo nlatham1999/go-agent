@@ -9,7 +9,8 @@ import (
 func TestAllPatch(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	patch1 := m.Patch(0, 0)
 	patch2 := m.Patch(0, 1)
@@ -41,7 +42,8 @@ func TestAllPatch(t *testing.T) {
 func TestAnyPatch(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	patch1 := m.Patch(0, 0)
 	patch2 := m.Patch(0, 1)
@@ -69,7 +71,8 @@ func TestAnyPatch(t *testing.T) {
 
 func TestAtPointsPatch(t *testing.T) {
 	//create basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get some random patches from the model
 	patch1 := m.Patch(0, 0)
@@ -88,7 +91,8 @@ func TestAtPointsPatch(t *testing.T) {
 
 func TestPatchesInRadiusPatch(t *testing.T) {
 	//create basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get some random patches from the model
 	patch1 := m.Patch(-15, -15)
@@ -111,7 +115,11 @@ func TestPatchesInRadiusPatch(t *testing.T) {
 	}
 
 	// create a model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	// get some random patches from the model
 	patch1 = m.Patch(-15, -15)
@@ -136,7 +144,8 @@ func TestPatchesInRadiusPatch(t *testing.T) {
 
 func TestPatchesInRadiusTurtle(t *testing.T) {
 	//create basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get some random patches from the model
 	patch1 := m.Patch(-15, -15)
@@ -167,7 +176,11 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 	}
 
 	// create a model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	// get some random patches from the model
 	patch1 = m.Patch(-15, -15)
@@ -201,7 +214,8 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 func TestPatchesWhoAreNotInPatches(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	patch1 := m.Patch(0, 0)
 	patch2 := m.Patch(0, 1)
@@ -225,7 +239,8 @@ func TestPatchesWhoAreNotInPatches(t *testing.T) {
 func TestPatchesWhoAreNotPatch(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	patch1 := m.Patch(0, 0)
 	patch2 := m.Patch(0, 1)
@@ -243,7 +258,8 @@ func TestPatchesWhoAreNotPatch(t *testing.T) {
 func TestPatchesMaxNOf(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	patch1 := m.Patch(0, 0)
 	patch2 := m.Patch(0, 1)

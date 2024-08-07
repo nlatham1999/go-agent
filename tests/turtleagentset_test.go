@@ -9,7 +9,7 @@ import (
 func TestAllTurtle(t *testing.T) {
 
 	//create a basic model
-	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	u := model.NewModel(model.ModelSettings{})
 
 	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
@@ -40,7 +40,7 @@ func TestAllTurtle(t *testing.T) {
 func TestAnyTurtle(t *testing.T) {
 
 	//create a basic model
-	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	u := model.NewModel(model.ModelSettings{})
 
 	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
@@ -69,7 +69,7 @@ func TestAnyTurtle(t *testing.T) {
 func TestAtPointsTurtle(t *testing.T) {
 
 	//create basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	m := model.NewModel(model.ModelSettings{})
 
 	//create some random turtles from the model
 	m.CreateTurtles(5, "", nil)
@@ -102,7 +102,7 @@ func TestAtPointsTurtle(t *testing.T) {
 func TestTurtlesWhoAreNotInTurtles(t *testing.T) {
 
 	//create a basic model
-	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	u := model.NewModel(model.ModelSettings{})
 
 	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
@@ -126,7 +126,7 @@ func TestTurtlesWhoAreNotInTurtles(t *testing.T) {
 func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 
 	//create a basic model
-	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	u := model.NewModel(model.ModelSettings{})
 
 	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
@@ -144,7 +144,8 @@ func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 func TestTurtlesMaxNOf(t *testing.T) {
 
 	//create a basic model
-	u := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	u := model.NewModel(settings)
 
 	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)

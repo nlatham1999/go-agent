@@ -9,7 +9,8 @@ import (
 func TestPatchDistanceToTurtle(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false) // Use the fully qualified function name
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings) // Use the fully qualified function name
 
 	//get a patch
 	patch := m.Patch(-2, -2)
@@ -27,7 +28,11 @@ func TestPatchDistanceToTurtle(t *testing.T) {
 	}
 
 	//create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	//get a patch
 	patch = m.Patch(-15, -15)
@@ -54,14 +59,15 @@ func TestPatchDistanceToTurtle(t *testing.T) {
 	distance = patch.DistanceTurtle(turtle)
 
 	if distance != 4 {
-		t.Errorf("  4, got %v", distance)
+		t.Errorf("Expected 4, got %v", distance)
 	}
 }
 
 func TestPatchDistanceToPatch(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch1 := m.Patch(0, 0)
@@ -76,7 +82,11 @@ func TestPatchDistanceToPatch(t *testing.T) {
 	}
 
 	//create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	//get a patch
 	patch1 = m.Patch(-15, -15)
@@ -103,7 +113,8 @@ func TestPatchDistanceToPatch(t *testing.T) {
 func TestPatchDistanceToXY(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch := m.Patch(0, 0)
@@ -117,7 +128,11 @@ func TestPatchDistanceToXY(t *testing.T) {
 	}
 
 	//create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	//get a patch
 	patch = m.Patch(-15, -15)
@@ -142,7 +157,8 @@ func TestPatchDistanceToXY(t *testing.T) {
 func TestPatchNeighbors(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch := m.Patch(0, 0)
@@ -212,7 +228,11 @@ func TestPatchNeighbors(t *testing.T) {
 	}
 
 	//create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	//get the top left patch and make sure we get 8 neighbors
 	patch = m.Patch(-15, -15)
@@ -251,7 +271,8 @@ func TestPatchNeighbors(t *testing.T) {
 func TestPatchNeighbors4(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch := m.Patch(0, 0)
@@ -310,7 +331,11 @@ func TestPatchNeighbors4(t *testing.T) {
 	}
 
 	// create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	// get the top left patch and make sure we get 4 neighbors
 	patch = m.Patch(-15, -15)
@@ -345,7 +370,8 @@ func TestPatchNeighbors4(t *testing.T) {
 func TestPatchPatchAt(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch := m.Patch(0, 0)
@@ -366,7 +392,11 @@ func TestPatchPatchAt(t *testing.T) {
 	}
 
 	//create model that has wrapping
-	m = model.NewModel(nil, nil, nil, nil, nil, nil, true, true)
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m = model.NewModel(settings)
 
 	//get a patch
 	patch = m.Patch(-15, -15)
@@ -396,7 +426,8 @@ func TestPatchPatchAt(t *testing.T) {
 func TestPatchSprout(t *testing.T) {
 
 	//create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	//get a patch
 	patch := m.Patch(0, 0)
@@ -443,7 +474,8 @@ func TestPatchSprout(t *testing.T) {
 func TestPatchTowardsXY(t *testing.T) {
 
 	// create a basic model
-	m := model.NewModel(nil, nil, nil, nil, nil, nil, false, false)
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
 
 	// get a patch
 	patch := m.Patch(0, 0)

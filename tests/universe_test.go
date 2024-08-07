@@ -11,7 +11,10 @@ func TestCreateTurtles(t *testing.T) {
 		"ants",
 	}
 
-	environment := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: breeds,
+	}
+	environment := model.NewModel(settings)
 
 	// creating turtles without a breed should add them to the default breed
 	environment.CreateTurtles(5, "", nil)
@@ -40,7 +43,10 @@ func TestTurtle(t *testing.T) {
 		"ants",
 	}
 
-	environment := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: breeds,
+	}
+	environment := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
 	environment.CreateTurtles(5, "", nil)
@@ -88,7 +94,10 @@ func TestClearTurtles(t *testing.T) {
 		"ants",
 	}
 
-	m := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: breeds,
+	}
+	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, "", nil)
@@ -136,7 +145,10 @@ func TestKillTurtle(t *testing.T) {
 		"ants",
 	}
 
-	m := model.NewModel(nil, nil, nil, breeds, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: breeds,
+	}
+	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, "", nil)
@@ -198,7 +210,11 @@ func TestModelLink(t *testing.T) {
 		"workers",
 	}
 
-	m := model.NewModel(nil, nil, nil, breeds, nil, undirectedLinkBreeds, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds:         breeds,
+		UndirectedLinkBreeds: undirectedLinkBreeds,
+	}
+	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, "", nil)
@@ -286,7 +302,11 @@ func TestModelLinkDirected(t *testing.T) {
 		"workers",
 	}
 
-	m := model.NewModel(nil, nil, nil, breeds, directedLinkBreeds, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds:       breeds,
+		DirectedLinkBreeds: directedLinkBreeds,
+	}
+	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, "", nil)

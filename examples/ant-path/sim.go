@@ -26,7 +26,10 @@ func SetUp() {
 		m.ClearAll()
 	}
 
-	m = model.NewModel(nil, nil, nil, []string{"leader", "follower"}, nil, nil, false, false)
+	settings := model.ModelSettings{
+		TurtleBreeds: []string{"leader", "follower"},
+	}
+	m = model.NewModel(settings)
 
 	m.SetDefaultShapeTurtles("bug")
 
