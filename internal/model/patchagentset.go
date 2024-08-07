@@ -38,6 +38,14 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	return false
 }
 
+func (p *PatchAgentSet) Ask(operations []PatchOperation) {
+	for patch := range p.patches {
+		for j := 0; j < len(operations); j++ {
+			operations[j](patch)
+		}
+	}
+}
+
 func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	// create a map of the patches
 	pointsMap := make(map[*Patch]interface{})

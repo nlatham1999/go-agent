@@ -48,10 +48,9 @@ func SetUp() {
 		},
 	})
 
-	model.AskTurtle(
-		m.Turtles.MaxOneOf(func(t *model.Turtle) float64 {
-			return float64(t.Who())
-		}),
+	m.Turtles.MaxOneOf(func(t *model.Turtle) float64 {
+		return float64(t.Who())
+	}).Ask(
 		[]model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.Color.SetColor(model.Blue)
@@ -59,7 +58,7 @@ func SetUp() {
 		},
 	)
 
-	model.AskTurtles(m.Turtles, []model.TurtleOperation{
+	m.Turtles.Ask([]model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.SetXY(nestX, nestY)
 		},
@@ -80,7 +79,7 @@ func Go() {
 			return
 		}
 
-		model.AskTurtles(m.Breeds["leader"].Turtles, []model.TurtleOperation{
+		m.Breeds["leader"].Turtles.Ask([]model.TurtleOperation{
 			func(t *model.Turtle) {
 				wiggle(t, 45)
 				correctPath(t)
@@ -93,7 +92,7 @@ func Go() {
 			},
 		})
 
-		model.AskTurtles(m.Breeds["follower"].Turtles, []model.TurtleOperation{
+		m.Breeds["follower"].Turtles.Ask([]model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.FaceTurtle(m.Turtle("", t.Who()-1))
 				if timeToStart(t) && t.XCor() < foodX {

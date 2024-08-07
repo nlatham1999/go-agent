@@ -32,7 +32,7 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 		linksAdded.Add(l)
 	}
 
-	AskLinks(linksAdded, operations)
+	linksAdded.Ask(operations)
 }
 
 // creates an undirected breed link from the current turtle with the turtle passed in
@@ -62,7 +62,7 @@ func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, opera
 		linksAdded.Add(l)
 	}
 
-	AskLinks(linksAdded, operations)
+	linksAdded.Ask(operations)
 }
 
 // creates a directed breed link from the current turtle with the turtle passed in
@@ -91,7 +91,7 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 		linksAdded.Add(l)
 	}
 
-	AskLinks(linksAdded, operations)
+	linksAdded.Ask(operations)
 }
 
 // returns if there is any sort of link between the current turtle and the turtle passed in

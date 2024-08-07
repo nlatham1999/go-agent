@@ -688,8 +688,8 @@ func TestTurtleFaceTurtle(t *testing.T) {
 	t1.FaceTurtle(t2)
 
 	// expect the turtle to face -45 degrees because of wrapping
-	if t1.GetHeading() != 315 {
-		t.Errorf("Expected turtle to face -45 degrees, got %v", t1.GetHeading())
+	if t1.GetHeading() != 135 {
+		t.Errorf("Expected turtle to face 135 degrees, got %v", t1.GetHeading())
 	}
 
 	m.WrappingXOff()

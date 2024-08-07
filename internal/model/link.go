@@ -97,6 +97,12 @@ func (l *Link) BothEnds() *TurtleAgentSet {
 	return TurtleSet([]*Turtle{l.end1, l.end2})
 }
 
+func (l *Link) Ask(operations []LinkOperation) {
+	for j := 0; j < len(operations); j++ {
+		operations[j](l)
+	}
+}
+
 func (l *Link) End1() *Turtle {
 	return l.end1
 }

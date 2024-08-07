@@ -91,6 +91,12 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	return t
 }
 
+func (t *Turtle) Ask(operations []TurtleOperation) {
+	for j := 0; j < len(operations); j++ {
+		operations[j](t)
+	}
+}
+
 func (t *Turtle) Back(distance float64) {
 	t.Forward(-distance)
 }

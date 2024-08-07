@@ -10,7 +10,7 @@ func TestAskLink(t *testing.T) {
 	link := &model.Link{}
 	link.Color.SetColor(model.Blue)
 
-	model.AskLink(link, []model.LinkOperation{
+	link.Ask([]model.LinkOperation{
 		func(link *model.Link) {
 			link.Color.SetColor(model.Red)
 		},
@@ -32,7 +32,7 @@ func TestAskLinks(t *testing.T) {
 	agentset := model.LinkSet([]*model.Link{link1, link2, link3})
 
 	// ask to change all colors to red
-	model.AskLinks(agentset, []model.LinkOperation{
+	agentset.Ask([]model.LinkOperation{
 		func(link *model.Link) {
 			link.Color.SetColor(model.Red)
 		},
@@ -50,7 +50,7 @@ func TestAskPatch(t *testing.T) {
 	patch := &model.Patch{}
 	patch.PColor.SetColor(model.Blue)
 
-	model.AskPatch(patch, []model.PatchOperation{
+	patch.Ask([]model.PatchOperation{
 		func(patch *model.Patch) {
 			patch.PColor.SetColor(model.Red)
 		},
@@ -72,7 +72,7 @@ func TestAskPatches(t *testing.T) {
 	agentset := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
 
 	// ask to change all colors to red
-	model.AskPatches(agentset, []model.PatchOperation{
+	agentset.Ask([]model.PatchOperation{
 		func(patch *model.Patch) {
 			patch.PColor.SetColor(model.Red)
 		},
@@ -90,7 +90,7 @@ func TestAskTurtle(t *testing.T) {
 	turtle := &model.Turtle{}
 	turtle.Color.SetColor(model.Blue)
 
-	model.AskTurtle(turtle, []model.TurtleOperation{
+	turtle.Ask([]model.TurtleOperation{
 		func(turtle *model.Turtle) {
 			turtle.Color.SetColor(model.Red)
 		},
@@ -112,7 +112,7 @@ func TestAskTurtles(t *testing.T) {
 	agentset := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	// ask to change all colors to red
-	model.AskTurtles(agentset, []model.TurtleOperation{
+	agentset.Ask([]model.TurtleOperation{
 		func(turtle *model.Turtle) {
 			turtle.Color.SetColor(model.Red)
 		},

@@ -46,6 +46,14 @@ func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
 	return false
 }
 
+func (t *TurtleAgentSet) Ask(operations []TurtleOperation) {
+	for turtle := range t.turtles {
+		for j := 0; j < len(operations); j++ {
+			operations[j](turtle)
+		}
+	}
+}
+
 func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {
 	//get the turtles at the patches
 	turtlesAtPatches := []*Turtle{}

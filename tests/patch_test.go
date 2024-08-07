@@ -155,12 +155,11 @@ func TestPatchNeighbors(t *testing.T) {
 		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
 	}
 
-	model.AskPatches(neighbors,
-		[]model.PatchOperation{
-			func(p *model.Patch) {
-				p.PColor.SetColor(model.Red)
-			},
+	neighbors.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.PColor.SetColor(model.Red)
 		},
+	},
 	)
 
 	//make sure that the patches around the patch are red
@@ -232,7 +231,7 @@ func TestPatchNeighbors(t *testing.T) {
 	p7 = m.Patch(15, -14)
 	p8 = m.Patch(15, 15)
 
-	model.AskPatches(neighbors,
+	neighbors.Ask(
 		[]model.PatchOperation{
 			func(p *model.Patch) {
 				p.PColor.SetColor(model.Red)
@@ -265,7 +264,7 @@ func TestPatchNeighbors4(t *testing.T) {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	model.AskPatches(neighbors,
+	neighbors.Ask(
 		[]model.PatchOperation{
 			func(p *model.Patch) {
 				p.PColor.SetColor(model.Red)
@@ -326,7 +325,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	p3 = m.Patch(-15, 15)
 	p4 = m.Patch(15, -15)
 
-	model.AskPatches(neighbors,
+	neighbors.Ask(
 		[]model.PatchOperation{
 			func(p *model.Patch) {
 				p.PColor.SetColor(model.Red)

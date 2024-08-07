@@ -74,6 +74,12 @@ func (p *Patch) addTurtle(t *Turtle) {
 	}
 }
 
+func (p *Patch) Ask(operations []PatchOperation) {
+	for j := 0; j < len(operations); j++ {
+		operations[j](p)
+	}
+}
+
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
 	if _, ok := p.turtles[t.breed]; ok {
@@ -210,7 +216,7 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 		turtlesAdded.Add(t)
 	}
 
-	AskTurtles(turtlesAdded, operations)
+	turtlesAdded.Ask(operations)
 }
 
 func (p *Patch) TowardsPatch(patch *Patch) float64 {
