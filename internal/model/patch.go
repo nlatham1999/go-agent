@@ -266,6 +266,11 @@ func (p *Patch) GetOwn(key string) interface{} {
 }
 
 func (p *Patch) SetOwn(key string, value interface{}) {
+	// if the value is an int, convert it to a float64
+	if _, ok := value.(int); ok {
+		value = float64(value.(int))
+	}
+
 	if _, ok := p.patchesOwn[key]; !ok {
 		return
 	}

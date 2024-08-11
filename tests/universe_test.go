@@ -347,3 +347,168 @@ func TestModelLinkDirected(t *testing.T) {
 		t.Errorf("Expected l3, got different link")
 	}
 }
+
+func TestDiffuse(t *testing.T) {
+
+	patchesOwn := map[string]interface{}{
+		"heat": 0.0,
+	}
+
+	// create a basic model
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
+
+	m.Patches.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 0)
+		},
+	})
+
+	m.Patch(0, 0).Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 100)
+		},
+	})
+
+	p1 := m.Patch(-1, 1)
+	p2 := m.Patch(0, 1)
+	p3 := m.Patch(1, 1)
+	p4 := m.Patch(-1, 0)
+	p5 := m.Patch(0, 0)
+	p6 := m.Patch(1, 0)
+	p7 := m.Patch(-1, -1)
+	p8 := m.Patch(0, -1)
+	p9 := m.Patch(1, -1)
+
+	if p5.GetOwn("heat") != float64(100) {
+		t.Errorf("Expected 100, got %d", p5.GetOwn("heat"))
+	}
+
+	m.Diffuse("heat", .25)
+
+	if p1.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p1.GetOwn("heat"))
+	}
+
+	if p2.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p2.GetOwn("heat"))
+	}
+
+	if p3.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p3.GetOwn("heat"))
+	}
+
+	if p4.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p4.GetOwn("heat"))
+	}
+
+	if p5.GetOwn("heat") != float64(75) {
+		t.Errorf("Expected 75, got %d", p5.GetOwn("heat"))
+	}
+
+	if p6.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p6.GetOwn("heat"))
+	}
+
+	if p7.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p7.GetOwn("heat"))
+	}
+
+	if p8.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p8.GetOwn("heat"))
+	}
+
+	if p9.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p9.GetOwn("heat"))
+	}
+
+	// diffuse a second round
+	m.Diffuse("heat", .25)
+
+	if p1.GetOwn("heat").(float64)-4.8828125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p1.GetOwn("heat"))
+	}
+
+	if p2.GetOwn("heat").(float64)-5.078125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p2.GetOwn("heat"))
+	}
+
+	if p3.GetOwn("heat").(float64)-4.8828125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p3.GetOwn("heat"))
+	}
+
+	if p4.GetOwn("heat").(float64)-5.078125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p4.GetOwn("heat"))
+	}
+
+	if p5.GetOwn("heat").(float64)-57.03125 > 0.0001 {
+		t.Errorf("Expected 75, got %d", p5.GetOwn("heat"))
+	}
+
+	if p6.GetOwn("heat").(float64)-5.078125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p6.GetOwn("heat"))
+	}
+
+	if p7.GetOwn("heat").(float64)-4.8828125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p7.GetOwn("heat"))
+	}
+
+	if p8.GetOwn("heat").(float64)-5.078125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p8.GetOwn("heat"))
+	}
+
+	if p9.GetOwn("heat").(float64)-4.8828125 > 0.0001 {
+		t.Errorf("Expected 25, got %d", p9.GetOwn("heat"))
+	}
+}
+
+func TestDiffuseCorner(t *testing.T) {
+
+	patchesOwn := map[string]interface{}{
+		"heat": 0.0,
+	}
+
+	// create a basic model
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
+
+	m.Patches.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 0)
+		},
+	})
+
+	m.Patch(-15, -15).Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 100)
+		},
+	})
+
+	p1 := m.Patch(-15, -14)
+	p2 := m.Patch(-14, -14)
+	p3 := m.Patch(-15, -15)
+	p4 := m.Patch(-15, -14)
+
+	m.Diffuse("heat", .25)
+
+	if p1.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p1.GetOwn("heat"))
+	}
+
+	if p2.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p2.GetOwn("heat"))
+	}
+
+	if p3.GetOwn("heat") != 90.625 {
+		t.Errorf("Expected 25, got %d", p3.GetOwn("heat"))
+	}
+
+	if p4.GetOwn("heat") != 3.125 {
+		t.Errorf("Expected 25, got %d", p4.GetOwn("heat"))
+	}
+
+}

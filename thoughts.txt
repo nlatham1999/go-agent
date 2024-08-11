@@ -35,3 +35,6 @@ should we store a list in the agentset structs as well?
 why have linkedTurtles and linkedTurtlesConnectedFrom?
  - linkedTurtles should only have turtles that have a path to them
  - so that means we need to store the directed links that are conecting back to the current turtle
+
+
+ patches own should not contain ints, only floats, this is for diffusing

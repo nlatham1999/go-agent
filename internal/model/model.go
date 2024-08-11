@@ -60,6 +60,19 @@ func NewModel(
 	minPxCor := -15
 	minPyCor := -15
 
+	patchesOwn := make(map[string]interface{})
+	if settings.PatchesOwn != nil {
+		for key, value := range settings.PatchesOwn {
+			switch value.(type) {
+			case int:
+				// if the type is a int convert to a float
+				patchesOwn[key] = float64(value.(int))
+			default:
+				patchesOwn[key] = value
+			}
+		}
+	}
+
 	model := &Model{
 		TicksOn:            true,
 		MaxPxCor:           maxPxCor,
@@ -507,7 +520,7 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 		}
 
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
-		amountToKeep := 1 - (patchAmount * percent) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
+		amountToKeep := (patchAmount * (1 - percent)) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
 
 		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
 	}
