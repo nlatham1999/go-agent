@@ -512,3 +512,120 @@ func TestDiffuseCorner(t *testing.T) {
 	}
 
 }
+
+// tests the Diffuse4 function
+func TestDiffuse4(t *testing.T) {
+
+	patchesOwn := map[string]interface{}{
+		"heat": 0.0,
+	}
+
+	// create a basic model
+	settings := model.ModelSettings{
+		PatchesOwn: patchesOwn,
+	}
+	m := model.NewModel(settings)
+
+	m.Patches.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 0)
+		},
+	})
+
+	m.Patch(0, 0).Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("heat", 100)
+		},
+	})
+
+	p1 := m.Patch(-1, 1)
+	p2 := m.Patch(0, 1)
+	p3 := m.Patch(1, 1)
+	p4 := m.Patch(-1, 0)
+	p5 := m.Patch(0, 0)
+	p6 := m.Patch(1, 0)
+	p7 := m.Patch(-1, -1)
+	p8 := m.Patch(0, -1)
+	p9 := m.Patch(1, -1)
+
+	if p5.GetOwn("heat") != float64(100) {
+		t.Errorf("Expected 100, got %d", p5.GetOwn("heat"))
+	}
+
+	m.Diffuse4("heat", .25)
+
+	if p1.GetOwn("heat") != 0.0 {
+		t.Errorf("Expected 0, got %d", p1.GetOwn("heat"))
+	}
+
+	if p2.GetOwn("heat") != 6.25 {
+		t.Errorf("Expected 6.25, got %d", p2.GetOwn("heat"))
+	}
+
+	if p3.GetOwn("heat") != 0.0 {
+		t.Errorf("Expected 0, got %d", p3.GetOwn("heat"))
+	}
+
+	if p4.GetOwn("heat") != 6.25 {
+		t.Errorf("Expected 6.25, got %d", p4.GetOwn("heat"))
+	}
+
+	if p5.GetOwn("heat") != float64(75) {
+		t.Errorf("Expected 75, got %d", p5.GetOwn("heat"))
+	}
+
+	if p6.GetOwn("heat") != 6.25 {
+		t.Errorf("Expected 6.25, got %d", p6.GetOwn("heat"))
+	}
+
+	if p7.GetOwn("heat") != 0.0 {
+		t.Errorf("Expected 0, got %d", p7.GetOwn("heat"))
+	}
+
+	if p8.GetOwn("heat") != 6.25 {
+		t.Errorf("Expected 6.25, got %d", p8.GetOwn("heat"))
+	}
+
+	if p9.GetOwn("heat") != 0.0 {
+		t.Errorf("Expected 0, got %d", p9.GetOwn("heat"))
+	}
+
+	// diffuse a second round
+	m.Diffuse4("heat", .25)
+
+	if p1.GetOwn("heat") != 0.78125 {
+		t.Errorf("Expected 0, got %d", p1.GetOwn("heat"))
+	}
+
+	if p2.GetOwn("heat") != 9.375 {
+		t.Errorf("Expected 6.25, got %d", p2.GetOwn("heat"))
+	}
+
+	if p3.GetOwn("heat") != 0.78125 {
+		t.Errorf("Expected 0, got %d", p3.GetOwn("heat"))
+	}
+
+	if p4.GetOwn("heat") != 9.375 {
+		t.Errorf("Expected 6.25, got %d", p4.GetOwn("heat"))
+	}
+
+	if p5.GetOwn("heat") != float64(57.8125) {
+		t.Errorf("Expected 57.8125, got %d", p5.GetOwn("heat"))
+	}
+
+	if p6.GetOwn("heat") != 9.375 {
+		t.Errorf("Expected 6.25, got %d", p6.GetOwn("heat"))
+	}
+
+	if p7.GetOwn("heat") != 0.78125 {
+		t.Errorf("Expected 0, got %d", p7.GetOwn("heat"))
+	}
+
+	if p8.GetOwn("heat") != 9.375 {
+		t.Errorf("Expected 6.25, got %d", p8.GetOwn("heat"))
+	}
+
+	if p9.GetOwn("heat") != 0.78125 {
+		t.Errorf("Expected 0, got %d", p9.GetOwn("heat"))
+	}
+}

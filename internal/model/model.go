@@ -530,6 +530,38 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 // @TODO implement
 func (m *Model) Diffuse4(patchVariable string, percent float64) error {
+
+	if percent > 1 || percent < 0 {
+		return errors.New("percent amount was outside bounds")
+	}
+
+	diffusions := make(map[*Patch]float64)
+
+	//go through each patch and calculate the diffusion amount
+	for patch := range m.Patches.patches {
+		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		amountToGive := patchAmount * percent / 4
+		diffusions[patch] = amountToGive
+	}
+
+	//go through each patch and get the new amount
+	for patch := range m.Patches.patches {
+
+		amountFromNeighbors := 0.0
+		neighbors := m.neighbors4(patch)
+		if neighbors.Count() > 4 || neighbors.Count() < 2 {
+			return errors.New("invalid amount of neighbors")
+		}
+		for n := range neighbors.patches {
+			amountFromNeighbors += diffusions[n]
+		}
+
+		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		amountToKeep := (patchAmount * (1 - percent)) + (float64(4-neighbors.Count()) * (patchAmount * percent / 4))
+
+		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+	}
+
 	return nil
 }
 
