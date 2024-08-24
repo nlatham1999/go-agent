@@ -37,6 +37,32 @@ var (
 		"BREED-WITH":            nil,
 	}
 
+	noSpaceTokens = map[string]interface{}{
+		"(": nil,
+		")": nil,
+		"[": nil,
+		"]": nil,
+		"{": nil,
+		"}": nil,
+		",": nil,
+		":": nil,
+		";": nil,
+		"=": nil,
+		"+": nil,
+		"*": nil,
+		"/": nil,
+		"^": nil,
+		"<": nil,
+		">": nil,
+	}
+
+	doubleNoSpaceTokens = map[string]interface{}{
+		"!=": nil,
+		"<=": nil,
+		">=": nil,
+		"->": nil,
+	}
+
 	valueTokens = map[string]interface{}{
 		"NUMBER":  nil,
 		"STRING":  nil,
@@ -85,6 +111,10 @@ var (
 		">=":                            "GREATER-EQUAL",
 		"= ":                            "EQUAL",
 		"!= ":                           "NOT-EQUAL",
+		"[":                             "OPEN-BRACKET",
+		"]":                             "CLOSE-BRACKET",
+		"(":                             "OPEN-PARENTHESIS",
+		")":                             "CLOSE-PARENTHESIS",
 		"asin":                          "ASIN",
 		"ask":                           "ASK",
 		"at-points":                     "AT-POINTS",
