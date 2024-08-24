@@ -71,43 +71,42 @@ func SetUp() {
 }
 
 func Go() {
-	for {
-		if m.Turtles("").All(func(t *model.Turtle) bool {
-			return t.XCor() >= foodX
-		}) {
-			fmt.Println("All ants have reached the food")
-			fmt.Println("time in ms:", m.Timer())
-			fmt.Println("num ticks:", m.Ticks)
+	if m.Turtles("").All(func(t *model.Turtle) bool {
+		return t.XCor() >= foodX
+	}) {
+		fmt.Println("All ants have reached the food")
+		fmt.Println("time in ms:", m.Timer())
+		fmt.Println("num ticks:", m.Ticks)
 
-			return
-		}
-
-		m.Turtles("leader").Ask([]model.TurtleOperation{
-			func(t *model.Turtle) {
-				wiggle(t, 45)
-				correctPath(t)
-				if t.XCor() > (foodX - 5) {
-					t.FaceXY(foodX, foodY)
-				}
-				if t.XCor() < foodX {
-					t.Forward(0.5)
-				}
-			},
-		})
-
-		m.Turtles("follower").Ask([]model.TurtleOperation{
-			func(t *model.Turtle) {
-				t.FaceTurtle(m.Turtle("", t.Who()-1))
-				if timeToStart(t) && t.XCor() < foodX {
-					if t.Who() == 1 {
-					}
-					t.Forward(0.5)
-				}
-			},
-		})
-
-		m.Tick()
+		return
 	}
+
+	m.Turtles("leader").Ask([]model.TurtleOperation{
+		func(t *model.Turtle) {
+			wiggle(t, 45)
+			correctPath(t)
+			if t.XCor() > (foodX - 5) {
+				t.FaceXY(foodX, foodY)
+			}
+			if t.XCor() < foodX {
+				t.Forward(0.5)
+			}
+		},
+	})
+
+	m.Turtles("follower").Ask([]model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.FaceTurtle(m.Turtle("", t.Who()-1))
+			if timeToStart(t) && t.XCor() < foodX {
+				if t.Who() == 1 {
+				}
+				t.Forward(0.5)
+			}
+		},
+	})
+
+	m.Tick()
+
 }
 
 func wiggle(t *model.Turtle, angle float64) {
