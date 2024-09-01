@@ -12,7 +12,7 @@ var (
 
 	// Keywords that are used with breeds
 	breededTokens = map[string]interface{}{
-		"CREATE-ORDERED_BREEDS": nil,
+		"CREATE-ORDERED-BREEDS": nil,
 		"CREATE-BREED-TO":       nil,
 		"CREATE-BREEDS-TO":      nil,
 		"CREATE-BREED-FROM":     nil,
@@ -69,6 +69,25 @@ var (
 		"BOOLEAN": nil,
 		"VAR":     nil,
 		"NEWLINE": nil,
+	}
+
+	colorTokens = map[string]interface{}{
+		"BLACK":     nil,
+		"GRAY":      nil,
+		"WHITE":     nil,
+		"RED":       nil,
+		"ORANGE":    nil,
+		"BROWN":     nil,
+		"YELLOW":    nil,
+		"GREEN":     nil,
+		"LIME":      nil,
+		"TURQUOISE": nil,
+		"CYAN":      nil,
+		"SKY":       nil,
+		"BLUE":      nil,
+		"VIOLET":    nil,
+		"MAGENTA":   nil,
+		"PINK":      nil,
 	}
 
 	// Keywords
@@ -375,7 +394,7 @@ var (
 		"setup-plots":                   "SETUP-PLOTS",
 		"set-plot-x-range":              "SET-PLOT-X-RANGE",
 		"set-plot-y-range":              "SET-PLOT-Y-RANGE",
-		"set-xy":                        "SET-XY",
+		"setxy":                         "SET-XY",
 		"shade-of?":                     "SHADE-OF",
 		"shape":                         "SHAPE",
 		"shapes":                        "SHAPES",

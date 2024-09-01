@@ -26,26 +26,17 @@ func Convert(filename string) error {
 		return fmt.Errorf("could not lex file: %v", err)
 	}
 
-	//open file and print out tokens
-	// create output file
-	// outputFile, err := os.Create("output.txt")
-	// if err != nil {
-	// 	return fmt.Errorf("could not create output file: %v", err)
-	// }
-	// defer outputFile.Close()
-
-	// // write tokens to output file
-	// for _, token := range tokens {
-	// 	_, err := outputFile.WriteString(token.tokenType +
-	// 		"\t" + token.lexeme + "\n")
-	// 	if err != nil {
-	// 		return fmt.Errorf("could not write token to output file: %v", err)
-	// 	}
-	// }
+	tokens = condenseTokens(tokens)
 
 	for _, token := range tokens {
-		fmt.Println(token.tokenType + "\t" + token.lexeme)
+		fmt.Println(token.tokenType)
 	}
+
+	// ast, err := parse(tokens)
+	// if err != nil {
+	// 	return fmt.Errorf("unable to parse file: %v", err)
+	// }
+	// ast.print(0)
 
 	return nil
 }

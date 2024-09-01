@@ -3,6 +3,7 @@ package converter
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func Lexer(lines []string) ([]token, error) {
@@ -26,7 +27,7 @@ func Lexer(lines []string) ([]token, error) {
 					if err != nil {
 						return nil, err
 					}
-					tokens = append(tokens, token)
+					tokens = append(tokens, token...)
 					text = ""
 				}
 
@@ -42,7 +43,7 @@ func Lexer(lines []string) ([]token, error) {
 					if err != nil {
 						return nil, err
 					}
-					tokens = append(tokens, token)
+					tokens = append(tokens, token...)
 				}
 				continue
 			}
@@ -54,7 +55,7 @@ func Lexer(lines []string) ([]token, error) {
 					if err != nil {
 						return nil, err
 					}
-					tokens = append(tokens, token)
+					tokens = append(tokens, token...)
 				}
 				// fmt.Println("comment")
 				break
@@ -92,7 +93,7 @@ func Lexer(lines []string) ([]token, error) {
 				if err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, token)
+				tokens = append(tokens, token...)
 				text = ""
 
 				// fmt.Println("string")
@@ -107,7 +108,7 @@ func Lexer(lines []string) ([]token, error) {
 					if err != nil {
 						return nil, err
 					}
-					tokens = append(tokens, token)
+					tokens = append(tokens, token...)
 					text = ""
 				}
 
@@ -118,7 +119,7 @@ func Lexer(lines []string) ([]token, error) {
 						if err != nil {
 							return nil, err
 						}
-						tokens = append(tokens, token)
+						tokens = append(tokens, token...)
 						column += 2
 						continue
 					}
@@ -128,7 +129,7 @@ func Lexer(lines []string) ([]token, error) {
 				if err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, token)
+				tokens = append(tokens, token...)
 				column++
 				// fmt.Println("no space token")
 				continue
@@ -141,7 +142,7 @@ func Lexer(lines []string) ([]token, error) {
 					if err != nil {
 						return nil, err
 					}
-					tokens = append(tokens, token)
+					tokens = append(tokens, token...)
 					text = ""
 				}
 				column++
@@ -157,7 +158,7 @@ func Lexer(lines []string) ([]token, error) {
 				if err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, token)
+				tokens = append(tokens, token...)
 				text = ""
 			}
 			// fmt.Println("adding to text")
@@ -168,30 +169,138 @@ func Lexer(lines []string) ([]token, error) {
 	return tokens, nil
 }
 
-func generateToken(text string, line int, column int) (token, error) {
+func generateToken(text string, line int, column int) ([]token, error) {
 
 	// make sure the token is valid
 	if _, ok := notImplementedTokens[text]; ok {
-		return token{}, fmt.Errorf("keyword %s not implemented at line %d, column %d", text, line, column)
+		return []token{}, fmt.Errorf("keyword %s not implemented at line %d, column %d", text, line, column)
 	}
 
 	// check to see if the token is a keyword
 	if tokenType, ok := keywordToTokenType[text]; ok {
-		return token{tokenType: tokenType, lexeme: text, line: line, column: column}, nil
+		return []token{{tokenType: tokenType, lexeme: text, line: line, column: column}}, nil
 	}
 
 	// check to see if the token is a number
 	if _, err := strconv.ParseFloat(text, 64); err == nil {
-		return token{tokenType: "NUMBER", lexeme: text, line: line, column: column}, nil
+		return []token{{tokenType: "NUMBER", lexeme: text, line: line, column: column}}, nil
 	}
 
 	// check to see if the token is a string
 	if text[0] == '"' && text[len(text)-1] == '"' {
-		return token{tokenType: "STRING", lexeme: text, line: line, column: column}, nil
+		return []token{{tokenType: "STRING", lexeme: text, line: line, column: column}}, nil
+	}
+
+	//check for breeded tokens
+	split := strings.Split(text, "-")
+	if len(split) == 2 {
+		if split[0] == "create" {
+			return []token{
+				{tokenType: "CREATE-BREEDS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "my" {
+			return []token{
+				{tokenType: "MY-BREEDS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[1] == "neighbor" {
+			return []token{
+				{tokenType: "BREED-NEIGHBOR", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		} else if split[1] == "at" {
+			return []token{
+				{tokenType: "BREEDS-AT", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		} else if split[1] == "here" {
+			return []token{
+				{tokenType: "BREEDS-HERE", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		} else if split[1] == "on" {
+			return []token{
+				{tokenType: "BREEDS-ON", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		} else if split[1] == "own" {
+			return []token{
+				{tokenType: "BREEDS-OWN", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		} else if split[1] == "with" {
+			return []token{
+				{tokenType: "BREEDS-WITH", lexeme: split[1], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[0], line: line, column: column},
+			}, nil
+		}
+	} else if len(split) == 3 {
+		if split[0] == "create" && split[1] == "ordered" {
+			return []token{
+				{tokenType: "CREATE-ORDERED-BREEDS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		} else if split[0] == "create" && split[2] == "to" {
+			return []token{
+				{tokenType: "CREATE-BREEDS-TO", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "create" && split[2] == "from" {
+			return []token{
+				{tokenType: "CREATE-BREEDS-FROM", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "create" && split[2] == "with" {
+			return []token{
+				{tokenType: "CREATE-BREEDS-WITH", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "in" && split[2] == "neighbor" {
+			return []token{
+				{tokenType: "IN-BREED-NEIGHBOR", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "in" && split[2] == "neighbors" {
+			return []token{
+				{tokenType: "IN-BREED-NEIGHBORS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "in" && split[2] == "from" {
+			return []token{
+				{tokenType: "IN-BREED-FROM", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[1], line: line, column: column},
+			}, nil
+		} else if split[0] == "my" && split[1] == "in" {
+			return []token{
+				{tokenType: "MY-IN-BREEDS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		} else if split[0] == "my" && split[1] == "out" {
+			return []token{
+				{tokenType: "MY-OUT-BREEDS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		} else if split[0] == "out" && split[1] == "neighbor" {
+			return []token{
+				{tokenType: "OUT-BREED-NEIGHBOR", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		} else if split[0] == "out" && split[1] == "neighbors" {
+			return []token{
+				{tokenType: "OUT-BREED-NEIGHBORS", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		} else if split[0] == "out" && split[1] == "to" {
+			return []token{
+				{tokenType: "OUT-BREED-TO", lexeme: split[0], line: line, column: column},
+				{tokenType: "VAR", lexeme: split[2], line: line, column: column},
+			}, nil
+		}
 	}
 
 	//token is an identifier
-	return token{tokenType: "VAR", lexeme: text, line: line, column: column}, nil
+	return []token{{tokenType: "VAR", lexeme: text, line: line, column: column}}, nil
 }
 
 func isWhitespace(char byte) bool {
