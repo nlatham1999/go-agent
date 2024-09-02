@@ -114,7 +114,7 @@ var (
 		"pink":                          "PINK",
 		"abs":                           "ABS",
 		"acos":                          "ACOS",
-		"all":                           "ALL",
+		"all?":                          "ALL",
 		"and":                           "AND",
 		"any?":                          "ANY",
 		"approximate-hsb":               "APPROXIMATE-HSB",

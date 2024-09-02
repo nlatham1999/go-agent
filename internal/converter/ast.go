@@ -17,7 +17,7 @@ func (a *ast) print(tabs int) {
 	for i := 0; i < tabs; i++ {
 		print("\t")
 	}
-	println(a.token.tokenType)
+	println(a.token.tokenType, a.token.lexeme)
 	for _, child := range a.children {
 		child.print(tabs + 1)
 	}

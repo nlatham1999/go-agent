@@ -26,17 +26,17 @@ func Convert(filename string) error {
 		return fmt.Errorf("could not lex file: %v", err)
 	}
 
-	tokens = condenseTokens(tokens)
+	tokens = augmentTokens(tokens)
 
-	for _, token := range tokens {
-		fmt.Println(token.tokenType)
-	}
-
-	// ast, err := parse(tokens)
-	// if err != nil {
-	// 	return fmt.Errorf("unable to parse file: %v", err)
+	// for _, token := range tokens {
+	// 	fmt.Println(token.tokenType)
 	// }
-	// ast.print(0)
+
+	ast, err := parse(tokens)
+	if err != nil {
+		return fmt.Errorf("unable to parse file: %v", err)
+	}
+	ast.print(0)
 
 	return nil
 }

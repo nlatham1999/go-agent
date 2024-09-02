@@ -29,6 +29,16 @@ var toBodyValidType = validTokens{
 		"RESET-TICKS":       nil,
 		"SET":               nil,
 		"SET-DEFAULT-SHAPE": nil,
+		"IF":                nil,
+		"STOP":              nil,
+		"FACEXY":            nil,
+		"FORWARD":           nil,
+		"FACE":              nil,
+		"TICK":              nil,
+		"RIGHT":             nil,
+		"LEFT":              nil,
+		"IFELSE":            nil,
+		"REPORT":            nil,
 	},
 }
 
@@ -61,21 +71,33 @@ var rValuleValidType = validTokens{
 			"OPEN-PARENTHESIS": nil,
 			"VAR":              nil,
 			"MAX":              nil,
+			"WHO":              nil,
+			"ALL":              nil,
+			"EQUAL":            nil,
+			"XCOR":             nil,
+			"GREATER-EQUAL":    nil,
+			"MULTIPLY":         nil,
+			"DIVIDE":           nil,
+			"POWER":            nil,
+			"LESS":             nil,
+			"GREATER":          nil,
+			"LESS-EQUAL":       nil,
+			"NOT-EQUAL":        nil,
+			"AND":              nil,
+			"RANDOM-FLOAT":     nil,
+			"HEADING":          nil,
+			"PATCH-AT":         nil,
+			"NOBODY":           nil,
+			"FUNCTION-CALL":    nil,
+			"OPEN-BRACKET-OF":  nil,
+			"TURTLE":           nil,
+			"RANDOM":           nil,
 		}
 		for k, v := range colorTokens {
 			result[k] = v
 		}
 		return result
 	}(),
-}
-
-var askAgentValidType = validTokens{
-	validType: "any",
-	tokens: map[string]interface{}{
-		"PATCH":   nil,
-		"TURTLES": nil,
-		"TURTLE":  nil,
-	},
 }
 
 var varOrNumberValidType = validTokens{
@@ -89,9 +111,14 @@ var varOrNumberValidType = validTokens{
 var askBodyValidType = validTokens{
 	validType: "many",
 	tokens: map[string]interface{}{
-		"SPROUT": nil,
-		"SET-XY": nil,
-		"SET":    nil,
+		"SPROUT":        nil,
+		"SET-XY":        nil,
+		"SET":           nil,
+		"FUNCTION-CALL": nil,
+		"IF":            nil,
+		"FACE":          nil,
+		"FORWARD":       nil,
+		"FACE-XY":       nil,
 	},
 }
 
@@ -134,4 +161,74 @@ var varNumberOrParenthesisValidType = validTokens{
 		"NUMBER":           nil,
 		"OPEN-PARENTHESIS": nil,
 	},
+}
+
+var maxValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"OPEN-BRACKET-OF": nil,
+	},
+}
+
+var closeBracketOfValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"CLOSE-BRACKET-OF": nil,
+	},
+}
+
+var ofValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"OF": nil,
+	},
+}
+
+var ofRValueValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"TURTLES":          nil,
+		"OPEN-PARENTHESIS": nil,
+	},
+}
+
+var agentSetValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"VAR":     nil,
+		"PATCH":   nil,
+		"TURTLES": nil,
+		"TURTLE":  nil,
+	},
+}
+
+var functionNameValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"FUNCTION-NAME": nil,
+	},
+}
+
+var functionParametersValidType = validTokens{
+	validType: "optional",
+	tokens: map[string]interface{}{
+		"VAR": nil,
+	},
+}
+
+var turtleAgentValidType = validTokens{
+	validType: "any",
+	tokens: map[string]interface{}{
+		"TURTLE": nil,
+	},
+}
+
+var openBracketFunctionParameterValidType = validTokens{
+	validType: "optional",
+	tokens:    map[string]interface{}{"OPEN-BRACKET-FUNCTION-PARAMETER": nil},
+}
+
+var closeBracketFunctionParameterValidType = validTokens{
+	validType: "any",
+	tokens:    map[string]interface{}{"CLOSE-BRACKET-FUNCTION-PARAMETER": nil},
 }

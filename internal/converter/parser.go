@@ -61,7 +61,7 @@ func parseExp(tokens []token, index *int) (ast, error) {
 				}
 				a.children = append(a.children, c)
 			} else {
-				return ast{}, fmt.Errorf("valid next token not found. Current token: %s, line: %d, column: %d. Valid next tokens: %v. Given next token: %v", tokens[*index-1].tokenType, tokens[*index-1].line, tokens[*index-1].column, valids.tokens, tokens[*index])
+				return ast{}, fmt.Errorf(errorMessage(a.token, tokens[*index-1], valids.tokens, tokens[*index]))
 			}
 		} else if valids.validType == "many" {
 
@@ -83,15 +83,33 @@ func parseExp(tokens []token, index *int) (ast, error) {
 
 				} else {
 					if childrenFound == 0 {
-						return ast{}, fmt.Errorf("valid next token not found. Current token: %s, line: %d, column: %d. Valid next tokens in many: %v. Given next token: %v", tokens[*index-1].tokenType, tokens[*index-1].line, tokens[*index-1].column, valids.tokens, tokens[*index])
+						return ast{}, fmt.Errorf(errorMessage(a.token, tokens[*index-1], valids.tokens, tokens[*index]))
 					}
 					found = false
 					*index--
 				}
 			}
 
+		} else if valids.validType == "optional" {
+			*index++
+			if *index >= len(tokens) {
+				break
+			}
+			nextToken := tokens[*index]
+			if _, ok := valids.tokens[nextToken.tokenType]; ok {
+				c, err := parseExp(tokens, index)
+				if err != nil {
+					return ast{}, err
+				}
+				a.children = append(a.children, c)
+			} else {
+				*index--
+			}
 		} else if valids.validType == "skip" {
 			*index++
+			if _, ok := valids.tokens[tokens[*index].tokenType]; !ok {
+				return ast{}, fmt.Errorf(errorMessage(a.token, tokens[*index-1], valids.tokens, tokens[*index]))
+			}
 		} else {
 			panic("not valid valid type")
 		}
@@ -106,11 +124,24 @@ func parseExp(tokens []token, index *int) (ast, error) {
 	return a, nil
 }
 
+func errorMessage(parentToken token, previousToken token, validTokens map[string]interface{}, currentToken token) string {
+
+	tokensArr := []string{}
+	for k := range validTokens {
+		tokensArr = append(tokensArr, k)
+	}
+
+	return fmt.Sprintf(
+		"valid next token not found.\n parent token: %s\n previous token: %s\n current token: %s\n line: %d, column: %d\n Valid next tokens: %v",
+		parentToken.tokenType, previousToken.tokenType, currentToken.tokenType, currentToken.line+1, currentToken.column, tokensArr,
+	)
+}
+
 var rootExp = parseExpression{
 	subTokens: []validTokens{
 		{
 			validType: "many",
-			tokens:    map[string]interface{}{"BREED": nil, "GLOBALS": nil, "TO": nil},
+			tokens:    map[string]interface{}{"BREED": nil, "GLOBALS": nil, "TO": nil, "TO-REPORT": nil},
 		},
 	},
 }
@@ -141,7 +172,7 @@ var globalsExpr = parseExpression{
 
 var toExpr = parseExpression{
 	subTokens: []validTokens{
-		varValidType,
+		functionNameValidType,
 		toBodyValidType,
 		endValidType,
 	},
@@ -163,7 +194,7 @@ var setExpr = parseExpression{
 
 var askExpr = parseExpression{
 	subTokens: []validTokens{
-		askAgentValidType,
+		agentSetValidType,
 		openBracketValidType,
 		askBodyValidType,
 		closeBracketValidType,
@@ -199,7 +230,7 @@ var createBreedsExpr = parseExpression{
 var leftParenthesisExpr = parseExpression{
 	subTokens: []validTokens{
 		rValuleValidType,
-		closeBracketValidType,
+		closeParenthesisValidType,
 	},
 }
 
@@ -213,5 +244,126 @@ var setXYExpr = parseExpression{
 var turtleExpr = parseExpression{
 	subTokens: []validTokens{
 		varNumberOrParenthesisValidType,
+	},
+}
+
+var maxExpr = parseExpression{
+	subTokens: []validTokens{
+		maxValidType,
+	},
+}
+
+//this is really for of statements but they start with an open bracket hence the naming
+var openBracketOfExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+		closeBracketOfValidType,
+		ofValidType,
+		ofRValueValidType,
+	},
+}
+
+var ifExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+		openBracketValidType,
+		toBodyValidType,
+		closeBracketValidType,
+	},
+}
+
+var ifElseExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+		openBracketValidType,
+		toBodyValidType,
+		closeBracketValidType,
+		openBracketValidType,
+		toBodyValidType,
+		closeBracketValidType,
+	},
+}
+
+var allExpr = parseExpression{
+	subTokens: []validTokens{
+		agentSetValidType,
+		openBracketValidType,
+		rValuleValidType,
+		closeBracketValidType,
+	},
+}
+
+var functionCallExpr = parseExpression{
+	subTokens: []validTokens{
+		functionParametersValidType,
+	},
+}
+
+var faceXYCallExpr = parseExpression{
+	subTokens: []validTokens{
+		varOrNumberValidType,
+		varOrNumberValidType,
+	},
+}
+
+var forwardCallExpr = parseExpression{
+	subTokens: []validTokens{
+		varOrNumberValidType,
+	},
+}
+
+var faceExpr = parseExpression{
+	subTokens: []validTokens{
+		turtleAgentValidType,
+	},
+}
+
+var functionNameExpr = parseExpression{
+	subTokens: []validTokens{
+		openBracketFunctionParameterValidType,
+	},
+}
+
+var openBracketFunctionParameterExpr = parseExpression{
+	subTokens: []validTokens{
+		varValidType,
+		closeBracketFunctionParameterValidType,
+	},
+}
+
+var rightExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+	},
+}
+
+var randomFloatExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+	},
+}
+
+var leftExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+	},
+}
+
+var patchAtExpr = parseExpression{
+	subTokens: []validTokens{
+		varOrNumberValidType,
+		varOrNumberValidType,
+	},
+}
+
+var reportExpr = parseExpression{
+	subTokens: []validTokens{
+		rValuleValidType,
+	},
+}
+
+var randomExpr = parseExpression{
+	subTokens: []validTokens{
+		varOrNumberValidType,
 	},
 }
