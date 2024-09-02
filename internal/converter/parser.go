@@ -17,12 +17,12 @@ func parse(tokens []token) (ast, error) {
 
 	//root token
 	rootToken := token{
-		tokenType: "ROOT",
+		tokenType: tROOT,
 	}
 
 	index := 0
 
-	if tokens[0].tokenType != "ROOT" {
+	if tokens[0].tokenType != tROOT {
 		tokens = append([]token{rootToken}, tokens...)
 	}
 
@@ -141,7 +141,7 @@ var rootExp = parseExpression{
 	subTokens: []validTokens{
 		{
 			validType: "many",
-			tokens:    map[string]interface{}{"BREED": nil, "GLOBALS": nil, "TO": nil, "TO-REPORT": nil},
+			tokens:    map[string]interface{}{tBREED: nil, tGLOBALS: nil, tTO: nil, tTO_REPORT: nil},
 		},
 	},
 }
