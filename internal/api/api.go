@@ -43,8 +43,8 @@ func (a *Api) Serve() {
 
 	r.HandleFunc("/", a.HomeHandler)
 	r.HandleFunc("/health", a.healthCheckHandler)
-	r.HandleFunc("/setup", a.setUpHandler)
-	r.HandleFunc("/go", a.goHandler)
+	r.HandleFunc("/setup", a.setUpHandler).Methods("POST")
+	r.HandleFunc("/go", a.goHandler).Methods("POST")
 	r.HandleFunc("/model", a.modelHandler)
 
 	//frontend handlers

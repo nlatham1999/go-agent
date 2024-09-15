@@ -1,13 +1,10 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/nlatham1999/go-agent/internal/model"
 )
 
 func convertModelToApiModel(model *model.Model) *Model {
-	fmt.Println("Patches", model.Patches)
 	apiModel := Model{
 		Patches:          convertPatchSetToApiPatchSet(model.Patches),
 		Turtles:          convertTurtleSetToApiTurtleSet(model.Turtles("")),

@@ -8,10 +8,23 @@
 </head>
 <body>
     <h1>{{ .Title }}</h1>
-    <button hx-get="/load" hx-target="#content">Load Content</button>
-    
-    <div id="content">
-        <!-- Content will be loaded here -->
-    </div>
+
+    <div id="min-pxcor">Min PXCor</div>
+    <div id="max-pxcor">Max PXCor</div>
+    <div id="min-pycor">Min PYCor</div>
+    <div id="max-pxcor">Max PYCor</div>
+
+     <!--button that calls the js function setup()-->
+    <button onclick="setup()">setup</button>
+
+
+    <button onclick="setup()">go</button>
+
+    <button onclick="model()">load model</button>
+
+
+    <script>
+        {{ .Script}}
+    </script>
 </body>
 </html>

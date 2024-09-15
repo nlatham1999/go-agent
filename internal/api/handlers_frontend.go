@@ -9,16 +9,19 @@ import (
 //go:embed html/index.html
 var indexHTML string
 
+//go:embed html/script.js
+var scriptJS string
+
 func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.New("content").Parse(indexHTML)
-	// tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	data := map[string]interface{}{
-		"Title": "Go Agent",
+		"Title":  "Go Agent",
+		"Script": scriptJS,
 	}
 
 	tmpl.Execute(w, data)

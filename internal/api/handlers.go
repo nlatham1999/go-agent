@@ -12,12 +12,7 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 	a.SetupFunc()
 
-	model := convertModelToApiModel(a.ModelFunc())
-
-	//return the model as json
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(model)
 }
 
 func (a *Api) goHandler(w http.ResponseWriter, r *http.Request) {
