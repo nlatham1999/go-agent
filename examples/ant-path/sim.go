@@ -14,22 +14,36 @@ var (
 	foodX float64
 	foodY float64
 
-	numAnts = 10000
-
 	startDelay = 3
 
 	timerVal int64
 )
 
-func SetUp() {
-	if m != nil {
-		m.ClearAll()
-	}
+func Model() *model.Model {
+	return m
+}
+
+func Init() {
+
+	fmt.Println("Initializing model")
 
 	settings := model.ModelSettings{
 		TurtleBreeds: []string{"leader", "follower"},
 	}
 	m = model.NewModel(settings)
+
+	m.SetDynamicVariable("max-ticks", 5000)
+	m.SetDynamicVariable("num-turtles", 1000)
+
+	if m != nil {
+		fmt.Println("Model initialized")
+	}
+}
+
+func SetUp() {
+	if m != nil {
+		m.ClearAll()
+	}
 
 	m.SetDefaultShapeTurtles("bug")
 
@@ -44,6 +58,7 @@ func SetUp() {
 		},
 	})
 
+	numAnts := m.GetDynamicVariable("num-turtles").(int)
 	m.CreateTurtles(numAnts-1, "follower", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)

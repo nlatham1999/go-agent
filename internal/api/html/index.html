@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go and HTMX Example</title>
+    <script src="https://unpkg.com/htmx.org@1.8.0"></script>
+</head>
+<body>
+    <h1>{{ .Title }}</h1>
+    <button hx-get="/load" hx-target="#content">Load Content</button>
+    
+    <div id="content">
+        <!-- Content will be loaded here -->
+    </div>
+</body>
+</html>

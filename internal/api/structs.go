@@ -1,9 +1,10 @@
 package api
 
 type Model struct {
-	Patches []Patch  `json:"patches"`
-	Turtles []Turtle `json:"turtles"`
-	Links   []Link   `json:"links"`
+	Patches          []Patch  `json:"patches"`
+	Turtles          []Turtle `json:"turtles"`
+	Links            []Link   `json:"links"`
+	DynamicVariables map[string]interface{}
 }
 
 type Patch struct {
@@ -23,9 +24,10 @@ type Turtle struct {
 }
 
 type Color struct {
-	R uint8 `json:"r"`
-	G uint8 `json:"g"`
-	B uint8 `json:"b"`
+	R int `json:"r"`
+	G int `json:"g"`
+	B int `json:"b"`
+	A int `json:"a"`
 }
 
 type Link struct {

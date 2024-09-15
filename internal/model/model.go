@@ -49,6 +49,8 @@ type Model struct {
 	randomGenerator *rand.Rand
 
 	modelStart time.Time
+
+	DynamicVariables map[string]interface{}
 }
 
 func NewModel(
@@ -91,6 +93,7 @@ func NewModel(
 		whoToTurtles:       make(map[int]*Turtle),
 		randomGenerator:    rand.New(rand.NewSource(0)),
 		modelStart:         time.Now(),
+		DynamicVariables:   make(map[string]interface{}),
 	}
 
 	//construct turtle breeds
@@ -319,7 +322,7 @@ func (m *Model) ClearTurtles() {
 	m.turtlesWhoNumber = 0
 }
 
-//like create turtles but goes through the list of colors and evenly spaces out the headings
+// like create turtles but goes through the list of colors and evenly spaces out the headings
 func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []TurtleOperation) error {
 	if breed != "" {
 		_, found := m.breeds[breed]
@@ -591,6 +594,14 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	}
 
 	return distance
+}
+
+func (m *Model) GetDynamicVariable(key string) interface{} {
+	return m.DynamicVariables[key]
+}
+
+func (m *Model) SetDynamicVariable(key string, value interface{}) {
+	m.DynamicVariables[key] = value
 }
 
 func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
