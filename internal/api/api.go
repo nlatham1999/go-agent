@@ -11,31 +11,25 @@ import (
 )
 
 type Api struct {
-	SetupFunc func()
-	GoFunc    func()
-	InitFunc  func()
-	ModelFunc func() *model.Model
+	Sim model.ModelInterface
 }
 
-func NewApi(modelFunc func() *model.Model, init func(), setup func(), goloop func()) *Api {
+func NewApi(sim model.ModelInterface) *Api {
 
 	return &Api{
-		SetupFunc: setup,
-		GoFunc:    goloop,
-		InitFunc:  init,
-		ModelFunc: modelFunc,
+		Sim: sim,
 	}
 }
 
 func (a *Api) Serve() {
 
-	if a.ModelFunc() == nil {
+	if a.Sim.Model() == nil {
 		fmt.Println("Model is nil")
 	}
 
-	a.InitFunc()
+	a.Sim.Init()
 
-	if a.ModelFunc() == nil {
+	if a.Sim.Model() == nil {
 		fmt.Println("Model is nil")
 	}
 

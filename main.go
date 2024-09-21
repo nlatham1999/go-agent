@@ -9,12 +9,8 @@ import (
 
 func main() {
 
-	i := antpath.Init
-	s := antpath.SetUp
-	g := antpath.Go
-	m := antpath.Model
 
-	agentApi := api.NewApi(m, i, s, g)
+	agentApi := api.NewApi(antpath.AntPath
 
 	agentApi.Serve()
 

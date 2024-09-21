@@ -6,7 +6,9 @@ import (
 	"github.com/nlatham1999/go-agent/internal/model"
 )
 
-var (
+var ()
+
+type AntPath struct {
 	m *model.Model
 
 	nestX float64
@@ -14,59 +16,65 @@ var (
 	foodX float64
 	foodY float64
 
-	startDelay = 3
+	startDelay int
 
 	timerVal int64
-)
-
-func Model() *model.Model {
-	return m
 }
 
-func Init() {
+func NewAntPath() *AntPath {
+	return &AntPath{
+		startDelay: 3,
+	}
+}
+
+func (a *AntPath) Model() *model.Model {
+	return a.m
+}
+
+func (a *AntPath) Init() {
 
 	fmt.Println("Initializing model")
 
 	settings := model.ModelSettings{
 		TurtleBreeds: []string{"leader", "follower"},
 	}
-	m = model.NewModel(settings)
+	a.m = model.NewModel(settings)
 
-	m.SetDynamicVariable("max-ticks", 5000)
-	m.SetDynamicVariable("num-turtles", 1000)
+	a.m.SetDynamicVariable("max-ticks", 5000)
+	a.m.SetDynamicVariable("num-turtles", 1000)
 
-	if m != nil {
+	if a.m != nil {
 		fmt.Println("Model initialized")
 	}
 }
 
-func SetUp() {
-	if m != nil {
-		m.ClearAll()
+func (a *AntPath) SetUp() {
+	if a.m != nil {
+		a.m.ClearAll()
 	}
 
-	m.SetDefaultShapeTurtles("bug")
+	a.m.SetDefaultShapeTurtles("bug")
 
-	nestX = 10 + float64(m.MinPxCor)
-	nestY = 0
-	foodX = float64(m.MaxPxCor) - 10
-	foodY = 0
+	a.nestX = 10 + float64(a.m.MinPxCor)
+	a.nestY = 0
+	a.foodX = float64(a.m.MaxPxCor) - 10
+	a.foodY = 0
 
-	m.CreateTurtles(1, "leader", []model.TurtleOperation{
+	a.m.CreateTurtles(1, "leader", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Red)
 		},
 	})
 
-	numAnts := m.GetDynamicVariable("num-turtles").(int)
-	m.CreateTurtles(numAnts-1, "follower", []model.TurtleOperation{
+	numAnts := a.m.GetDynamicVariable("num-turtles").(int)
+	a.m.CreateTurtles(numAnts-1, "follower", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)
 			t.SetHeading(0)
 		},
 	})
 
-	m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
+	a.m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
 		return float64(t.Who())
 	}).Ask(
 		[]model.TurtleOperation{
@@ -76,43 +84,43 @@ func SetUp() {
 		},
 	)
 
-	m.Turtles("").Ask([]model.TurtleOperation{
+	a.m.Turtles("").Ask([]model.TurtleOperation{
 		func(t *model.Turtle) {
-			t.SetXY(nestX, nestY)
+			t.SetXY(a.nestX, a.nestY)
 		},
 	})
 
-	m.ResetTicks()
+	a.m.ResetTicks()
 }
 
-func Go() {
-	if m.Turtles("").All(func(t *model.Turtle) bool {
-		return t.XCor() >= foodX
+func (a *AntPath) Go() {
+	if a.m.Turtles("").All(func(t *model.Turtle) bool {
+		return t.XCor() >= a.foodX
 	}) {
 		fmt.Println("All ants have reached the food")
-		fmt.Println("time in ms:", m.Timer())
-		fmt.Println("num ticks:", m.Ticks)
+		fmt.Println("time in ms:", a.m.Timer())
+		fmt.Println("num ticks:", a.m.Ticks)
 
 		return
 	}
 
-	m.Turtles("leader").Ask([]model.TurtleOperation{
+	a.m.Turtles("leader").Ask([]model.TurtleOperation{
 		func(t *model.Turtle) {
-			wiggle(t, 45)
+			a.wiggle(t, 45)
 			correctPath(t)
-			if t.XCor() > (foodX - 5) {
-				t.FaceXY(foodX, foodY)
+			if t.XCor() > (a.foodX - 5) {
+				t.FaceXY(a.foodX, a.foodY)
 			}
-			if t.XCor() < foodX {
+			if t.XCor() < a.foodX {
 				t.Forward(0.5)
 			}
 		},
 	})
 
-	m.Turtles("follower").Ask([]model.TurtleOperation{
+	a.m.Turtles("follower").Ask([]model.TurtleOperation{
 		func(t *model.Turtle) {
-			t.FaceTurtle(m.Turtle("", t.Who()-1))
-			if timeToStart(t) && t.XCor() < foodX {
+			t.FaceTurtle(a.m.Turtle("", t.Who()-1))
+			if a.timeToStart(t) && t.XCor() < a.foodX {
 				if t.Who() == 1 {
 				}
 				t.Forward(0.5)
@@ -120,13 +128,13 @@ func Go() {
 		},
 	})
 
-	m.Tick()
+	a.m.Tick()
 
 }
 
-func wiggle(t *model.Turtle, angle float64) {
-	t.Right(m.RandomFloat(angle))
-	t.Left(m.RandomFloat(angle))
+func (a *AntPath) wiggle(t *model.Turtle, angle float64) {
+	t.Right(a.m.RandomFloat(angle))
+	t.Left(a.m.RandomFloat(angle))
 }
 
 func correctPath(t *model.Turtle) {
@@ -142,9 +150,9 @@ func correctPath(t *model.Turtle) {
 	}
 }
 
-func timeToStart(t *model.Turtle) bool {
-	x := m.Turtle("", t.Who()-1).XCor()
-	delay := nestX + float64(startDelay) + float64(m.RandomInt(startDelay))
+func (a *AntPath) timeToStart(t *model.Turtle) bool {
+	x := a.m.Turtle("", t.Who()-1).XCor()
+	delay := a.nestX + float64(a.startDelay) + float64(a.m.RandomInt(a.startDelay))
 	if t.Who() == 1 {
 		// fmt.Println(x, delay)
 	}

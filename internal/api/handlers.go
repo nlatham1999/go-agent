@@ -10,18 +10,18 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
-	a.SetupFunc()
+	a.Sim.SetUp()
 
 	w.WriteHeader(http.StatusOK)
 }
 
 func (a *Api) goHandler(w http.ResponseWriter, r *http.Request) {
-	a.GoFunc()
+	a.Sim.Go()
 	w.WriteHeader(http.StatusOK)
 }
 
 func (a *Api) modelHandler(w http.ResponseWriter, r *http.Request) {
-	model := convertModelToApiModel(a.ModelFunc())
+	model := convertModelToApiModel(a.Sim.Model())
 
 	//return the model as json
 	w.Header().Set("Content-Type", "application/json")
