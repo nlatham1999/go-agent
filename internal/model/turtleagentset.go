@@ -11,6 +11,7 @@ type TurtleAgentSet struct {
 
 func TurtleSet(turtles []*Turtle) *TurtleAgentSet {
 	turtleSet := make(map[*Turtle]interface{})
+
 	for _, turtle := range turtles {
 		turtleSet[turtle] = nil
 	}

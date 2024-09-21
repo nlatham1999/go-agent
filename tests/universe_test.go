@@ -629,3 +629,83 @@ func TestDiffuse4(t *testing.T) {
 		t.Errorf("Expected 0, got %d", p9.GetOwn("heat"))
 	}
 }
+
+func TestTurtlesOnPatch(t *testing.T) {
+
+	// create a basic model
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
+
+	// create 5 turtles on a patch
+	m.CreateTurtles(5, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+
+	t1.SetXY(1, 1)
+	t2.SetXY(1, 1)
+	t3.SetXY(1, 1)
+
+	turtles := m.TurtlesOnPatch(m.Patch(1, 1))
+
+	if turtles.Count() != 3 {
+		t.Errorf("Expected 3 turtles, got %d", turtles.Count())
+	}
+
+	if !turtles.Contains(t1) {
+		t.Errorf("Expected turtles to contain t1")
+	}
+
+	if !turtles.Contains(t2) {
+		t.Errorf("Expected turtles to contain t2")
+	}
+
+	if !turtles.Contains(t3) {
+		t.Errorf("Expected turtles to contain t3")
+	}
+}
+
+func TestTurtlesOnPatches(t *testing.T) {
+
+	// create a basic model
+	settings := model.ModelSettings{}
+	m := model.NewModel(settings)
+
+	// create 5 turtles on a patch
+	m.CreateTurtles(5, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+
+	t1.SetXY(1, 1)
+	t2.SetXY(1, 1)
+	t3.SetXY(1, 1)
+	t4.SetXY(1, 2)
+
+	patchSet := model.PatchSet([]*model.Patch{m.Patch(1, 1), m.Patch(1, 2)})
+
+	turtles := m.TurtlesOnPatches(patchSet)
+
+	if turtles.Count() != 4 {
+		t.Errorf("Expected 4 turtles, got %d", turtles.Count())
+	}
+
+	if !turtles.Contains(t1) {
+		t.Errorf("Expected turtles to contain t1")
+	}
+
+	if !turtles.Contains(t2) {
+		t.Errorf("Expected turtles to contain t2")
+	}
+
+	if !turtles.Contains(t3) {
+		t.Errorf("Expected turtles to contain t3")
+	}
+
+	if !turtles.Contains(t4) {
+		t.Errorf("Expected turtles to contain t4")
+	}
+}

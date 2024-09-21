@@ -20,6 +20,10 @@ func PatchSet(patches []*Patch) *PatchAgentSet {
 	}
 }
 
+func (p *PatchAgentSet) Add(patch *Patch) {
+	p.patches[patch] = nil
+}
+
 func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
 	for patch := range p.patches {
 		if !operation(patch) {

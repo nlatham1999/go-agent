@@ -9,8 +9,9 @@ import (
 
 func main() {
 
+	sim := antpath.NewAntPath()
 
-	agentApi := api.NewApi(antpath.AntPath
+	agentApi := api.NewApi(sim)
 
 	agentApi.Serve()
 

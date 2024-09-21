@@ -531,7 +531,6 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 	return nil
 }
 
-// @TODO implement
 func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 
 	if percent > 1 || percent < 0 {
@@ -1044,7 +1043,6 @@ func (m *Model) Turtles(breed string) *TurtleAgentSet {
 	return m.breeds[breed].Turtles
 }
 
-// @TODO implement
 func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
 	x := int(math.Round(pxcor))
 	y := int(math.Round(pycor))
@@ -1058,24 +1056,47 @@ func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAge
 	return nil
 }
 
-// @TODO implement
+// Returns the turtles on the provided patch
 func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
-	return nil
+	return patch.TurtlesHere("")
 }
 
-// @TODO implement
+// Returns the turtles on the provided patches
 func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
-	return nil
+	turtles := TurtleSet(nil)
+
+	for patch := range patches.patches {
+		s := m.TurtlesOnPatch(patch)
+		for turtle := range s.turtles {
+			turtles.Add(turtle)
+		}
+	}
+
+	return turtles
 }
 
-// @TODO implement
+// Returns the turtles on the same patch as the provided turtle
 func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
-	return nil
+	p := turtle.PatchHere()
+	if p == nil {
+		return nil
+	}
+
+	return p.TurtlesHere("")
 }
 
-// @TODO implement
+// Returns the turtles on the same patch as the provided turtle
 func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
-	return nil
+	patches := PatchSet(nil)
+
+	for turtle := range turtles.turtles {
+		p := turtle.PatchHere()
+		if p != nil {
+			patches.Add(p)
+		}
+	}
+
+	return m.TurtlesOnPatches(patches)
 }
 
 func (m *Model) WrappingXOn() {
