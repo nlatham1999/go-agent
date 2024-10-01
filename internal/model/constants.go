@@ -2,23 +2,23 @@ package model
 
 // colors
 var (
-	Black     = Color{Red: 0, Green: 0, Blue: 0}
-	White     = Color{Red: 255, Green: 255, Blue: 255}
-	Grey      = Color{Red: 128, Green: 128, Blue: 128}
-	Gray      = Color{Red: 128, Green: 128, Blue: 128}
-	Red       = Color{Red: 255, Green: 0, Blue: 0}
-	Orange    = Color{Red: 255, Green: 165, Blue: 0}
-	Brown     = Color{Red: 165, Green: 42, Blue: 42}
-	Yellow    = Color{Red: 255, Green: 255, Blue: 0}
-	Green     = Color{Red: 0, Green: 128, Blue: 0}
-	Lime      = Color{Red: 0, Green: 255, Blue: 0}
-	Turquoise = Color{Red: 64, Green: 224, Blue: 208}
-	Cyan      = Color{Red: 0, Green: 255, Blue: 255}
-	Sky       = Color{Red: 135, Green: 206, Blue: 235}
-	Blue      = Color{Red: 0, Green: 0, Blue: 255}
-	Violet    = Color{Red: 238, Green: 130, Blue: 238}
-	Magenta   = Color{Red: 255, Green: 0, Blue: 255}
-	Pink      = Color{Red: 255, Green: 192, Blue: 203}
+	Black     = Color{Red: 0, Green: 0, Blue: 0, Alpha: 1}
+	White     = Color{Red: 255, Green: 255, Blue: 255, Alpha: 1}
+	Grey      = Color{Red: 128, Green: 128, Blue: 128, Alpha: 1}
+	Gray      = Color{Red: 128, Green: 128, Blue: 128, Alpha: 1}
+	Red       = Color{Red: 255, Green: 0, Blue: 0, Alpha: 1}
+	Orange    = Color{Red: 255, Green: 165, Blue: 0, Alpha: 1}
+	Brown     = Color{Red: 165, Green: 42, Blue: 42, Alpha: 1}
+	Yellow    = Color{Red: 255, Green: 255, Blue: 0, Alpha: 1}
+	Green     = Color{Red: 0, Green: 128, Blue: 0, Alpha: 1}
+	Lime      = Color{Red: 0, Green: 255, Blue: 0, Alpha: 1}
+	Turquoise = Color{Red: 64, Green: 224, Blue: 208, Alpha: 1}
+	Cyan      = Color{Red: 0, Green: 255, Blue: 255, Alpha: 1}
+	Sky       = Color{Red: 135, Green: 206, Blue: 235, Alpha: 1}
+	Blue      = Color{Red: 0, Green: 0, Blue: 255, Alpha: 1}
+	Violet    = Color{Red: 238, Green: 130, Blue: 238, Alpha: 1}
+	Magenta   = Color{Red: 255, Green: 0, Blue: 255, Alpha: 1}
+	Pink      = Color{Red: 255, Green: 192, Blue: 203, Alpha: 1}
 
 	baseColorsList = []Color{
 		Black,

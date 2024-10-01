@@ -5,26 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go and HTMX Example</title>
     <script src="https://unpkg.com/htmx.org@1.8.0"></script>
+
+    <style>
+        .patch {
+            position: absolute;
+        }
+        .turtle {
+            position: absolute;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
 </head>
 <body>
     <h1>{{ .Title }}</h1>
 
-    <div id="min-pxcor">Min PXCor</div>
-    <div id="max-pxcor">Max PXCor</div>
-    <div id="min-pycor">Min PYCor</div>
-    <div id="max-pxcor">Max PYCor</div>
+    <div style="position: absolute;" >
+        <button hx-post="/setup" hx-swap="none">Setup</button>
 
-     <!--button that calls the js function setup()-->
-    <button onclick="setup()">setup</button>
+        <button hx-post="/gorepeat" hx-swap="none">Go</button>
+        <!-- <input type="checkbox" hx-post="/repeat" hx-trigger="change" hx-swap="none"> Repeat Go -->
+        <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .01s" style="visibility: hidden;">Load Content</button>
+    </div>
+
+    <div id="content">
+        <!-- Content will be loaded here -->
+    </div>
 
 
-    <button onclick="setup()">go</button>
-
-    <button onclick="model()">load model</button>
-
-
-    <script>
-        {{ .Script}}
-    </script>
 </body>
+<script>
+    document.getElementById('loadButton').addEventListener('htmx:configRequest', function (event) {
+        // Capture the screen width and height
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Add the width and height to the request parameters
+        event.detail.parameters['width'] = width;
+        event.detail.parameters['height'] = height;
+    });
+</script>
 </html>

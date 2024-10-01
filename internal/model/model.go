@@ -248,6 +248,7 @@ func (m *Model) ClearAll() {
 	m.ClearGlobals()
 	m.ClearTicks()
 	m.ClearPatches()
+	m.ClearTurtles()
 }
 
 func (m *Model) ClearGlobals() {
@@ -964,6 +965,7 @@ func (m *Model) RandomInt(number int) int {
 }
 
 func (m *Model) ResetTicks() {
+	m.TicksOn = true
 	m.Ticks = 0
 }
 

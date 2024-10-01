@@ -5,6 +5,9 @@ type Model struct {
 	Turtles          []Turtle `json:"turtles"`
 	Links            []Link   `json:"links"`
 	DynamicVariables map[string]interface{}
+	Ticks            int `json:"ticks"`
+	Width            int `json:"width"`
+	Height           int `json:"height"`
 }
 
 type Patch struct {

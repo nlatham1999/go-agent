@@ -10,6 +10,9 @@ func convertModelToApiModel(model *model.Model) *Model {
 		Turtles:          convertTurtleSetToApiTurtleSet(model.Turtles("")),
 		Links:            convertLinkSetToApiLinkSet(model.Links),
 		DynamicVariables: model.DynamicVariables,
+		Ticks:            model.Ticks,
+		Width:            model.WorldWidth,
+		Height:           model.WorldHeight,
 	}
 	return &apiModel
 }

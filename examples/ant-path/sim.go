@@ -41,7 +41,7 @@ func (a *AntPath) Init() {
 	a.m = model.NewModel(settings)
 
 	a.m.SetDynamicVariable("max-ticks", 5000)
-	a.m.SetDynamicVariable("num-turtles", 1000)
+	a.m.SetDynamicVariable("num-turtles", 100)
 
 	if a.m != nil {
 		fmt.Println("Model initialized")
@@ -129,7 +129,6 @@ func (a *AntPath) Go() {
 	})
 
 	a.m.Tick()
-
 }
 
 func (a *AntPath) wiggle(t *model.Turtle, angle float64) {
@@ -157,4 +156,20 @@ func (a *AntPath) timeToStart(t *model.Turtle) bool {
 		// fmt.Println(x, delay)
 	}
 	return x > delay
+}
+
+func (a *AntPath) Stats() map[string]interface{} {
+	return map[string]interface{}{
+		"num-turtles": a.m.Turtles("").Count(),
+		"num-at-food": a.m.Turtles("").With(func(t *model.Turtle) bool {
+			return t.XCor() >= a.foodX
+		}).Count(),
+	}
+}
+
+// stop the model when all the ants have reached the food
+func (a *AntPath) Stop() bool {
+	return a.m.Turtles("").All(func(t *model.Turtle) bool {
+		return t.XCor() >= a.foodX
+	})
 }

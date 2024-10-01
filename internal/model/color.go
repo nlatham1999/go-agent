@@ -18,6 +18,7 @@ func (c *Color) SetColorRGB(red int, blue int, green int) {
 	c.Red = red
 	c.Blue = blue
 	c.Green = green
+	c.Alpha = 1
 }
 
 func (c *Color) SetColorRGBA(red int, blue int, green int, alpha int) {

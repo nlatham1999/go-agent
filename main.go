@@ -10,6 +10,7 @@ import (
 func main() {
 
 	sim := antpath.NewAntPath()
+	// sim := simplesim.NewSimpleSim()
 
 	agentApi := api.NewApi(sim)
 
