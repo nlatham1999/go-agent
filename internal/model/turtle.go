@@ -205,6 +205,10 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 	return &TurtleAgentSet{tiedTurtlesMap}
 }
 
+func (t *Turtle) Die() {
+	t.parent.KillTurtle(t)
+}
+
 // returns the distance between the two turtles
 func (t *Turtle) DistanceTurtle(turtle *Turtle) float64 {
 	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, turtle.xcor, turtle.ycor)
@@ -636,6 +640,49 @@ func (t *Turtle) GetOwn(key string) interface{} {
 		return val
 	}
 	return nil
+}
+
+func (t *Turtle) GetOwnI(key string) int {
+	v := t.GetOwn(key)
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return v
+	case float64:
+		return int(v)
+	default:
+		return 0
+	}
+}
+
+func (t *Turtle) GetOwnF(key string) float64 {
+	v := t.GetOwn(key)
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return float64(v)
+	case float64:
+		return v
+	default:
+		return 0
+	}
+}
+
+func (t *Turtle) GetOwnS(key string) string {
+	v := t.GetOwn(key)
+	if v == nil {
+		return ""
+	}
+	switch v := v.(type) {
+	case string:
+		return v
+	default:
+		return ""
+	}
 }
 
 // sets the turtle own variable

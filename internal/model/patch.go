@@ -265,6 +265,49 @@ func (p *Patch) GetOwn(key string) interface{} {
 	return p.patchesOwn[key]
 }
 
+func (t *Patch) GetOwnI(key string) int {
+	v := t.GetOwn(key)
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return v
+	case float64:
+		return int(v)
+	default:
+		return 0
+	}
+}
+
+func (t *Patch) GetOwnF(key string) float64 {
+	v := t.GetOwn(key)
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return float64(v)
+	case float64:
+		return v
+	default:
+		return 0
+	}
+}
+
+func (t *Patch) GetOwnS(key string) string {
+	v := t.GetOwn(key)
+	if v == nil {
+		return ""
+	}
+	switch v := v.(type) {
+	case string:
+		return v
+	default:
+		return ""
+	}
+}
+
 func (p *Patch) SetOwn(key string, value interface{}) {
 	// if the value is an int, convert it to a float64
 	if _, ok := value.(int); ok {

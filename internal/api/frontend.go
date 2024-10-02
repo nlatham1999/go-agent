@@ -45,7 +45,7 @@ func (a *Api) getFrontend(width int, height int) string {
 
 	// Render turtles
 	turtleOffset := patchSize / 2
-	for _, turtle := range model.Turtles("").List() {
+	for _, turtle := range model.Turtles("").ListSorted() {
 		relativeX := turtle.XCor() + 16
 		relativeY := turtle.YCor() + 16
 		tmpl += `

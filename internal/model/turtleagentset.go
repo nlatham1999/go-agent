@@ -96,12 +96,24 @@ func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleA
 }
 
 func (t *TurtleAgentSet) List() []*Turtle {
-
 	turtles := make([]*Turtle, 0)
 	for turtle := range t.turtles {
 		turtles = append(turtles, turtle)
 	}
 
+	return turtles
+}
+
+func (t *TurtleAgentSet) ListSorted() []*Turtle {
+	turtles := t.List()
+
+	sort.Sort(&TurtleSorter{
+		turtles: turtles,
+		f: func(t *Turtle) float64 {
+			return float64(t.Who())
+		},
+		reverse: false,
+	})
 	return turtles
 }
 

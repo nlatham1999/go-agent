@@ -9,7 +9,7 @@ func convertModelToApiModel(model *model.Model) *Model {
 		Patches:          convertPatchSetToApiPatchSet(model.Patches),
 		Turtles:          convertTurtleSetToApiTurtleSet(model.Turtles("")),
 		Links:            convertLinkSetToApiLinkSet(model.Links),
-		DynamicVariables: model.DynamicVariables,
+		DynamicVariables: model.Globals,
 		Ticks:            model.Ticks,
 		Width:            model.WorldWidth(),
 		Height:           model.WorldHeight(),
@@ -42,7 +42,7 @@ func convertColorToApiColor(color *model.Color) Color {
 
 func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 	apiTurtles := make([]Turtle, 0, turtles.Count())
-	for _, turtle := range turtles.List() {
+	for _, turtle := range turtles.ListSorted() {
 		apiTurtle := Turtle{
 			X:       turtle.XCor(),
 			Y:       turtle.YCor(),

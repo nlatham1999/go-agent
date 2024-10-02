@@ -40,8 +40,8 @@ func (a *AntPath) Init() {
 	}
 	a.m = model.NewModel(settings)
 
-	a.m.SetDynamicVariable("max-ticks", 5000)
-	a.m.SetDynamicVariable("num-turtles", 100)
+	a.m.SetGlobal("max-ticks", 5000)
+	a.m.SetGlobal("num-turtles", 100)
 
 	if a.m != nil {
 		fmt.Println("Model initialized")
@@ -66,7 +66,7 @@ func (a *AntPath) SetUp() {
 		},
 	})
 
-	numAnts := a.m.GetDynamicVariable("num-turtles").(int)
+	numAnts := a.m.GetGlobal("num-turtles").(int)
 	a.m.CreateTurtles(numAnts-1, "follower", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)

@@ -161,9 +161,9 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 					if err != nil {
 						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
 					}
-					a.Sim.Model().SetDynamicVariable(name, intValue)
+					a.Sim.Model().SetGlobal(name, intValue)
 				} else {
-					a.Sim.Model().SetDynamicVariable(name, value)
+					a.Sim.Model().SetGlobal(name, value)
 				}
 			}
 		}

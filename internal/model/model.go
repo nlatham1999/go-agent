@@ -43,14 +43,11 @@ type Model struct {
 
 	turtlesWhoNumber int //who number of the next turtle to be created
 
-	GlobalFloats map[string]float64
-	GlobalBools  map[string]bool
-
 	randomGenerator *rand.Rand
 
 	modelStart time.Time
 
-	DynamicVariables map[string]interface{}
+	Globals map[string]interface{}
 }
 
 func NewModel(
@@ -93,7 +90,7 @@ func NewModel(
 		whoToTurtles:       make(map[int]*Turtle),
 		randomGenerator:    rand.New(rand.NewSource(0)),
 		modelStart:         time.Now(),
-		DynamicVariables:   make(map[string]interface{}),
+		Globals:            make(map[string]interface{}),
 	}
 
 	//construct turtle breeds
@@ -174,7 +171,13 @@ func NewModel(
 		links: make(map[*Link]interface{}),
 	}
 
+	// build patches
 	model.buildPatches()
+
+	// build globals
+	for key, value := range settings.Globals {
+		model.Globals[key] = value
+	}
 
 	return model
 }
@@ -240,19 +243,9 @@ func (m *Model) patchIndex(x int, y int) int {
 }
 
 func (m *Model) ClearAll() {
-	m.ClearGlobals()
 	m.ClearTicks()
 	m.ClearPatches()
 	m.ClearTurtles()
-}
-
-func (m *Model) ClearGlobals() {
-	for g := range m.GlobalBools {
-		m.GlobalBools[g] = false
-	}
-	for g := range m.GlobalFloats {
-		m.GlobalFloats[g] = 0
-	}
 }
 
 func (m *Model) ClearLinks() {
@@ -591,12 +584,50 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	return distance
 }
 
-func (m *Model) GetDynamicVariable(key string) interface{} {
-	return m.DynamicVariables[key]
+func (m *Model) GetGlobal(key string) interface{} {
+	return m.Globals[key]
 }
 
-func (m *Model) SetDynamicVariable(key string, value interface{}) {
-	m.DynamicVariables[key] = value
+func (m *Model) GetGlobalI(key string) int {
+	v := m.Globals[key]
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return v
+	case float64:
+		return int(v)
+	default:
+		return 0
+	}
+}
+
+func (m *Model) GetGlobalF(key string) float64 {
+	v := m.Globals[key]
+	if v == nil {
+		return 0
+	}
+	switch v := v.(type) {
+	case int:
+		return float64(v)
+	case float64:
+		return v
+	default:
+		return 0
+	}
+}
+
+func (m *Model) GetGlobalS(key string) string {
+	v := m.Globals[key]
+	if v == nil {
+		return ""
+	}
+	return v.(string)
+}
+
+func (m *Model) SetGlobal(key string, value interface{}) {
+	m.Globals[key] = value
 }
 
 func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
@@ -973,6 +1004,14 @@ func (m *Model) RandomInt(number int) int {
 	}
 
 	return m.randomGenerator.Intn(number) * sign
+}
+
+func (m *Model) RandomXCor() float64 {
+	return m.RandomFloat(m.maxXCor-m.minXCor) + m.minXCor
+}
+
+func (m *Model) RandomYCor() float64 {
+	return m.RandomFloat(m.maxYCor-m.minYCor) + m.minYCor
 }
 
 func (m *Model) ResetTicks() {
