@@ -25,18 +25,18 @@ type Model struct {
 	posOfPatches map[int]*Patch  //map of patches by their index
 	whoToTurtles map[int]*Turtle //map of turtles by their who number
 
-	MaxPxCor    int
-	MaxPyCor    int
-	MinPxCor    int
-	MinPyCor    int
-	MaxXCor     float64
-	MaxYCor     float64
-	MinXCor     float64
-	MinYCor     float64
-	WorldWidth  int
-	WorldHeight int
-	wrappingX   bool
-	wrappingY   bool
+	maxPxCor    int     //the maximum x coordinate
+	maxPyCor    int     //the maximum y coordinate
+	minPxCor    int     //the minimum x coordinate
+	minPyCor    int     //the minimum y coordinate
+	maxXCor     float64 //the maximum x coordinate as a float, adds .5 to the max x cor
+	maxYCor     float64 //the maximum y coordinate as a float, adds .5 to the max y cor
+	minXCor     float64 //the minimum x coordinate as a float, subtracts .5 from the min x cor
+	minYCor     float64 //the minimum y coordinate as a float, subtracts .5 from the min y cor
+	worldWidth  int     //the width of the world
+	worldHeight int     //the height of the world
+	wrappingX   bool    //if the world wraps around in the x direction
+	wrappingY   bool    //if the world wraps around in the y direction
 
 	DefaultShapeTurtles string //the default shape for all turtles
 	DefaultShapeLinks   string //the default shape for links
@@ -77,16 +77,16 @@ func NewModel(
 
 	model := &Model{
 		TicksOn:            true,
-		MaxPxCor:           maxPxCor,
-		MaxPyCor:           maxPyCor,
-		MinPxCor:           minPxCor,
-		MinPyCor:           minPyCor,
-		MaxXCor:            float64(maxPxCor) + .5,
-		MaxYCor:            float64(maxPyCor) + .5,
-		MinXCor:            float64(minPxCor) - .5,
-		MinYCor:            float64(minPyCor) - .5,
-		WorldWidth:         maxPxCor - minPxCor + 1,
-		WorldHeight:        maxPyCor - minPyCor + 1,
+		maxPxCor:           maxPxCor,
+		maxPyCor:           maxPyCor,
+		minPxCor:           minPxCor,
+		minPyCor:           minPyCor,
+		maxXCor:            float64(maxPxCor) + .5,
+		maxYCor:            float64(maxPyCor) + .5,
+		minXCor:            float64(minPxCor) - .5,
+		minYCor:            float64(minPyCor) - .5,
+		worldWidth:         maxPxCor - minPxCor + 1,
+		worldHeight:        maxPyCor - minPyCor + 1,
 		patchesOwnTemplate: settings.PatchesOwn,
 		wrappingX:          settings.WrappingX,
 		wrappingY:          settings.WrappingY,
@@ -185,21 +185,16 @@ func (m *Model) buildPatches() {
 		patches: map[*Patch]interface{}{},
 	}
 	m.posOfPatches = make(map[int]*Patch)
-	for i := 0; i < m.WorldHeight; i++ {
-		for j := 0; j < m.WorldWidth; j++ {
-			x := j + m.MinPxCor
-			y := (i + m.MinPyCor) * -1
+	for i := 0; i < m.worldHeight; i++ {
+		for j := 0; j < m.worldWidth; j++ {
+			x := j + m.minPxCor
+			y := (i + m.minPyCor) * -1
 			p := NewPatch(m, m.patchesOwnTemplate, x, y)
-			m.Patches.patches[p] = nil
-			index := y*m.WorldHeight + x
+			m.Patches.Add(p)
+			index := y*m.worldHeight + x
 			m.posOfPatches[index] = p
 			p.index = index
 		}
-	}
-
-	p0 := m.posOfPatches[0]
-	l := m.leftNeighbor(p0)
-	if l == nil {
 	}
 
 	for p := range m.Patches.patches {
@@ -241,7 +236,7 @@ func (m *Model) buildPatches() {
 }
 
 func (m *Model) patchIndex(x int, y int) int {
-	return y*m.WorldHeight + x
+	return y*m.worldHeight + x
 }
 
 func (m *Model) ClearAll() {
@@ -313,7 +308,7 @@ func (m *Model) ClearTurtles() {
 		*turtle = Turtle{}
 	}
 
-	m.turtles.turtles = make(map[*Turtle]interface{})
+	m.turtles.Clear()
 	for breed := range m.breeds {
 		m.breeds[breed].Turtles.turtles = make(map[*Turtle]interface{})
 	}
@@ -400,33 +395,33 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 // returns false if the x y is not in bounds and the topology does not allow it
 func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, bool) {
 
-	if x < m.MinXCor {
+	if x < m.minXCor {
 		if m.wrappingX {
-			x = m.MaxXCor - math.Mod(m.MinXCor-x, float64(m.WorldWidth)) + 1
+			x = m.maxXCor - math.Mod(m.minXCor-x, float64(m.worldWidth)) + 1
 		} else {
 			return x, y, false
 		}
 	}
 
-	if x >= m.MaxXCor {
+	if x >= m.maxXCor {
 		if m.wrappingX {
-			x = m.MinXCor + math.Mod(x-m.MinXCor, float64(m.WorldWidth))
+			x = m.minXCor + math.Mod(x-m.minXCor, float64(m.worldWidth))
 		} else {
 			return x, y, false
 		}
 	}
 
-	if y < m.MinYCor {
+	if y < m.minYCor {
 		if m.wrappingY {
-			y = m.MaxYCor - math.Mod(m.MinYCor-y, float64(m.WorldHeight)) + 1
+			y = m.maxYCor - math.Mod(m.minYCor-y, float64(m.worldHeight)) + 1
 		} else {
 			return x, y, false
 		}
 	}
 
-	if y >= m.MaxYCor {
+	if y >= m.maxYCor {
 		if m.wrappingY {
-			y = m.MinYCor + math.Mod(y-m.MinYCor, float64(m.WorldHeight))
+			y = m.minYCor + math.Mod(y-m.minYCor, float64(m.worldHeight))
 		} else {
 			return x, y, false
 		}
@@ -439,9 +434,9 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 // kills a turtle
 func (m *Model) KillTurtle(turtle *Turtle) {
 
-	delete(m.turtles.turtles, turtle)
+	m.turtles.Remove(turtle)
 	if turtle.breed != "" {
-		delete(m.breeds[turtle.breed].Turtles.turtles, turtle)
+		m.breeds[turtle.breed].Turtles.Remove(turtle)
 	}
 	delete(m.whoToTurtles, turtle.who)
 
@@ -449,7 +444,7 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 	if p != nil {
 		delete(p.turtles[""].turtles, turtle)
 		if turtle.breed != "" {
-			delete(p.turtles[turtle.breed].turtles, turtle)
+			p.turtles[turtle.breed].Remove(turtle)
 		}
 	}
 
@@ -578,8 +573,8 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 		return distance
 	}
 
-	deltaXInverse := float64(m.WorldWidth) - math.Abs(deltaX)
-	deltaYInverse := float64(m.WorldHeight) - math.Abs(deltaY)
+	deltaXInverse := float64(m.worldWidth) - math.Abs(deltaX)
+	deltaYInverse := float64(m.worldHeight) - math.Abs(deltaY)
 
 	if m.wrappingX {
 		distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY)))
@@ -655,13 +650,29 @@ func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 	return t1.linkedTurtles.getLinkDirected(breed, t2)
 }
 
+func (m *Model) MaxPxCor() int {
+	return m.maxPxCor
+}
+
+func (m *Model) MaxPyCor() int {
+	return m.maxPyCor
+}
+
+func (m *Model) MinPxCor() int {
+	return m.minPxCor
+}
+
+func (m *Model) MinPyCor() int {
+	return m.minPyCor
+}
+
 // does not implement wrappimg, that is the responsibilty of the caller
 func (m *Model) getPatchAtCoords(x int, y int) *Patch {
-	if x < m.MinPxCor || x > m.MaxPxCor || y < m.MinPyCor || y > m.MaxPyCor {
+	if x < m.minPxCor || x > m.maxPxCor || y < m.minPyCor || y > m.maxPyCor {
 		return nil
 	}
 
-	pos := y*m.WorldHeight + x
+	pos := y*m.worldHeight + x
 
 	return m.posOfPatches[pos]
 }
@@ -679,19 +690,19 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 	x := p.x - 1
 	y := p.y - 1
 
-	if x < m.MinPxCor {
+	if x < m.minPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MaxPxCor
+			x = m.maxPxCor
 		}
 	}
 
-	if y < m.MinPyCor {
+	if y < m.minPyCor {
 		if !m.wrappingY {
 			return nil
 		} else {
-			y = m.MaxPyCor
+			y = m.maxPyCor
 		}
 	}
 
@@ -703,11 +714,11 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 func (m *Model) topNeighbor(p *Patch) *Patch {
 	y := p.y - 1
 
-	if y < m.MinPyCor {
+	if y < m.minPyCor {
 		if !m.wrappingY {
 			return nil
 		} else {
-			y = m.MaxPyCor
+			y = m.maxPyCor
 		}
 	}
 
@@ -720,19 +731,19 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 	x := p.x + 1
 	y := p.y - 1
 
-	if x > m.MaxPxCor {
+	if x > m.maxPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MinPxCor
+			x = m.minPxCor
 		}
 	}
 
-	if y < m.MinPyCor {
+	if y < m.minPyCor {
 		if !m.wrappingY {
 			return nil
 		} else {
-			y = m.MaxPyCor
+			y = m.maxPyCor
 		}
 	}
 
@@ -744,11 +755,11 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 func (m *Model) leftNeighbor(p *Patch) *Patch {
 	x := p.x - 1
 
-	if x < m.MinPxCor {
+	if x < m.minPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MaxPxCor
+			x = m.maxPxCor
 		}
 	}
 
@@ -760,11 +771,11 @@ func (m *Model) leftNeighbor(p *Patch) *Patch {
 func (m *Model) rightNeighbor(p *Patch) *Patch {
 	x := p.x + 1
 
-	if x > m.MaxPxCor {
+	if x > m.maxPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MinPxCor
+			x = m.minPxCor
 		}
 	}
 
@@ -777,19 +788,19 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 	x := p.x - 1
 	y := p.y + 1
 
-	if x < m.MinPxCor {
+	if x < m.minPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MaxPxCor
+			x = m.maxPxCor
 		}
 	}
 
-	if y > m.MaxPyCor {
+	if y > m.maxPyCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			y = m.MinPyCor
+			y = m.minPyCor
 		}
 	}
 
@@ -801,11 +812,11 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 func (m *Model) bottomNeighbor(p *Patch) *Patch {
 	y := p.y + 1
 
-	if y > m.MaxPyCor {
+	if y > m.maxPyCor {
 		if !m.wrappingY {
 			return nil
 		} else {
-			y = m.MinPyCor
+			y = m.minPyCor
 		}
 	}
 
@@ -818,19 +829,19 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 	x := p.x + 1
 	y := p.y + 1
 
-	if x > m.MaxPxCor {
+	if x > m.maxPxCor {
 		if !m.wrappingX {
 			return nil
 		} else {
-			x = m.MinPxCor
+			x = m.minPxCor
 		}
 	}
 
-	if y > m.MaxPyCor {
+	if y > m.maxPyCor {
 		if !m.wrappingY {
 			return nil
 		} else {
-			y = m.MinPyCor
+			y = m.minPyCor
 		}
 	}
 
@@ -925,13 +936,13 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 	// since the min value will be -*.5 and we want to round up in that case
 	var x int
 	var y int
-	if pxcor == m.MinXCor {
+	if pxcor == m.minXCor {
 		x = int(math.Ceil(pxcor))
 	} else {
 		x = int(math.Round(pxcor))
 	}
 
-	if pycor == m.MinYCor {
+	if pycor == m.minYCor {
 		y = int(math.Ceil(pycor))
 	} else {
 		y = int(math.Round(pycor))
@@ -974,12 +985,16 @@ func (m *Model) ResetTimer() {
 }
 
 func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
-	m.MinPxCor = minPxcor
-	m.MaxPxCor = maxPxcor
-	m.MinPyCor = minPycor
-	m.MaxPyCor = maxPycor
-	m.WorldWidth = maxPxcor - minPxcor + 1
-	m.WorldHeight = maxPycor - minPycor + 1
+	m.minPxCor = minPxcor
+	m.maxPxCor = maxPxcor
+	m.minPyCor = minPycor
+	m.maxPyCor = maxPycor
+	m.maxXCor = float64(maxPxcor) + .5
+	m.maxYCor = float64(maxPycor) + .5
+	m.minXCor = float64(minPxcor) - .5
+	m.minYCor = float64(minPycor) - .5
+	m.worldWidth = maxPxcor - minPxcor + 1
+	m.worldHeight = maxPycor - minPycor + 1
 
 	m.buildPatches()
 }
@@ -1099,6 +1114,14 @@ func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 	}
 
 	return m.TurtlesOnPatches(patches)
+}
+
+func (m *Model) WorldHeight() int {
+	return m.worldHeight
+}
+
+func (m *Model) WorldWidth() int {
+	return m.worldWidth
 }
 
 func (m *Model) WrappingXOn() {

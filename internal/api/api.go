@@ -11,18 +11,22 @@ import (
 )
 
 type Api struct {
-	Sim ModelInterface
+	Sim     ModelInterface
+	Widgets []Widget
 
 	running    bool
 	stop       chan struct{}
 	mu         sync.Mutex
 	funcMutext sync.Mutex
+	speed      time.Duration
 }
 
-func NewApi(sim ModelInterface) *Api {
+func NewApi(sim ModelInterface, widgets []Widget) *Api {
 
 	return &Api{
-		Sim: sim,
+		Sim:     sim,
+		Widgets: widgets,
+		speed:   100 * time.Millisecond,
 	}
 }
 
@@ -49,6 +53,8 @@ func (a *Api) Serve() {
 
 	//frontend handlers
 	r.HandleFunc("/load", a.loadHandler)
+	r.HandleFunc("/updatespeed", a.updateSpeedHandler)
+	r.HandleFunc("/updatedynamic", a.updateDynamicVariableHandler)
 
 	srv := &http.Server{
 		Handler:      r,

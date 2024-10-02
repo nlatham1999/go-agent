@@ -72,6 +72,10 @@ func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet
 	return TurtleSet(turtlesAtPatches)
 }
 
+func (t *TurtleAgentSet) Clear() {
+	t.turtles = make(map[*Turtle]interface{})
+}
+
 func (t *TurtleAgentSet) Contains(turtle *Turtle) bool {
 	_, ok := t.turtles[turtle]
 	return ok
@@ -92,10 +96,12 @@ func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleA
 }
 
 func (t *TurtleAgentSet) List() []*Turtle {
+
 	turtles := make([]*Turtle, 0)
 	for turtle := range t.turtles {
 		turtles = append(turtles, turtle)
 	}
+
 	return turtles
 }
 

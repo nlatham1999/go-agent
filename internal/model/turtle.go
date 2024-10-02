@@ -31,12 +31,6 @@ type Turtle struct {
 	patch *Patch //patch the turtle is on
 }
 
-type linkedTurtle struct {
-	directed bool
-	breed    string
-	turtle   *Turtle
-}
-
 // @TODO might be faster having the patch passed in as a parameter instead of having to calculate it
 func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 
@@ -62,7 +56,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		linkedTurtles: newTurtleLinks(),
 	}
 
-	m.turtles.turtles[t] = nil
+	m.turtles.Add(t)
 	m.whoToTurtles[m.turtlesWhoNumber] = t
 
 	if breedSet != nil {
@@ -145,7 +139,7 @@ func (t *Turtle) CanMove(distance float64) bool {
 	newX := t.xcor + distance*math.Cos(t.heading)
 	newY := t.ycor + distance*math.Sin(t.heading)
 
-	if newX < float64(t.parent.MinPxCor) || newX >= float64(t.parent.MaxPxCor) {
+	if newX < float64(t.parent.minPxCor) || newX >= float64(t.parent.maxPxCor) {
 		if !t.parent.wrappingX {
 			return false
 		} else {
@@ -153,7 +147,7 @@ func (t *Turtle) CanMove(distance float64) bool {
 		}
 	}
 
-	if newY < float64(t.parent.MinPyCor) || newY >= float64(t.parent.MaxPyCor) {
+	if newY < float64(t.parent.minPyCor) || newY >= float64(t.parent.maxPyCor) {
 		if !t.parent.wrappingY {
 			return false
 		} else {
@@ -387,8 +381,8 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 
 	distance := math.Abs(math.Sqrt(dx*dx + dy*dy))
 
-	deltaXInverse := float64(t.parent.WorldWidth) - math.Abs(dx)
-	deltaYInverse := float64(t.parent.WorldHeight) - math.Abs(dy)
+	deltaXInverse := float64(t.parent.worldWidth) - math.Abs(dx)
+	deltaYInverse := float64(t.parent.worldHeight) - math.Abs(dy)
 
 	if t.parent.wrappingX {
 		d := math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+dy*dy)))

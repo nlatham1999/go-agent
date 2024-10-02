@@ -11,8 +11,8 @@ func convertModelToApiModel(model *model.Model) *Model {
 		Links:            convertLinkSetToApiLinkSet(model.Links),
 		DynamicVariables: model.DynamicVariables,
 		Ticks:            model.Ticks,
-		Width:            model.WorldWidth,
-		Height:           model.WorldHeight,
+		Width:            model.WorldWidth(),
+		Height:           model.WorldHeight(),
 	}
 	return &apiModel
 }

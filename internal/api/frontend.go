@@ -3,9 +3,6 @@ package api
 import (
 	_ "embed"
 	"fmt"
-	"net/http"
-	"strconv"
-	"text/template"
 )
 
 //go:embed html/index.html
@@ -15,57 +12,22 @@ var (
 	statsKeys = []string{}
 )
 
-func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.New("content").Parse(indexHTML)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (a *Api) getFrontend(width int, height int) string {
 
-	data := map[string]interface{}{
-		"Title": "Go Agent",
-	}
+	model := a.Sim.Model()
 
-	tmpl.Execute(w, data)
-}
-
-func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
-
-	a.funcMutext.Lock()
-	defer a.funcMutext.Unlock()
-
-	queryParams := r.URL.Query()
-
-	// Get the 'width' and 'height' parameters from the query string
-	widthStr := queryParams.Get("width")
-	heightStr := queryParams.Get("height")
-	width, err := strconv.Atoi(widthStr)
-	if err != nil {
-		http.Error(w, "Invalid width parameter", http.StatusBadRequest)
-		return
-	}
-
-	height, err := strconv.Atoi(heightStr)
-	if err != nil {
-		http.Error(w, "Invalid height parameter", http.StatusBadRequest)
-		return
-	}
-
-	model := convertModelToApiModel(a.Sim.Model())
-
-	patchSize := getPatchSize(width, height, model.Width, model.Height)
+	patchSize := a.getPatchSize(width, height, model.WorldWidth(), model.WorldHeight())
 	turtleSize := patchSize - 2
 	if turtleSize < 1 {
 		turtleSize = 1
 	}
 
-	// Start the HTML template for rendering
 	tmpl := `<div class="grid-container patch-grid" style="position: absolute; left: 50%; top: 5px;">`
 
 	// Render patches
-	for _, patch := range model.Patches {
-		relativeX := patch.X + 16
-		relativeY := patch.Y + 16
+	for _, patch := range model.Patches.List() {
+		relativeX := patch.PXCor() + 16
+		relativeY := patch.PYCor() + 16
 		tmpl += `
 			<div 
 				class="patch" 
@@ -74,18 +36,18 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 					height:` + fmt.Sprintf("%dpx", patchSize) + `;
 					left:` + fmt.Sprintf("%dpx", relativeX*patchSize) + `; 
 					top:` + fmt.Sprintf("%dpx", relativeY*patchSize) + `;
-					background-color: rgba(` + fmt.Sprintf("%d", patch.Color.R) + `, ` + fmt.Sprintf("%d", patch.Color.G) + `, ` + fmt.Sprintf("%d", patch.Color.B) + `, ` + fmt.Sprintf("%d", patch.Color.A) + `);
+					background-color: rgba(` + fmt.Sprintf("%d", patch.PColor.Red) + `, ` + fmt.Sprintf("%d", patch.PColor.Green) + `, ` + fmt.Sprintf("%d", patch.PColor.Blue) + `, ` + fmt.Sprintf("%d", patch.PColor.Alpha) + `);
 				"
 			>
 			</div>
 		`
 	}
 
-	turtleOffset := patchSize / 2
 	// Render turtles
-	for _, turtle := range model.Turtles {
-		relativeX := turtle.X + 16
-		relativeY := turtle.Y + 16
+	turtleOffset := patchSize / 2
+	for _, turtle := range model.Turtles("").List() {
+		relativeX := turtle.XCor() + 16
+		relativeY := turtle.YCor() + 16
 		tmpl += `
 			<div 
 				class="turtle" 
@@ -94,21 +56,22 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 					height:` + fmt.Sprintf("%dpx", turtleSize) + `;
 					left:` + fmt.Sprintf("%vpx", relativeX*float64(patchSize)+float64(turtleOffset)) + `; 
 					top:` + fmt.Sprintf("%vpx", relativeY*float64(patchSize)+float64(turtleOffset)) + `;
-					background-color: rgba(` + fmt.Sprintf("%d", turtle.Color.R) + `, ` + fmt.Sprintf("%d", turtle.Color.G) + `, ` + fmt.Sprintf("%d", turtle.Color.B) + `, ` + fmt.Sprintf("%d", turtle.Color.A) + `);
+					background-color: rgba(` + fmt.Sprintf("%d", turtle.Color.Red) + `, ` + fmt.Sprintf("%d", turtle.Color.Green) + `, ` + fmt.Sprintf("%d", turtle.Color.Blue) + `, ` + fmt.Sprintf("%d", turtle.Color.Alpha) + `);
 					"
 			>
 			</div>
 		`
 	}
+
 	tmpl += `</div>`
 
+	// Render stats
 	stats := a.Sim.Stats()
 	if len(statsKeys) == 0 {
 		for key := range stats {
 			statsKeys = append(statsKeys, key)
 		}
 	}
-
 	tmpl += `<div style="position: absolute; left: 5px; top: 20%;">`
 	tmpl += `<div>Ticks: ` + fmt.Sprintf("%d", model.Ticks) + `</div>`
 	for _, key := range statsKeys {
@@ -116,15 +79,15 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl += `</div>`
 
-	// Execute the template
-	_, err = w.Write([]byte(tmpl))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	return tmpl
 }
 
-func getPatchSize(screenWidth int, screenHeight int, worldWidth int, worldHeight int) int {
+func (a *Api) getPatchSize(screenWidth int, screenHeight int, worldWidth int, worldHeight int) int {
+
+	// add 1 to worldWidth and worldHeight to account for the extra .5 on each side
+	worldWidth++
+	worldHeight++
+
 	//can only take up 50% of the width of the screen
 	screenWidth = screenWidth / 2
 
@@ -145,4 +108,16 @@ func getPatchSize(screenWidth int, screenHeight int, worldWidth int, worldHeight
 		return maxPatchWidth
 	}
 	return maxPatchHeight
+}
+
+func (a *Api) buildWidgets() string {
+	html := `<div class="grid-container widgets" style="position: absolute; left: 1%; top: 50%;">`
+
+	// Add widgets here
+	for _, widget := range a.Widgets {
+		html += widget.Render()
+	}
+
+	html += `</div>`
+	return html
 }

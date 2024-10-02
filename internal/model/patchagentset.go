@@ -110,6 +110,7 @@ func (p *PatchAgentSet) List() []*Patch {
 	for patch := range p.patches {
 		patches = append(patches, patch)
 	}
+
 	return patches
 }
 

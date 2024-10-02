@@ -12,7 +12,7 @@
         }
         .turtle {
             position: absolute;
-            border-radius: 50%;
+            /* border-radius: 50%; */
             transform: translate(-50%, -50%);
         }
     </style>
@@ -23,10 +23,20 @@
     <div style="position: absolute;" >
         <button hx-post="/setup" hx-swap="none">Setup</button>
 
-        <button hx-post="/gorepeat" hx-swap="none">Go</button>
-        <!-- <input type="checkbox" hx-post="/repeat" hx-trigger="change" hx-swap="none"> Repeat Go -->
-        <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .01s" style="visibility: hidden;">Load Content</button>
+        <button hx-post="/go" hx-swap="none">Go</button>
+        <button hx-post="/gorepeat" hx-swap="none">Go 🔁 </button>
+
+        <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button>
+
+        <div>
+            <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
+        </div>
+        <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
+               hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
+               oninput="document.getElementById('sliderValue').innerText = 100 - this.value;">
     </div>
+
+    {{ .Widgets }}
 
     <div id="content">
         <!-- Content will be loaded here -->

@@ -1120,10 +1120,10 @@ implement?
 implement?
 
 ### world-width
-```Model.WorldWidth```
+```Model.worldWidth```
 
 ### world-height
-```Model.WorldHeight```
+```Model.worldHeight```
 
 ### wrap-color
 ```WrapColor(color float64) float64```

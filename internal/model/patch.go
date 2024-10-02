@@ -10,7 +10,7 @@ type Patch struct {
 	y int
 
 	// this corresponds to the position in the patches array
-	// set as x*m.WorldWidth + y
+	// set as x*m.worldWidth + y
 	// maps to parent.posOfPatches[index]
 	index int
 
@@ -141,33 +141,33 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	x := int(math.Round(p.xFloat64 + dx))
 	y := int(math.Round(p.yFloat64 + dy))
 
-	if x < p.parent.MinPxCor {
+	if x < p.parent.minPxCor {
 		if p.parent.wrappingX {
-			x = p.parent.MaxPxCor + 1 + ((x - p.parent.MinPxCor) % p.parent.WorldWidth)
+			x = p.parent.maxPxCor + 1 + ((x - p.parent.minPxCor) % p.parent.worldWidth)
 		} else {
 			return nil
 		}
 	}
 
-	if y < p.parent.MinPyCor {
+	if y < p.parent.minPyCor {
 		if p.parent.wrappingY {
-			y = p.parent.MaxPyCor + 1 + ((y - p.parent.MinPyCor) % p.parent.WorldHeight)
+			y = p.parent.maxPyCor + 1 + ((y - p.parent.minPyCor) % p.parent.worldHeight)
 		} else {
 			return nil
 		}
 	}
 
-	if x > p.parent.MaxPxCor {
+	if x > p.parent.maxPxCor {
 		if p.parent.wrappingX {
-			x = (x-p.parent.MaxPxCor)%p.parent.WorldWidth + p.parent.MinPxCor - 1
+			x = (x-p.parent.maxPxCor)%p.parent.worldWidth + p.parent.minPxCor - 1
 		} else {
 			return nil
 		}
 	}
 
-	if y > p.parent.MaxPyCor {
+	if y > p.parent.maxPyCor {
 		if p.parent.wrappingY {
-			y = (y-p.parent.MaxPyCor)%p.parent.WorldHeight + p.parent.MinPyCor - 1
+			y = (y-p.parent.maxPyCor)%p.parent.worldHeight + p.parent.minPyCor - 1
 		} else {
 			return nil
 		}

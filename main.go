@@ -12,7 +12,19 @@ func main() {
 	sim := antpath.NewAntPath()
 	// sim := simplesim.NewSimpleSim()
 
-	agentApi := api.NewApi(sim)
+	widgets := []api.Widget{
+		{
+			PrettyName:      "Number of Turtles",
+			TargetVariable:  "num-turtles",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "2",
+			MaxValue:        "1000",
+			DefaultValue:    "50",
+		},
+	}
+
+	agentApi := api.NewApi(sim, widgets)
 
 	agentApi.Serve()
 

@@ -55,9 +55,9 @@ func (a *AntPath) SetUp() {
 
 	a.m.SetDefaultShapeTurtles("bug")
 
-	a.nestX = 10 + float64(a.m.MinPxCor)
+	a.nestX = 10 + float64(a.m.MinPxCor())
 	a.nestY = 0
-	a.foodX = float64(a.m.MaxPxCor) - 10
+	a.foodX = float64(a.m.MaxPxCor()) - 10
 	a.foodY = 0
 
 	a.m.CreateTurtles(1, "leader", []model.TurtleOperation{

@@ -28,11 +28,11 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	// make sure the breed exists
 	if directed {
 		if _, ok := model.DirectedLinkBreeds[breed]; !ok {
-			return nil, fmt.Errorf("Directed link breed %s does not exist", breed)
+			return nil, fmt.Errorf("directed link breed %s does not exist", breed)
 		}
 	} else {
 		if _, ok := model.UndirectedLinkBreeds[breed]; !ok {
-			return nil, fmt.Errorf("Undirected link breed %s does not exist", breed)
+			return nil, fmt.Errorf("undirected link breed %s does not exist", breed)
 		}
 	}
 
