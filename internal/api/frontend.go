@@ -22,8 +22,8 @@ func (a *Api) getFrontend(width int, height int) string {
 
 	// Render patches
 	for _, patch := range model.Patches.List() {
-		relativeX := patch.PXCor() + 16
-		relativeY := patch.PYCor() + 16
+		relativeX := patch.PXCor() - model.MinPxCor()
+		relativeY := patch.PYCor() - model.MinPyCor()
 		tmpl += `
 			<div 
 				class="patch" 
@@ -46,8 +46,8 @@ func (a *Api) getFrontend(width int, height int) string {
 		if turtleSize < 1 {
 			turtleSize = 1
 		}
-		relativeX := turtle.XCor() + 16
-		relativeY := turtle.YCor() + 16
+		relativeX := turtle.XCor() - float64(model.MinPxCor())
+		relativeY := turtle.YCor() - float64(model.MinPyCor())
 		tmpl += `
 			<div 
 				class="turtle" 

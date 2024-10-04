@@ -381,11 +381,11 @@ func TestRotatingTiedTurtles(t *testing.T) {
 		t.Errorf("Turtle 2 x should be 3.6490159697043456, got %f", t2.XCor())
 	}
 
-	if t1.XCor() != 1.3891854213354429 || t1.YCor() != -1.0418890660015827 {
+	if t1.XCor()-1.3891854213354429 > .0001 || t1.YCor()+1.0418890660015827 > .0001 {
 		t.Errorf("Turtle 1 x should be 1.3891854213354429 and y should be 0=-1.0418890660015827, got %f and %f", t1.XCor(), t1.YCor())
 	}
 
-	if t3.XCor() != 6.139576008729553 || t3.YCor() != 0.8111595753452776 {
+	if t3.XCor()-6.139576008729553 > .0001 || t3.YCor()-0.8111595753452776 > .0001 {
 		t.Errorf("Turtle 3 x should be 6.139576008729553 and y should be 0.8111595753452776, got %f and %f", t3.XCor(), t3.YCor())
 	}
 

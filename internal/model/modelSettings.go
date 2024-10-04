@@ -10,4 +10,8 @@ type ModelSettings struct {
 	WrappingX            bool
 	WrappingY            bool
 	Globals              map[string]interface{}
+	MinPxCor             int
+	MaxPxCor             int
+	MinPyCor             int
+	MaxPyCor             int
 }

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/nlatham1999/go-agent/internal/model"
@@ -708,4 +709,94 @@ func TestTurtlesOnPatches(t *testing.T) {
 	if !turtles.Contains(t4) {
 		t.Errorf("Expected turtles to contain t4")
 	}
+}
+
+func TestModelSize(t *testing.T) {
+	modelSettings := model.ModelSettings{
+		TurtleBreeds: []string{"sheep", "wolves"},
+		TurtlesOwn: map[string]interface{}{
+			"energy": 0,
+		},
+		PatchesOwn: map[string]interface{}{
+			"countdown": int(0),
+		},
+		Globals: map[string]interface{}{
+			"show-energy":           true,
+			"max-sheep":             300,
+			"grass-regrowth-time":   30,
+			"initial-number-sheep":  20,
+			"initial-number-wolves": 4,
+			"wolf-gain-from-food":   2,
+			"sheep-gain-from-food":  2,
+			"sheep-reproduce-rate":  50.0,
+			"wolf-reprodue-rate":    40.0,
+		},
+		MinPxCor: 0,
+		MaxPxCor: 50,
+		MinPyCor: 0,
+		MaxPyCor: 50,
+	}
+
+	m := model.NewModel(modelSettings)
+
+	m.ClearAll()
+
+	m.Patches.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+
+			grassRegrowthTime := m.GetGlobal("grass-regrowth-time")
+			if m.RandomFloat(1) < 0.5 {
+				p.PColor.SetColor(model.Green)
+				p.SetOwn("countdown", grassRegrowthTime.(int))
+			} else {
+				p.PColor.SetColor(model.Brown)
+				p.SetOwn("countdown", m.RandomInt(grassRegrowthTime.(int)))
+			}
+		},
+	})
+
+	initialNumberSheep, _ := m.GetGlobalI("initial-number-sheep")
+
+	sheepGainFromFood, _ := m.GetGlobalI("sheep-gain-from-food")
+
+	m.CreateTurtles(initialNumberSheep, "sheep", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			// t.Shape("sheep")
+			t.Color.SetColor(model.White)
+			// t.Size(1.5)
+			t.SetLabelColor(model.Blue)
+			t.SetOwn("energy", m.RandomInt(2*sheepGainFromFood))
+			t.SetXY(m.RandomXCor(), m.RandomYCor())
+			t.SetSize(.5)
+		},
+	})
+
+	initialNumberWolves, _ := m.GetGlobalI("initial-number-wolves")
+
+	wolfGainFromFood, _ := m.GetGlobalI("wolf-gain-from-food")
+
+	m.CreateTurtles(initialNumberWolves, "wolves", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			// t.Shape("wolf")
+			t.Color.SetColor(model.Black)
+			// t.Size(2)
+			t.SetLabelColor(model.White)
+			t.SetOwn("energy", m.RandomInt(2*wolfGainFromFood))
+			t.SetXY(float64(m.RandomXCor()), m.RandomYCor())
+			t.SetSize(.5)
+		},
+	})
+
+	showEnergy, _ := m.GetGlobalB("show-energy")
+	m.Turtles("").Ask([]model.TurtleOperation{
+		func(t *model.Turtle) {
+			if showEnergy {
+				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
+			} else {
+				t.SetLabel("")
+			}
+		},
+	})
+
+	m.ResetTicks()
 }

@@ -53,10 +53,29 @@ func NewModel(
 	settings ModelSettings,
 ) *Model {
 
-	maxPxCor := 15
-	maxPyCor := 15
-	minPxCor := -15
-	minPyCor := -15
+	useDefaultPxCor := false
+
+	// if the user did not set the max and min px cor then use the default
+	if settings.MaxPxCor == 0 && settings.MaxPyCor == 0 && settings.MinPxCor == 0 && settings.MinPyCor == 0 {
+		useDefaultPxCor = true
+	}
+
+	// if the user set the max to be less or equal to the min then use the default
+	if settings.MaxPxCor <= settings.MinPxCor || settings.MaxPyCor <= settings.MinPyCor {
+		useDefaultPxCor = true
+	}
+
+	// if the user set the min to greater than 0 or the max to be less than 0 then use the default
+	if settings.MinPxCor > 0 || settings.MinPyCor > 0 || settings.MaxPxCor < 0 || settings.MaxPyCor < 0 {
+		useDefaultPxCor = true
+	}
+
+	if useDefaultPxCor {
+		settings.MaxPxCor = 15
+		settings.MaxPyCor = 15
+		settings.MinPxCor = -15
+		settings.MinPyCor = -15
+	}
 
 	patchesOwn := make(map[string]interface{})
 	if settings.PatchesOwn != nil {
@@ -67,16 +86,16 @@ func NewModel(
 
 	model := &Model{
 		TicksOn:            true,
-		maxPxCor:           maxPxCor,
-		maxPyCor:           maxPyCor,
-		minPxCor:           minPxCor,
-		minPyCor:           minPyCor,
-		maxXCor:            float64(maxPxCor) + .5,
-		maxYCor:            float64(maxPyCor) + .5,
-		minXCor:            float64(minPxCor) - .5,
-		minYCor:            float64(minPyCor) - .5,
-		worldWidth:         maxPxCor - minPxCor + 1,
-		worldHeight:        maxPyCor - minPyCor + 1,
+		maxPxCor:           settings.MaxPxCor,
+		maxPyCor:           settings.MaxPyCor,
+		minPxCor:           settings.MinPxCor,
+		minPyCor:           settings.MinPyCor,
+		maxXCor:            float64(settings.MaxPxCor) + .5,
+		maxYCor:            float64(settings.MaxPyCor) + .5,
+		minXCor:            float64(settings.MinPxCor) - .5,
+		minYCor:            float64(settings.MinPyCor) - .5,
+		worldWidth:         settings.MaxPxCor - settings.MinPxCor + 1,
+		worldHeight:        settings.MaxPyCor - settings.MinPyCor + 1,
 		patchesOwnTemplate: settings.PatchesOwn,
 		wrappingX:          settings.WrappingX,
 		wrappingY:          settings.WrappingY,
@@ -181,10 +200,10 @@ func (m *Model) buildPatches() {
 		patches: map[*Patch]interface{}{},
 	}
 	m.posOfPatches = make(map[int]*Patch)
-	for i := 0; i < m.worldHeight; i++ {
-		for j := 0; j < m.worldWidth; j++ {
-			x := j + m.minPxCor
-			y := (i + m.minPyCor) * -1
+	for i := m.minPyCor; i <= m.maxPyCor; i++ {
+		for j := m.minPxCor; j <= m.maxPxCor; j++ {
+			x := j
+			y := i
 			p := NewPatch(m, m.patchesOwnTemplate, x, y)
 			m.Patches.Add(p)
 			index := y*m.worldHeight + x

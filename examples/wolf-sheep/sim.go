@@ -39,6 +39,10 @@ func (ws *WolfSheep) Init() {
 			"sheep-reproduce-rate":  50.0,
 			"wolf-reprodue-rate":    40.0,
 		},
+		MinPxCor: 0,
+		MaxPxCor: 100,
+		MinPyCor: 0,
+		MaxPyCor: 100,
 	}
 
 	ws.m = model.NewModel(modelSettings)
