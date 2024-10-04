@@ -13,15 +13,6 @@ func main() {
 	// sim := simplesim.NewSimpleSim()
 	sim := wolfsheep.NewWolfSheep()
 
-	// "max-sheep":             300,
-	// "grass-regrowth-time":   30,
-	// "initial-number-sheep":  20,
-	// "initial-number-wolves": 4,
-	// "wolf-gain-from-food":   2,
-	// "sheep-gain-from-food":  2,
-	// "sheep-reproduce-rate":  50.0,
-	// "wolf-reprodue-rate":    40.0,
-
 	widgets := []api.Widget{
 		{
 			PrettyName:      "Max Sheep",
@@ -49,6 +40,51 @@ func main() {
 			MinValue:        "1",
 			MaxValue:        "100",
 			DefaultValue:    "4",
+		},
+		{
+			PrettyName:      "Grass Regrowth Time",
+			TargetVariable:  "grass-regrowth-time",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "1",
+			MaxValue:        "40",
+			DefaultValue:    "20",
+		},
+		{
+			PrettyName:      "Wolf Gain From Food",
+			TargetVariable:  "wolf-gain-from-food",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "1",
+			MaxValue:        "8",
+			DefaultValue:    "2",
+		},
+		{
+			PrettyName:      "Sheep Gain From Food",
+			TargetVariable:  "sheep-gain-from-food",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "1",
+			MaxValue:        "8",
+			DefaultValue:    "2",
+		},
+		{
+			PrettyName:      "Sheep Reproduce Rate",
+			TargetVariable:  "sheep-reproduce-rate",
+			WidgetType:      "slider",
+			WidgetValueType: "float",
+			MinValue:        "1",
+			MaxValue:        "int",
+			DefaultValue:    "50",
+		},
+		{
+			PrettyName:      "Wolf Reproduce Rate",
+			TargetVariable:  "wolf-reproduce-rate",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "1",
+			MaxValue:        "100",
+			DefaultValue:    "40",
 		},
 	}
 

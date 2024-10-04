@@ -29,6 +29,7 @@ func (ws *WolfSheep) Init() {
 			"countdown": int(0),
 		},
 		Globals: map[string]interface{}{
+			"show-energy":           true,
 			"max-sheep":             300,
 			"grass-regrowth-time":   30,
 			"initial-number-sheep":  20,
@@ -43,7 +44,7 @@ func (ws *WolfSheep) Init() {
 	ws.m = model.NewModel(modelSettings)
 }
 
-func (ws *WolfSheep) SetUp() {
+func (ws *WolfSheep) SetUp() error {
 	ws.m.ClearAll()
 
 	ws.m.Patches.Ask([]model.PatchOperation{
@@ -60,28 +61,67 @@ func (ws *WolfSheep) SetUp() {
 		},
 	})
 
-	ws.m.CreateTurtles(ws.m.GetGlobal("initial-number-sheep").(int), "sheep", []model.TurtleOperation{
+	initialNumberSheep, err := ws.m.GetGlobalI("initial-number-sheep")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	sheepGainFromFood, err := ws.m.GetGlobalI("sheep-gain-from-food")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	ws.m.CreateTurtles(initialNumberSheep, "sheep", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
 			// t.Size(1.5)
-			t.LabelColor.SetColor(model.Blue)
-			t.SetOwn("energy", ws.m.RandomInt(2*ws.m.GetGlobal("sheep-gain-from-food").(int)))
+			t.SetLabelColor(model.Blue)
+			t.SetOwn("energy", ws.m.RandomInt(2*sheepGainFromFood))
 			t.SetXY(ws.m.RandomXCor(), ws.m.RandomYCor())
+			t.SetSize(.5)
 		},
 	})
 
-	ws.m.CreateTurtles(ws.m.GetGlobal("initial-number-wolves").(int), "wolves", []model.TurtleOperation{
+	initialNumberWolves, err := ws.m.GetGlobalI("initial-number-wolves")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	wolfGainFromFood, err := ws.m.GetGlobalI("wolf-gain-from-food")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	ws.m.CreateTurtles(initialNumberWolves, "wolves", []model.TurtleOperation{
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
 			// t.Size(2)
-			t.SetOwn("energy", ws.m.RandomInt(2*ws.m.GetGlobal("wolf-gain-from-food").(int)))
+			t.SetLabelColor(model.White)
+			t.SetOwn("energy", ws.m.RandomInt(2*wolfGainFromFood))
 			t.SetXY(float64(ws.m.RandomXCor()), ws.m.RandomYCor())
+			t.SetSize(.5)
+		},
+	})
+
+	showEnergy, _ := ws.m.GetGlobalB("show-energy")
+	ws.m.Turtles("").Ask([]model.TurtleOperation{
+		func(t *model.Turtle) {
+			if showEnergy {
+				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
+			} else {
+				t.SetLabel("")
+			}
 		},
 	})
 
 	ws.m.ResetTicks()
+	return nil
 }
 
 func (ws *WolfSheep) Go() {
@@ -97,7 +137,14 @@ func (ws *WolfSheep) Go() {
 	ws.m.Turtles("sheep").Ask([]model.TurtleOperation{
 		ws.move,
 		func(t *model.Turtle) {
-			t.SetOwn("energy", t.GetOwn("energy").(int)-1)
+
+			energy, err := t.GetOwnI("energy")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			t.SetOwn("energy", energy-1)
 		},
 		ws.EatGrass,
 		ws.Death,
@@ -118,6 +165,17 @@ func (ws *WolfSheep) Go() {
 		ws.growGrass,
 	})
 
+	showEnergy, _ := ws.m.GetGlobalB("show-energy")
+	ws.m.Turtles("").Ask([]model.TurtleOperation{
+		func(t *model.Turtle) {
+			if showEnergy {
+				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
+			} else {
+				t.SetLabel("")
+			}
+		},
+	})
+
 	ws.m.Tick()
 }
 
@@ -136,11 +194,17 @@ func (ws *WolfSheep) EatGrass(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
-	if t.GetOwnI("energy") <= 0 {
+	energy, err := t.GetOwnI("energy")
+	if err != nil {
+		return
+	}
+
+	if energy <= 0 {
 		return
 	}
 	if ws.m.RandomFloat(100) < ws.m.GetGlobal("sheep-reproduce-rate").(float64) {
-		t.SetOwn("energy", t.GetOwnI("energy")/2)
+
+		t.SetOwn("energy", energy/2)
 		t.Hatch("", 1, []model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
@@ -151,11 +215,16 @@ func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
-	if t.GetOwnI("energy") <= 0 {
+	energy, err := t.GetOwnI("energy")
+	if err != nil {
+		return
+	}
+
+	if energy <= 0 {
 		return
 	}
 	if ws.m.RandomFloat(100) < ws.m.GetGlobal("sheep-reproduce-rate").(float64) {
-		t.SetOwn("energy", t.GetOwnI("energy")/2)
+		t.SetOwn("energy", energy/2)
 		t.Hatch("", 1, []model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))

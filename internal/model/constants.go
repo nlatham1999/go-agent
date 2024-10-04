@@ -8,7 +8,7 @@ var (
 	Gray      = Color{Red: 128, Green: 128, Blue: 128, Alpha: 1}
 	Red       = Color{Red: 255, Green: 0, Blue: 0, Alpha: 1}
 	Orange    = Color{Red: 255, Green: 165, Blue: 0, Alpha: 1}
-	Brown     = Color{Red: 165, Green: 42, Blue: 42, Alpha: 1}
+	Brown     = Color{Red: 88, Green: 57, Blue: 39, Alpha: 1}
 	Yellow    = Color{Red: 255, Green: 255, Blue: 0, Alpha: 1}
 	Green     = Color{Red: 0, Green: 128, Blue: 0, Alpha: 1}
 	Lime      = Color{Red: 0, Green: 255, Blue: 0, Alpha: 1}

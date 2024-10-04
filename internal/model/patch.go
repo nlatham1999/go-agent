@@ -27,7 +27,7 @@ type Patch struct {
 	patchesOwn map[string]interface{}
 
 	Label       interface{}
-	PLabelColor Color
+	PlabelColor Color
 
 	turtles map[string]*TurtleAgentSet // sets of turtles keyed by breed
 

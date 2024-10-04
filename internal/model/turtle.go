@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -8,19 +9,18 @@ type Turtle struct {
 	xcor float64
 	ycor float64
 	who  int //the id of the turtle
-	size int
+	size float64
 
 	Color   Color
 	heading float64 //direction the turtle is facing in radians
 	Hidden  bool    //if the turtle is hidden
 	breed   string
 	Shape   string
-	Size    float64
 
 	parent *Model //model the turtle belongs too
 
-	Label      interface{}
-	LabelColor Color
+	label      interface{}
+	labelColor Color
 
 	turtlesOwnGeneral map[string]interface{} // turtles own variables
 	turtlesOwnBreed   map[string]interface{} // turtles own variables
@@ -54,6 +54,9 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		ycor:          y,
 		breed:         breed,
 		linkedTurtles: newTurtleLinks(),
+		size:          .8,
+		label:         "",
+		labelColor:    Black,
 	}
 
 	m.turtles.Add(t)
@@ -454,9 +457,9 @@ func (t *Turtle) Hatch(breed string, amount int, operations []TurtleOperation) {
 		turtles[i].heading = t.heading
 		turtles[i].Hidden = t.Hidden
 		turtles[i].Shape = t.Shape
-		turtles[i].Size = t.Size
-		turtles[i].Label = t.Label
-		turtles[i].LabelColor = t.LabelColor
+		turtles[i].size = t.size
+		turtles[i].label = t.label
+		turtles[i].labelColor = t.labelColor
 
 		// copy the own variables
 		for key, value := range t.turtlesOwnGeneral {
@@ -573,6 +576,25 @@ func (t *Turtle) Jump(distance float64) {
 	}
 }
 
+func (t *Turtle) SetLabel(label interface{}) {
+	if label == nil {
+		return
+	}
+	t.label = label
+}
+
+func (t *Turtle) GetLabel() interface{} {
+	return t.label
+}
+
+func (t *Turtle) SetLabelColor(color Color) {
+	t.labelColor = color
+}
+
+func (t *Turtle) GetLabelColor() Color {
+	return t.labelColor
+}
+
 func (t *Turtle) Left(number float64) {
 	// convert number to radians
 	number = -number * (math.Pi / 180)
@@ -642,46 +664,46 @@ func (t *Turtle) GetOwn(key string) interface{} {
 	return nil
 }
 
-func (t *Turtle) GetOwnI(key string) int {
+func (t *Turtle) GetOwnI(key string) (int, error) {
 	v := t.GetOwn(key)
 	if v == nil {
-		return 0
+		return 0, fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
 	switch v := v.(type) {
 	case int:
-		return v
+		return v, nil
 	case float64:
-		return int(v)
+		return int(v), nil
 	default:
-		return 0
+		return 0, fmt.Errorf("not a number")
 	}
 }
 
-func (t *Turtle) GetOwnF(key string) float64 {
+func (t *Turtle) GetOwnF(key string) (float64, error) {
 	v := t.GetOwn(key)
 	if v == nil {
-		return 0
+		return 0, fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
 	switch v := v.(type) {
 	case int:
-		return float64(v)
+		return float64(v), nil
 	case float64:
-		return v
+		return v, nil
 	default:
-		return 0
+		return 0, fmt.Errorf("not a number")
 	}
 }
 
-func (t *Turtle) GetOwnS(key string) string {
+func (t *Turtle) GetOwnS(key string) (string, error) {
 	v := t.GetOwn(key)
 	if v == nil {
-		return ""
+		return "", fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
 	switch v := v.(type) {
 	case string:
-		return v
+		return v, nil
 	default:
-		return ""
+		return "", fmt.Errorf("not a string")
 	}
 }
 
@@ -807,6 +829,14 @@ func (t *Turtle) moveTiedTurtle(turtle *Turtle, dx float64, dy float64) {
 
 func (t *Turtle) Show() {
 	t.Hidden = false
+}
+
+func (t *Turtle) SetSize(size float64) {
+	t.size = size
+}
+
+func (t *Turtle) GetSize() float64 {
+	return t.size
 }
 
 func (t *Turtle) TowardsPatch(patch *Patch) float64 {

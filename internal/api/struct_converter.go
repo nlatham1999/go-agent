@@ -47,7 +47,7 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 			X:       turtle.XCor(),
 			Y:       turtle.YCor(),
 			Color:   convertColorToApiColor(&turtle.Color),
-			Size:    turtle.Size,
+			Size:    turtle.GetSize(),
 			Who:     turtle.Who(),
 			Shape:   turtle.Shape,
 			Heading: turtle.GetHeading(),

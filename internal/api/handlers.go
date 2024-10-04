@@ -17,12 +17,19 @@ func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
-	a.Sim.SetUp()
+	err := a.Sim.SetUp()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
 func (a *Api) goHandler(w http.ResponseWriter, r *http.Request) {
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
+
 	a.Sim.Go()
 	w.WriteHeader(http.StatusOK)
 }

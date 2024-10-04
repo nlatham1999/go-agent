@@ -23,6 +23,12 @@ type turtleLinks struct {
 	turtlesUndirectedBreed  map[string]map[*Turtle]*Link
 }
 
+// links to connected turtles are stored in the turtleLinks struct
+// this is to allow for quick access to the links that are connected to the turtle
+// the links are stored in maps to allow for quick access to the links
+// allLinks* are maps of all links that are connected to the turtle
+// allTurtles* are maps of all turtles that are connected to the turtle
+// turtles* are maps of turtles that are connected to the turtle split by breed
 func newTurtleLinks() *turtleLinks {
 	return &turtleLinks{
 		allLinksDirectedOut: make(map[*Link]interface{}),

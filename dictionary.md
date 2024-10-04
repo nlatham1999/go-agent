@@ -434,8 +434,8 @@ we have indeces on slices
 ```Turtle.Label```
 
 ### label-color
-```Link.LabelColor```
-```Turtle.LabelColor```
+```Link.labelColor```
+```Turtle.labelColor```
 
 ### last
 last element in slice
@@ -712,8 +712,8 @@ implement?
 ```Turtle.PatchHere().Label```
 
 ### plabel-color
-```Patch.PLabelColor```
-```Turtle.PatchHere().PLabelColor```
+```Patch.PlabelColor```
+```Turtle.PatchHere().PlabelColor```
 
 ### plot
 implement?

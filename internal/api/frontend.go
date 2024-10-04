@@ -17,10 +17,6 @@ func (a *Api) getFrontend(width int, height int) string {
 	model := a.Sim.Model()
 
 	patchSize := a.getPatchSize(width, height, model.WorldWidth(), model.WorldHeight())
-	turtleSize := patchSize - 2
-	if turtleSize < 1 {
-		turtleSize = 1
-	}
 
 	tmpl := `<div class="grid-container patch-grid" style="position: absolute; left: 50%; top: 5px;">`
 
@@ -46,6 +42,10 @@ func (a *Api) getFrontend(width int, height int) string {
 	// Render turtles
 	turtleOffset := patchSize / 2
 	for _, turtle := range model.Turtles("").ListSorted() {
+		turtleSize := int(float64(patchSize) * turtle.GetSize())
+		if turtleSize < 1 {
+			turtleSize = 1
+		}
 		relativeX := turtle.XCor() + 16
 		relativeY := turtle.YCor() + 16
 		tmpl += `
@@ -57,8 +57,10 @@ func (a *Api) getFrontend(width int, height int) string {
 					left:` + fmt.Sprintf("%vpx", relativeX*float64(patchSize)+float64(turtleOffset)) + `; 
 					top:` + fmt.Sprintf("%vpx", relativeY*float64(patchSize)+float64(turtleOffset)) + `;
 					background-color: rgba(` + fmt.Sprintf("%d", turtle.Color.Red) + `, ` + fmt.Sprintf("%d", turtle.Color.Green) + `, ` + fmt.Sprintf("%d", turtle.Color.Blue) + `, ` + fmt.Sprintf("%d", turtle.Color.Alpha) + `);
+					color: rgba(` + fmt.Sprintf("%d", turtle.GetLabelColor().Red) + `, ` + fmt.Sprintf("%d", turtle.GetLabelColor().Green) + `, ` + fmt.Sprintf("%d", turtle.GetLabelColor().Blue) + `, ` + fmt.Sprintf("%d", turtle.GetLabelColor().Alpha) + `);
 					"
 			>
+			` + fmt.Sprintf("%v", turtle.GetLabel()) + `
 			</div>
 		`
 	}

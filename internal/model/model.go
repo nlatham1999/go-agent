@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -11,9 +12,7 @@ type Model struct {
 	Ticks   int
 	TicksOn bool
 
-	linksOwnTemplate      map[string]interface{}            //additional variables for each link
-	linkBreedsOwnTemplate map[string]map[string]interface{} //additional variables for each link breed. The first key is the breed name
-	patchesOwnTemplate    map[string]interface{}            //additional variables for each patch
+	patchesOwnTemplate map[string]interface{} //additional variables for each patch
 
 	Patches              *PatchAgentSet
 	turtles              *TurtleAgentSet         //all the turtles
@@ -62,13 +61,7 @@ func NewModel(
 	patchesOwn := make(map[string]interface{})
 	if settings.PatchesOwn != nil {
 		for key, value := range settings.PatchesOwn {
-			switch value.(type) {
-			case int:
-				// if the type is a int convert to a float
-				patchesOwn[key] = float64(value.(int))
-			default:
-				patchesOwn[key] = value
-			}
+			patchesOwn[key] = value
 		}
 	}
 
@@ -588,42 +581,60 @@ func (m *Model) GetGlobal(key string) interface{} {
 	return m.Globals[key]
 }
 
-func (m *Model) GetGlobalI(key string) int {
+func (m *Model) GetGlobalB(key string) (bool, error) {
 	v := m.Globals[key]
 	if v == nil {
-		return 0
+		return false, fmt.Errorf("global %s not found", key)
 	}
 	switch v := v.(type) {
-	case int:
-		return v
-	case float64:
-		return int(v)
+	case bool:
+		return v, nil
 	default:
-		return 0
+		return false, fmt.Errorf("global %s is not a bool", key)
 	}
 }
 
-func (m *Model) GetGlobalF(key string) float64 {
+func (m *Model) GetGlobalI(key string) (int, error) {
 	v := m.Globals[key]
 	if v == nil {
-		return 0
+		return 0, fmt.Errorf("global %s not found", key)
 	}
 	switch v := v.(type) {
 	case int:
-		return float64(v)
+		return v, nil
 	case float64:
-		return v
+		return int(v), nil
 	default:
-		return 0
+		return 0, fmt.Errorf("global %s is not an int", key)
 	}
 }
 
-func (m *Model) GetGlobalS(key string) string {
+func (m *Model) GetGlobalF(key string) (float64, error) {
 	v := m.Globals[key]
 	if v == nil {
-		return ""
+		return 0, fmt.Errorf("global %s not found", key)
 	}
-	return v.(string)
+	switch v := v.(type) {
+	case int:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	default:
+		return 0, fmt.Errorf("global %s is not a float64", key)
+	}
+}
+
+func (m *Model) GetGlobalS(key string) (string, error) {
+	v := m.Globals[key]
+	if v == nil {
+		return "", fmt.Errorf("global %s not found", key)
+	}
+	switch v := v.(type) {
+	case string:
+		return v, nil
+	default:
+		return "", fmt.Errorf("global %s is not a string", key)
+	}
 }
 
 func (m *Model) SetGlobal(key string, value interface{}) {

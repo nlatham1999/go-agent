@@ -20,7 +20,7 @@ type Link struct {
 	parent    *Model
 
 	Label      interface{}
-	LabelColor Color
+	labelColor Color
 }
 
 func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
