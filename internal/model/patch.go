@@ -308,6 +308,19 @@ func (t *Patch) GetOwnS(key string) string {
 	}
 }
 
+func (t *Patch) GetOwnB(key string) bool {
+	v := t.GetOwn(key)
+	if v == nil {
+		return false
+	}
+	switch v := v.(type) {
+	case bool:
+		return v
+	default:
+		return false
+	}
+}
+
 func (p *Patch) SetOwn(key string, value interface{}) {
 	// if the value is an int, convert it to a float64
 	if _, ok := value.(int); ok {

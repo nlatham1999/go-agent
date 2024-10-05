@@ -160,7 +160,7 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 		// Assuming there's only one value per query parameter (HTMX serializes like this)
 		value := values[0]
 		// go through widgets and update the dynamic variable
-		for _, widget := range a.Widgets {
+		for _, widget := range a.Sim.Widgets() {
 			if widget.TargetVariable == name {
 				// Update the dynamic variable
 				if widget.WidgetValueType == "int" {

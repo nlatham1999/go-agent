@@ -11,8 +11,7 @@ import (
 )
 
 type Api struct {
-	Sim     ModelInterface
-	Widgets []Widget
+	Sim ModelInterface
 
 	running    bool
 	stop       chan struct{}
@@ -21,12 +20,11 @@ type Api struct {
 	speed      time.Duration
 }
 
-func NewApi(sim ModelInterface, widgets []Widget) *Api {
+func NewApi(sim ModelInterface) *Api {
 
 	return &Api{
-		Sim:     sim,
-		Widgets: widgets,
-		speed:   100 * time.Millisecond,
+		Sim:   sim,
+		speed: 100 * time.Millisecond,
 	}
 }
 
