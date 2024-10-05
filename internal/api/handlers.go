@@ -112,7 +112,7 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the HTML template for rendering
-	tmpl := a.getFrontend(width, height)
+	tmpl := a.getFrontend(width, height, convertModelToApiModel(a.Sim.Model()))
 
 	// Execute the template
 	_, err = w.Write([]byte(tmpl))
@@ -124,8 +124,6 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
-
-	fmt.Println("Update speed")
 
 	// Get the 'speed' parameter from the query string
 	speedStr := queryParams.Get("speed")
@@ -169,6 +167,12 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
 					}
 					a.Sim.Model().SetGlobal(name, intValue)
+				} else if widget.WidgetValueType == "float" {
+					floatValue, err := strconv.ParseFloat(value, 64)
+					if err != nil {
+						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
+					}
+					a.Sim.Model().SetGlobal(name, floatValue)
 				} else {
 					a.Sim.Model().SetGlobal(name, value)
 				}

@@ -31,6 +31,7 @@ func (g *Gol) Init() {
 			"max-neighbors-to-live":      3,
 			"min-neighbors-to-reproduce": 3,
 			"max-neighbors-to-reproduce": 3,
+			"initial-alive":              0.5,
 		},
 	}
 
@@ -42,7 +43,7 @@ func (g *Gol) SetUp() error {
 
 	g.model.Patches.Ask([]model.PatchOperation{
 		func(p *model.Patch) {
-			if v := g.model.RandomFloat(1); v < 0.5 {
+			if v := g.model.RandomFloat(1); v < g.model.GetGlobal("initial-alive").(float64) {
 				p.SetOwn("alive", true)
 				p.PColor.SetColor(model.Green)
 			} else {
@@ -98,7 +99,11 @@ func (g *Gol) Go() {
 }
 
 func (g *Gol) Stats() map[string]interface{} {
-	return map[string]interface{}{}
+	return map[string]interface{}{
+		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
+			return p.GetOwnB("alive")
+		}).Count(),
+	}
 }
 
 func (g *Gol) Stop() bool {
@@ -144,6 +149,16 @@ func (g *Gol) Widgets() []api.Widget {
 			MinValue:        "1",
 			MaxValue:        "8",
 			DefaultValue:    "3",
+		},
+		{
+			PrettyName:      "Initial Alive",
+			TargetVariable:  "initial-alive",
+			WidgetType:      "slider",
+			WidgetValueType: "float",
+			MinValue:        "0",
+			MaxValue:        "1",
+			DefaultValue:    "0.5",
+			StepAmount:      "0.01",
 		},
 	}
 }

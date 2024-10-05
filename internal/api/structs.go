@@ -6,8 +6,12 @@ type Model struct {
 	Links            []Link   `json:"links"`
 	DynamicVariables map[string]interface{}
 	Ticks            int `json:"ticks"`
-	Width            int `json:"width"`
-	Height           int `json:"height"`
+	WorldWidth       int `json:"width"`
+	WorldHeight      int `json:"height"`
+	MinPxCor         int `json:"minPxCor"`
+	MaxPxCor         int `json:"maxPxCor"`
+	MinPyCor         int `json:"minPyCor"`
+	MaxPyCor         int `json:"maxPyCor"`
 }
 
 type Patch struct {
@@ -17,20 +21,22 @@ type Patch struct {
 }
 
 type Turtle struct {
-	X       float64 `json:"x"`
-	Y       float64 `json:"y"`
-	Color   Color   `json:"color"`
-	Size    float64 `json:"size"`
-	Who     int     `json:"who"`
-	Shape   string  `json:"shape"`
-	Heading float64 `json:"heading"`
+	X          float64     `json:"x"`
+	Y          float64     `json:"y"`
+	Color      Color       `json:"color"`
+	Size       float64     `json:"size"`
+	Who        int         `json:"who"`
+	Shape      string      `json:"shape"`
+	Heading    float64     `json:"heading"`
+	Label      interface{} `json:"label"`
+	LabelColor Color       `json:"labelColor"`
 }
 
 type Color struct {
-	R int `json:"r"`
-	G int `json:"g"`
-	B int `json:"b"`
-	A int `json:"a"`
+	Red   int `json:"r"`
+	Green int `json:"g"`
+	Blue  int `json:"b"`
+	Alpha int `json:"a"`
 }
 
 type Link struct {

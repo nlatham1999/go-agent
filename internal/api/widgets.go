@@ -8,6 +8,7 @@ type Widget struct {
 	MinValue        string `json:"minValue"`
 	MaxValue        string `json:"maxValue"`
 	DefaultValue    string `json:"defaultValue"`
+	StepAmount      string `json:"stepAmount"`
 }
 
 func (w *Widget) Render() string {
@@ -28,8 +29,11 @@ func (w *Widget) Render() string {
 		html += `</div>`
 		//input type range with id and dynamic name (TargetVariable as the name)
 		html += `<input type="range" id="` + id + `" name="` + w.TargetVariable + `" 
-		min="` + w.MinValue + `" max="` + w.MaxValue + `" value="` + w.DefaultValue + `"
-		hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `"
+		min="` + w.MinValue + `" max="` + w.MaxValue + `" value="` + w.DefaultValue + `"`
+		if w.StepAmount != "" {
+			html += `step="` + w.StepAmount + `"`
+		}
+		html += `hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `"
 		oninput="document.getElementById('` + labelId + `').innerText = this.value;">`
 	}
 	html += "</div>"
