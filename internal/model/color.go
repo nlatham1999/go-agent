@@ -1,12 +1,14 @@
 package model
 
+// holds RGBA values
 type Color struct {
 	Red   int
 	Blue  int
 	Green int
-	Alpha int //used with rbg it is the transparency
+	Alpha int
 }
 
+// creates a new color with the same values as the given color
 func (c *Color) SetColor(c2 Color) {
 	c.Red = c2.Red
 	c.Blue = c2.Blue
@@ -14,6 +16,7 @@ func (c *Color) SetColor(c2 Color) {
 	c.Alpha = c2.Alpha
 }
 
+// creates a new color with the given red, blue, and green values
 func (c *Color) SetColorRGB(red int, blue int, green int) {
 	c.Red = red
 	c.Blue = blue
@@ -21,6 +24,7 @@ func (c *Color) SetColorRGB(red int, blue int, green int) {
 	c.Alpha = 1
 }
 
+// creates a new color with the given red, blue, green, and alpha values
 func (c *Color) SetColorRGBA(red int, blue int, green int, alpha int) {
 	c.Red = red
 	c.Blue = blue

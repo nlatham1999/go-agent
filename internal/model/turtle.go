@@ -63,7 +63,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	m.whoToTurtles[m.turtlesWhoNumber] = t
 
 	if breedSet != nil {
-		breedSet.Turtles.turtles[t] = nil
+		breedSet.turtles.turtles[t] = nil
 	}
 
 	//link the turtle to the patch
@@ -114,13 +114,13 @@ func (t *Turtle) SetBreed(name string) {
 	}
 
 	if t.breed != "" {
-		delete(t.parent.breeds[t.breed].Turtles.turtles, t)
+		delete(t.parent.breeds[t.breed].turtles.turtles, t)
 	}
 
 	t.breed = name
 
 	if name != "" {
-		t.parent.breeds[name].Turtles.turtles[t] = nil
+		t.parent.breeds[name].turtles.turtles[t] = nil
 	}
 
 	// switch the turtles own variables to the new breed

@@ -48,12 +48,12 @@ func TestLinkCreation(t *testing.T) {
 	}
 
 	// make sure it exist in the general directed link list
-	if !m.DirectedLinkBreeds[""].Links.Contains(l) {
+	if !m.DirectedLinkBreeds[""].Links().Contains(l) {
 		t.Errorf("Link should have been added to the general directed link list")
 	}
 
 	// make sure it exist in the directed link list for the breed
-	if !m.DirectedLinkBreeds["parent-children"].Links.Contains(l) {
+	if !m.DirectedLinkBreeds["parent-children"].Links().Contains(l) {
 		t.Errorf("Link should have been added to the directed link list for the breed")
 	}
 }
@@ -147,12 +147,12 @@ func TestLinkSetBreed(t *testing.T) {
 	}
 
 	// make sure it no longer exists for parent-children
-	if m.DirectedLinkBreeds["parent-children"].Links.Contains(l) {
+	if m.DirectedLinkBreeds["parent-children"].Links().Contains(l) {
 		t.Errorf("Link should have been removed from parent-children")
 	}
 
 	// make sure it exists for person-pet
-	if !m.DirectedLinkBreeds["person-pet"].Links.Contains(l) {
+	if !m.DirectedLinkBreeds["person-pet"].Links().Contains(l) {
 		t.Errorf("Link should have been added to person-pet")
 	}
 }

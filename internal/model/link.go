@@ -7,6 +7,7 @@ import (
 
 type TieMode int
 
+// Link represents a link between two turtles
 type Link struct {
 	Color     Color
 	end1      *Turtle
@@ -23,6 +24,7 @@ type Link struct {
 	labelColor Color
 }
 
+// NewLink creates a new link between two turtles
 func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
 
 	// make sure the breed exists
@@ -56,11 +58,11 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	model.Links.Add(l)
 
 	if directed {
-		model.DirectedLinkBreeds[breed].Links.Add(l)
-		model.DirectedLinkBreeds[""].Links.Add(l)
+		model.DirectedLinkBreeds[breed].links.Add(l)
+		model.DirectedLinkBreeds[""].links.Add(l)
 	} else {
-		model.UndirectedLinkBreeds[breed].Links.Add(l)
-		model.UndirectedLinkBreeds[""].Links.Add(l)
+		model.UndirectedLinkBreeds[breed].links.Add(l)
+		model.UndirectedLinkBreeds[""].links.Add(l)
 	}
 
 	// add the link to the turtle's link map
@@ -75,10 +77,12 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	return l, nil
 }
 
+// Returns the name of the breed of the link
 func (l *Link) BreedName() string {
 	return l.breed
 }
 
+// Returns the breed of this link
 func (l *Link) Breed() *LinkBreed {
 	if l.breed == "" {
 		return nil
@@ -96,20 +100,24 @@ func (l *Link) BothEnds() *TurtleAgentSet {
 	return TurtleSet([]*Turtle{l.end1, l.end2})
 }
 
+// takes in a list of link operations and runs them for the link
 func (l *Link) Ask(operations []LinkOperation) {
 	for j := 0; j < len(operations); j++ {
 		operations[j](l)
 	}
 }
 
+// returns the first end of the link
 func (l *Link) End1() *Turtle {
 	return l.end1
 }
 
+// returns the second end of the link
 func (l *Link) End2() *Turtle {
 	return l.end2
 }
 
+// sets the link to be a breed
 func (l *Link) SetBreed(name string) {
 
 	// make sure the breed exists
@@ -132,20 +140,21 @@ func (l *Link) SetBreed(name string) {
 			breed = l.parent.UndirectedLinkBreeds[l.breed]
 		}
 
-		delete(breed.Links.links, l)
+		delete(breed.links.links, l)
 	}
 
 	l.breed = name
 
 	if l.breed != "" {
 		if l.Directed {
-			l.parent.DirectedLinkBreeds[name].Links.Add(l)
+			l.parent.DirectedLinkBreeds[name].links.Add(l)
 		} else {
-			l.parent.UndirectedLinkBreeds[name].Links.Add(l)
+			l.parent.UndirectedLinkBreeds[name].links.Add(l)
 		}
 	}
 }
 
+// sets the link to be hidden
 func (l *Link) Hide() {
 	l.Hidden = true
 }
@@ -184,14 +193,17 @@ func (l *Link) OtherEnd(t *Turtle) *Turtle {
 	}
 }
 
+// sets the link to be visible
 func (l *Link) Show() {
 	l.Hidden = false
 }
 
+// sets the tie mode to be fixed
 func (l *Link) Tie() {
 	l.TieMode = TieModeFixed
 }
 
+// sets the tie mode to be none
 func (l *Link) Untie() {
 	l.TieMode = TieModeNone
 }
