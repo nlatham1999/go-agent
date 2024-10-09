@@ -11,32 +11,50 @@ import (
 )
 
 type Api struct {
-	Sim ModelInterface
+	Model ModelInterface
 
-	running    bool
-	stop       chan struct{}
-	mu         sync.Mutex
-	funcMutext sync.Mutex
-	speed      time.Duration
+	funcMutext      sync.Mutex // Mutex for when we are running a model function
+	simulationSpeed time.Duration
+
+	goRepeatRunning bool
+	stopRepeating   chan struct{}
+	goRepeatMutex   sync.Mutex // Mutex for the goRepeatHandler
+	settings        ApiSettings
+
+	stepData    map[int]*Model
+	oldestValue int
+
+	tickValue int //used for loading the model frontend
 }
 
-func NewApi(sim ModelInterface) *Api {
+type ApiSettings struct {
+	StoreSteps bool // Whether to store steps
+	MaxSteps   int  // Maximum number of steps to store. Default is 1000
+}
+
+func NewApi(model ModelInterface, settings ApiSettings) *Api {
+
+	if settings.StoreSteps && settings.MaxSteps == 0 {
+		settings.MaxSteps = 1000 // Default value
+	}
 
 	return &Api{
-		Sim:   sim,
-		speed: 100 * time.Millisecond,
+		Model:           model,
+		simulationSpeed: 100 * time.Millisecond,
+		settings:        settings,
+		stepData:        map[int]*Model{},
 	}
 }
 
 func (a *Api) Serve() {
 
-	if a.Sim.Model() == nil {
+	if a.Model.Model() == nil {
 		fmt.Println("Model is nil")
 	}
 
-	a.Sim.Init()
+	a.Model.Init()
 
-	if a.Sim.Model() == nil {
+	if a.Model.Model() == nil {
 		fmt.Println("Model is nil")
 	}
 
@@ -48,11 +66,13 @@ func (a *Api) Serve() {
 	r.HandleFunc("/go", a.goHandler).Methods("POST")
 	r.HandleFunc("/gorepeat", a.goRepeatHandler).Methods("POST")
 	r.HandleFunc("/model", a.modelHandler)
+	r.HandleFunc("/modelat", a.modelAtHandler)
 
 	//frontend handlers
 	r.HandleFunc("/load", a.loadHandler)
 	r.HandleFunc("/updatespeed", a.updateSpeedHandler)
 	r.HandleFunc("/updatedynamic", a.updateDynamicVariableHandler)
+	r.HandleFunc("/settick", a.setTickValueHandler)
 
 	srv := &http.Server{
 		Handler:      r,

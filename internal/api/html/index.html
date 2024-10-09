@@ -25,10 +25,24 @@
     <div style="position: absolute;" >
         <button hx-post="/setup" hx-swap="none">Setup</button>
 
-        <button hx-post="/go" hx-swap="none">Go</button>
-        <button hx-post="/gorepeat" hx-swap="none">Go 🔁 </button>
+        <button id="goOnce" hx-post="/go" hx-swap="none">Go</button>
+        <button 
+            id="goRepeat"
+            hx-post="/gorepeat" hx-swap="none"
+        >
+            Play
+        </button>
 
         <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button>
+
+        <div id="replayTickDiv" hidden="hidden">
+            <label for="replayTick">Replay For Tick:</label>
+            <input id="replayTick" type="number" name="tick"
+                   hx-get="/settick"
+                   hx-trigger="change" 
+                   hx-include="#replayTick"
+                   hx-target="this">
+        </div>
 
         <div>
             <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
@@ -47,7 +61,45 @@
 
 </body>
 <script>
-    document.getElementById('loadButton').addEventListener('htmx:configRequest', function (event) {
+
+    const goOnceButton = document.getElementById('goOnce');
+    const goRepeatButton = document.getElementById('goRepeat');
+    const replayTickDiv = document.getElementById('replayTickDiv');
+    const loadButton = document.getElementById('loadButton');
+
+    // Function to update visibility based on goRepeatButton's inner text
+    function updateVisibility() {
+        if (goRepeatButton.innerText === "Pause") {
+            replayTickDiv.hidden = true;
+        } else {
+            replayTickDiv.hidden = false;
+        }
+    }
+
+    // Add an event listener to the goRepeat button to change text and update visibility
+    goRepeatButton.addEventListener('click', function() {
+        if (document.getElementById('goRepeat').innerText == 'Play') {
+            document.getElementById('goRepeat').innerText = 'Pause';
+        } else {
+            document.getElementById('goRepeat').innerText = 'Play';
+        }
+        updateVisibility();
+    });
+
+    // Initial check on page load
+    updateVisibility();
+
+    // event listener on go to make the tickValue current
+    goOnceButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    // event listener on go to make the tickValue current
+    goRepeatButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    loadButton.addEventListener('htmx:configRequest', function (event) {
         // Capture the screen width and height
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -56,5 +108,6 @@
         event.detail.parameters['width'] = width;
         event.detail.parameters['height'] = height;
     });
+
 </script>
 </html>

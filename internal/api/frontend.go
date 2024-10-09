@@ -34,7 +34,7 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 	tmpl.WriteString(`</div>`)
 
 	// Render stats
-	stats := a.Sim.Stats()
+	stats := a.Model.Stats()
 	if len(statsKeys) == 0 {
 		for key := range stats {
 			statsKeys = append(statsKeys, key)
@@ -126,7 +126,7 @@ func (a *Api) buildWidgets() string {
 	html := `<div class="grid-container widgets" style="position: absolute; left: 1%; top: 50%;">`
 
 	// Add widgets here
-	for _, widget := range a.Sim.Widgets() {
+	for _, widget := range a.Model.Widgets() {
 		html += widget.Render()
 	}
 
