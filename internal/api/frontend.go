@@ -3,6 +3,7 @@ package api
 import (
 	_ "embed"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -31,6 +32,11 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 		a.renderTurtle(&tmpl, turtle, model, patchSize, turtleOffset)
 	}
 
+	// Render links
+	for _, link := range model.Links {
+		a.renderLink(&tmpl, link, model, patchSize, turtleOffset)
+	}
+
 	tmpl.WriteString(`</div>`)
 
 	// Render stats
@@ -48,6 +54,42 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 	tmpl.WriteString(`</div>`)
 
 	return tmpl.String()
+}
+
+func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSize int, turtleOffset int) {
+
+	relative1X := link.End1X - float64(model.MinPxCor)
+	relative1Y := link.End1Y - float64(model.MinPyCor)
+	relative2X := link.End2X - float64(model.MinPxCor)
+	relative2Y := link.End2Y - float64(model.MinPyCor)
+	point1X := relative1X*float64(patchSize) + float64(turtleOffset)
+	point1Y := relative1Y*float64(patchSize) + float64(turtleOffset)
+	point2X := relative2X*float64(patchSize) + float64(turtleOffset)
+	point2Y := relative2Y*float64(patchSize) + float64(turtleOffset)
+
+	// Calculate the distance between the two points (line length)
+	distance := math.Sqrt(math.Pow(point2X-point1X, 2) + math.Pow(point2Y-point1Y, 2))
+
+	// Calculate the angle of the line in degrees
+	angle := math.Atan2(point2Y-point1Y, point2X-point1X) * (180 / math.Pi)
+
+	// Create the line div
+	tmpl.WriteString(fmt.Sprintf(`
+			<div 
+				class="line" 
+				style="
+					width: %fpx;
+					height: 2px; /* Line thickness */
+					position: absolute;
+					left: %fpx;
+					top: %fpx;
+					transform: rotate(%fdeg);
+					transform-origin: 0 0; /* Ensure the rotation starts from the first point */
+					background-color: black; /* Line color */
+				"
+			></div>
+			`, distance, point1X, point1Y, angle))
+
 }
 
 func (a *Api) renderTurtle(tmpl *strings.Builder, turtle Turtle, model *Model, patchSize int, turtleOffset int) {

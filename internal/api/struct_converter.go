@@ -70,6 +70,10 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			End1:     link.End1().Who(),
 			End2:     link.End2().Who(),
 			Directed: link.Directed,
+			End1X:    link.End1().XCor(),
+			End1Y:    link.End1().YCor(),
+			End2X:    link.End2().XCor(),
+			End2Y:    link.End2().YCor(),
 		}
 		apiLinks = append(apiLinks, apiLink)
 	}

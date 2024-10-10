@@ -3,6 +3,7 @@ package antpath
 import (
 	"fmt"
 
+	"github.com/nlatham1999/go-agent/internal/api"
 	"github.com/nlatham1999/go-agent/internal/model"
 )
 
@@ -48,7 +49,7 @@ func (a *AntPath) Init() {
 	}
 }
 
-func (a *AntPath) SetUp() {
+func (a *AntPath) SetUp() error {
 	if a.m != nil {
 		a.m.ClearAll()
 	}
@@ -91,6 +92,8 @@ func (a *AntPath) SetUp() {
 	})
 
 	a.m.ResetTicks()
+
+	return nil
 }
 
 func (a *AntPath) Go() {
@@ -172,4 +175,8 @@ func (a *AntPath) Stop() bool {
 	return a.m.Turtles("").All(func(t *model.Turtle) bool {
 		return t.XCor() >= a.foodX
 	})
+}
+
+func (a *AntPath) Widgets() []api.Widget {
+	return []api.Widget{}
 }
