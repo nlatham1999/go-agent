@@ -30,7 +30,7 @@ func (ws *WolfSheep) Init() {
 			"countdown": int(0),
 		},
 		Globals: map[string]interface{}{
-			"show-energy":           true,
+			"show-energy":           false,
 			"max-sheep":             300,
 			"grass-regrowth-time":   30,
 			"initial-number-sheep":  20,
@@ -40,10 +40,10 @@ func (ws *WolfSheep) Init() {
 			"sheep-reproduce-rate":  50.0,
 			"wolf-reprodue-rate":    40.0,
 		},
-		MinPxCor: 0,
-		MaxPxCor: 100,
-		MinPyCor: 0,
-		MaxPyCor: 100,
+		MinPxCor: -15,
+		MaxPxCor: 15,
+		MinPyCor: -15,
+		MaxPyCor: 15,
 	}
 
 	ws.m = model.NewModel(modelSettings)
