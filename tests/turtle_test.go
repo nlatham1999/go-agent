@@ -1561,3 +1561,64 @@ func TestTurtleTowardsXY(t *testing.T) {
 		t.Errorf("Expected heading to be 315 degrees, got %v", h)
 	}
 }
+
+func TestTurtlesLinksDying(t *testing.T) {
+
+	settings := model.ModelSettings{}
+
+	m := model.NewModel(settings)
+
+	m.CreateTurtles(6, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+	t6 := m.Turtle("", 5)
+
+	t1.CreateLinkWithTurtle("", t2, nil)
+	t1.Die()
+	if t2.LinkNeighbors("").Count() != 0 {
+		t.Errorf("Expected turtle to have no neighbors")
+	}
+
+	t3.CreateLinkToTurtle("", t4, nil)
+	t3.Die()
+	if t4.LinkNeighbors("").Count() != 0 {
+		t.Errorf("Expected turtle to have no neighbors")
+	}
+
+	t5.CreateLinkFromTurtle("", t6, nil)
+	t5.Die()
+	if t6.LinkNeighbors("").Count() != 0 {
+		t.Errorf("Expected turtle to have no neighbors")
+	}
+
+}
+
+func TestTurtleSetBreedPatchHere(t *testing.T) {
+	settings := model.ModelSettings{
+		TurtleBreeds: []string{
+			"scouts",
+			"foragers",
+		},
+	}
+
+	m := model.NewModel(settings)
+
+	m.CreateTurtles(1, "scouts", nil)
+
+	t1 := m.Turtle("scouts", 0)
+
+	if t1.PatchHere().TurtlesHere("scouts").Count() != 1 {
+		t.Errorf("Expected turtle to be on patch")
+	}
+
+	t1.SetBreed("foragers")
+
+	if t1.PatchHere().TurtlesHere("foragers").Count() != 1 {
+		t.Errorf("Expected turtle to be on patch")
+	}
+
+}

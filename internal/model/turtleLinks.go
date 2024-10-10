@@ -100,6 +100,11 @@ func (t *turtleLinks) removeDirectedOutBreed(breed string, turtle *Turtle, link 
 				break
 			}
 		}
+
+		//if the turtle has no more links, remove it
+		if len(t.allTurtlesDirectedOut[turtle]) == 0 {
+			delete(t.allTurtlesDirectedOut, turtle)
+		}
 	}
 
 	delete(t.allLinksDirectedOut, link)
@@ -118,6 +123,11 @@ func (t *turtleLinks) removeDirectedInBreed(breed string, turtle *Turtle, link *
 				break
 			}
 		}
+
+		//if the turtle has no more links, remove it
+		if len(t.allTurtlesDirectedIn[turtle]) == 0 {
+			delete(t.allTurtlesDirectedIn, turtle)
+		}
 	}
 
 	delete(t.allLinksDirectedIn, link)
@@ -135,6 +145,11 @@ func (t *turtleLinks) removeUndirectedBreed(breed string, turtle *Turtle, link *
 				t.allTurtlesUndirected[turtle] = append(t.allTurtlesUndirected[turtle][:i], t.allTurtlesUndirected[turtle][i+1:]...)
 				break
 			}
+		}
+
+		//if the turtle has no more links, remove it
+		if len(t.allTurtlesUndirected[turtle]) == 0 {
+			delete(t.allTurtlesUndirected, turtle)
 		}
 	}
 

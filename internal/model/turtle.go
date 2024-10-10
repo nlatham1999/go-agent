@@ -113,6 +113,10 @@ func (t *Turtle) SetBreed(name string) {
 		return
 	}
 
+	// remove the turtle from the patch and add it back in at the end
+	t.patch.removeTurtle(t)
+	defer t.patch.addTurtle(t)
+
 	if t.breed != "" {
 		delete(t.parent.breeds[t.breed].turtles.turtles, t)
 	}
@@ -131,6 +135,9 @@ func (t *Turtle) SetBreed(name string) {
 			t.turtlesOwnBreed[key] = value
 		}
 	}
+
+	// add the turtle to the patch
+
 }
 
 func (t *Turtle) CanMove(distance float64) bool {

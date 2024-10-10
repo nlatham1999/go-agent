@@ -17,7 +17,7 @@ func (c *Color) SetColor(c2 Color) {
 }
 
 // creates a new color with the given red, blue, and green values
-func (c *Color) SetColorRGB(red int, blue int, green int) {
+func (c *Color) SetColorRGB(red int, green int, blue int) {
 	c.Red = red
 	c.Blue = blue
 	c.Green = green
@@ -25,7 +25,7 @@ func (c *Color) SetColorRGB(red int, blue int, green int) {
 }
 
 // creates a new color with the given red, blue, green, and alpha values
-func (c *Color) SetColorRGBA(red int, blue int, green int, alpha int) {
+func (c *Color) SetColorRGBA(red int, green int, blue int, alpha int) {
 	c.Red = red
 	c.Blue = blue
 	c.Green = green
