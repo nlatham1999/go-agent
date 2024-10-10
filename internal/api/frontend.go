@@ -22,13 +22,13 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 
 	// Render patches
 	for _, patch := range model.Patches {
-		tmpl.WriteString(a.renderPatch(patch, model, patchSize))
+		a.renderPatch(&tmpl, patch, model, patchSize)
 	}
 
 	// Render turtles
 	turtleOffset := patchSize / 2
 	for _, turtle := range model.Turtles {
-		tmpl.WriteString(a.renderTurtle(turtle, model, patchSize, turtleOffset))
+		a.renderTurtle(&tmpl, turtle, model, patchSize, turtleOffset)
 	}
 
 	tmpl.WriteString(`</div>`)
@@ -40,7 +40,7 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 			statsKeys = append(statsKeys, key)
 		}
 	}
-	tmpl.WriteString(`<div style="position: absolute; left: 5px; top: 20%;">`)
+	tmpl.WriteString(`<div id="statsContainer">`)
 	tmpl.WriteString(`<div>Ticks: ` + fmt.Sprintf("%d", model.Ticks) + `</div>`)
 	for _, key := range statsKeys {
 		tmpl.WriteString(`<div>` + key + `: ` + fmt.Sprintf("%v", stats[key]) + `</div>`)
@@ -50,48 +50,51 @@ func (a *Api) getFrontend(width int, height int, model *Model) string {
 	return tmpl.String()
 }
 
-func (a *Api) renderTurtle(turtle Turtle, model *Model, patchSize int, turtleOffset int) string {
+func (a *Api) renderTurtle(tmpl *strings.Builder, turtle Turtle, model *Model, patchSize int, turtleOffset int) {
 	turtleSize := int(float64(patchSize) * turtle.Size)
 	if turtleSize < 1 {
 		turtleSize = 1
 	}
 	relativeX := turtle.X - float64(model.MinPxCor)
 	relativeY := turtle.Y - float64(model.MinPyCor)
-	tmpl := `
+	tmpl.WriteString(fmt.Sprintf(`
 			<div 
 				class="turtle" 
 				style="
-					width:` + fmt.Sprintf("%dpx", turtleSize) + `;
-					height:` + fmt.Sprintf("%dpx", turtleSize) + `;
-					left:` + fmt.Sprintf("%vpx", relativeX*float64(patchSize)+float64(turtleOffset)) + `; 
-					top:` + fmt.Sprintf("%vpx", relativeY*float64(patchSize)+float64(turtleOffset)) + `;
-					background-color: rgba(` + fmt.Sprintf("%d", turtle.Color.Red) + `, ` + fmt.Sprintf("%d", turtle.Color.Green) + `, ` + fmt.Sprintf("%d", turtle.Color.Blue) + `, ` + fmt.Sprintf("%d", turtle.Color.Alpha) + `);
-					color: rgba(` + fmt.Sprintf("%d", turtle.LabelColor.Red) + `, ` + fmt.Sprintf("%d", turtle.LabelColor.Green) + `, ` + fmt.Sprintf("%d", turtle.LabelColor.Blue) + `, ` + fmt.Sprintf("%d", turtle.LabelColor.Alpha) + `);
+					width: %d;
+					height: %d;
+					left: %vpx; 
+					top: %vpx;
+					background-color: rgba(%d,%d,%d,%d);
+					color: rgba(%d,%d,%d,%d);
 					"
 			>
-			` + fmt.Sprintf("%v", turtle.Label) + `
+			`+fmt.Sprintf("%v", turtle.Label)+`
 			</div>
-		`
-	return tmpl
+		`, turtleSize, turtleSize, relativeX*float64(patchSize)+float64(turtleOffset), relativeY*float64(patchSize)+float64(turtleOffset),
+		turtle.Color.Red, turtle.Color.Green, turtle.Color.Blue, turtle.Color.Alpha,
+		turtle.LabelColor.Red, turtle.LabelColor.Green, turtle.LabelColor.Blue, turtle.LabelColor.Alpha,
+	))
 }
 
-func (a *Api) renderPatch(patch Patch, model *Model, patchSize int) string {
+func (a *Api) renderPatch(tmpl *strings.Builder, patch Patch, model *Model, patchSize int) {
 	relativeX := patch.X - model.MinPxCor
 	relativeY := patch.Y - model.MinPyCor
-	tmpl := `
+	tmpl.WriteString(fmt.Sprintf(`
 			<div 
 				class="patch" 
 				style="
-					width:` + fmt.Sprintf("%dpx", patchSize) + `;
-					height:` + fmt.Sprintf("%dpx", patchSize) + `;
-					left:` + fmt.Sprintf("%dpx", relativeX*patchSize) + `; 
-					top:` + fmt.Sprintf("%dpx", relativeY*patchSize) + `;
-					background-color: rgba(` + fmt.Sprintf("%d", patch.Color.Red) + `, ` + fmt.Sprintf("%d", patch.Color.Green) + `, ` + fmt.Sprintf("%d", patch.Color.Blue) + `, ` + fmt.Sprintf("%d", patch.Color.Alpha) + `);
+					width: %dpx;
+					height: %dpx;
+					left: %dpx; 
+					top: %dpx;
+					background-color: rgba(%d,%d,%d,%d);
 				"
 			>
 			</div>
-		`
-	return tmpl
+		`, patchSize, patchSize, relativeX*patchSize, relativeY*patchSize,
+		patch.Color.Red, patch.Color.Green, patch.Color.Blue, patch.Color.Alpha,
+	))
 }
 
 func (a *Api) getPatchSize(screenWidth int, screenHeight int, worldWidth int, worldHeight int) int {
@@ -123,7 +126,7 @@ func (a *Api) getPatchSize(screenWidth int, screenHeight int, worldWidth int, wo
 }
 
 func (a *Api) buildWidgets() string {
-	html := `<div class="grid-container widgets" style="position: absolute; left: 1%; top: 50%;">`
+	html := `<div id="widgetContainer">`
 
 	// Add widgets here
 	for _, widget := range a.Model.Widgets() {

@@ -3,10 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go and HTMX Example</title>
+    <title>Go Agent</title>
     <script src="https://unpkg.com/htmx.org@1.8.0"></script>
 
     <style>
+
+        h1 {
+            position: absolute;
+            left: 1vw;
+            top: 1vh;
+            color: white;
+        }
+        body {
+            font-family: Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(42, 45, 46);
+            color: white;
+        }
+        button {
+            font-size: x-large;
+            background-color: rgb(35, 124, 47);
+            border-radius: 10%;
+            color: white;
+            border-color: rgb(35, 124, 47);
+            box-shadow: none;
+            border-style: none;
+        }
+        #buttonsContainer {
+            position: absolute;
+            left: 1vw;
+            top: 10vh;
+            transform: translateY(-50%);
+            width: 15vw;
+        }
+        #speedSliderContainer {
+            position: absolute;
+            left: 16vw;
+            top: 10vh;
+            transform: translateY(-50%);
+            width: 15vw;
+            color: white;
+        }
+        #replayTickContainer {
+            position: absolute;
+            left: 32vw;
+            top: 10vh;
+            transform: translateY(-50%);
+            width: 15vw;
+        }
+        #statsContainer {
+            position: absolute;
+            left: 1vw;
+            top: 15vh;
+            height: 30vh;
+            width: 40vw;
+            border: 4px solid rgb(69, 69, 69);
+            border-radius: 5px;
+            padding: 1vw;
+            overflow: auto;
+            border: 4px solid rgb(69, 69, 69);
+            background-color: rgb(33, 36, 37);
+        }
+        #widgetContainer {
+            position: absolute;
+            left: 1vw;
+            top: 50vh;
+            height: 40vh;
+            width: 40vw;
+            border: 4px solid rgb(69, 69, 69);
+            background-color: rgb(33, 36, 37);
+            border-radius: 5px;
+            padding: 1vw;
+        }
         .patch {
             position: absolute;
         }
@@ -22,8 +91,8 @@
 <body>
     <h1>{{ .Title }}</h1>
 
-    <div style="position: absolute;" >
-        <button hx-post="/setup" hx-swap="none">Setup</button>
+    <div id="buttonsContainer">
+        <button id="setup" hx-post="/setup" hx-swap="none">Setup</button>
 
         <button id="goOnce" hx-post="/go" hx-swap="none">Go</button>
         <button 
@@ -32,25 +101,28 @@
         >
             Play
         </button>
+    </div>
 
-        <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button>
-
-        <div id="replayTickDiv" hidden="hidden">
-            <label for="replayTick">Replay For Tick:</label>
-            <input id="replayTick" type="number" name="tick"
-                   hx-get="/settick"
-                   hx-trigger="change" 
-                   hx-include="#replayTick"
-                   hx-target="this">
-        </div>
-
+    <div id="speedSliderContainer">
         <div>
             <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
         </div>
         <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
-               hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
-               oninput="document.getElementById('sliderValue').innerText = 100 - this.value;">
+            hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
+            oninput="document.getElementById('sliderValue').innerText = 100 - this.value;">
     </div>
+
+    <div id="replayTickContainer">
+        <label for="replayTick">Replay For Tick:</label>
+        <input id="replayTick" type="number" name="tick"
+                hx-get="/settick"
+                hx-trigger="change" 
+                hx-include="#replayTick"
+                hx-target="this">
+    </div>
+
+    <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .1s" style="visibility: hidden;">Load Content</button>
+
 
     {{ .Widgets }}
 
@@ -64,15 +136,19 @@
 
     const goOnceButton = document.getElementById('goOnce');
     const goRepeatButton = document.getElementById('goRepeat');
-    const replayTickDiv = document.getElementById('replayTickDiv');
+    const replayTickContainer = document.getElementById('replayTickContainer');
+    const replayTick = document.getElementById('replayTick');
     const loadButton = document.getElementById('loadButton');
+    const setupButton = document.getElementById('setup')
 
     // Function to update visibility based on goRepeatButton's inner text
     function updateVisibility() {
         if (goRepeatButton.innerText === "Pause") {
-            replayTickDiv.hidden = true;
+            // replayTickContainer.setAttribute('disabled', true);
+            replayTick.disabled = true;
         } else {
-            replayTickDiv.hidden = false;
+            // replayTickContainer.setAttribute('disabled', false);
+            replayTick.disabled = false;
         }
     }
 
@@ -85,6 +161,10 @@
         }
         updateVisibility();
     });
+
+    setupButton.addEventListener('click', function() {
+        goRepeatButton.innerText = "Play"
+    })
 
     // Initial check on page load
     updateVisibility();

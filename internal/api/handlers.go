@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"text/template"
@@ -14,8 +13,20 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
+
+	if a.goRepeatRunning {
+		a.stopRepeating <- struct{}{}
+		a.goRepeatRunning = false
+	}
+
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
+
+	if a.concurrentCall {
+		http.Error(w, "concurrent call", http.StatusInternalServerError)
+		return
+	}
+	a.concurrentCall = true
 
 	a.tickValue = -1
 	a.stepData = map[int]*Model{}
@@ -28,22 +39,40 @@ func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+
+	a.concurrentCall = false
+
 }
 
 func (a *Api) goHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
+	if a.concurrentCall {
+		http.Error(w, "concurrent call", http.StatusInternalServerError)
+		return
+	}
+	a.concurrentCall = true
+
 	a.tickValue = -1
 
 	a.Model.Go()
 	a.storeStepData()
 	w.WriteHeader(http.StatusOK)
+
+	a.concurrentCall = false
 }
 
 func (a *Api) goRepeatHandler(w http.ResponseWriter, r *http.Request) {
 	a.goRepeatMutex.Lock()
 	defer a.goRepeatMutex.Unlock()
+
+	if a.concurrentCall {
+		http.Error(w, "concurrent call", http.StatusInternalServerError)
+		return
+	}
+	a.concurrentCall = true
+
 	if a.goRepeatRunning {
 		// Stop the loop
 		a.stopRepeating <- struct{}{}
@@ -57,6 +86,8 @@ func (a *Api) goRepeatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+
+	a.concurrentCall = false
 }
 
 func (a *Api) storeStepData() {
@@ -169,7 +200,6 @@ func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 	speedStr := queryParams.Get("speed")
 	speed, err := strconv.Atoi(speedStr)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Invalid speed parameter", http.StatusBadRequest)
 		return
 	}

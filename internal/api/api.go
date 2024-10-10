@@ -20,6 +20,7 @@ type Api struct {
 	stopRepeating   chan struct{}
 	goRepeatMutex   sync.Mutex // Mutex for the goRepeatHandler
 	settings        ApiSettings
+	concurrentCall  bool
 
 	stepData    map[int]*Model
 	oldestValue int
