@@ -39,7 +39,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	}
 
 	//if the breed is nonexistent then return nil
-	var breedSet *TurtleBreed = nil
+	var breedSet *turtleBreed = nil
 	if breed != "" {
 		found := false
 		if breedSet, found = m.breeds[breed]; !found {
@@ -100,10 +100,6 @@ func (t *Turtle) Back(distance float64) {
 
 func (t *Turtle) BreedName() string {
 	return t.breed
-}
-
-func (t *Turtle) Breed() *TurtleBreed {
-	return t.parent.breeds[t.breed]
 }
 
 // Sets the breed of the turtle to the name passed in

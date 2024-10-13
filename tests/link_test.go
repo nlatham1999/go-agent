@@ -43,17 +43,17 @@ func TestLinkCreation(t *testing.T) {
 	}
 
 	// make sure it exist in the general link list
-	if !m.Links.Contains(l) {
+	if !m.Links().Contains(l) {
 		t.Errorf("Link should have been added to the general link list")
 	}
 
 	// make sure it exist in the general directed link list
-	if !m.DirectedLinkBreeds[""].Links().Contains(l) {
+	if !m.DirectedLinks("").Contains(l) {
 		t.Errorf("Link should have been added to the general directed link list")
 	}
 
 	// make sure it exist in the directed link list for the breed
-	if !m.DirectedLinkBreeds["parent-children"].Links().Contains(l) {
+	if !m.DirectedLinks("parent-children").Contains(l) {
 		t.Errorf("Link should have been added to the directed link list for the breed")
 	}
 }
@@ -105,7 +105,7 @@ func TestLinkBreed(t *testing.T) {
 		t.Errorf("Error should be nil")
 	}
 
-	if l.Breed().Name() != "parent-children" {
+	if l.BreedName() != "parent-children" {
 		t.Errorf("Breed name should be parent-children")
 	}
 }
@@ -147,12 +147,12 @@ func TestLinkSetBreed(t *testing.T) {
 	}
 
 	// make sure it no longer exists for parent-children
-	if m.DirectedLinkBreeds["parent-children"].Links().Contains(l) {
+	if m.DirectedLinks("parent-children").Contains(l) {
 		t.Errorf("Link should have been removed from parent-children")
 	}
 
 	// make sure it exists for person-pet
-	if !m.DirectedLinkBreeds["person-pet"].Links().Contains(l) {
+	if !m.DirectedLinks("person-pet").Contains(l) {
 		t.Errorf("Link should have been added to person-pet")
 	}
 }
@@ -551,4 +551,8 @@ func TestLinkCreationNoDuplicates(t *testing.T) {
 	if err == nil {
 		t.Errorf("Error should not be nil")
 	}
+}
+
+func TestLinkBreedSetting(t *testing.T) {
+	//create breeded link betwen turtles switch breed and make sure link under the old breed does not exist any more for either turtle
 }

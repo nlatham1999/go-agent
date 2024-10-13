@@ -14,12 +14,12 @@ type Model struct {
 
 	patchesOwnTemplate map[string]interface{} //additional variables for each patch
 
-	Patches              *PatchAgentSet
+	Patches              *PatchAgentSet          //all the patches
 	turtles              *TurtleAgentSet         //all the turtles
-	breeds               map[string]*TurtleBreed //turtles that are part of specific breeds
-	Links                *LinkAgentSet           //all the links
-	DirectedLinkBreeds   map[string]*LinkBreed
-	UndirectedLinkBreeds map[string]*LinkBreed
+	links                *LinkAgentSet           //all the links
+	breeds               map[string]*turtleBreed //turtles split into breeds
+	directedLinkBreeds   map[string]*linkBreed   //directed link breeds
+	undirectedLinkBreeds map[string]*linkBreed   //undirected link breeds
 
 	posOfPatches map[int]*Patch  //map of patches by their index
 	whoToTurtles map[int]*Turtle //map of turtles by their who number
@@ -106,9 +106,9 @@ func NewModel(
 	}
 
 	//construct turtle breeds
-	turtleBreedsMap := make(map[string]*TurtleBreed)
+	turtleBreedsMap := make(map[string]*turtleBreed)
 	for i := 0; i < len(settings.TurtleBreeds); i++ {
-		turtleBreedsMap[settings.TurtleBreeds[i]] = &TurtleBreed{
+		turtleBreedsMap[settings.TurtleBreeds[i]] = &turtleBreed{
 			turtles: &TurtleAgentSet{
 				turtles: make(map[*Turtle]interface{}),
 			},
@@ -129,10 +129,10 @@ func NewModel(
 	model.breeds = turtleBreedsMap
 
 	//construct directed link breeds
-	directedLinkBreedsMap := make(map[string]*LinkBreed)
+	directedLinkBreedsMap := make(map[string]*linkBreed)
 	settings.DirectedLinkBreeds = append(settings.DirectedLinkBreeds, "") // add the general population
 	for i := 0; i < len(settings.DirectedLinkBreeds); i++ {
-		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &LinkBreed{
+		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &linkBreed{
 			links: &LinkAgentSet{
 				links: make(map[*Link]interface{}),
 			},
@@ -141,13 +141,13 @@ func NewModel(
 			name:         settings.DirectedLinkBreeds[i],
 		}
 	}
-	model.DirectedLinkBreeds = directedLinkBreedsMap
+	model.directedLinkBreeds = directedLinkBreedsMap
 
 	//construct undirected link breeds
-	undirectedLinkBreedsMap := make(map[string]*LinkBreed)
+	undirectedLinkBreedsMap := make(map[string]*linkBreed)
 	settings.UndirectedLinkBreeds = append(settings.UndirectedLinkBreeds, "") // add the general population
 	for i := 0; i < len(settings.UndirectedLinkBreeds); i++ {
-		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &LinkBreed{
+		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &linkBreed{
 			links: &LinkAgentSet{
 				links: make(map[*Link]interface{}),
 			},
@@ -156,7 +156,7 @@ func NewModel(
 			name:         settings.UndirectedLinkBreeds[i],
 		}
 	}
-	model.UndirectedLinkBreeds = undirectedLinkBreedsMap
+	model.undirectedLinkBreeds = undirectedLinkBreedsMap
 
 	//construct general turtle set
 	model.turtles = &TurtleAgentSet{
@@ -164,7 +164,7 @@ func NewModel(
 	}
 
 	// create a breed with no name for the general population
-	model.breeds[""] = &TurtleBreed{
+	model.breeds[""] = &turtleBreed{
 		turtles:            model.turtles,
 		name:               "",
 		defaultShape:       "",
@@ -179,7 +179,7 @@ func NewModel(
 	}
 
 	//construct general link set
-	model.Links = &LinkAgentSet{
+	model.links = &LinkAgentSet{
 		links: make(map[*Link]interface{}),
 	}
 
@@ -261,19 +261,19 @@ func (m *Model) ClearAll() {
 }
 
 func (m *Model) ClearLinks() {
-	for link := range m.Links.links {
+	for link := range m.links.links {
 		*link = Link{}
 	}
-	m.Links = &LinkAgentSet{
+	m.links = &LinkAgentSet{
 		links: make(map[*Link]interface{}),
 	}
-	for breed := range m.DirectedLinkBreeds {
-		m.DirectedLinkBreeds[breed].links = &LinkAgentSet{
+	for breed := range m.directedLinkBreeds {
+		m.directedLinkBreeds[breed].links = &LinkAgentSet{
 			links: make(map[*Link]interface{}),
 		}
 	}
-	for breed := range m.UndirectedLinkBreeds {
-		m.UndirectedLinkBreeds[breed].links = &LinkAgentSet{
+	for breed := range m.undirectedLinkBreeds {
+		m.undirectedLinkBreeds[breed].links = &LinkAgentSet{
 			links: make(map[*Link]interface{}),
 		}
 	}
@@ -295,12 +295,12 @@ func (m *Model) ClearPatches() {
 // kills all turtles
 func (m *Model) ClearTurtles() {
 	// delete all links since they are linked to turtles
-	m.Links.links = make(map[*Link]interface{})
-	for breed := range m.DirectedLinkBreeds {
-		m.DirectedLinkBreeds[breed].links.links = make(map[*Link]interface{})
+	m.links.links = make(map[*Link]interface{})
+	for breed := range m.directedLinkBreeds {
+		m.directedLinkBreeds[breed].links.links = make(map[*Link]interface{})
 	}
-	for breed := range m.UndirectedLinkBreeds {
-		m.UndirectedLinkBreeds[breed].links.links = make(map[*Link]interface{})
+	for breed := range m.undirectedLinkBreeds {
+		m.undirectedLinkBreeds[breed].links.links = make(map[*Link]interface{})
 	}
 
 	// remove all turtles from patches
@@ -474,13 +474,13 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 // kills a link
 func (m *Model) KillLink(link *Link) {
 
-	delete(m.Links.links, link)
+	delete(m.links.links, link)
 
 	if link.breed != "" {
 		if link.Directed {
-			delete(m.DirectedLinkBreeds[link.breed].links.links, link)
+			delete(m.directedLinkBreeds[link.breed].links.links, link)
 		} else {
-			delete(m.UndirectedLinkBreeds[link.breed].links.links, link)
+			delete(m.undirectedLinkBreeds[link.breed].links.links, link)
 		}
 	}
 
@@ -566,6 +566,24 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	}
 
 	return nil
+}
+
+func (m *Model) DirectedLinks(breed string) *LinkAgentSet {
+	if breed, ok := m.directedLinkBreeds[breed]; ok {
+		return breed.links
+	}
+	return nil
+}
+
+func (m *Model) UndirectedLinks(breed string) *LinkAgentSet {
+	if breed, ok := m.undirectedLinkBreeds[breed]; ok {
+		return breed.links
+	}
+	return nil
+}
+
+func (m *Model) Links() *LinkAgentSet {
+	return m.links
 }
 
 func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
@@ -1077,7 +1095,7 @@ func (m *Model) SetDefaultShapeTurtles(shape string) {
 }
 
 func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
-	m.DirectedLinkBreeds[breed].DefaultShape = shape
+	m.directedLinkBreeds[breed].DefaultShape = shape
 }
 
 func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {

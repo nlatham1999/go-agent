@@ -21,7 +21,7 @@ type Link struct {
 	parent    *Model
 
 	Label      interface{}
-	labelColor Color
+	LabelColor Color
 }
 
 // NewLink creates a new link between two turtles
@@ -29,11 +29,11 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	// make sure the breed exists
 	if directed {
-		if _, ok := model.DirectedLinkBreeds[breed]; !ok {
+		if _, ok := model.directedLinkBreeds[breed]; !ok {
 			return nil, fmt.Errorf("directed link breed %s does not exist", breed)
 		}
 	} else {
-		if _, ok := model.UndirectedLinkBreeds[breed]; !ok {
+		if _, ok := model.undirectedLinkBreeds[breed]; !ok {
 			return nil, fmt.Errorf("undirected link breed %s does not exist", breed)
 		}
 	}
@@ -55,14 +55,14 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		parent:   model,
 	}
 
-	model.Links.Add(l)
+	model.links.Add(l)
 
 	if directed {
-		model.DirectedLinkBreeds[breed].links.Add(l)
-		model.DirectedLinkBreeds[""].links.Add(l)
+		model.directedLinkBreeds[breed].links.Add(l)
+		model.directedLinkBreeds[""].links.Add(l)
 	} else {
-		model.UndirectedLinkBreeds[breed].links.Add(l)
-		model.UndirectedLinkBreeds[""].links.Add(l)
+		model.undirectedLinkBreeds[breed].links.Add(l)
+		model.undirectedLinkBreeds[""].links.Add(l)
 	}
 
 	// add the link to the turtle's link map
@@ -83,15 +83,15 @@ func (l *Link) BreedName() string {
 }
 
 // Returns the breed of this link
-func (l *Link) Breed() *LinkBreed {
+func (l *Link) Breed() *linkBreed {
 	if l.breed == "" {
 		return nil
 	}
 
 	if l.Directed {
-		return l.parent.DirectedLinkBreeds[l.breed]
+		return l.parent.directedLinkBreeds[l.breed]
 	} else {
-		return l.parent.UndirectedLinkBreeds[l.breed]
+		return l.parent.undirectedLinkBreeds[l.breed]
 	}
 }
 
@@ -122,22 +122,22 @@ func (l *Link) SetBreed(name string) {
 
 	// make sure the breed exists
 	if l.Directed {
-		if _, ok := l.parent.DirectedLinkBreeds[name]; !ok {
+		if _, ok := l.parent.directedLinkBreeds[name]; !ok {
 			return
 		}
 	} else {
-		if _, ok := l.parent.UndirectedLinkBreeds[name]; !ok {
+		if _, ok := l.parent.undirectedLinkBreeds[name]; !ok {
 			return
 		}
 	}
 
 	// remove the link from the old breed if it exists
 	if l.breed != "" {
-		var breed *LinkBreed
+		var breed *linkBreed
 		if l.Directed {
-			breed = l.parent.DirectedLinkBreeds[l.breed]
+			breed = l.parent.directedLinkBreeds[l.breed]
 		} else {
-			breed = l.parent.UndirectedLinkBreeds[l.breed]
+			breed = l.parent.undirectedLinkBreeds[l.breed]
 		}
 
 		delete(breed.links.links, l)
@@ -147,9 +147,9 @@ func (l *Link) SetBreed(name string) {
 
 	if l.breed != "" {
 		if l.Directed {
-			l.parent.DirectedLinkBreeds[name].links.Add(l)
+			l.parent.directedLinkBreeds[name].links.Add(l)
 		} else {
-			l.parent.UndirectedLinkBreeds[name].links.Add(l)
+			l.parent.undirectedLinkBreeds[name].links.Add(l)
 		}
 	}
 }

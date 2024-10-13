@@ -195,8 +195,8 @@ func TestKillTurtle(t *testing.T) {
 	}
 
 	// make sure there's only one link left
-	if m.Links.Count() != 1 {
-		t.Errorf("Expected 1 link, got %d", m.Links.Count())
+	if m.Links().Count() != 1 {
+		t.Errorf("Expected 1 link, got %d", m.Links().Count())
 	}
 }
 

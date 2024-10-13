@@ -65,11 +65,11 @@ func TestTurtleBreed(t *testing.T) {
 
 	turtle := m.Turtle("ants", 0)
 
-	if turtle.Breed() == nil {
+	if turtle.BreedName() == "" {
 		t.Errorf("Expected turtle to have a breed")
 	}
 
-	if turtle.Breed().Name() != "ants" {
+	if turtle.BreedName() != "ants" {
 		t.Errorf("Expected turtle to have breed 'ants'")
 	}
 }

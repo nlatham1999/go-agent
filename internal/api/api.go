@@ -71,6 +71,7 @@ func (a *Api) Serve() {
 
 	//frontend handlers
 	r.HandleFunc("/load", a.loadHandler)
+	r.HandleFunc("/loadstats", a.loadStatsHandler)
 	r.HandleFunc("/updatespeed", a.updateSpeedHandler)
 	r.HandleFunc("/updatedynamic", a.updateDynamicVariableHandler)
 	r.HandleFunc("/settick", a.setTickValueHandler)

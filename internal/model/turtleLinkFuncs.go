@@ -100,7 +100,8 @@ func (t *Turtle) LinkNeighbor(breed string, turtle *Turtle) bool {
 }
 
 // returns all turtles that are linked to the current turtle
-//   incoming, outgoing, or undirected
+//
+//	incoming, outgoing, or undirected
 func (t *Turtle) LinkNeighbors(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesAll(breed)
 }
@@ -112,7 +113,9 @@ func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 }
 
 // returns all turtles that have a directed link to the current turtle
-//  or an undirected link connecting the two
+//
+//	or an undirected link connecting the two
+//
 // basically all turtles where there is a path from the turtle to the current turtle
 func (t *Turtle) InLinkNeighbors(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesIncoming(breed)

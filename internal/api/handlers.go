@@ -193,6 +193,21 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) loadStatsHandler(w http.ResponseWriter, r *http.Request) {
+
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
+
+	tmpl := a.renderStats()
+
+	// Execute the template
+	_, err := w.Write([]byte(tmpl))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 

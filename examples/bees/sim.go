@@ -70,6 +70,21 @@ func (b *Bees) SetUp() error {
 		},
 	})
 
+	b.model.CreateTurtles(1, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetXY(0, 0)
+		},
+	})
+	b.model.CreateTurtles(1, "", []model.TurtleOperation{
+		func(t *model.Turtle) {
+			t.SetXY(1, 0)
+			t.CreateLinkWithTurtle("", b.model.Turtle("", 0), nil)
+		},
+	})
+
+	b.model.Patch(0, 0).PColor.SetColor(model.Red)
+	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
+
 	numScouts, _ := b.model.GetGlobalI("scouts")
 	b.model.CreateTurtles(numScouts, "scouts", []model.TurtleOperation{
 		func(t *model.Turtle) {
@@ -109,7 +124,12 @@ func (b *Bees) Go() {
 						forager.Color.SetColor(model.Red)
 						forager.SetHeading(b.model.RandomFloat(360))
 						forager.Forward(b.model.RandomFloat(searchRadius))
-						scout.CreateLinkWithTurtle("", forager, nil)
+						scout.CreateLinkWithTurtle("", forager, []model.LinkOperation{
+							func(l *model.Link) {
+								l.Label = l.Length()
+								l.LabelColor = model.Red
+							},
+						})
 						forager.SetLabel(forager.PatchHere().GetOwnI("nectar"))
 					},
 				})
@@ -154,6 +174,12 @@ func (b *Bees) Go() {
 			},
 		})
 	}
+
+	b.model.Links().Ask([]model.LinkOperation{
+		func(l *model.Link) {
+			l.Color.SetColor(model.Orange)
+		},
+	})
 
 	b.step++
 

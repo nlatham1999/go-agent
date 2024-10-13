@@ -8,7 +8,7 @@ func convertModelToApiModel(model *model.Model) *Model {
 	apiModel := Model{
 		Patches:          convertPatchSetToApiPatchSet(model.Patches),
 		Turtles:          convertTurtleSetToApiTurtleSet(model.Turtles("")),
-		Links:            convertLinkSetToApiLinkSet(model.Links),
+		Links:            convertLinkSetToApiLinkSet(model.Links()),
 		DynamicVariables: model.Globals,
 		Ticks:            model.Ticks,
 		WorldWidth:       model.WorldWidth(),
@@ -67,13 +67,18 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
 	for _, link := range links.List() {
 		apiLink := Link{
-			End1:     link.End1().Who(),
-			End2:     link.End2().Who(),
-			Directed: link.Directed,
-			End1X:    link.End1().XCor(),
-			End1Y:    link.End1().YCor(),
-			End2X:    link.End2().XCor(),
-			End2Y:    link.End2().YCor(),
+			End1:       link.End1().Who(),
+			End2:       link.End2().Who(),
+			Directed:   link.Directed,
+			End1X:      link.End1().XCor(),
+			End1Y:      link.End1().YCor(),
+			End2X:      link.End2().XCor(),
+			End2Y:      link.End2().YCor(),
+			End1Size:   link.End1().GetSize(),
+			End2Size:   link.End2().GetSize(),
+			Color:      convertColorToApiColor(link.Color),
+			Label:      link.Label,
+			LabelColor: convertColorToApiColor(link.LabelColor),
 		}
 		apiLinks = append(apiLinks, apiLink)
 	}

@@ -40,11 +40,16 @@ type Color struct {
 }
 
 type Link struct {
-	End1     int     `json:"end1"`
-	End2     int     `json:"end2"`
-	End1X    float64 `json:"end1X"`
-	End1Y    float64 `json:"end1Y"`
-	End2X    float64 `json:"end2X"`
-	End2Y    float64 `json:"end2Y"`
-	Directed bool    `json:"directed"`
+	End1       int         `json:"end1"`
+	End2       int         `json:"end2"`
+	End1X      float64     `json:"end1X"`
+	End1Y      float64     `json:"end1Y"`
+	End2X      float64     `json:"end2X"`
+	End2Y      float64     `json:"end2Y"`
+	End1Size   float64     `json:"end1Size"`
+	End2Size   float64     `json:"end2Size"`
+	Directed   bool        `json:"directed"`
+	Color      Color       `json:"color"`
+	Label      interface{} `json:"label"`
+	LabelColor Color       `json:"labelColor"`
 }
