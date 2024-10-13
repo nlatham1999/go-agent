@@ -94,7 +94,12 @@ func (l *LinkAgentSet) MaxNOf(n int, operation LinkFloatOperation) *LinkAgentSet
 }
 
 // returns the max link in the agent set based on the float operation
-func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {
+func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) (*Link, error) {
+
+	if len(l.links) == 0 {
+		return nil, ErrNoLinksInAgentSet
+	}
+
 	max := math.MaxFloat64 * -1
 	var maxLink *Link
 	for link := range l.links {
@@ -103,7 +108,7 @@ func (l *LinkAgentSet) MaxOneOf(operation LinkFloatOperation) *Link {
 			maxLink = link
 		}
 	}
-	return maxLink
+	return maxLink, nil
 }
 
 // returns the min n links in the agent set based on the float operation
@@ -124,7 +129,12 @@ func (l *LinkAgentSet) MinNOf(n int, operation LinkFloatOperation) *LinkAgentSet
 }
 
 // returns the min link in the agent set based on the float operation
-func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {
+func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) (*Link, error) {
+
+	if len(l.links) == 0 {
+		return nil, ErrNoLinksInAgentSet
+	}
+
 	min := math.MaxFloat64
 	var minLink *Link
 	for link := range l.links {
@@ -133,17 +143,17 @@ func (l *LinkAgentSet) MinOneOf(operation LinkFloatOperation) *Link {
 			minLink = link
 		}
 	}
-	return minLink
+	return minLink, nil
 }
 
 // returns one of the links
 // @TODO make this actually random based on model seed
-func (l *LinkAgentSet) OneOf() *Link {
+func (l *LinkAgentSet) OneOf() (*Link, error) {
 	for link := range l.links {
-		return link
+		return link, nil
 	}
 
-	return nil
+	return nil, ErrNoLinksInAgentSet
 }
 
 // returns n links or all the links in the agentset if the length is lower than n

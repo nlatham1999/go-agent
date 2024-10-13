@@ -16,7 +16,7 @@ type turtleLinks struct {
 	allTurtlesDirectedIn  map[*Turtle][]*Link
 	allTurtlesUndirected  map[*Turtle][]*Link
 
-	// maps of turtles to links split by breed
+	// maps of turtles to links split by link breed
 	// unbreeded is stored as empty string
 	turtlesDirectedOutBreed map[string]map[*Turtle]*Link
 	turtlesDirectedInBreed  map[string]map[*Turtle]*Link
@@ -154,6 +154,39 @@ func (t *turtleLinks) removeUndirectedBreed(breed string, turtle *Turtle, link *
 	}
 
 	delete(t.allLinksUndirected, link)
+}
+
+func (t *turtleLinks) changeDirectedOutBreed(oldLinkBreed string, newLinkBreed string, turtle *Turtle, link *Link) {
+	if _, ok := t.turtlesDirectedOutBreed[oldLinkBreed]; ok {
+		delete(t.turtlesDirectedOutBreed[oldLinkBreed], turtle)
+	}
+
+	if _, ok := t.turtlesDirectedOutBreed[newLinkBreed]; !ok {
+		t.turtlesDirectedOutBreed[newLinkBreed] = make(map[*Turtle]*Link)
+	}
+	t.turtlesDirectedOutBreed[newLinkBreed][turtle] = link
+}
+
+func (t *turtleLinks) changeDirectedInBreed(oldLinkBreed string, newLinkBreed string, turtle *Turtle, link *Link) {
+	if _, ok := t.turtlesDirectedInBreed[oldLinkBreed]; ok {
+		delete(t.turtlesDirectedInBreed[oldLinkBreed], turtle)
+	}
+
+	if _, ok := t.turtlesDirectedInBreed[newLinkBreed]; !ok {
+		t.turtlesDirectedInBreed[newLinkBreed] = make(map[*Turtle]*Link)
+	}
+	t.turtlesDirectedInBreed[newLinkBreed][turtle] = link
+}
+
+func (t *turtleLinks) changeUndirectedBreed(oldLinkBreed string, newLinkBreed string, turtle *Turtle, link *Link) {
+	if _, ok := t.turtlesUndirectedBreed[oldLinkBreed]; ok {
+		delete(t.turtlesUndirectedBreed[oldLinkBreed], turtle)
+	}
+
+	if _, ok := t.turtlesUndirectedBreed[newLinkBreed]; !ok {
+		t.turtlesUndirectedBreed[newLinkBreed] = make(map[*Turtle]*Link)
+	}
+	t.turtlesUndirectedBreed[newLinkBreed][turtle] = link
 }
 
 // get a turtle that is connected from the current turtle

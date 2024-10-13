@@ -147,9 +147,12 @@ func (b *Bees) Go() {
 					return
 				}
 
-				max := foragers.MaxOneOf(func(f *model.Turtle) float64 {
+				max, err := foragers.MaxOneOf(func(f *model.Turtle) float64 {
 					return f.PatchHere().GetOwnF("nectar")
 				})
+				if err != nil {
+					return
+				}
 
 				if max.PatchHere().GetOwnF("nectar") > t.PatchHere().GetOwnF("nectar") {
 					t.Die()

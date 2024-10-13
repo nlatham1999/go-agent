@@ -555,4 +555,98 @@ func TestLinkCreationNoDuplicates(t *testing.T) {
 
 func TestLinkBreedSetting(t *testing.T) {
 	//create breeded link betwen turtles switch breed and make sure link under the old breed does not exist any more for either turtle
+
+	modelSettings := model.ModelSettings{
+		UndirectedLinkBreeds: []string{"a", "b"},
+		DirectedLinkBreeds:   []string{"c", "d"},
+	}
+
+	m := model.NewModel(modelSettings)
+
+	m.CreateTurtles(4, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	l, err := t1.CreateLinkWithTurtle("a", t2, nil)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	if t1.Links("a").Count() != 1 {
+		t.Errorf("Turtle 1 should have 1 link of breed a")
+	}
+
+	if t2.Links("a").Count() != 1 {
+		t.Errorf("Turtle 2 should have 1 link of breed a")
+	}
+
+	l.SetBreed("b")
+
+	if m.UndirectedLinks("a").Count() != 0 {
+		t.Errorf("Link should not exist under breed a")
+	}
+
+	if m.UndirectedLinks("b").Count() != 1 {
+		t.Errorf("Link should exist under breed b")
+	}
+
+	if t1.Links("a").Count() != 0 {
+		t.Errorf("Turtle 1 should have 0 links of breed a")
+	}
+
+	if t2.Links("a").Count() != 0 {
+		t.Errorf("Turtle 2 should have 0 links of breed a")
+	}
+
+	if t1.Links("b").Count() != 1 {
+		t.Errorf("Turtle 1 should have 1 link of breed b")
+	}
+
+	if t2.Links("b").Count() != 1 {
+		t.Errorf("Turtle 2 should have 1 link of breed b")
+	}
+
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+
+	l, err = t3.CreateLinkToTurtle("c", t4, nil)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	if t3.OutLinks("c").Count() != 1 {
+		t.Errorf("Turtle 3 should have 1 out link of breed c")
+	}
+
+	if t4.InLinks("c").Count() != 1 {
+		t.Errorf("Turtle 4 should have 1 in link of breed c")
+	}
+
+	l.SetBreed("d")
+
+	if m.DirectedLinks("c").Count() != 0 {
+		t.Errorf("Link should not exist under breed c")
+	}
+
+	if m.DirectedLinks("d").Count() != 1 {
+		t.Errorf("Link should exist under breed d")
+	}
+
+	if t3.OutLinks("c").Count() != 0 {
+		t.Errorf("Turtle 3 should have 0 out links of breed c")
+	}
+
+	if t4.InLinks("c").Count() != 0 {
+		t.Errorf("Turtle 4 should have 0 in links of breed c")
+	}
+
+	if t3.OutLinks("d").Count() != 1 {
+		t.Errorf("Turtle 3 should have 1 out link of breed d")
+	}
+
+	if t4.InLinks("d").Count() != 1 {
+		t.Errorf("Turtle 4 should have 1 in link of breed d")
+	}
+
 }

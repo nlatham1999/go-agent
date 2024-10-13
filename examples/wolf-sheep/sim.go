@@ -240,7 +240,10 @@ func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) EatSheep(t *model.Turtle) {
-	prey := t.PatchHere().TurtlesHere("sheep").OneOf()
+	prey, err := t.PatchHere().TurtlesHere("sheep").OneOf()
+	if err != nil {
+		return
+	}
 	if prey != nil {
 		prey.Die()
 		t.SetOwn("energy", t.GetOwn("energy").(int)+ws.m.GetGlobal("wolf-gain-from-food").(int))

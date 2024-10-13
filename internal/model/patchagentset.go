@@ -136,7 +136,12 @@ func (p *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgent
 	return PatchSet(patches[:n])
 }
 
-func (p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) *Patch {
+func (p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) (*Patch, error) {
+
+	if len(p.patches) == 0 {
+		return nil, ErrNoPatchesInAgentSet
+	}
+
 	max := math.MaxFloat64 * -1
 	var maxPatch *Patch
 	for patch := range p.patches {
@@ -145,7 +150,7 @@ func (p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) *Patch {
 			maxPatch = patch
 		}
 	}
-	return maxPatch
+	return maxPatch, nil
 }
 
 func (p *PatchAgentSet) MinNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
@@ -171,7 +176,12 @@ func (p *PatchAgentSet) MinNOf(n int, operation PatchFloatOperation) *PatchAgent
 	return PatchSet(patches[:n])
 }
 
-func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {
+func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) (*Patch, error) {
+
+	if len(p.patches) == 0 {
+		return nil, ErrNoPatchesInAgentSet
+	}
+
 	min := math.MaxFloat64
 	var minPatch *Patch
 	for patch := range p.patches {
@@ -180,15 +190,15 @@ func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) *Patch {
 			minPatch = patch
 		}
 	}
-	return minPatch
+	return minPatch, nil
 }
 
-func (p *PatchAgentSet) OneOf() *Patch {
+func (p *PatchAgentSet) OneOf() (*Patch, error) {
 	for patch := range p.patches {
-		return patch
+		return patch, nil
 	}
 
-	return nil
+	return nil, ErrNoPatchesInAgentSet
 }
 
 func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {

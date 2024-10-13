@@ -1298,7 +1298,7 @@ func TestTurtleMyLinks(t *testing.T) {
 	l7 := t1.LinkWith("", t8)
 	l8 := t1.LinkWith("coworkers", t9)
 
-	links := t1.MyLinks("")
+	links := t1.Links("")
 	if links.Count() != 8 {
 		t.Errorf("Expected 8 links, got %d", links.Count())
 	}
@@ -1306,7 +1306,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.MyLinks("parent-children")
+	links = t1.Links("parent-children")
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1314,7 +1314,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l2 and l6")
 	}
 
-	links = t1.MyLinks("coworkers")
+	links = t1.Links("coworkers")
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1322,7 +1322,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l4 and l8")
 	}
 
-	links = t1.MyInLinks("")
+	links = t1.InLinks("")
 	if links.Count() != 6 {
 		t.Errorf("Expected 6 links, got %d", links.Count())
 	}
@@ -1330,7 +1330,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.MyInLinks("parent-children")
+	links = t1.InLinks("parent-children")
 	if links.Count() != 1 {
 		t.Errorf("Expected 1 link, got %d", links.Count())
 	}
@@ -1338,7 +1338,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l6")
 	}
 
-	links = t1.MyInLinks("coworkers")
+	links = t1.InLinks("coworkers")
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1346,7 +1346,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l4 and l8")
 	}
 
-	links = t1.MyOutLinks("")
+	links = t1.OutLinks("")
 	if links.Count() != 6 {
 		t.Errorf("Expected 6 links, got %d", links.Count())
 	}
@@ -1354,7 +1354,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.MyOutLinks("parent-children")
+	links = t1.OutLinks("parent-children")
 	if links.Count() != 1 {
 		t.Errorf("Expected 1 link, got %d", links.Count())
 	}
@@ -1362,7 +1362,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l2")
 	}
 
-	links = t1.MyOutLinks("coworkers")
+	links = t1.OutLinks("coworkers")
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}

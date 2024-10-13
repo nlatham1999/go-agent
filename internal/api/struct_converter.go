@@ -79,6 +79,7 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Color:      convertColorToApiColor(link.Color),
 			Label:      link.Label,
 			LabelColor: convertColorToApiColor(link.LabelColor),
+			Size:       link.Size,
 		}
 		apiLinks = append(apiLinks, apiLink)
 	}

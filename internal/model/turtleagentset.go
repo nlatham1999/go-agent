@@ -139,7 +139,12 @@ func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAg
 	return TurtleSet(sorter.turtles[:n])
 }
 
-func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle {
+func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) (*Turtle, error) {
+
+	if len(t.turtles) == 0 {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+
 	max := math.MaxFloat64 * -1
 	var maxTurtle *Turtle
 	for turtle := range t.turtles {
@@ -148,7 +153,7 @@ func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) *Turtle {
 			maxTurtle = turtle
 		}
 	}
-	return maxTurtle
+	return maxTurtle, nil
 }
 
 func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
@@ -174,7 +179,12 @@ func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAg
 	return TurtleSet(sorter.turtles[:n])
 }
 
-func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
+func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) (*Turtle, error) {
+
+	if len(t.turtles) == 0 {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+
 	min := math.MaxFloat64
 	var minTurtle *Turtle
 	for turtle := range t.turtles {
@@ -183,15 +193,16 @@ func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) *Turtle {
 			minTurtle = turtle
 		}
 	}
-	return minTurtle
+	return minTurtle, nil
 }
 
-func (t *TurtleAgentSet) OneOf() *Turtle {
+func (t *TurtleAgentSet) OneOf() (*Turtle, error) {
+
 	for turtle := range t.turtles {
-		return turtle
+		return turtle, nil
 	}
 
-	return nil
+	return nil, ErrNoTurtlesInAgentSet
 }
 
 func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {

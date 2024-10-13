@@ -75,9 +75,14 @@ func (a *AntPath) SetUp() error {
 		},
 	})
 
-	a.m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
+	t, err := a.m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
 		return float64(t.Who())
-	}).Ask(
+	})
+	if err != nil {
+		return err
+	}
+
+	t.Ask(
 		[]model.TurtleOperation{
 			func(t *model.Turtle) {
 				t.Color.SetColor(model.Blue)

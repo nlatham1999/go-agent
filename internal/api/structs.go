@@ -52,4 +52,5 @@ type Link struct {
 	Color      Color       `json:"color"`
 	Label      interface{} `json:"label"`
 	LabelColor Color       `json:"labelColor"`
+	Size       int         `json"size"`
 }

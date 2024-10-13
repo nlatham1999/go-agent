@@ -3,17 +3,17 @@ package model
 // all api functions for turtles that deal with links
 
 // creates a directed link from the current turtle to the turtle passed in
-func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
+func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
 	l, err := NewLink(t.parent, breed, t, turtle, true)
 	if err != nil {
-		return err
+		return l, err
 	}
 
 	for _, operation := range operations {
 		operation(l)
 	}
 
-	return nil
+	return l, nil
 }
 
 // creates a directed link from the current turtle to the turtles passed in
@@ -36,17 +36,17 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 }
 
 // creates an undirected breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
+func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
 	l, err := NewLink(t.parent, breed, t, turtle, false)
 	if err != nil {
-		return err
+		return l, err
 	}
 
 	for _, operation := range operations {
 		operation(l)
 	}
 
-	return nil
+	return l, nil
 
 }
 
@@ -66,17 +66,17 @@ func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, opera
 }
 
 // creates a directed breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations []LinkOperation) error {
+func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
 	l, err := NewLink(t.parent, breed, turtle, t, true)
 	if err != nil {
-		return err
+		return l, err
 	}
 
 	for _, operation := range operations {
 		operation(l)
 	}
 
-	return nil
+	return l, nil
 }
 
 // creates a directed breed link from the turtles passed in to the current turtle
@@ -168,16 +168,18 @@ func (t *Turtle) LinkWith(breed string, turtle *Turtle) *Link {
 }
 
 // returns all links that are connected to a turtle, undirected or directed, incoming or outgoing
-func (t *Turtle) MyLinks(breed string) *LinkAgentSet {
+func (t *Turtle) Links(breed string) *LinkAgentSet {
 	return t.linkedTurtles.getLinksAll(breed)
 }
 
 // returns all incoming links that are connected to the turtle
-func (t *Turtle) MyInLinks(breed string) *LinkAgentSet {
+// this includes directed links going in and undirected links
+func (t *Turtle) InLinks(breed string) *LinkAgentSet {
 	return t.linkedTurtles.getLinksIncoming(breed)
 }
 
 // returns all outgoing links that are connected to the turtle
-func (t *Turtle) MyOutLinks(breed string) *LinkAgentSet {
+// this includes directed links going out and undirected links
+func (t *Turtle) OutLinks(breed string) *LinkAgentSet {
 	return t.linkedTurtles.getLinksOutgoing(breed)
 }

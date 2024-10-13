@@ -19,6 +19,7 @@ type Link struct {
 	Thickness float64
 	TieMode   TieMode
 	parent    *Model
+	Size      int
 
 	Label      interface{}
 	LabelColor Color
@@ -53,6 +54,7 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		end2:     end2,
 		Directed: directed,
 		parent:   model,
+		Size:     1,
 	}
 
 	model.links.Add(l)
@@ -107,6 +109,10 @@ func (l *Link) Ask(operations []LinkOperation) {
 	}
 }
 
+func (l *Link) Die() {
+	l.parent.KillLink(l)
+}
+
 // returns the first end of the link
 func (l *Link) End1() *Turtle {
 	return l.end1
@@ -119,6 +125,8 @@ func (l *Link) End2() *Turtle {
 
 // sets the link to be a breed
 func (l *Link) SetBreed(name string) {
+
+	oldBreedName := l.breed
 
 	// make sure the breed exists
 	if l.Directed {
@@ -151,6 +159,15 @@ func (l *Link) SetBreed(name string) {
 		} else {
 			l.parent.undirectedLinkBreeds[name].links.Add(l)
 		}
+	}
+
+	//change the breed on the turtles
+	if l.Directed {
+		l.end1.linkedTurtles.changeDirectedOutBreed(oldBreedName, name, l.end2, l)
+		l.end2.linkedTurtles.changeDirectedInBreed(oldBreedName, name, l.end1, l)
+	} else {
+		l.end1.linkedTurtles.changeUndirectedBreed(oldBreedName, name, l.end2, l)
+		l.end2.linkedTurtles.changeUndirectedBreed(oldBreedName, name, l.end1, l)
 	}
 }
 

@@ -101,7 +101,7 @@ func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSi
 				class="line" 
 				style="
 					width: %fpx;
-					height: 2px; /* Line thickness */
+					height: %dpx; /* Line thickness */
 					position: absolute;
 					left: %fpx;
 					top: %fpx;
@@ -111,7 +111,7 @@ func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSi
 					color: rgba(%d,%d,%d,%d);
 				"
 			>%v</div>
-			`, distance, point1X, point1Y+offset, angle, link.Color.Red, link.Color.Green, link.Color.Blue, link.Color.Alpha, link.LabelColor.Red, link.LabelColor.Green, link.LabelColor.Blue, link.LabelColor.Alpha, link.Label))
+			`, distance, link.Size, point1X, point1Y+offset, angle, link.Color.Red, link.Color.Green, link.Color.Blue, link.Color.Alpha, link.LabelColor.Red, link.LabelColor.Green, link.LabelColor.Blue, link.LabelColor.Alpha, link.Label))
 
 }
 
