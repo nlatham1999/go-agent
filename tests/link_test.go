@@ -648,5 +648,56 @@ func TestLinkBreedSetting(t *testing.T) {
 	if t4.InLinks("d").Count() != 1 {
 		t.Errorf("Turtle 4 should have 1 in link of breed d")
 	}
+}
 
+func TestLinkDying(t *testing.T) {
+	//create a link and kill it, make sure it is removed from the model and the turtles
+
+	modelSettings := model.ModelSettings{
+		UndirectedLinkBreeds: []string{"a", "b"},
+		DirectedLinkBreeds:   []string{"c", "d"},
+	}
+
+	m := model.NewModel(modelSettings)
+
+	m.CreateTurtles(5, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+	t3 := m.Turtle("", 2)
+	t4 := m.Turtle("", 3)
+	t5 := m.Turtle("", 4)
+
+	t1.CreateLinkWithTurtle("a", t2, nil)
+	t1.CreateLinkWithTurtle("a", t3, nil)
+	t1.CreateLinkWithTurtle("a", t4, nil)
+	t1.CreateLinkWithTurtle("a", t5, nil)
+	t2.CreateLinkWithTurtle("a", t3, nil)
+	t2.CreateLinkWithTurtle("a", t4, nil)
+	t2.CreateLinkWithTurtle("a", t5, nil)
+	t3.CreateLinkWithTurtle("a", t4, nil)
+	t3.CreateLinkWithTurtle("a", t5, nil)
+	t4.CreateLinkWithTurtle("a", t5, nil)
+
+	if m.Links().Count() != 10 {
+		t.Errorf("Model should have 4 links")
+	}
+
+	if m.UndirectedLinks("a").Count() != 10 {
+		t.Errorf("Model should have 4 links of breed a")
+	}
+
+	for i, link := range m.UndirectedLinks("a").List() {
+		if i == 0 {
+			link.Die()
+		}
+	}
+
+	if m.Links().Count() != 9 {
+		t.Errorf("Model should have 9 links, got %d", m.Links().Count())
+	}
+
+	if len(m.Links().List()) != 9 {
+		t.Errorf("Model should have 9 links, got %d", len(m.Links().List()))
+	}
 }

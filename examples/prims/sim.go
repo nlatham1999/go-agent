@@ -60,6 +60,10 @@ func (p *Prims) SetUp() error {
 		},
 	})
 
+	p.model.UndirectedLinks("unplaced").SortDesc(func(l *model.Link) float64 {
+		return l.Length()
+	})
+
 	t0 := p.model.Turtle("", 0)
 	t0.Color.SetColor(model.Red)
 	t0.SetBreed("placed")
@@ -73,36 +77,31 @@ func (p *Prims) Go() {
 	// find the closest link to the cluster
 	var closestLink *model.Link
 	var closestTurtle *model.Turtle
-	var closestDistance float64 = 100000 //max float
-	p.model.Turtles("placed").Ask([]model.TurtleOperation{
-		func(t *model.Turtle) {
+	links := p.model.UndirectedLinks("unplaced")
+	// for link != nil {
+	// fmt.Println("Before loop", p.model.Links().Count())
+	for _, link := range links.List() {
 
-			t.Links("unplaced").Ask([]model.LinkOperation{
-				func(l *model.Link) {
-					if l.OtherEnd(t).BreedName() == "placed" {
-						l.Die()
-						return
-					}
+		breedName1 := link.End1().BreedName()
+		breedName2 := link.End2().BreedName()
+		if breedName1 == "placed" && breedName2 == "placed" {
+			// fmt.Println("killing")
+			// link.Die()
+			continue
+		}
+		if breedName1 == "unplaced" && breedName2 == "unplaced" {
+			continue
+		}
 
-					d := l.Length()
-					if d < closestDistance {
-						closestDistance = d
-						closestLink = l
-						closestTurtle = l.OtherEnd(t)
-					}
-				},
-			})
-
-		},
-	})
-
-	if closestLink == nil {
-		return
+		closestLink = link
+		if breedName1 == "unplaced" {
+			closestTurtle = link.End1()
+		} else {
+			closestTurtle = link.End2()
+		}
 	}
 
-	//if the closest link is linked to two placed nodes already then delete it
-	if closestLink.End1().BreedName() == "placed" && closestLink.End2().BreedName() == "placed" {
-		closestLink.Die()
+	if closestLink == nil {
 		return
 	}
 
@@ -111,6 +110,15 @@ func (p *Prims) Go() {
 	closestLink.Color.SetColor(model.Red)
 	closestTurtle.SetBreed("placed")
 	closestTurtle.Color.SetColor(model.Red)
+
+	// if all nodes are placed, kill all unplaced links
+	if p.model.Turtles("placed").Count() == p.model.GetGlobal("nodes").(int) {
+		p.model.UndirectedLinks("unplaced").Ask([]model.LinkOperation{
+			func(l *model.Link) {
+				l.Die()
+			},
+		})
+	}
 
 	p.model.Tick()
 }
@@ -124,7 +132,8 @@ func (p *Prims) Stats() map[string]interface{} {
 }
 
 func (p *Prims) Stop() bool {
-	return p.model.UndirectedLinks("unplaced").Count() == 0
+	// return p.model.UndirectedLinks("unplaced").Count() == 0
+	return false
 }
 
 func (p *Prims) Widgets() []api.Widget {

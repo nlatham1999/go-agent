@@ -6,6 +6,8 @@ import (
 	"math"
 	"math/rand"
 	"time"
+
+	"github.com/nlatham1999/sortedset"
 )
 
 type Model struct {
@@ -134,7 +136,7 @@ func NewModel(
 	for i := 0; i < len(settings.DirectedLinkBreeds); i++ {
 		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &linkBreed{
 			links: &LinkAgentSet{
-				links: make(map[*Link]interface{}),
+				links: *sortedset.NewSortedSet(),
 			},
 			Directed:     true,
 			DefaultShape: "",
@@ -149,7 +151,7 @@ func NewModel(
 	for i := 0; i < len(settings.UndirectedLinkBreeds); i++ {
 		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &linkBreed{
 			links: &LinkAgentSet{
-				links: make(map[*Link]interface{}),
+				links: *sortedset.NewSortedSet(),
 			},
 			Directed:     false,
 			DefaultShape: "",
@@ -180,7 +182,7 @@ func NewModel(
 
 	//construct general link set
 	model.links = &LinkAgentSet{
-		links: make(map[*Link]interface{}),
+		links: *sortedset.NewSortedSet(),
 	}
 
 	// build patches
@@ -261,20 +263,18 @@ func (m *Model) ClearAll() {
 }
 
 func (m *Model) ClearLinks() {
-	for link := range m.links.links {
-		*link = Link{}
-	}
+	m.links.links = *sortedset.NewSortedSet()
 	m.links = &LinkAgentSet{
-		links: make(map[*Link]interface{}),
+		links: *sortedset.NewSortedSet(),
 	}
 	for breed := range m.directedLinkBreeds {
 		m.directedLinkBreeds[breed].links = &LinkAgentSet{
-			links: make(map[*Link]interface{}),
+			links: *sortedset.NewSortedSet(),
 		}
 	}
 	for breed := range m.undirectedLinkBreeds {
 		m.undirectedLinkBreeds[breed].links = &LinkAgentSet{
-			links: make(map[*Link]interface{}),
+			links: *sortedset.NewSortedSet(),
 		}
 	}
 	for turtle := range m.turtles.turtles {
@@ -295,12 +295,12 @@ func (m *Model) ClearPatches() {
 // kills all turtles
 func (m *Model) ClearTurtles() {
 	// delete all links since they are linked to turtles
-	m.links.links = make(map[*Link]interface{})
+	m.links.links = *sortedset.NewSortedSet()
 	for breed := range m.directedLinkBreeds {
-		m.directedLinkBreeds[breed].links.links = make(map[*Link]interface{})
+		m.directedLinkBreeds[breed].links.links = *sortedset.NewSortedSet()
 	}
 	for breed := range m.undirectedLinkBreeds {
-		m.undirectedLinkBreeds[breed].links.links = make(map[*Link]interface{})
+		m.undirectedLinkBreeds[breed].links.links = *sortedset.NewSortedSet()
 	}
 
 	// remove all turtles from patches
@@ -474,13 +474,13 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 // kills a link
 func (m *Model) KillLink(link *Link) {
 
-	delete(m.links.links, link)
+	m.links.links.Remove(link)
 
 	if link.breed != "" {
 		if link.Directed {
-			delete(m.directedLinkBreeds[link.breed].links.links, link)
+			m.directedLinkBreeds[link.breed].links.links.Remove(link)
 		} else {
-			delete(m.undirectedLinkBreeds[link.breed].links.links, link)
+			m.undirectedLinkBreeds[link.breed].links.links.Remove(link)
 		}
 	}
 

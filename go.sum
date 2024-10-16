@@ -1,2 +1,4 @@
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
+github.com/nlatham1999/sortedset v1.0.2 h1:Kc9Z2l1ovnpygn5IxNMIaYp3Hlq9c4l5W3sdTIIZOCg=
+github.com/nlatham1999/sortedset v1.0.2/go.mod h1:e9I4ZjzCGctYVjMy+Zw064AA/4CtdhHKIU1zZoA/Ktw=

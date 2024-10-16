@@ -148,7 +148,7 @@ func (l *Link) SetBreed(name string) {
 			breed = l.parent.undirectedLinkBreeds[l.breed]
 		}
 
-		delete(breed.links.links, l)
+		breed.links.links.Remove(l)
 	}
 
 	l.breed = name

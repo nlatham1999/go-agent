@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/nlatham1999/go-agent/internal/model"
 )
 
@@ -66,6 +68,10 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
 	for _, link := range links.List() {
+		if link.End1() == nil || link.End2() == nil {
+			fmt.Println("Link has nil ends")
+			return nil
+		}
 		apiLink := Link{
 			End1:       link.End1().Who(),
 			End2:       link.End2().Who(),
