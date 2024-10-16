@@ -16,7 +16,7 @@ func TestAllPatch(t *testing.T) {
 	patch2 := m.Patch(0, 1)
 	patch3 := m.Patch(0, 2)
 
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
 	patch1.PColor.SetColor(model.Blue)
 	patch2.PColor.SetColor(model.Blue)
@@ -49,7 +49,7 @@ func TestAnyPatch(t *testing.T) {
 	patch2 := m.Patch(0, 1)
 	patch3 := m.Patch(0, 2)
 
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
 	patch1.PColor.SetColor(model.Blue)
 
@@ -80,7 +80,7 @@ func TestAtPointsPatch(t *testing.T) {
 	patch3 := m.Patch(2, 2)
 
 	//create a patchset
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
 	//get the patchset at the points
 	patchSetAtPoints := patchSet.AtPoints(m, []model.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}, {X: 5, Y: 5}, {X: 100, Y: 0}})
@@ -105,7 +105,7 @@ func TestPatchesInRadiusPatch(t *testing.T) {
 	patch8 := m.Patch(14, 14)
 
 	//create a patchset
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
 	//get the patches in radius
 	patchSetInRadius := patchSet.InRadiusPatch(1, patch2)
@@ -132,7 +132,7 @@ func TestPatchesInRadiusPatch(t *testing.T) {
 	patch8 = m.Patch(-14, 14)
 
 	//create a patchset
-	patchSet = model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+	patchSet = model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
 	//get the patches in radius
 	patchSetInRadius = patchSet.InRadiusPatch(1, patch1)
@@ -158,7 +158,7 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 	patch8 := m.Patch(14, 14)
 
 	//create a patchset
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
 	m.CreateTurtles(1, "", []model.TurtleOperation{
 		func(t *model.Turtle) {
@@ -193,7 +193,7 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 	patch8 = m.Patch(-14, 14)
 
 	//create a patchset
-	patchSet = model.PatchSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
+	patchSet = model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
 	m.CreateTurtles(1, "", []model.TurtleOperation{
 		func(t *model.Turtle) {
@@ -221,9 +221,9 @@ func TestPatchesWhoAreNotInPatches(t *testing.T) {
 	patch2 := m.Patch(0, 1)
 	patch3 := m.Patch(0, 2)
 
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
-	patchSet2 := model.PatchSet([]*model.Patch{patch1, patch2})
+	patchSet2 := model.NewPatchAgentSet([]*model.Patch{patch1, patch2})
 
 	patchSet3 := patchSet.WhoAreNot(patchSet2)
 
@@ -246,30 +246,9 @@ func TestPatchesWhoAreNotPatch(t *testing.T) {
 	patch2 := m.Patch(0, 1)
 	patch3 := m.Patch(0, 2)
 
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
 	patchSet2 := patchSet.WhoAreNotPatch(patch1)
-
-	if patchSet2.Count() != 2 {
-		t.Errorf("Expected patchSet2 to have 2 patches")
-	}
-}
-
-func TestPatchesMaxNOf(t *testing.T) {
-
-	//create a basic model
-	settings := model.ModelSettings{}
-	m := model.NewModel(settings)
-
-	patch1 := m.Patch(0, 0)
-	patch2 := m.Patch(0, 1)
-	patch3 := m.Patch(0, 2)
-
-	patchSet := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
-
-	patchSet2 := patchSet.MaxNOf(2, func(p *model.Patch) float64 {
-		return float64(p.PYCor())
-	})
 
 	if patchSet2.Count() != 2 {
 		t.Errorf("Expected patchSet2 to have 2 patches")

@@ -15,7 +15,7 @@ func TestAllTurtle(t *testing.T) {
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
 	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	turtle1.Color.SetColor(model.Lime)
 	turtle2.Color.SetColor(model.Lime)
@@ -46,7 +46,7 @@ func TestAnyTurtle(t *testing.T) {
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
 	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	turtle1.Color.SetColor(model.Lime)
 
@@ -87,7 +87,7 @@ func TestAtPointsTurtle(t *testing.T) {
 	turtle5.SetXY(4, 4)
 
 	//create a turtleset
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4, turtle5})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4, turtle5})
 
 	//get turtles at the patches
 	turtleSetAtPatches := turtleSet.AtPoints(m, []model.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}, {X: 2, Y: 2}})
@@ -108,9 +108,9 @@ func TestTurtlesWhoAreNotInTurtles(t *testing.T) {
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
 	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
-	turtleSet2 := model.TurtleSet([]*model.Turtle{turtle1, turtle2})
+	turtleSet2 := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2})
 
 	turtleSet3 := turtleSet.WhoAreNot(turtleSet2)
 
@@ -132,7 +132,7 @@ func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
 	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	turtleSet2 := turtleSet.WhoAreNotTurtle(turtle1)
 
@@ -152,7 +152,7 @@ func TestTurtlesMaxNOf(t *testing.T) {
 	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
 	turtle4 := model.NewTurtle(u, 3, "", 0, 0)
 
-	turtleSet := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4})
+	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4})
 
 	turtleSet2 := turtleSet.MaxNOf(2, func(t *model.Turtle) float64 {
 		return float64(t.Who())

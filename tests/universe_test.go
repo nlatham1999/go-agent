@@ -686,7 +686,7 @@ func TestTurtlesOnPatches(t *testing.T) {
 	t3.SetXY(1, 1)
 	t4.SetXY(1, 2)
 
-	patchSet := model.PatchSet([]*model.Patch{m.Patch(1, 1), m.Patch(1, 2)})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{m.Patch(1, 1), m.Patch(1, 2)})
 
 	turtles := m.TurtlesOnPatches(patchSet)
 

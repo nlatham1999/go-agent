@@ -266,7 +266,7 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 	t2 := m.Turtle("", 1)
 	t3 := m.Turtle("", 2)
 
-	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
 	t1.CreateLinksToSet("parent-children", agentSet, nil)
 
@@ -348,7 +348,7 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 	t2 := m.Turtle("", 1)
 	t3 := m.Turtle("", 2)
 
-	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
 	t1.CreateLinksWithSet("coworkers", agentSet, nil)
 
@@ -436,7 +436,7 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 	t2 := m.Turtle("", 1)
 	t3 := m.Turtle("", 2)
 
-	agentSet := model.TurtleSet([]*model.Turtle{t2, t3})
+	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
 	t1.CreateLinksFromSet("parent-children", agentSet, nil)
 

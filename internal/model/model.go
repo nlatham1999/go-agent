@@ -198,9 +198,7 @@ func NewModel(
 
 // builds an array of patches and links them togethor
 func (m *Model) buildPatches() {
-	m.Patches = &PatchAgentSet{
-		patches: map[*Patch]interface{}{},
-	}
+	m.Patches = NewPatchAgentSet([]*Patch{})
 	m.posOfPatches = make(map[int]*Patch)
 	for i := m.minPyCor; i <= m.maxPyCor; i++ {
 		for j := m.minPxCor; j <= m.maxPxCor; j++ {
@@ -214,7 +212,7 @@ func (m *Model) buildPatches() {
 		}
 	}
 
-	for p := range m.Patches.patches {
+	for _, p := range m.Patches.List() {
 		p.patchNeighborsMap = map[*Patch]string{}
 		p.neighborsPatchMap = map[string]*Patch{}
 
@@ -287,7 +285,7 @@ func (m *Model) ClearTicks() {
 }
 
 func (m *Model) ClearPatches() {
-	for patch := range m.Patches.patches {
+	for _, patch := range m.Patches.List() {
 		patch.Reset(m.patchesOwnTemplate)
 	}
 }
@@ -304,7 +302,7 @@ func (m *Model) ClearTurtles() {
 	}
 
 	// remove all turtles from patches
-	for patch := range m.Patches.patches {
+	for _, patch := range m.Patches.List() {
 		patch.turtles = make(map[string]*TurtleAgentSet)
 	}
 
@@ -504,22 +502,24 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	diffusions := make(map[*Patch]float64)
 
+	patchList := m.Patches.List()
+
 	//go through each patch and calculate the diffusion amount
-	for patch := range m.Patches.patches {
+	for _, patch := range patchList {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for patch := range m.Patches.patches {
+	for _, patch := range patchList {
 
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors(patch)
 		if neighbors.Count() > 8 || neighbors.Count() < 3 {
 			return errors.New("invalid amount of neighbors")
 		}
-		for n := range neighbors.patches {
+		for _, n := range neighbors.List() {
 			amountFromNeighbors += diffusions[n]
 		}
 
@@ -540,22 +540,24 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 
 	diffusions := make(map[*Patch]float64)
 
+	patchList := m.Patches.List()
+
 	//go through each patch and calculate the diffusion amount
-	for patch := range m.Patches.patches {
+	for _, patch := range patchList {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 4
 		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for patch := range m.Patches.patches {
+	for _, patch := range patchList {
 
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors4(patch)
 		if neighbors.Count() > 4 || neighbors.Count() < 2 {
 			return errors.New("invalid amount of neighbors")
 		}
-		for n := range neighbors.patches {
+		for _, n := range neighbors.List() {
 			amountFromNeighbors += diffusions[n]
 		}
 
@@ -930,78 +932,78 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 }
 
 func (m *Model) neighbors(p *Patch) *PatchAgentSet {
-	n := make(map[*Patch]interface{})
+	n := sortedset.NewSortedSet()
 
 	topLeft := p.neighborsPatchMap["topLeft"]
 	if topLeft != nil {
-		n[topLeft] = nil
+		n.Add(topLeft)
 	}
 
 	left := p.neighborsPatchMap["left"]
 	if left != nil {
-		n[left] = nil
+		n.Add(left)
 	}
 
 	bottomLeft := p.neighborsPatchMap["bottomLeft"]
 	if bottomLeft != nil {
-		n[bottomLeft] = nil
+		n.Add(bottomLeft)
 	}
 
 	top := p.neighborsPatchMap["top"]
 	if top != nil {
-		n[top] = nil
+		n.Add(top)
 	}
 
 	topRight := p.neighborsPatchMap["topRight"]
 	if topRight != nil {
-		n[topRight] = nil
+		n.Add(topRight)
 	}
 
 	right := p.neighborsPatchMap["right"]
 	if right != nil {
-		n[right] = nil
+		n.Add(right)
 	}
 
 	bottomRight := p.neighborsPatchMap["bottomRight"]
 	if bottomRight != nil {
-		n[bottomRight] = nil
+		n.Add(bottomRight)
 	}
 
 	bottom := p.neighborsPatchMap["bottom"]
 	if bottom != nil {
-		n[bottom] = nil
+		n.Add(bottom)
 	}
 
 	return &PatchAgentSet{
-		patches: n,
+		patches: *n,
 	}
 }
 
 func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
-	n := make(map[*Patch]interface{})
+	n := sortedset.NewSortedSet()
 
 	top := p.neighborsPatchMap["top"]
 	if top != nil {
-		n[top] = nil
+		n.Add(top)
 	}
 
 	left := p.neighborsPatchMap["left"]
 	if left != nil {
-		n[left] = nil
+		n.Add(left)
 	}
 
 	right := p.neighborsPatchMap["right"]
 	if right != nil {
-		n[right] = nil
+		n.Add(right)
 	}
 
 	bottom := p.neighborsPatchMap["bottom"]
 	if bottom != nil {
-		n[bottom] = nil
+		n.Add(bottom)
 	}
 
 	return &PatchAgentSet{
-		patches: n,
+		patches: *n,
 	}
 }
 
@@ -1167,9 +1169,9 @@ func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
 
 // Returns the turtles on the provided patches
 func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
-	turtles := TurtleSet(nil)
+	turtles := NewTurtleAgentSet(nil)
 
-	for patch := range patches.patches {
+	for _, patch := range patches.List() {
 		s := m.TurtlesOnPatch(patch)
 		for turtle := range s.turtles {
 			turtles.Add(turtle)
@@ -1191,7 +1193,7 @@ func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
 
 // Returns the turtles on the same patch as the provided turtle
 func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
-	patches := PatchSet(nil)
+	patches := NewPatchAgentSet(nil)
 
 	for turtle := range turtles.turtles {
 		p := turtle.PatchHere()

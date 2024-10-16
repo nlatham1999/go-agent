@@ -61,14 +61,14 @@ func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch 
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
 	if _, ok := p.turtles[t.breed]; !ok {
-		p.turtles[t.breed] = TurtleSet([]*Turtle{})
+		p.turtles[t.breed] = NewTurtleAgentSet([]*Turtle{})
 	}
 	p.turtles[t.breed].Add(t)
 
 	// if the breed is provided, add it to the general set of turtles as well
 	if t.breed != "" {
 		if _, ok := p.turtles[""]; !ok {
-			p.turtles[""] = TurtleSet([]*Turtle{})
+			p.turtles[""] = NewTurtleAgentSet([]*Turtle{})
 		}
 		p.turtles[""].Add(t)
 	}
@@ -121,13 +121,11 @@ func (p *Patch) Neighbors4() *PatchAgentSet {
 }
 
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
-	other := &PatchAgentSet{
-		patches: make(map[*Patch]interface{}),
-	}
+	other := NewPatchAgentSet([]*Patch{})
 
-	for patch := range patches.patches {
+	for _, patch := range patches.List() {
 		if patch != p {
-			other.patches[patch] = nil
+			other.Add(patch)
 		}
 	}
 
@@ -201,7 +199,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 
 func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 
-	turtlesAdded := TurtleSet([]*Turtle{})
+	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
 	for i := 0; i < number; i++ {
 
 		t := NewTurtle(p.parent, p.parent.turtlesWhoNumber, breed, p.xFloat64, p.yFloat64)
@@ -242,13 +240,13 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 	//is the breed valid
 	if breed != "" {
 		if _, ok := p.turtles[breed]; !ok {
-			return TurtleSet([]*Turtle{})
+			return NewTurtleAgentSet([]*Turtle{})
 		}
 	}
 
 	turtles := p.turtles[breed]
 	if turtles == nil {
-		return TurtleSet([]*Turtle{})
+		return NewTurtleAgentSet([]*Turtle{})
 	}
 
 	turtlesMap := make(map[*Turtle]interface{})

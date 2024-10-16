@@ -11,7 +11,7 @@ func TestAllLink(t *testing.T) {
 	link2 := &model.Link{}
 	link3 := &model.Link{}
 
-	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+	linkSet := model.NewLinkAgentSet([]*model.Link{link1, link2, link3})
 
 	link1.Shape = "circle"
 	link2.Shape = "circle"
@@ -39,7 +39,7 @@ func TestAnyLink(t *testing.T) {
 	link2 := &model.Link{}
 	link3 := &model.Link{}
 
-	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+	linkSet := model.NewLinkAgentSet([]*model.Link{link1, link2, link3})
 
 	link1.Shape = "circle"
 	link2.Shape = "square"
@@ -70,10 +70,10 @@ func TestLinksWhoAreNotLinks(t *testing.T) {
 	link3 := &model.Link{}
 
 	// create linkset
-	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+	linkSet := model.NewLinkAgentSet([]*model.Link{link1, link2, link3})
 
 	// create a second linkset
-	linkSet2 := model.LinkSet([]*model.Link{link1, link2})
+	linkSet2 := model.NewLinkAgentSet([]*model.Link{link1, link2})
 
 	// create a third linkset that is the difference between the first and second linkset
 	linkSet3 := linkSet.WhoAreNot(linkSet2)
@@ -97,7 +97,7 @@ func TestLinksWhoAreNotLink(t *testing.T) {
 	link3 := &model.Link{}
 
 	// create linkset
-	linkSet := model.LinkSet([]*model.Link{link1, link2, link3})
+	linkSet := model.NewLinkAgentSet([]*model.Link{link1, link2, link3})
 
 	// create a second linkset
 	linkSet2 := linkSet.WhoAreNotLink(link1)

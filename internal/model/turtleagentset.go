@@ -9,7 +9,7 @@ type TurtleAgentSet struct {
 	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
 }
 
-func TurtleSet(turtles []*Turtle) *TurtleAgentSet {
+func NewTurtleAgentSet(turtles []*Turtle) *TurtleAgentSet {
 	turtleSet := make(map[*Turtle]interface{})
 
 	for _, turtle := range turtles {
@@ -69,7 +69,7 @@ func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet
 		}
 	}
 
-	return TurtleSet(turtlesAtPatches)
+	return NewTurtleAgentSet(turtlesAtPatches)
 }
 
 func (t *TurtleAgentSet) Clear() {
@@ -136,7 +136,7 @@ func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAg
 	}
 
 	//get the n turtles with the highest float operation
-	return TurtleSet(sorter.turtles[:n])
+	return NewTurtleAgentSet(sorter.turtles[:n])
 }
 
 func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) (*Turtle, error) {
@@ -176,7 +176,7 @@ func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAg
 	}
 
 	//get the n turtles with the lowest float operation
-	return TurtleSet(sorter.turtles[:n])
+	return NewTurtleAgentSet(sorter.turtles[:n])
 }
 
 func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) (*Turtle, error) {
@@ -215,7 +215,7 @@ func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 // returns a new TurtleAgentSet with all the turtles that are not in the given TurtleAgentSet
@@ -255,7 +255,7 @@ func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {
 			turtles = append(turtles, turtle)
 		}
 	}
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet {
@@ -274,7 +274,7 @@ func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 func (t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet {
@@ -293,5 +293,5 @@ func (t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }

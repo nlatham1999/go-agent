@@ -23,7 +23,7 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 		return
 	}
 
-	linksAdded := LinkSet([]*Link{})
+	linksAdded := NewLinkAgentSet([]*Link{})
 	for turtle := range turtles.turtles {
 		l, err := NewLink(t.parent, breed, t, turtle, true)
 		if err != nil {
@@ -53,7 +53,7 @@ func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations [
 // creates an undirected breed link from the current turtle with the turtles passed in
 // if a link creation errors, than it is skipped
 func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
-	linksAdded := LinkSet([]*Link{})
+	linksAdded := NewLinkAgentSet([]*Link{})
 	for turtle := range turtles.turtles {
 		l, err := NewLink(t.parent, breed, t, turtle, false)
 		if err != nil {
@@ -82,7 +82,7 @@ func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations [
 // creates a directed breed link from the turtles passed in to the current turtle
 // if a link creation errors, than it is skipped
 func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
-	linksAdded := LinkSet([]*Link{})
+	linksAdded := NewLinkAgentSet([]*Link{})
 	for turtle := range turtles.turtles {
 		l, err := NewLink(t.parent, breed, turtle, t, true)
 		if err != nil {

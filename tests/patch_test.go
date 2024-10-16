@@ -187,7 +187,7 @@ func TestPatchNeighbors(t *testing.T) {
 	p6 := m.Patch(-1, -1)
 	p7 := m.Patch(0, -1)
 	p8 := m.Patch(1, -1)
-	patchSet := model.PatchSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
 		return p.PColor == model.Red
@@ -259,7 +259,7 @@ func TestPatchNeighbors(t *testing.T) {
 		},
 	)
 
-	patchSet = model.PatchSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
+	patchSet = model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
 		return p.PColor == model.Red
@@ -298,7 +298,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	p2 := m.Patch(0, 1)
 	p3 := m.Patch(-1, 0)
 	p4 := m.Patch(0, -1)
-	patchSet := model.PatchSet([]*model.Patch{p1, p2, p3, p4})
+	patchSet := model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
 		return p.PColor == model.Red
@@ -358,7 +358,7 @@ func TestPatchNeighbors4(t *testing.T) {
 		},
 	)
 
-	patchSet = model.PatchSet([]*model.Patch{p1, p2, p3, p4})
+	patchSet = model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
 		return p.PColor == model.Red

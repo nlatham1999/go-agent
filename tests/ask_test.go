@@ -29,7 +29,7 @@ func TestAskLinks(t *testing.T) {
 	link3 := &model.Link{}
 
 	//create an agentset
-	agentset := model.LinkSet([]*model.Link{link1, link2, link3})
+	agentset := model.NewLinkAgentSet([]*model.Link{link1, link2, link3})
 
 	// ask to change all colors to red
 	agentset.Ask([]model.LinkOperation{
@@ -69,7 +69,7 @@ func TestAskPatches(t *testing.T) {
 	patch3 := &model.Patch{}
 
 	//create an agentset
-	agentset := model.PatchSet([]*model.Patch{patch1, patch2, patch3})
+	agentset := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3})
 
 	// ask to change all colors to red
 	agentset.Ask([]model.PatchOperation{
@@ -109,7 +109,7 @@ func TestAskTurtles(t *testing.T) {
 	turtle3 := &model.Turtle{}
 
 	//create an agentset
-	agentset := model.TurtleSet([]*model.Turtle{turtle1, turtle2, turtle3})
+	agentset := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	// ask to change all colors to red
 	agentset.Ask([]model.TurtleOperation{

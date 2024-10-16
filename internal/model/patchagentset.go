@@ -1,293 +1,242 @@
 package model
 
 import (
-	"math"
-	"sort"
+	"github.com/nlatham1999/sortedset"
 )
 
 type PatchAgentSet struct {
-	patches map[*Patch]interface{}
+	patches sortedset.SortedSet
 }
 
-func PatchSet(patches []*Patch) *PatchAgentSet {
-	newPatches := make(map[*Patch]interface{})
+func NewPatchAgentSet(patches []*Patch) *PatchAgentSet {
+	patchSet := &PatchAgentSet{
+		patches: *sortedset.NewSortedSet(),
+	}
 	for _, patch := range patches {
-		newPatches[patch] = nil
+		patchSet.patches.Add(patch)
 	}
-
-	return &PatchAgentSet{
-		patches: newPatches,
-	}
+	return patchSet
 }
 
 func (p *PatchAgentSet) Add(patch *Patch) {
-	p.patches[patch] = nil
+	p.patches.Add(patch)
 }
 
 func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
-	for patch := range p.patches {
-		if !operation(patch) {
+	patch := p.patches.First()
+	for patch != nil {
+		if !operation(patch.(*Patch)) {
 			return false
 		}
+		patch, _ = p.patches.Next(patch)
 	}
 	return true
 }
 
 func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
-	for patch := range p.patches {
-		if operation(patch) {
+	patch := p.patches.First()
+	for patch != nil {
+		if operation(patch.(*Patch)) {
 			return true
 		}
+		patch, _ = p.patches.Next(patch)
 	}
 	return false
 }
 
 func (p *PatchAgentSet) Ask(operations []PatchOperation) {
-	for patch := range p.patches {
+	patches := p.patches.List()
+
+	for _, patch := range patches {
 		for j := 0; j < len(operations); j++ {
-			operations[j](patch)
+			operations[j](patch.(*Patch))
 		}
 	}
 }
 
 func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	// create a map of the patches
-	pointsMap := make(map[*Patch]interface{})
+	patchesAtPoints := sortedset.NewSortedSet()
 	for _, point := range points {
 		patch := m.Patch(point.X, point.Y)
 		if patch != nil {
-			if _, ok := p.patches[patch]; ok {
-				pointsMap[patch] = nil
+			if p.patches.Contains(patch) {
+				patchesAtPoints.Add(patch)
 			}
 		}
 	}
 
 	return &PatchAgentSet{
-		patches: pointsMap,
+		patches: *patchesAtPoints,
 	}
+
 }
 
 func (p *PatchAgentSet) Contains(patch *Patch) bool {
-	_, ok := p.patches[patch]
-	return ok
+	return p.patches.Contains(patch)
 }
 
 func (p *PatchAgentSet) Count() int {
-	return len(p.patches)
+	return p.patches.Len()
 }
 
 func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet {
-	patchMap := make(map[*Patch]interface{})
+	patchSet := sortedset.NewSortedSet()
 
-	for p := range p.patches {
-		distance := p.DistancePatch(patch)
+	patchIter := p.patches.First()
+	for patchIter != nil {
+		distance := patchIter.(*Patch).DistancePatch(patch)
 		if distance <= radius {
-			patchMap[p] = nil
+			patchSet.Add(patchIter)
 		}
+		patchIter, _ = p.patches.Next(patchIter)
 	}
 
 	return &PatchAgentSet{
-		patches: patchMap,
+		patches: *patchSet,
 	}
 }
 
 func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgentSet {
-	patchMap := make(map[*Patch]interface{})
+	patchSet := sortedset.NewSortedSet()
 
-	for p := range p.patches {
-		if p.DistanceTurtle(turtle) <= radius {
-			patchMap[p] = nil
+	patchIter := p.patches.First()
+	for patchIter != nil {
+		if patchIter.(*Patch).DistanceTurtle(turtle) <= radius {
+			patchSet.Add(patchIter)
 		}
+		patchIter, _ = p.patches.Next(patchIter)
 	}
 
 	return &PatchAgentSet{
-		patches: patchMap,
+		patches: *patchSet,
 	}
 }
 
 func (p *PatchAgentSet) List() []*Patch {
-	patches := make([]*Patch, 0)
-	for patch := range p.patches {
-		patches = append(patches, patch)
+	v := []*Patch{}
+	patch := p.patches.First()
+	for patch != nil {
+		v = append(v, patch.(*Patch))
+		patch, _ = p.patches.Next(patch)
 	}
-
-	return patches
+	return v
 }
 
-func (p *PatchAgentSet) MaxNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
-	if n < 1 {
-		return nil
+func (p *PatchAgentSet) FirstNOf(n int) *PatchAgentSet {
+	patchSet := sortedset.NewSortedSet()
+	patch := p.patches.First()
+	for i := 0; i < n && patch != nil; i++ {
+		patchSet.Add(patch)
+		patch, _ = p.patches.Next(patch)
 	}
-
-	// get all the patches
-	patches := p.List()
-
-	// sort the patches based on the float operation
-	sorter := &PatchSorter{
-		patches: patches,
-		f:       operation,
+	return &PatchAgentSet{
+		patches: *patchSet,
 	}
-	sort.Sort(sorter)
-
-	if n > len(patches) {
-		n = len(patches)
-	}
-
-	return PatchSet(patches[:n])
 }
 
-func (p *PatchAgentSet) MaxOneOf(operation PatchFloatOperation) (*Patch, error) {
-
-	if len(p.patches) == 0 {
-		return nil, ErrNoPatchesInAgentSet
+func (p *PatchAgentSet) First(operation PatchFloatOperation) (*Patch, error) {
+	patch := p.patches.First()
+	if patch == nil {
+		return nil, ErrNoLinksInAgentSet
 	}
-
-	max := math.MaxFloat64 * -1
-	var maxPatch *Patch
-	for patch := range p.patches {
-		if operation(patch) > max {
-			max = operation(patch)
-			maxPatch = patch
-		}
-	}
-	return maxPatch, nil
+	return patch.(*Patch), nil
 }
 
-func (p *PatchAgentSet) MinNOf(n int, operation PatchFloatOperation) *PatchAgentSet {
-	if n < 1 {
-		return nil
+func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
+	patchSet := sortedset.NewSortedSet()
+	patch := p.patches.Last()
+	for i := 0; i < n && patch != nil; i++ {
+		patchSet.Add(patch)
+		patch, _ = p.patches.Previous(patch)
 	}
-
-	// get all the patches
-	patches := p.List()
-
-	// sort the patches based on the float operation
-	sorter := &PatchSorter{
-		patches: patches,
-		f:       operation,
-		reverse: true,
+	return &PatchAgentSet{
+		patches: *patchSet,
 	}
-	sort.Sort(sorter)
-
-	if n > len(patches) {
-		n = len(patches)
-	}
-
-	return PatchSet(patches[:n])
 }
 
-func (p *PatchAgentSet) MinOneOf(operation PatchFloatOperation) (*Patch, error) {
-
-	if len(p.patches) == 0 {
-		return nil, ErrNoPatchesInAgentSet
+func (p *PatchAgentSet) Last(operation PatchFloatOperation) (*Patch, error) {
+	patch := p.patches.Last()
+	if patch == nil {
+		return nil, ErrNoLinksInAgentSet
 	}
-
-	min := math.MaxFloat64
-	var minPatch *Patch
-	for patch := range p.patches {
-		if operation(patch) < min {
-			min = operation(patch)
-			minPatch = patch
-		}
-	}
-	return minPatch, nil
+	return patch.(*Patch), nil
 }
 
 func (p *PatchAgentSet) OneOf() (*Patch, error) {
-	for patch := range p.patches {
-		return patch, nil
+	for _, patch := range p.patches.List() {
+		return patch.(*Patch), nil
 	}
 
-	return nil, ErrNoPatchesInAgentSet
+	return nil, ErrNoLinksInAgentSet
+}
+
+func (p *PatchAgentSet) Remove(patch *Patch) {
+	p.patches.Remove(patch)
+}
+
+func (p *PatchAgentSet) SortAsc(operation PatchFloatOperation) {
+	p.patches.SortAsc(func(a interface{}) interface{} {
+		return operation(a.(*Patch))
+	})
+}
+
+func (p *PatchAgentSet) SortDesc(operation PatchFloatOperation) {
+	p.patches.SortDesc(func(a interface{}) interface{} {
+		return operation(a.(*Patch))
+	})
 }
 
 func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
-	patches := []*Patch{}
-
-	for patch := range p.patches {
-		patches = append(patches, patch)
-		if len(patches) == n {
-			break
-		}
+	patchSet := sortedset.NewSortedSet()
+	patch := p.patches.First()
+	for i := 0; i < n && patch != nil; i++ {
+		patchSet.Add(patch)
+		patch, _ = p.patches.Next(patch)
 	}
-
-	return PatchSet(patches)
+	return &PatchAgentSet{
+		patches: *patchSet,
+	}
 }
 
 // returns a new PatchAgentSet with all the patches that are not in the given PatchAgentSet
 func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
-	patchMap := make(map[*Patch]interface{})
+	patchSet := sortedset.NewSortedSet()
 
-	for patch := range p.patches {
-		if _, ok := patches.patches[patch]; !ok {
-			patchMap[patch] = nil
+	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next(patch) {
+		if !patches.Contains(patch.(*Patch)) {
+			patchSet.Add(patch)
 		}
 	}
 
 	return &PatchAgentSet{
-		patches: patchMap,
+		patches: *patchSet,
 	}
 }
 
 // returns a new PatchAgentSet with all the patches that are not the given patch
 func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
-	patchMap := make(map[*Patch]interface{})
+	patchSet := sortedset.NewSortedSet()
 
-	for p1 := range p.patches {
-		if p1 != patch {
-			patchMap[p1] = nil
+	for p1 := p.patches.First(); p1 != nil; p1, _ = p.patches.Next(p1) {
+		if p1.(*Patch) != patch {
+			patchSet.Add(p1)
 		}
 	}
 
 	return &PatchAgentSet{
-		patches: patchMap,
+		patches: *patchSet,
 	}
 }
 
 func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {
-	patches := make([]*Patch, 0)
-	for patch := range p.patches {
-		if operation(patch) {
-			patches = append(patches, patch)
+	patchSet := sortedset.NewSortedSet()
+	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next(patch) {
+		if operation(patch.(*Patch)) {
+			patchSet.Add(patch)
 		}
 	}
-	return PatchSet(patches)
-}
-
-func (p *PatchAgentSet) WithMax(operation PatchFloatOperation) *PatchAgentSet {
-	max := math.MaxFloat64 * -1
-	for patch := range p.patches {
-		if operation(patch) > max {
-			max = operation(patch)
-		}
+	return &PatchAgentSet{
+		patches: *patchSet,
 	}
-
-	//get all patches where the float operation is equal to the max
-	patches := make([]*Patch, 0)
-	for patch := range p.patches {
-		if operation(patch) == max {
-			patches = append(patches, patch)
-		}
-	}
-
-	return PatchSet(patches)
-}
-
-func (p *PatchAgentSet) WithMin(operation PatchFloatOperation) *PatchAgentSet {
-	min := math.MaxFloat64
-	for patch := range p.patches {
-		if operation(patch) < min {
-			min = operation(patch)
-		}
-	}
-
-	//get all patches where the float operation is equal to the min
-	patches := make([]*Patch, 0)
-	for patch := range p.patches {
-		if operation(patch) == min {
-			patches = append(patches, patch)
-		}
-	}
-
-	return PatchSet(patches)
 }

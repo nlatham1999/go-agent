@@ -99,7 +99,7 @@ func (l *Link) Breed() *linkBreed {
 
 // returns an agentset of the turtles at the ends of the link
 func (l *Link) BothEnds() *TurtleAgentSet {
-	return TurtleSet([]*Turtle{l.end1, l.end2})
+	return NewTurtleAgentSet([]*Turtle{l.end1, l.end2})
 }
 
 // takes in a list of link operations and runs them for the link

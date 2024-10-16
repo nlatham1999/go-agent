@@ -1,8 +1,6 @@
 package model
 
 import (
-	"math"
-
 	"github.com/nlatham1999/sortedset"
 )
 
@@ -12,7 +10,7 @@ type LinkAgentSet struct {
 }
 
 // create a new LinkAgentSet
-func LinkSet(links []*Link) *LinkAgentSet {
+func NewLinkAgentSet(links []*Link) *LinkAgentSet {
 
 	linkSet := &LinkAgentSet{
 		links: *sortedset.NewSortedSet(),
@@ -88,13 +86,15 @@ func (l *LinkAgentSet) List() []*Link {
 
 // returns the top n links in the agent set based on the float operation
 func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
-	links := []*Link{}
+	linkSet := sortedset.NewSortedSet()
 	link := l.links.First()
 	for i := 0; i < n && link != nil; i++ {
-		links = append(links, link.(*Link))
+		linkSet.Add(link)
 		link, _ = l.links.Next(link)
 	}
-	return LinkSet(links)
+	return &LinkAgentSet{
+		links: *linkSet,
+	}
 }
 
 // returns the max link in the agent set based on the float operation
@@ -108,13 +108,15 @@ func (l *LinkAgentSet) First() (*Link, error) {
 
 // returns the min n links in the agent set based on the float operation
 func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
-	links := []*Link{}
+	linkSet := sortedset.NewSortedSet()
 	link := l.links.Last()
 	for i := 0; i < n && link != nil; i++ {
-		links = append(links, link.(*Link))
+		linkSet.Add(link)
 		link, _ = l.links.Previous(link)
 	}
-	return LinkSet(links)
+	return &LinkAgentSet{
+		links: *linkSet,
+	}
 }
 
 // returns the min link in the agent set based on the float operation
@@ -134,15 +136,6 @@ func (l *LinkAgentSet) OneOf() (*Link, error) {
 	}
 
 	return nil, ErrNoLinksInAgentSet
-}
-
-// returns the next element of the agentset after the provided one
-func (l *LinkAgentSet) Previous(link *Link) (*Link, error) {
-	v, err := l.links.Previous(link)
-	if v == nil {
-		return nil, err
-	}
-	return v.(*Link), err
 }
 
 // remove a link from the agent set
@@ -167,88 +160,56 @@ func (l *LinkAgentSet) SortDesc(operation LinkFloatOperation) {
 // returns n links or all the links in the agentset if the length is lower than n
 // make this actually random based on model seed
 func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
-	links := []*Link{}
+	linkSet := sortedset.NewSortedSet()
 	link := l.links.First()
 	for i := 0; i < n && link != nil; i++ {
-		links = append(links, link.(*Link))
+		linkSet.Add(link)
 		link, _ = l.links.Next(link)
 	}
-	return LinkSet(links)
+	return &LinkAgentSet{
+		links: *linkSet,
+	}
 }
 
 // returns a new agent set with all the links that are not in the given agents set
 func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
-	newLinks := []*Link{}
+	linkSet := sortedset.NewSortedSet()
 
 	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
 		if !links.Contains(link.(*Link)) {
-			newLinks = append(newLinks, link.(*Link))
+			linkSet.Add(link)
 		}
 	}
 
-	return LinkSet(newLinks)
+	return &LinkAgentSet{
+		links: *linkSet,
+	}
 }
 
 // returns a new agent set with all the links that are not the given link
 func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
-	newLinks := []*Link{}
+	linkSet := sortedset.NewSortedSet()
 
 	for l1 := l.links.First(); l1 != nil; l1, _ = l.links.Next(l1) {
 		if l1.(*Link) != link {
-			newLinks = append(newLinks, l1.(*Link))
+			linkSet.Add(l1)
 		}
 	}
 
-	return LinkSet(newLinks)
+	return &LinkAgentSet{
+		links: *linkSet,
+	}
 }
 
 // returns a new agent set that is a subset of the agent set where all satisfy the bool operation
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
-	links := make([]*Link, 0)
+	linkSet := sortedset.NewSortedSet()
 	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
 		if operation(link.(*Link)) {
-			links = append(links, link.(*Link))
+			linkSet.Add(link)
 		}
 	}
-	return LinkSet(links)
-}
-
-// returns a subset of the agent set where all links are equal to the max value provided by the operation
-func (l *LinkAgentSet) WithMax(operation LinkFloatOperation) *LinkAgentSet {
-	max := math.MaxFloat64 * -1
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
-		if operation(link.(*Link)) > max {
-			max = operation(link.(*Link))
-		}
+	return &LinkAgentSet{
+		links: *linkSet,
 	}
-
-	//get all links where the float operation is equal to the max
-	links := make([]*Link, 0)
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
-		if operation(link.(*Link)) == max {
-			links = append(links, link.(*Link))
-		}
-	}
-
-	return LinkSet(links)
-}
-
-// returns a subset of the agent set where all links are equal to the min value provided by the operation
-func (l *LinkAgentSet) WithMin(operation LinkFloatOperation) *LinkAgentSet {
-	min := math.MaxFloat64
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
-		if operation(link.(*Link)) < min {
-			min = operation(link.(*Link))
-		}
-	}
-
-	//get all links where the float operation is equal to the min
-	links := make([]*Link, 0)
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
-		if operation(link.(*Link)) == min {
-			links = append(links, link.(*Link))
-		}
-	}
-
-	return LinkSet(links)
 }

@@ -252,7 +252,7 @@ func (t *turtleLinks) getTurtlesIncoming(breed string) *TurtleAgentSet {
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 func (t *turtleLinks) getTurtlesOutgoing(breed string) *TurtleAgentSet {
@@ -273,7 +273,7 @@ func (t *turtleLinks) getTurtlesOutgoing(breed string) *TurtleAgentSet {
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 func (t *turtleLinks) getTurtlesAll(breed string) *TurtleAgentSet {
@@ -300,7 +300,7 @@ func (t *turtleLinks) getTurtlesAll(breed string) *TurtleAgentSet {
 		}
 	}
 
-	return TurtleSet(turtles)
+	return NewTurtleAgentSet(turtles)
 }
 
 // returns all links that have an incoming path to the turtle. This includes undirected links
@@ -313,7 +313,7 @@ func (t *turtleLinks) getLinksIncoming(breed string) *LinkAgentSet {
 		for link := range t.allLinksUndirected {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	} else {
 		links := make([]*Link, 0)
 		for _, link := range t.turtlesDirectedInBreed[breed] {
@@ -322,7 +322,7 @@ func (t *turtleLinks) getLinksIncoming(breed string) *LinkAgentSet {
 		for _, link := range t.turtlesUndirectedBreed[breed] {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	}
 }
 
@@ -335,7 +335,7 @@ func (t turtleLinks) getLinksOutgoing(breed string) *LinkAgentSet {
 		for link := range t.allLinksUndirected {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	} else {
 		links := make([]*Link, 0)
 		for _, link := range t.turtlesDirectedOutBreed[breed] {
@@ -344,7 +344,7 @@ func (t turtleLinks) getLinksOutgoing(breed string) *LinkAgentSet {
 		for _, link := range t.turtlesUndirectedBreed[breed] {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	}
 }
 
@@ -360,7 +360,7 @@ func (t *turtleLinks) getLinksAll(breed string) *LinkAgentSet {
 		for link := range t.allLinksUndirected {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	} else {
 		links := make([]*Link, 0)
 		for _, link := range t.turtlesDirectedOutBreed[breed] {
@@ -372,7 +372,7 @@ func (t *turtleLinks) getLinksAll(breed string) *LinkAgentSet {
 		for _, link := range t.turtlesUndirectedBreed[breed] {
 			links = append(links, link)
 		}
-		return LinkSet(links)
+		return NewLinkAgentSet(links)
 	}
 }
 
