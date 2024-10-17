@@ -9,20 +9,19 @@ type TieMode int
 
 // Link represents a link between two turtles
 type Link struct {
-	Color     Color
-	end1      *Turtle
-	end2      *Turtle
-	Hidden    bool
-	Directed  bool
-	breed     string
-	Shape     string
-	Thickness float64
-	TieMode   TieMode
-	parent    *Model
-	Size      int
-
-	Label      interface{}
-	LabelColor Color
+	Color      Color       // Color of the link
+	end1       *Turtle     // the two ends of the link
+	end2       *Turtle     // the two ends of the link
+	Hidden     bool        // whether the link is hidden or not
+	directed   bool        // whether the link is directed or not
+	breed      string      // Breed of the link
+	Shape      string      // Shape of the link
+	Thickness  float64     // Thickness of the link
+	TieMode    TieMode     // Tie mode of the link
+	parent     *Model      // the parent model
+	Size       int         // Size of the link
+	Label      interface{} // Label of the link
+	LabelColor Color       // Color of the label
 }
 
 // NewLink creates a new link between two turtles
@@ -52,9 +51,10 @@ func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		breed:    breed,
 		end1:     end1,
 		end2:     end2,
-		Directed: directed,
+		directed: directed,
 		parent:   model,
 		Size:     1,
+		Hidden:   false,
 	}
 
 	model.links.Add(l)
@@ -90,7 +90,7 @@ func (l *Link) Breed() *linkBreed {
 		return nil
 	}
 
-	if l.Directed {
+	if l.directed {
 		return l.parent.directedLinkBreeds[l.breed]
 	} else {
 		return l.parent.undirectedLinkBreeds[l.breed]
@@ -113,6 +113,10 @@ func (l *Link) Die() {
 	l.parent.KillLink(l)
 }
 
+func (l *Link) Directed() bool {
+	return l.directed
+}
+
 // returns the first end of the link
 func (l *Link) End1() *Turtle {
 	return l.end1
@@ -129,7 +133,7 @@ func (l *Link) SetBreed(name string) {
 	oldBreedName := l.breed
 
 	// make sure the breed exists
-	if l.Directed {
+	if l.directed {
 		if _, ok := l.parent.directedLinkBreeds[name]; !ok {
 			return
 		}
@@ -142,7 +146,7 @@ func (l *Link) SetBreed(name string) {
 	// remove the link from the old breed if it exists
 	if l.breed != "" {
 		var breed *linkBreed
-		if l.Directed {
+		if l.directed {
 			breed = l.parent.directedLinkBreeds[l.breed]
 		} else {
 			breed = l.parent.undirectedLinkBreeds[l.breed]
@@ -154,7 +158,7 @@ func (l *Link) SetBreed(name string) {
 	l.breed = name
 
 	if l.breed != "" {
-		if l.Directed {
+		if l.directed {
 			l.parent.directedLinkBreeds[name].links.Add(l)
 		} else {
 			l.parent.undirectedLinkBreeds[name].links.Add(l)
@@ -162,7 +166,7 @@ func (l *Link) SetBreed(name string) {
 	}
 
 	//change the breed on the turtles
-	if l.Directed {
+	if l.directed {
 		l.end1.linkedTurtles.changeDirectedOutBreed(oldBreedName, name, l.end2, l)
 		l.end2.linkedTurtles.changeDirectedInBreed(oldBreedName, name, l.end1, l)
 	} else {

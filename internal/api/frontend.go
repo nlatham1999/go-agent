@@ -62,6 +62,10 @@ func (a *Api) renderStats() string {
 
 func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSize int, screenHeight float64) {
 
+	if link.Hidden {
+		return
+	}
+
 	// turtleSize1 := int(float64(patchSize) * link.End1Size)
 	// if turtleSize1 < 1 {
 	// 	turtleSize1 = 1

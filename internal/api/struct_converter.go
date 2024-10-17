@@ -67,7 +67,7 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 
 func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
-	for _, link := range links.List() {
+	for link, _ := links.First(); link != nil; link, _ = links.Next() {
 		if link.End1() == nil || link.End2() == nil {
 			fmt.Println("Link has nil ends")
 			return nil
@@ -75,7 +75,7 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 		apiLink := Link{
 			End1:       link.End1().Who(),
 			End2:       link.End2().Who(),
-			Directed:   link.Directed,
+			Directed:   link.Directed(),
 			End1X:      link.End1().XCor(),
 			End1Y:      link.End1().YCor(),
 			End2X:      link.End2().XCor(),
@@ -86,6 +86,7 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Label:      link.Label,
 			LabelColor: convertColorToApiColor(link.LabelColor),
 			Size:       link.Size,
+			Hidden:     link.Hidden,
 		}
 		apiLinks = append(apiLinks, apiLink)
 	}

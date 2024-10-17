@@ -11,8 +11,7 @@ import (
 )
 
 type Model struct {
-	Ticks   int
-	TicksOn bool
+	Ticks int
 
 	patchesOwnTemplate map[string]interface{} //additional variables for each patch
 
@@ -87,7 +86,6 @@ func NewModel(
 	}
 
 	model := &Model{
-		TicksOn:            true,
 		maxPxCor:           settings.MaxPxCor,
 		maxPyCor:           settings.MaxPyCor,
 		minPxCor:           settings.MinPxCor,
@@ -281,7 +279,7 @@ func (m *Model) ClearLinks() {
 }
 
 func (m *Model) ClearTicks() {
-	m.TicksOn = false
+	m.Ticks = 0
 }
 
 func (m *Model) ClearPatches() {
@@ -475,7 +473,7 @@ func (m *Model) KillLink(link *Link) {
 	m.links.links.Remove(link)
 
 	if link.breed != "" {
-		if link.Directed {
+		if link.directed {
 			m.directedLinkBreeds[link.breed].links.links.Remove(link)
 		} else {
 			m.undirectedLinkBreeds[link.breed].links.links.Remove(link)
@@ -483,7 +481,7 @@ func (m *Model) KillLink(link *Link) {
 	}
 
 	// remove the link from the turtles
-	if link.Directed {
+	if link.directed {
 		link.end1.linkedTurtles.removeDirectedOutBreed(link.breed, link.end2, link)
 		link.end2.linkedTurtles.removeDirectedInBreed(link.breed, link.end1, link)
 	} else {
@@ -1065,7 +1063,6 @@ func (m *Model) RandomYCor() float64 {
 }
 
 func (m *Model) ResetTicks() {
-	m.TicksOn = true
 	m.Ticks = 0
 }
 
@@ -1105,15 +1102,11 @@ func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {
 }
 
 func (m *Model) Tick() {
-	if m.TicksOn {
-		m.Ticks++
-	}
+	m.Ticks++
 }
 
 func (m *Model) TickAdvance(amount int) {
-	if m.TicksOn {
-		m.Ticks += amount
-	}
+	m.Ticks += amount
 }
 
 func (m *Model) Timer() int64 {

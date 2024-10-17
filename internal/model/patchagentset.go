@@ -28,7 +28,7 @@ func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
 		if !operation(patch.(*Patch)) {
 			return false
 		}
-		patch, _ = p.patches.Next(patch)
+		patch, _ = p.patches.Next()
 	}
 	return true
 }
@@ -39,7 +39,7 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 		if operation(patch.(*Patch)) {
 			return true
 		}
-		patch, _ = p.patches.Next(patch)
+		patch, _ = p.patches.Next()
 	}
 	return false
 }
@@ -89,7 +89,7 @@ func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSe
 		if distance <= radius {
 			patchSet.Add(patchIter)
 		}
-		patchIter, _ = p.patches.Next(patchIter)
+		patchIter, _ = p.patches.Next()
 	}
 
 	return &PatchAgentSet{
@@ -105,7 +105,7 @@ func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgen
 		if patchIter.(*Patch).DistanceTurtle(turtle) <= radius {
 			patchSet.Add(patchIter)
 		}
-		patchIter, _ = p.patches.Next(patchIter)
+		patchIter, _ = p.patches.Next()
 	}
 
 	return &PatchAgentSet{
@@ -118,7 +118,7 @@ func (p *PatchAgentSet) List() []*Patch {
 	patch := p.patches.First()
 	for patch != nil {
 		v = append(v, patch.(*Patch))
-		patch, _ = p.patches.Next(patch)
+		patch, _ = p.patches.Next()
 	}
 	return v
 }
@@ -128,7 +128,7 @@ func (p *PatchAgentSet) FirstNOf(n int) *PatchAgentSet {
 	patch := p.patches.First()
 	for i := 0; i < n && patch != nil; i++ {
 		patchSet.Add(patch)
-		patch, _ = p.patches.Next(patch)
+		patch, _ = p.patches.Next()
 	}
 	return &PatchAgentSet{
 		patches: *patchSet,
@@ -148,7 +148,7 @@ func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
 	patch := p.patches.Last()
 	for i := 0; i < n && patch != nil; i++ {
 		patchSet.Add(patch)
-		patch, _ = p.patches.Previous(patch)
+		patch, _ = p.patches.Previous()
 	}
 	return &PatchAgentSet{
 		patches: *patchSet,
@@ -192,7 +192,7 @@ func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
 	patch := p.patches.First()
 	for i := 0; i < n && patch != nil; i++ {
 		patchSet.Add(patch)
-		patch, _ = p.patches.Next(patch)
+		patch, _ = p.patches.Next()
 	}
 	return &PatchAgentSet{
 		patches: *patchSet,
@@ -203,7 +203,7 @@ func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
 func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 
-	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next(patch) {
+	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
 		if !patches.Contains(patch.(*Patch)) {
 			patchSet.Add(patch)
 		}
@@ -218,7 +218,7 @@ func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
 func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 
-	for p1 := p.patches.First(); p1 != nil; p1, _ = p.patches.Next(p1) {
+	for p1 := p.patches.First(); p1 != nil; p1, _ = p.patches.Next() {
 		if p1.(*Patch) != patch {
 			patchSet.Add(p1)
 		}
@@ -231,7 +231,7 @@ func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
 
 func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
-	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next(patch) {
+	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
 		if operation(patch.(*Patch)) {
 			patchSet.Add(patch)
 		}

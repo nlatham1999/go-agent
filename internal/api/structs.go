@@ -53,4 +53,5 @@ type Link struct {
 	Label      interface{} `json:"label"`
 	LabelColor Color       `json:"labelColor"`
 	Size       int         `json"size"`
+	Hidden     bool        `json:"hidden"`
 }

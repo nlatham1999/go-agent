@@ -1,6 +1,8 @@
 package prims
 
 import (
+	"fmt"
+
 	"github.com/nlatham1999/go-agent/internal/api"
 	"github.com/nlatham1999/go-agent/internal/model"
 )
@@ -52,6 +54,7 @@ func (p *Prims) SetUp() error {
 						t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
 							func(l *model.Link) {
 								l.Color.SetColor(model.Gray)
+								l.Hidden = true
 							},
 						})
 					}
@@ -60,7 +63,7 @@ func (p *Prims) SetUp() error {
 		},
 	})
 
-	p.model.UndirectedLinks("unplaced").SortDesc(func(l *model.Link) float64 {
+	p.model.UndirectedLinks("unplaced").SortAsc(func(l *model.Link) float64 {
 		return l.Length()
 	})
 
@@ -78,15 +81,13 @@ func (p *Prims) Go() {
 	var closestLink *model.Link
 	var closestTurtle *model.Turtle
 	links := p.model.UndirectedLinks("unplaced")
-	// for link != nil {
-	// fmt.Println("Before loop", p.model.Links().Count())
-	for _, link := range links.List() {
+	for link, _ := links.First(); link != nil; link, _ = links.Next() {
 
 		breedName1 := link.End1().BreedName()
 		breedName2 := link.End2().BreedName()
 		if breedName1 == "placed" && breedName2 == "placed" {
-			// fmt.Println("killing")
-			// link.Die()
+			fmt.Println("killing")
+			link.Die()
 			continue
 		}
 		if breedName1 == "unplaced" && breedName2 == "unplaced" {
@@ -99,6 +100,7 @@ func (p *Prims) Go() {
 		} else {
 			closestTurtle = link.End2()
 		}
+		break
 	}
 
 	if closestLink == nil {
@@ -108,6 +110,7 @@ func (p *Prims) Go() {
 	//add the link and turtle to the cluster
 	closestLink.SetBreed("placed")
 	closestLink.Color.SetColor(model.Red)
+	closestLink.Hidden = false
 	closestTurtle.SetBreed("placed")
 	closestTurtle.Color.SetColor(model.Red)
 
@@ -144,7 +147,7 @@ func (p *Prims) Widgets() []api.Widget {
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "2",
-			MaxValue:        "200",
+			MaxValue:        "2000",
 			DefaultValue:    "5",
 		},
 	}

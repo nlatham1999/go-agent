@@ -35,9 +35,15 @@ func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
 		if !operation(link.(*Link)) {
 			return false
 		}
-		link, _ = l.links.Next(link)
+		link, _ = l.links.Next()
 	}
 	return true
+}
+
+// returns the next link in the set after the given link
+func (l *LinkAgentSet) After(link *Link) (*Link, error) {
+	v, err := l.links.After(link)
+	return v.(*Link), err
 }
 
 // returns true if any of the links in the agent set satisfy the operation
@@ -47,19 +53,19 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 		if operation(link.(*Link)) {
 			return true
 		}
-		link, _ = l.links.Next(link)
+		link, _ = l.links.Next()
 	}
 	return false
 }
 
 // perform the list of operations for all links in the agent set
 func (l *LinkAgentSet) Ask(operations []LinkOperation) {
-	links := l.links.List()
-
-	for _, link := range links {
+	link := l.links.First()
+	for link != nil {
 		for j := 0; j < len(operations); j++ {
 			operations[j](link.(*Link))
 		}
+		link, _ = l.links.Next()
 	}
 }
 
@@ -79,7 +85,7 @@ func (l *LinkAgentSet) List() []*Link {
 	link := l.links.First()
 	for link != nil {
 		v = append(v, link.(*Link))
-		link, _ = l.links.Next(link)
+		link, _ = l.links.Next()
 	}
 	return v
 }
@@ -90,7 +96,7 @@ func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
 	link := l.links.First()
 	for i := 0; i < n && link != nil; i++ {
 		linkSet.Add(link)
-		link, _ = l.links.Next(link)
+		link, _ = l.links.Next()
 	}
 	return &LinkAgentSet{
 		links: *linkSet,
@@ -112,7 +118,7 @@ func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 	link := l.links.Last()
 	for i := 0; i < n && link != nil; i++ {
 		linkSet.Add(link)
-		link, _ = l.links.Previous(link)
+		link, _ = l.links.Previous()
 	}
 	return &LinkAgentSet{
 		links: *linkSet,
@@ -126,6 +132,15 @@ func (l *LinkAgentSet) Last() (*Link, error) {
 		return nil, ErrNoLinksInAgentSet
 	}
 	return link.(*Link), nil
+}
+
+// returns the next link in the set
+func (l *LinkAgentSet) Next() (*Link, error) {
+	v, err := l.links.Next()
+	if err != nil {
+		return nil, err
+	}
+	return v.(*Link), err
 }
 
 // returns one of the links
@@ -164,7 +179,7 @@ func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 	link := l.links.First()
 	for i := 0; i < n && link != nil; i++ {
 		linkSet.Add(link)
-		link, _ = l.links.Next(link)
+		link, _ = l.links.Next()
 	}
 	return &LinkAgentSet{
 		links: *linkSet,
@@ -175,7 +190,7 @@ func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
 
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
+	for link := l.links.First(); link != nil; link, _ = l.links.Next() {
 		if !links.Contains(link.(*Link)) {
 			linkSet.Add(link)
 		}
@@ -190,7 +205,7 @@ func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
 func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
 
-	for l1 := l.links.First(); l1 != nil; l1, _ = l.links.Next(l1) {
+	for l1 := l.links.First(); l1 != nil; l1, _ = l.links.Next() {
 		if l1.(*Link) != link {
 			linkSet.Add(l1)
 		}
@@ -204,7 +219,7 @@ func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
 // returns a new agent set that is a subset of the agent set where all satisfy the bool operation
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
-	for link := l.links.First(); link != nil; link, _ = l.links.Next(link) {
+	for link := l.links.First(); link != nil; link, _ = l.links.Next() {
 		if operation(link.(*Link)) {
 			linkSet.Add(link)
 		}
