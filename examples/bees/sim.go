@@ -3,8 +3,8 @@ package bees
 import (
 	"fmt"
 
-	"github.com/nlatham1999/go-agent/internal/api"
-	"github.com/nlatham1999/go-agent/internal/model"
+	"github.com/nlatham1999/go-agent/api"
+	"github.com/nlatham1999/go-agent/model"
 )
 
 type Bees struct {

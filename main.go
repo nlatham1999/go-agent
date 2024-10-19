@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/nlatham1999/go-agent/api"
 	"github.com/nlatham1999/go-agent/examples/prims"
-	"github.com/nlatham1999/go-agent/internal/api"
 )
 
 // antpath "github.com/nlatham1999/go-agent/examples/ant-path"

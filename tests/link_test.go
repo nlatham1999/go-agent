@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/model"
+	"github.com/nlatham1999/go-agent/model"
 )
 
 func TestLinkCreation(t *testing.T) {

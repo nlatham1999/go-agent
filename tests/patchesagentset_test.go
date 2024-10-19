@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/model"
+	"github.com/nlatham1999/go-agent/model"
 )
 
 func TestAllPatch(t *testing.T) {

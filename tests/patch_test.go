@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/nlatham1999/go-agent/internal/model" // Add the import statement for the package that contains the NewModel function
+	"github.com/nlatham1999/go-agent/model" // Add the import statement for the package that contains the NewModel function
 )
 
 func TestPatchDistanceToTurtle(t *testing.T) {
