@@ -1,8 +1,6 @@
 package prims
 
 import (
-	"fmt"
-
 	"github.com/nlatham1999/go-agent/internal/api"
 	"github.com/nlatham1999/go-agent/internal/model"
 )
@@ -50,7 +48,7 @@ func (p *Prims) SetUp() error {
 		func(t *model.Turtle) {
 			p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
 				func(t2 *model.Turtle) {
-					if t != t2 {
+					if t != t2 && t.DistanceTurtle(t2) < 10 {
 						t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
 							func(l *model.Link) {
 								l.Color.SetColor(model.Gray)
@@ -76,6 +74,7 @@ func (p *Prims) SetUp() error {
 }
 
 func (p *Prims) Go() {
+	// start := time.Now()
 
 	// find the closest link to the cluster
 	var closestLink *model.Link
@@ -86,7 +85,6 @@ func (p *Prims) Go() {
 		breedName1 := link.End1().BreedName()
 		breedName2 := link.End2().BreedName()
 		if breedName1 == "placed" && breedName2 == "placed" {
-			fmt.Println("killing")
 			link.Die()
 			continue
 		}
@@ -124,6 +122,8 @@ func (p *Prims) Go() {
 	}
 
 	p.model.Tick()
+
+	// fmt.Println("Time taken: ", time.Since(start))
 }
 
 func (p *Prims) Model() *model.Model {
@@ -131,12 +131,16 @@ func (p *Prims) Model() *model.Model {
 }
 
 func (p *Prims) Stats() map[string]interface{} {
-	return nil
+	return map[string]interface{}{
+		"Placed nodes":    p.model.Turtles("placed").Count(),
+		"Unplaced nodes":  p.model.Turtles("unplaced").Count(),
+		"potential links": p.model.UndirectedLinks("unplaced").Count(),
+	}
 }
 
 func (p *Prims) Stop() bool {
-	// return p.model.UndirectedLinks("unplaced").Count() == 0
-	return false
+	return p.model.UndirectedLinks("placed").Count() >= p.model.GetGlobal("nodes").(int)-2
+	// return false
 }
 
 func (p *Prims) Widgets() []api.Widget {
@@ -147,7 +151,7 @@ func (p *Prims) Widgets() []api.Widget {
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "2",
-			MaxValue:        "2000",
+			MaxValue:        "4000",
 			DefaultValue:    "5",
 		},
 	}

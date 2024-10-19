@@ -648,7 +648,7 @@ func TestTurtlesOnPatch(t *testing.T) {
 	t2.SetXY(1, 1)
 	t3.SetXY(1, 1)
 
-	turtles := m.TurtlesOnPatch(m.Patch(1, 1))
+	turtles := m.TurtlesOnPatch("", m.Patch(1, 1))
 
 	if turtles.Count() != 3 {
 		t.Errorf("Expected 3 turtles, got %d", turtles.Count())
@@ -688,7 +688,7 @@ func TestTurtlesOnPatches(t *testing.T) {
 
 	patchSet := model.NewPatchAgentSet([]*model.Patch{m.Patch(1, 1), m.Patch(1, 2)})
 
-	turtles := m.TurtlesOnPatches(patchSet)
+	turtles := m.TurtlesOnPatches("", patchSet)
 
 	if turtles.Count() != 4 {
 		t.Errorf("Expected 4 turtles, got %d", turtles.Count())

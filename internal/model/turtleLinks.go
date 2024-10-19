@@ -12,9 +12,9 @@ type turtleLinks struct {
 	allLinksUndirected  map[*Link]interface{}
 
 	// maps of turtles to links
-	allTurtlesDirectedOut map[*Turtle][]*Link
-	allTurtlesDirectedIn  map[*Turtle][]*Link
-	allTurtlesUndirected  map[*Turtle][]*Link
+	allTurtlesDirectedOut map[*Turtle]*LinkAgentSet
+	allTurtlesDirectedIn  map[*Turtle]*LinkAgentSet
+	allTurtlesUndirected  map[*Turtle]*LinkAgentSet
 
 	// maps of turtles to links split by link breed
 	// unbreeded is stored as empty string
@@ -35,9 +35,9 @@ func newTurtleLinks() *turtleLinks {
 		allLinksDirectedIn:  make(map[*Link]interface{}),
 		allLinksUndirected:  make(map[*Link]interface{}),
 
-		allTurtlesDirectedOut: make(map[*Turtle][]*Link),
-		allTurtlesDirectedIn:  make(map[*Turtle][]*Link),
-		allTurtlesUndirected:  make(map[*Turtle][]*Link),
+		allTurtlesDirectedOut: make(map[*Turtle]*LinkAgentSet),
+		allTurtlesDirectedIn:  make(map[*Turtle]*LinkAgentSet),
+		allTurtlesUndirected:  make(map[*Turtle]*LinkAgentSet),
 
 		turtlesDirectedOutBreed: make(map[string]map[*Turtle]*Link),
 		turtlesDirectedInBreed:  make(map[string]map[*Turtle]*Link),
@@ -52,9 +52,9 @@ func (t *turtleLinks) addDirectedOutBreed(breed string, turtle *Turtle, link *Li
 	t.turtlesDirectedOutBreed[breed][turtle] = link
 
 	if _, ok := t.allTurtlesDirectedOut[turtle]; !ok {
-		t.allTurtlesDirectedOut[turtle] = []*Link{}
+		t.allTurtlesDirectedOut[turtle] = NewLinkAgentSet([]*Link{})
 	}
-	t.allTurtlesDirectedOut[turtle] = append(t.allTurtlesDirectedOut[turtle], link)
+	t.allTurtlesDirectedOut[turtle].Add(link)
 
 	t.allLinksDirectedOut[link] = nil
 }
@@ -66,9 +66,9 @@ func (t *turtleLinks) addDirectedInBreed(breed string, turtle *Turtle, link *Lin
 	t.turtlesDirectedInBreed[breed][turtle] = link
 
 	if _, ok := t.allTurtlesDirectedIn[turtle]; !ok {
-		t.allTurtlesDirectedIn[turtle] = []*Link{}
+		t.allTurtlesDirectedIn[turtle] = NewLinkAgentSet([]*Link{})
 	}
-	t.allTurtlesDirectedIn[turtle] = append(t.allTurtlesDirectedIn[turtle], link)
+	t.allTurtlesDirectedIn[turtle].Add(link)
 
 	t.allLinksDirectedIn[link] = nil
 }
@@ -80,9 +80,9 @@ func (t *turtleLinks) addUndirectedBreed(breed string, turtle *Turtle, link *Lin
 	t.turtlesUndirectedBreed[breed][turtle] = link
 
 	if _, ok := t.allTurtlesUndirected[turtle]; !ok {
-		t.allTurtlesUndirected[turtle] = []*Link{}
+		t.allTurtlesUndirected[turtle] = NewLinkAgentSet([]*Link{})
 	}
-	t.allTurtlesUndirected[turtle] = append(t.allTurtlesUndirected[turtle], link)
+	t.allTurtlesUndirected[turtle].Add(link)
 
 	t.allLinksUndirected[link] = nil
 }
@@ -94,15 +94,10 @@ func (t *turtleLinks) removeDirectedOutBreed(breed string, turtle *Turtle, link 
 
 	if _, ok := t.allTurtlesDirectedOut[turtle]; ok {
 		// loop through and remove the link
-		for i, l := range t.allTurtlesDirectedOut[turtle] {
-			if l == link {
-				t.allTurtlesDirectedOut[turtle] = append(t.allTurtlesDirectedOut[turtle][:i], t.allTurtlesDirectedOut[turtle][i+1:]...)
-				break
-			}
-		}
+		t.allTurtlesDirectedOut[turtle].Remove(link)
 
 		//if the turtle has no more links, remove it
-		if len(t.allTurtlesDirectedOut[turtle]) == 0 {
+		if t.allTurtlesDirectedOut[turtle].Count() == 0 {
 			delete(t.allTurtlesDirectedOut, turtle)
 		}
 	}
@@ -117,15 +112,10 @@ func (t *turtleLinks) removeDirectedInBreed(breed string, turtle *Turtle, link *
 
 	if _, ok := t.allTurtlesDirectedIn[turtle]; ok {
 		// loop through and remove the link
-		for i, l := range t.allTurtlesDirectedIn[turtle] {
-			if l == link {
-				t.allTurtlesDirectedIn[turtle] = append(t.allTurtlesDirectedIn[turtle][:i], t.allTurtlesDirectedIn[turtle][i+1:]...)
-				break
-			}
-		}
+		t.allTurtlesDirectedIn[turtle].Remove(link)
 
 		//if the turtle has no more links, remove it
-		if len(t.allTurtlesDirectedIn[turtle]) == 0 {
+		if t.allTurtlesDirectedIn[turtle].Count() == 0 {
 			delete(t.allTurtlesDirectedIn, turtle)
 		}
 	}
@@ -140,15 +130,10 @@ func (t *turtleLinks) removeUndirectedBreed(breed string, turtle *Turtle, link *
 
 	if _, ok := t.allTurtlesUndirected[turtle]; ok {
 		// loop through and remove the link
-		for i, l := range t.allTurtlesUndirected[turtle] {
-			if l == link {
-				t.allTurtlesUndirected[turtle] = append(t.allTurtlesUndirected[turtle][:i], t.allTurtlesUndirected[turtle][i+1:]...)
-				break
-			}
-		}
+		t.allTurtlesUndirected[turtle].Remove(link)
 
 		//if the turtle has no more links, remove it
-		if len(t.allTurtlesUndirected[turtle]) == 0 {
+		if t.allTurtlesUndirected[turtle].Count() == 0 {
 			delete(t.allTurtlesUndirected, turtle)
 		}
 	}
@@ -194,13 +179,19 @@ func (t *turtleLinks) changeUndirectedBreed(oldLinkBreed string, newLinkBreed st
 func (t turtleLinks) getLink(breed string, turtle *Turtle) *Link {
 	if breed == "" {
 		// look in all directed
-		for _, link := range t.allTurtlesDirectedOut[turtle] {
-			return link
+		if _, ok := t.allTurtlesDirectedOut[turtle]; ok {
+			if t.allTurtlesDirectedOut[turtle].Count() > 0 {
+				link, _ := t.allTurtlesDirectedOut[turtle].First()
+				return link
+			}
 		}
 
 		// look in all undirected
-		for _, link := range t.allTurtlesUndirected[turtle] {
-			return link
+		if _, ok := t.allTurtlesUndirected[turtle]; ok {
+			if t.allTurtlesUndirected[turtle].Count() > 0 {
+				link, _ := t.allTurtlesUndirected[turtle].First()
+				return link
+			}
 		}
 	} else {
 		// look in directed
@@ -220,8 +211,11 @@ func (t turtleLinks) getLink(breed string, turtle *Turtle) *Link {
 func (t *turtleLinks) getLinkDirected(breed string, turtle *Turtle) *Link {
 	if breed == "" {
 		// look in all directed
-		for _, link := range t.allTurtlesDirectedOut[turtle] {
-			return link
+		if _, ok := t.allTurtlesDirectedOut[turtle]; ok {
+			if t.allTurtlesDirectedOut[turtle].Count() > 0 {
+				link, _ := t.allTurtlesDirectedOut[turtle].First()
+				return link
+			}
 		}
 	} else {
 		// look in directed
@@ -395,7 +389,7 @@ func (t *turtleLinks) getAllUndirectedLinks() map[*Link]interface{} {
 func (t *turtleLinks) existsOutgoing(breed string, turtle *Turtle) bool {
 	if breed == "" {
 		if v, ok := t.allTurtlesDirectedOut[turtle]; ok {
-			return len(v) > 0
+			return v.Count() > 0
 		} else {
 			return false
 		}
@@ -412,7 +406,7 @@ func (t *turtleLinks) existsOutgoing(breed string, turtle *Turtle) bool {
 func (t *turtleLinks) existsIncoming(breed string, turtle *Turtle) bool {
 	if breed == "" {
 		if v, ok := t.allTurtlesDirectedIn[turtle]; ok {
-			return len(v) > 0
+			return v.Count() > 0
 		} else {
 			return false
 		}
@@ -429,7 +423,7 @@ func (t *turtleLinks) existsIncoming(breed string, turtle *Turtle) bool {
 func (t *turtleLinks) existsUndirected(breed string, turtle *Turtle) bool {
 	if breed == "" {
 		if v, ok := t.allTurtlesUndirected[turtle]; ok {
-			return len(v) > 0
+			return v.Count() > 0
 		} else {
 			return false
 		}

@@ -17,10 +17,26 @@ func main() {
 	sim := prims.NewPrims()
 
 	agentApi := api.NewApi(sim, api.ApiSettings{
-		StoreSteps: true,
+		StoreSteps: false,
 	})
 
 	agentApi.Serve()
+
+	// fmt.Println("Setting up model")
+	// sim.Init()
+	// sim.Model().SetGlobal("nodes", 4000)
+	// sim.SetUp()
+	// fmt.Println("running model")
+	// i := 0
+	// for !sim.Stop() {
+	// 	sim.Go()
+	// 	if i%100 == 0 {
+	// 		fmt.Println("Ticks: ", sim.Model().Ticks)
+	// 		fmt.Println(sim.Stats())
+	// 	}
+	// 	i++
+	// }
+	// fmt.Println("model finished")
 
 	// err := converter.Convert("sample.txt")
 	// if err != nil {

@@ -36,7 +36,7 @@ type Patch struct {
 	neighborsPatchMap map[string]*Patch
 }
 
-func NewPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch {
+func newPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch {
 
 	patch := &Patch{
 		x:        x,
@@ -74,6 +74,7 @@ func (p *Patch) addTurtle(t *Turtle) {
 	}
 }
 
+// asks the patch to perform the operations
 func (p *Patch) Ask(operations []PatchOperation) {
 	for j := 0; j < len(operations); j++ {
 		operations[j](p)
@@ -108,18 +109,21 @@ func (p *Patch) DistanceXY(x float64, y float64) float64 {
 	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
 }
 
+// returns the neighbors of this patch
 func (p *Patch) Neighbors() *PatchAgentSet {
 	neighbors := p.parent.neighbors(p)
 
 	return neighbors
 }
 
+// returns the neighbors of this patch that are to the top, bottom, left, and right of this patch
 func (p *Patch) Neighbors4() *PatchAgentSet {
 	neighbors := p.parent.neighbors4(p)
 
 	return neighbors
 }
 
+// returns a set of patches that do not include this patch
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 	other := NewPatchAgentSet([]*Patch{})
 
@@ -174,6 +178,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 	return p.parent.getPatchAtCoords(x, y)
 }
 
+// gets the patch relavitve to this patch at the given heading and distance
 func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch {
 	dx := distance * math.Cos(heading)
 	dy := distance * math.Sin(heading)
@@ -181,14 +186,17 @@ func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Pa
 	return p.PatchAt(dx, dy)
 }
 
+// returns the x coordinate of this patch
 func (p *Patch) PXCor() int {
 	return p.x
 }
 
+// returns the y coordinate of this patch
 func (p *Patch) PYCor() int {
 	return p.y
 }
 
+// resest the patch to the default values
 func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 	p.PColor.SetColor(Black)
 
@@ -197,6 +205,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 	}
 }
 
+// creates new turtles on this patch
 func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 
 	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
@@ -217,16 +226,19 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 	turtlesAdded.Ask(operations)
 }
 
+// returns the heading that points towards the provided patch
 func (p *Patch) TowardsPatch(patch *Patch) float64 {
 	//returns heading that points towards the patch
 	return p.TowardsXY(patch.xFloat64, patch.yFloat64)
 }
 
+// returns the heading that points towards the provided turtle
 func (p *Patch) TowardsTurtle(t *Turtle) float64 {
 	//returns heading that points towards the turtle
 	return p.TowardsXY(t.xcor, t.ycor)
 }
 
+// returns the heading that points towards the provided x y coordinates
 func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	//returns heading that points towards the x y coordinates
 	deltaX := x - p.xFloat64

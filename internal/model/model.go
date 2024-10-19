@@ -50,6 +50,7 @@ type Model struct {
 	Globals map[string]interface{}
 }
 
+// Create a new model
 func NewModel(
 	settings ModelSettings,
 ) *Model {
@@ -202,7 +203,7 @@ func (m *Model) buildPatches() {
 		for j := m.minPxCor; j <= m.maxPxCor; j++ {
 			x := j
 			y := i
-			p := NewPatch(m, m.patchesOwnTemplate, x, y)
+			p := newPatch(m, m.patchesOwnTemplate, x, y)
 			m.Patches.Add(p)
 			index := y*m.worldHeight + x
 			m.posOfPatches[index] = p
@@ -252,12 +253,14 @@ func (m *Model) patchIndex(x int, y int) int {
 	return y*m.worldHeight + x
 }
 
+// clear all patches and turtles and set the ticks to zero
 func (m *Model) ClearAll() {
 	m.ClearTicks()
 	m.ClearPatches()
 	m.ClearTurtles()
 }
 
+// clear all links
 func (m *Model) ClearLinks() {
 	m.links.links = *sortedset.NewSortedSet()
 	m.links = &LinkAgentSet{
@@ -278,10 +281,12 @@ func (m *Model) ClearLinks() {
 	}
 }
 
+// set the ticks to zero
 func (m *Model) ClearTicks() {
 	m.Ticks = 0
 }
 
+// clear all patches
 func (m *Model) ClearPatches() {
 	for _, patch := range m.Patches.List() {
 		patch.Reset(m.patchesOwnTemplate)
@@ -356,6 +361,8 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 	return nil
 }
 
+// create the specified amount of turtles with the specified breed and operations
+// if the breed is empty then it will add it to the general population
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
 	if breed != "" {
@@ -492,6 +499,7 @@ func (m *Model) KillLink(link *Link) {
 	*link = Link{}
 }
 
+// diffuse the patch variable of each patch to its neighbors
 func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	if percent > 1 || percent < 0 {
@@ -530,6 +538,7 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 	return nil
 }
 
+// diffuse the patch variable of each patch to its neighbors at the top, bottom, left, and right
 func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 
 	if percent > 1 || percent < 0 {
@@ -568,6 +577,8 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
+// returns the linkset containing the directed links for the specified breed
+// if the breed is empty then it will return the general population of directed links
 func (m *Model) DirectedLinks(breed string) *LinkAgentSet {
 	if breed, ok := m.directedLinkBreeds[breed]; ok {
 		return breed.links
@@ -575,6 +586,8 @@ func (m *Model) DirectedLinks(breed string) *LinkAgentSet {
 	return nil
 }
 
+// returns the linkset containing the undirected links for the specified breed
+// if the breed is empty then it will return the general population of undirected links
 func (m *Model) UndirectedLinks(breed string) *LinkAgentSet {
 	if breed, ok := m.undirectedLinkBreeds[breed]; ok {
 		return breed.links
@@ -582,10 +595,12 @@ func (m *Model) UndirectedLinks(breed string) *LinkAgentSet {
 	return nil
 }
 
+// returns the link agentset containing all the links
 func (m *Model) Links() *LinkAgentSet {
 	return m.links
 }
 
+// returns the distance between two points
 func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
 	deltaX := x1 - x2
 	deltaY := y1 - y2
@@ -614,10 +629,12 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	return distance
 }
 
+// gets a gobal variable
 func (m *Model) GetGlobal(key string) interface{} {
 	return m.Globals[key]
 }
 
+// gets a global variable as a bool
 func (m *Model) GetGlobalB(key string) (bool, error) {
 	v := m.Globals[key]
 	if v == nil {
@@ -631,6 +648,7 @@ func (m *Model) GetGlobalB(key string) (bool, error) {
 	}
 }
 
+// gets a global variable as an int
 func (m *Model) GetGlobalI(key string) (int, error) {
 	v := m.Globals[key]
 	if v == nil {
@@ -646,6 +664,7 @@ func (m *Model) GetGlobalI(key string) (int, error) {
 	}
 }
 
+// gets a global variable as a float64
 func (m *Model) GetGlobalF(key string) (float64, error) {
 	v := m.Globals[key]
 	if v == nil {
@@ -661,6 +680,7 @@ func (m *Model) GetGlobalF(key string) (float64, error) {
 	}
 }
 
+// gets a global variable as a string
 func (m *Model) GetGlobalS(key string) (string, error) {
 	v := m.Globals[key]
 	if v == nil {
@@ -674,10 +694,12 @@ func (m *Model) GetGlobalS(key string) (string, error) {
 	}
 }
 
+// sets a global variable
 func (m *Model) SetGlobal(key string, value interface{}) {
 	m.Globals[key] = value
 }
 
+// layout the turtles in a circle with the specified radius
 func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 	amount := len(turtles)
 	for i := 0; i < amount; i++ {
@@ -686,21 +708,6 @@ func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 		heading := 2 * math.Pi * float64(i) / float64(amount)
 		agent.setHeadingRadians(heading)
 	}
-}
-
-// @TODO implement
-func (m *Model) LayoutRadial(turtles []*Turtle, links []*Link, root *Turtle) {
-
-}
-
-// @TODO implement
-func (m *Model) LayoutSpring(turtles []*Turtle, links []*Link, springConstant float64, springLength float64, repulsionConstant float64) {
-
-}
-
-// @TODO implement
-func (m *Model) LayoutTutte(turtles []*Turtle, links []*Link, radius float64) {
-
 }
 
 // returns a link between two turtles that connects from turtle1 to turtle2
@@ -729,18 +736,26 @@ func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 	return t1.linkedTurtles.getLinkDirected(breed, t2)
 }
 
+// returns the maximum patch x coordinate
+// the maximum x coordinate for a turtle is MaxPxCor() + .5
 func (m *Model) MaxPxCor() int {
 	return m.maxPxCor
 }
 
+// returns the maximum patch y coordinate
+// the maximum y coordinate for a turtle is MaxPyCor() + .5
 func (m *Model) MaxPyCor() int {
 	return m.maxPyCor
 }
 
+// returns the minimum patch x coordinate
+// the minimum x coordinate for a turtle is MinPxCor() - .5
 func (m *Model) MinPxCor() int {
 	return m.minPxCor
 }
 
+// returns the minimum patch y coordinate
+// the minimum y coordinate for a turtle is MinPyCor() - .5
 func (m *Model) MinPyCor() int {
 	return m.minPyCor
 }
@@ -756,11 +771,13 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	return m.posOfPatches[pos]
 }
 
+// returns a random int n the provided list
 func (m *Model) OneOfInt(arr []int) interface{} {
 
 	return arr[rand.Intn(len(arr))-1]
 }
 
+// returns a random int from (0, n]
 func (m *Model) RandomAmount(n int) int {
 	return rand.Intn(n)
 }
@@ -1009,6 +1026,7 @@ func (m *Model) getPatchAtPos(x int) *Patch {
 	return m.posOfPatches[x]
 }
 
+// returns the patch at the provided x y coordinates
 func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 
 	// round the x and y except in cases where the x or y is the min value
@@ -1054,22 +1072,27 @@ func (m *Model) RandomInt(number int) int {
 	return m.randomGenerator.Intn(number) * sign
 }
 
+// returns a random x cor that is within the world bounds
 func (m *Model) RandomXCor() float64 {
 	return m.RandomFloat(m.maxXCor-m.minXCor) + m.minXCor
 }
 
+// returns a random y cor that is within the world bounds
 func (m *Model) RandomYCor() float64 {
 	return m.RandomFloat(m.maxYCor-m.minYCor) + m.minYCor
 }
 
+// sets the tick counter to zero
 func (m *Model) ResetTicks() {
 	m.Ticks = 0
 }
 
+// resets the timer
 func (m *Model) ResetTimer() {
 	m.modelStart = time.Now()
 }
 
+// resizes the world to the provided bounds
 func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
 	m.minPxCor = minPxcor
 	m.maxPxCor = maxPxcor
@@ -1083,32 +1106,41 @@ func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor i
 	m.worldHeight = maxPycor - minPycor + 1
 
 	m.buildPatches()
+
+	//@TODO: resize the turtles
 }
 
+// sets the default shape for links
 func (m *Model) SetDefaultShapeLinks(shape string) {
 	m.DefaultShapeLinks = shape
 }
 
+// sets the default shape for turtles
 func (m *Model) SetDefaultShapeTurtles(shape string) {
 	m.DefaultShapeTurtles = shape
 }
 
+// sets the default shape for a directed link breed
 func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
 	m.directedLinkBreeds[breed].DefaultShape = shape
 }
 
+// sets the default shape for a turtle breed
 func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string) {
 	m.breeds[breed].defaultShape = shape
 }
 
+// increments the tick counter by one
 func (m *Model) Tick() {
 	m.Ticks++
 }
 
+// increments the tick counter by the provided amount
 func (m *Model) TickAdvance(amount int) {
 	m.Ticks += amount
 }
 
+// returns the time since the model was started in milliseconds
 func (m *Model) Timer() int64 {
 	return time.Since(m.modelStart).Milliseconds()
 }
@@ -1135,6 +1167,7 @@ func (m *Model) Turtle(breed string, who int) *Turtle {
 	}
 }
 
+// returns the turtle agentset for the provided breed
 func (m *Model) Turtles(breed string) *TurtleAgentSet {
 	if breed == "" {
 		return m.turtles
@@ -1142,6 +1175,7 @@ func (m *Model) Turtles(breed string) *TurtleAgentSet {
 	return m.breeds[breed].turtles
 }
 
+// returns the turtle agentset for the provided breed that is on the provided patch
 func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
 	x := int(math.Round(pxcor))
 	y := int(math.Round(pycor))
@@ -1152,20 +1186,20 @@ func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAge
 		return nil
 	}
 
-	return nil
+	return patch.TurtlesHere(breed)
 }
 
 // Returns the turtles on the provided patch
-func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
-	return patch.TurtlesHere("")
+func (m *Model) TurtlesOnPatch(breed string, patch *Patch) *TurtleAgentSet {
+	return patch.TurtlesHere(breed)
 }
 
 // Returns the turtles on the provided patches
-func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
+func (m *Model) TurtlesOnPatches(breed string, patches *PatchAgentSet) *TurtleAgentSet {
 	turtles := NewTurtleAgentSet(nil)
 
 	for _, patch := range patches.List() {
-		s := m.TurtlesOnPatch(patch)
+		s := m.TurtlesOnPatch(breed, patch)
 		for turtle := range s.turtles {
 			turtles.Add(turtle)
 		}
@@ -1175,17 +1209,17 @@ func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
 }
 
 // Returns the turtles on the same patch as the provided turtle
-func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
+func (m *Model) TurtlesWithTurtle(breed string, turtle *Turtle) *TurtleAgentSet {
 	p := turtle.PatchHere()
 	if p == nil {
 		return nil
 	}
 
-	return p.TurtlesHere("")
+	return p.TurtlesHere(breed)
 }
 
-// Returns the turtles on the same patch as the provided turtle
-func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
+// Returns the turtles on the same patch as the provided turtle and with the breed provided
+func (m *Model) TurtlesWithTurtles(breed string, turtles *TurtleAgentSet) *TurtleAgentSet {
 	patches := NewPatchAgentSet(nil)
 
 	for turtle := range turtles.turtles {
@@ -1195,29 +1229,35 @@ func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 		}
 	}
 
-	return m.TurtlesOnPatches(patches)
+	return m.TurtlesOnPatches(breed, patches)
 }
 
+// returns the world height
 func (m *Model) WorldHeight() int {
 	return m.worldHeight
 }
 
+// returns the world width
 func (m *Model) WorldWidth() int {
 	return m.worldWidth
 }
 
+// sets the x coordinate to wrap
 func (m *Model) WrappingXOn() {
 	m.wrappingX = true
 }
 
+// sets the y coordinate to wrap
 func (m *Model) WrappingYOn() {
 	m.wrappingY = true
 }
 
+// sets the x coordinate to not wrap
 func (m *Model) WrappingXOff() {
 	m.wrappingX = false
 }
 
+// sets the y coordinate to not wrap
 func (m *Model) WrappingYOff() {
 	m.wrappingY = false
 }
