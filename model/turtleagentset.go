@@ -1,19 +1,220 @@
 package model
 
 import (
-	"math"
-	"sort"
+	"github.com/nlatham1999/sortedset"
 )
 
 type TurtleAgentSet struct {
-	turtles map[*Turtle]interface{} //map of turtles so we can quickly check if a turtle is in the set
+	turtles *sortedset.SortedSet //map of turtles so we can quickly check if a turtle is in the set
 }
 
 func NewTurtleAgentSet(turtles []*Turtle) *TurtleAgentSet {
-	turtleSet := make(map[*Turtle]interface{})
+	turtleSet := &TurtleAgentSet{
+		turtles: sortedset.NewSortedSet(),
+	}
+	for _, turtle := range turtles {
+		turtleSet.turtles.Add(turtle)
+	}
+	return turtleSet
+}
+
+func (t *TurtleAgentSet) Add(turtle *Turtle) {
+	t.turtles.Add(turtle)
+}
+
+func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
+	turtle := t.turtles.First()
+	for turtle != nil {
+		if !operation(turtle.(*Turtle)) {
+			return false
+		}
+		turtle, _ = t.turtles.Next()
+	}
+	return true
+}
+
+func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
+	turtle := t.turtles.First()
+	for turtle != nil {
+		if operation(turtle.(*Turtle)) {
+			return true
+		}
+		turtle, _ = t.turtles.Next()
+	}
+	return false
+}
+
+func (t *TurtleAgentSet) Ask(operations []TurtleOperation) {
+	turtles := t.turtles.List()
 
 	for _, turtle := range turtles {
-		turtleSet[turtle] = nil
+		for j := 0; j < len(operations); j++ {
+			operations[j](turtle.(*Turtle))
+		}
+	}
+}
+
+func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {
+
+	// create a map of the turtles
+	patchesAtPoints := sortedset.NewSortedSet()
+	turtlesOnPoints := sortedset.NewSortedSet()
+
+	for _, point := range points {
+		patch := m.Patch(point.X, point.Y)
+		patchesAtPoints.Add(patch)
+	}
+
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		if patchesAtPoints.Contains(turtle.(*Turtle).PatchHere()) {
+			turtlesOnPoints.Add(turtle)
+		}
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtlesOnPoints,
+	}
+}
+
+func (t *TurtleAgentSet) Contains(turtle *Turtle) bool {
+	return t.turtles.Contains(turtle)
+}
+
+func (t *TurtleAgentSet) Count() int {
+	return t.turtles.Len()
+}
+
+// @TODO implement
+func (t *TurtleAgentSet) InRadiusPatch(radius float64, patch *Patch) *TurtleAgentSet {
+	turtlesInRadius := sortedset.NewSortedSet()
+
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		if turtle.(*Turtle).DistancePatch(patch) <= radius {
+			turtlesInRadius.Add(turtle)
+		}
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtlesInRadius,
+	}
+}
+
+// @TODO implement
+func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet {
+	turtlesInRadius := sortedset.NewSortedSet()
+
+	for turtleIter := t.turtles.First(); turtleIter != nil; turtleIter, _ = t.turtles.Next() {
+		if turtleIter.(*Turtle).DistanceTurtle(turtle) <= radius {
+			turtlesInRadius.Add(turtleIter)
+		}
+	}
+
+	return &TurtleAgentSet{
+		turtles: turtlesInRadius,
+	}
+}
+
+func (t *TurtleAgentSet) List() []*Turtle {
+	turtles := make([]*Turtle, 0)
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		turtles = append(turtles, turtle.(*Turtle))
+	}
+	return turtles
+}
+
+func (t *TurtleAgentSet) FirstNOf(n int) *TurtleAgentSet {
+	turtleSet := sortedset.NewSortedSet()
+	turtle := t.turtles.First()
+	for i := 0; i < n && turtle != nil; i++ {
+		turtleSet.Add(turtle)
+		turtle, _ = t.turtles.Next()
+	}
+	return &TurtleAgentSet{
+		turtles: turtleSet,
+	}
+}
+
+func (t *TurtleAgentSet) First() (*Turtle, error) {
+	turtle := t.turtles.First()
+	if turtle == nil {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+	return turtle.(*Turtle), nil
+}
+
+func (t *TurtleAgentSet) LastNOf(n int) *TurtleAgentSet {
+	turtleSet := sortedset.NewSortedSet()
+	turtle := t.turtles.Last()
+	for i := 0; i < n && turtle != nil; i++ {
+		turtleSet.Add(turtle)
+		turtle, _ = t.turtles.Previous()
+	}
+	return &TurtleAgentSet{
+		turtles: turtleSet,
+	}
+}
+
+func (t *TurtleAgentSet) Last() (*Turtle, error) {
+	turtle := t.turtles.Last()
+	if turtle == nil {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+	return turtle.(*Turtle), nil
+}
+
+func (t *TurtleAgentSet) Next() (*Turtle, error) {
+	turtle, _ := t.turtles.Next()
+	if turtle == nil {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+	return turtle.(*Turtle), nil
+}
+
+// @TODO make this random
+func (t *TurtleAgentSet) OneOf() (*Turtle, error) {
+	turtle := t.turtles.First()
+	if turtle == nil {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+	return turtle.(*Turtle), nil
+}
+
+func (t *TurtleAgentSet) Remove(turtle *Turtle) {
+	t.turtles.Remove(turtle)
+}
+
+func (t *TurtleAgentSet) SortAsc(operation TurtleFloatOperation) {
+	t.turtles.SortAsc(func(a interface{}) interface{} {
+		return operation(a.(*Turtle))
+	})
+}
+
+func (t *TurtleAgentSet) SortDesc(operation TurtleFloatOperation) {
+	t.turtles.SortDesc(func(a interface{}) interface{} {
+		return operation(a.(*Turtle))
+	})
+}
+
+func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {
+	turtleSet := sortedset.NewSortedSet()
+	turtle := t.turtles.First()
+	for i := 0; i < n && turtle != nil; i++ {
+		turtleSet.Add(turtle)
+		turtle, _ = t.turtles.Next()
+	}
+	return &TurtleAgentSet{
+		turtles: turtleSet,
+	}
+}
+
+// returns a new TurtleAgentSet with all the turtles that are not in the given TurtleAgentSet
+func (t *TurtleAgentSet) WhoAreNot(turtles *TurtleAgentSet) *TurtleAgentSet {
+	turtleSet := sortedset.NewSortedSet()
+
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		if !turtles.Contains(turtle.(*Turtle)) {
+			turtleSet.Add(turtle)
+		}
 	}
 
 	return &TurtleAgentSet{
@@ -21,277 +222,31 @@ func NewTurtleAgentSet(turtles []*Turtle) *TurtleAgentSet {
 	}
 }
 
-func (t *TurtleAgentSet) Add(turtle *Turtle) {
-	t.turtles[turtle] = len(t.turtles) - 1
-}
-
-func (t *TurtleAgentSet) Remove(turtle *Turtle) {
-	delete(t.turtles, turtle)
-}
-
-func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
-	for turtle := range t.turtles {
-		if !operation(turtle) {
-			return false
-		}
-	}
-	return true
-}
-
-func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
-	for turtle := range t.turtles {
-		if operation(turtle) {
-			return true
-		}
-	}
-	return false
-}
-
-func (t *TurtleAgentSet) Ask(operations []TurtleOperation) {
-	for turtle := range t.turtles {
-		for j := 0; j < len(operations); j++ {
-			operations[j](turtle)
-		}
-	}
-}
-
-func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {
-	//get the turtles at the patches
-	turtlesAtPatches := []*Turtle{}
-	for _, point := range points {
-		patch := m.Patch(point.X, point.Y)
-		if patch != nil && patch.turtles[""] != nil {
-			for turtle := range patch.turtles[""].turtles {
-				if _, ok := t.turtles[turtle]; ok {
-					turtlesAtPatches = append(turtlesAtPatches, turtle)
-				}
-			}
-		}
-	}
-
-	return NewTurtleAgentSet(turtlesAtPatches)
-}
-
-func (t *TurtleAgentSet) Clear() {
-	t.turtles = make(map[*Turtle]interface{})
-}
-
-func (t *TurtleAgentSet) Contains(turtle *Turtle) bool {
-	_, ok := t.turtles[turtle]
-	return ok
-}
-
-func (t *TurtleAgentSet) Count() int {
-	return len(t.turtles)
-}
-
-// @TODO implement
-func (t *TurtleAgentSet) InRadiusPatch(radius float64, patch *Patch) *TurtleAgentSet {
-	return nil
-}
-
-// @TODO implement
-func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet {
-	return nil
-}
-
-func (t *TurtleAgentSet) List() []*Turtle {
-	turtles := make([]*Turtle, 0)
-	for turtle := range t.turtles {
-		turtles = append(turtles, turtle)
-	}
-
-	return turtles
-}
-
-func (t *TurtleAgentSet) ListSorted() []*Turtle {
-	turtles := t.List()
-
-	sort.Sort(&TurtleSorter{
-		turtles: turtles,
-		f: func(t *Turtle) float64 {
-			return float64(t.Who())
-		},
-		reverse: false,
-	})
-	return turtles
-}
-
-func (t *TurtleAgentSet) MaxNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
-	if n < 0 {
-		return nil
-	}
-
-	turtles := t.List()
-
-	//sort the turtles
-	sorter := &TurtleSorter{
-		turtles: turtles,
-		f:       operation,
-	}
-	sort.Sort(sorter)
-
-	if n > len(turtles) {
-		n = len(turtles)
-	}
-
-	//get the n turtles with the highest float operation
-	return NewTurtleAgentSet(sorter.turtles[:n])
-}
-
-func (t *TurtleAgentSet) MaxOneOf(operation TurtleFloatOperation) (*Turtle, error) {
-
-	if len(t.turtles) == 0 {
-		return nil, ErrNoTurtlesInAgentSet
-	}
-
-	max := math.MaxFloat64 * -1
-	var maxTurtle *Turtle
-	for turtle := range t.turtles {
-		if operation(turtle) > max {
-			max = operation(turtle)
-			maxTurtle = turtle
-		}
-	}
-	return maxTurtle, nil
-}
-
-func (t *TurtleAgentSet) MinNOf(n int, operation TurtleFloatOperation) *TurtleAgentSet {
-	if n < 0 {
-		return nil
-	}
-
-	turtles := t.List()
-
-	//sort the turtles
-	sorter := &TurtleSorter{
-		turtles: turtles,
-		f:       operation,
-		reverse: true,
-	}
-	sort.Sort(sorter)
-
-	if n > len(turtles) {
-		n = len(turtles)
-	}
-
-	//get the n turtles with the lowest float operation
-	return NewTurtleAgentSet(sorter.turtles[:n])
-}
-
-func (t *TurtleAgentSet) MinOneOf(operation TurtleFloatOperation) (*Turtle, error) {
-
-	if len(t.turtles) == 0 {
-		return nil, ErrNoTurtlesInAgentSet
-	}
-
-	min := math.MaxFloat64
-	var minTurtle *Turtle
-	for turtle := range t.turtles {
-		if operation(turtle) < min {
-			min = operation(turtle)
-			minTurtle = turtle
-		}
-	}
-	return minTurtle, nil
-}
-
-func (t *TurtleAgentSet) OneOf() (*Turtle, error) {
-
-	for turtle := range t.turtles {
-		return turtle, nil
-	}
-
-	return nil, ErrNoTurtlesInAgentSet
-}
-
-func (t *TurtleAgentSet) UpToNOf(n int) *TurtleAgentSet {
-	turtles := []*Turtle{}
-
-	for turtle := range t.turtles {
-		turtles = append(turtles, turtle)
-		if len(turtles) == n {
-			break
-		}
-	}
-
-	return NewTurtleAgentSet(turtles)
-}
-
-// returns a new TurtleAgentSet with all the turtles that are not in the given TurtleAgentSet
-func (t *TurtleAgentSet) WhoAreNot(turtles *TurtleAgentSet) *TurtleAgentSet {
-	turtleMap := make(map[*Turtle]interface{})
-
-	for turtle := range t.turtles {
-		if _, ok := turtles.turtles[turtle]; !ok {
-			turtleMap[turtle] = nil
-		}
-	}
-
-	return &TurtleAgentSet{
-		turtles: turtleMap,
-	}
-}
-
 // returns a new TurtleAgentSet with all the turtles that are not the given turtle
 func (t *TurtleAgentSet) WhoAreNotTurtle(turtle *Turtle) *TurtleAgentSet {
-	turtleMap := make(map[*Turtle]interface{})
+	turtleSet := sortedset.NewSortedSet()
 
-	for t1 := range t.turtles {
-		if t1 != turtle {
-			turtleMap[t1] = nil
+	for turtleIter := t.turtles.First(); turtleIter != nil; turtleIter, _ = t.turtles.Next() {
+		if turtleIter.(*Turtle) != turtle {
+			turtleSet.Add(turtleIter)
 		}
 	}
 
 	return &TurtleAgentSet{
-		turtles: turtleMap,
+		turtles: turtleSet,
 	}
 }
 
 func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {
-	turtles := make([]*Turtle, 0)
-	for turtle := range t.turtles {
-		if operation(turtle) {
-			turtles = append(turtles, turtle)
-		}
-	}
-	return NewTurtleAgentSet(turtles)
-}
+	turtleSet := sortedset.NewSortedSet()
 
-func (t *TurtleAgentSet) WithMax(operation TurtleFloatOperation) *TurtleAgentSet {
-	max := math.MaxFloat64 * -1
-	for turtle := range t.turtles {
-		if operation(turtle) > max {
-			max = operation(turtle)
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		if operation(turtle.(*Turtle)) {
+			turtleSet.Add(turtle)
 		}
 	}
 
-	//get all turtles where the float operation is equal to the max
-	turtles := make([]*Turtle, 0)
-	for turtle := range t.turtles {
-		if operation(turtle) == max {
-			turtles = append(turtles, turtle)
-		}
+	return &TurtleAgentSet{
+		turtles: turtleSet,
 	}
-
-	return NewTurtleAgentSet(turtles)
-}
-
-func (t *TurtleAgentSet) WithMin(operation TurtleFloatOperation) *TurtleAgentSet {
-	min := math.MaxFloat64
-	for turtle := range t.turtles {
-		if operation(turtle) < min {
-			min = operation(turtle)
-		}
-	}
-
-	//get all turtles where the float operation is equal to the min
-	turtles := make([]*Turtle, 0)
-	for turtle := range t.turtles {
-		if operation(turtle) == min {
-			turtles = append(turtles, turtle)
-		}
-	}
-
-	return NewTurtleAgentSet(turtles)
 }

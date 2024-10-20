@@ -110,9 +110,7 @@ func NewModel(
 	turtleBreedsMap := make(map[string]*turtleBreed)
 	for i := 0; i < len(settings.TurtleBreeds); i++ {
 		turtleBreedsMap[settings.TurtleBreeds[i]] = &turtleBreed{
-			turtles: &TurtleAgentSet{
-				turtles: make(map[*Turtle]interface{}),
-			},
+			turtles:      NewTurtleAgentSet([]*Turtle{}),
 			name:         settings.TurtleBreeds[i],
 			defaultShape: "",
 		}
@@ -134,9 +132,7 @@ func NewModel(
 	settings.DirectedLinkBreeds = append(settings.DirectedLinkBreeds, "") // add the general population
 	for i := 0; i < len(settings.DirectedLinkBreeds); i++ {
 		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &linkBreed{
-			links: &LinkAgentSet{
-				links: *sortedset.NewSortedSet(),
-			},
+			links:        NewLinkAgentSet([]*Link{}),
 			Directed:     true,
 			DefaultShape: "",
 			name:         settings.DirectedLinkBreeds[i],
@@ -149,9 +145,7 @@ func NewModel(
 	settings.UndirectedLinkBreeds = append(settings.UndirectedLinkBreeds, "") // add the general population
 	for i := 0; i < len(settings.UndirectedLinkBreeds); i++ {
 		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &linkBreed{
-			links: &LinkAgentSet{
-				links: *sortedset.NewSortedSet(),
-			},
+			links:        NewLinkAgentSet([]*Link{}),
 			Directed:     false,
 			DefaultShape: "",
 			name:         settings.UndirectedLinkBreeds[i],
@@ -160,9 +154,7 @@ func NewModel(
 	model.undirectedLinkBreeds = undirectedLinkBreedsMap
 
 	//construct general turtle set
-	model.turtles = &TurtleAgentSet{
-		turtles: make(map[*Turtle]interface{}),
-	}
+	model.turtles = NewTurtleAgentSet([]*Turtle{})
 
 	// create a breed with no name for the general population
 	model.breeds[""] = &turtleBreed{
@@ -180,9 +172,7 @@ func NewModel(
 	}
 
 	//construct general link set
-	model.links = &LinkAgentSet{
-		links: *sortedset.NewSortedSet(),
-	}
+	model.links = NewLinkAgentSet([]*Link{})
 
 	// build patches
 	model.buildPatches()
@@ -211,7 +201,7 @@ func (m *Model) buildPatches() {
 		}
 	}
 
-	for _, p := range m.Patches.List() {
+	for p, _ := m.Patches.First(); p != nil; p, _ = m.Patches.Next() {
 		p.patchNeighborsMap = map[*Patch]string{}
 		p.neighborsPatchMap = map[string]*Patch{}
 
@@ -262,21 +252,14 @@ func (m *Model) ClearAll() {
 
 // clear all links
 func (m *Model) ClearLinks() {
-	m.links.links = *sortedset.NewSortedSet()
-	m.links = &LinkAgentSet{
-		links: *sortedset.NewSortedSet(),
-	}
+	m.links = NewLinkAgentSet([]*Link{})
 	for breed := range m.directedLinkBreeds {
-		m.directedLinkBreeds[breed].links = &LinkAgentSet{
-			links: *sortedset.NewSortedSet(),
-		}
+		m.directedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
 	for breed := range m.undirectedLinkBreeds {
-		m.undirectedLinkBreeds[breed].links = &LinkAgentSet{
-			links: *sortedset.NewSortedSet(),
-		}
+		m.undirectedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
-	for turtle := range m.turtles.turtles {
+	for turtle, _ := m.turtles.First(); turtle != nil; turtle, _ = m.turtles.Next() {
 		turtle.linkedTurtles = newTurtleLinks()
 	}
 }
@@ -288,7 +271,7 @@ func (m *Model) ClearTicks() {
 
 // clear all patches
 func (m *Model) ClearPatches() {
-	for _, patch := range m.Patches.List() {
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		patch.Reset(m.patchesOwnTemplate)
 	}
 }
@@ -296,27 +279,27 @@ func (m *Model) ClearPatches() {
 // kills all turtles
 func (m *Model) ClearTurtles() {
 	// delete all links since they are linked to turtles
-	m.links.links = *sortedset.NewSortedSet()
+	m.links = NewLinkAgentSet([]*Link{})
 	for breed := range m.directedLinkBreeds {
-		m.directedLinkBreeds[breed].links.links = *sortedset.NewSortedSet()
+		m.directedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
 	for breed := range m.undirectedLinkBreeds {
-		m.undirectedLinkBreeds[breed].links.links = *sortedset.NewSortedSet()
+		m.undirectedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
 
 	// remove all turtles from patches
-	for _, patch := range m.Patches.List() {
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		patch.turtles = make(map[string]*TurtleAgentSet)
 	}
 
 	// clear all turtles
-	for turtle := range m.turtles.turtles {
+	for turtle, _ := m.turtles.First(); turtle != nil; turtle, _ = m.turtles.Next() {
 		*turtle = Turtle{}
 	}
 
-	m.turtles.Clear()
+	m.turtles = NewTurtleAgentSet([]*Turtle{})
 	for breed := range m.breeds {
-		m.breeds[breed].turtles.turtles = make(map[*Turtle]interface{})
+		m.breeds[breed].turtles = NewTurtleAgentSet([]*Turtle{})
 	}
 
 	m.whoToTurtles = make(map[int]*Turtle)
@@ -450,7 +433,7 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 
 	p := turtle.PatchHere()
 	if p != nil {
-		delete(p.turtles[""].turtles, turtle)
+		p.turtles[""].Remove(turtle)
 		if turtle.breed != "" {
 			p.turtles[turtle.breed].Remove(turtle)
 		}
@@ -508,24 +491,21 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	diffusions := make(map[*Patch]float64)
 
-	patchList := m.Patches.List()
-
 	//go through each patch and calculate the diffusion amount
-	for _, patch := range patchList {
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for _, patch := range patchList {
-
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors(patch)
 		if neighbors.Count() > 8 || neighbors.Count() < 3 {
 			return errors.New("invalid amount of neighbors")
 		}
-		for _, n := range neighbors.List() {
+		for n, _ := neighbors.First(); n != nil; n, _ = neighbors.Next() {
 			amountFromNeighbors += diffusions[n]
 		}
 
@@ -547,24 +527,21 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 
 	diffusions := make(map[*Patch]float64)
 
-	patchList := m.Patches.List()
-
 	//go through each patch and calculate the diffusion amount
-	for _, patch := range patchList {
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 4
 		diffusions[patch] = amountToGive
 	}
 
 	//go through each patch and get the new amount
-	for _, patch := range patchList {
-
+	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors4(patch)
 		if neighbors.Count() > 4 || neighbors.Count() < 2 {
 			return errors.New("invalid amount of neighbors")
 		}
-		for _, n := range neighbors.List() {
+		for n, _ := neighbors.First(); n != nil; n, _ = neighbors.Next() {
 			amountFromNeighbors += diffusions[n]
 		}
 
@@ -990,7 +967,7 @@ func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	}
 
 	return &PatchAgentSet{
-		patches: *n,
+		patches: n,
 	}
 }
 
@@ -1018,7 +995,7 @@ func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
 	}
 
 	return &PatchAgentSet{
-		patches: *n,
+		patches: n,
 	}
 }
 
@@ -1198,9 +1175,9 @@ func (m *Model) TurtlesOnPatch(breed string, patch *Patch) *TurtleAgentSet {
 func (m *Model) TurtlesOnPatches(breed string, patches *PatchAgentSet) *TurtleAgentSet {
 	turtles := NewTurtleAgentSet(nil)
 
-	for _, patch := range patches.List() {
+	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
 		s := m.TurtlesOnPatch(breed, patch)
-		for turtle := range s.turtles {
+		for turtle, _ := s.First(); turtle != nil; turtle, _ = s.Next() {
 			turtles.Add(turtle)
 		}
 	}
@@ -1222,7 +1199,7 @@ func (m *Model) TurtlesWithTurtle(breed string, turtle *Turtle) *TurtleAgentSet 
 func (m *Model) TurtlesWithTurtles(breed string, turtles *TurtleAgentSet) *TurtleAgentSet {
 	patches := NewPatchAgentSet(nil)
 
-	for turtle := range turtles.turtles {
+	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
 		p := turtle.PatchHere()
 		if p != nil {
 			patches.Add(p)

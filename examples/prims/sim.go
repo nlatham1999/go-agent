@@ -36,29 +36,12 @@ func (p *Prims) SetUp() error {
 	numNodes := p.model.GetGlobal("nodes").(int)
 
 	p.model.CreateTurtles(numNodes, "unplaced", []model.TurtleOperation{
-		func(t *model.Turtle) {
-			t.Color.SetColor(model.Gray)
-			t.SetSize(1)
-			t.SetXY(p.model.RandomXCor(), p.model.RandomYCor())
-		},
+		p.placeInitialNodes,
 	})
 
 	//for each turtle create a link with every other turtle
 	p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
-		func(t *model.Turtle) {
-			p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
-				func(t2 *model.Turtle) {
-					if t != t2 && t.DistanceTurtle(t2) < 10 {
-						t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
-							func(l *model.Link) {
-								l.Color.SetColor(model.Gray)
-								l.Hidden = true
-							},
-						})
-					}
-				},
-			})
-		},
+		p.createInitialLinks,
 	})
 
 	p.model.UndirectedLinks("unplaced").SortAsc(func(l *model.Link) float64 {
@@ -71,6 +54,27 @@ func (p *Prims) SetUp() error {
 
 	p.model.ResetTicks()
 	return nil
+}
+
+func (p *Prims) placeInitialNodes(t *model.Turtle) {
+	t.Color.SetColor(model.Gray)
+	t.SetSize(1)
+	t.SetXY(p.model.RandomXCor(), p.model.RandomYCor())
+}
+
+func (p *Prims) createInitialLinks(t *model.Turtle) {
+	p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
+		func(t2 *model.Turtle) {
+			if t != t2 && t.DistanceTurtle(t2) < 10 {
+				t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
+					func(l *model.Link) {
+						l.Color.SetColor(model.Gray)
+						l.Hidden = true
+					},
+				})
+			}
+		},
+	})
 }
 
 func (p *Prims) Go() {
@@ -123,7 +127,6 @@ func (p *Prims) Go() {
 
 	p.model.Tick()
 
-	// fmt.Println("Time taken: ", time.Since(start))
 }
 
 func (p *Prims) Model() *model.Model {
@@ -140,7 +143,6 @@ func (p *Prims) Stats() map[string]interface{} {
 
 func (p *Prims) Stop() bool {
 	return p.model.UndirectedLinks("placed").Count() >= p.model.GetGlobal("nodes").(int)-2
-	// return false
 }
 
 func (p *Prims) Widgets() []api.Widget {

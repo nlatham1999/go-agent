@@ -25,7 +25,7 @@ func convertModelToApiModel(model *model.Model) *Model {
 
 func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
 	apiPatches := make([]Patch, 0, patches.Count())
-	for _, patch := range patches.List() {
+	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
 		apiPatch := Patch{
 			X:     patch.PXCor(),
 			Y:     patch.PYCor(),
@@ -48,7 +48,7 @@ func convertColorToApiColor(color model.Color) Color {
 
 func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 	apiTurtles := make([]Turtle, 0, turtles.Count())
-	for _, turtle := range turtles.ListSorted() {
+	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
 		apiTurtle := Turtle{
 			X:          turtle.XCor(),
 			Y:          turtle.YCor(),

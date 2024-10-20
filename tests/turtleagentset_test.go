@@ -141,7 +141,7 @@ func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 	}
 }
 
-func TestTurtlesMaxNOf(t *testing.T) {
+func TestTurtlesFirstNOf(t *testing.T) {
 
 	//create a basic model
 	settings := model.ModelSettings{}
@@ -154,9 +154,7 @@ func TestTurtlesMaxNOf(t *testing.T) {
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4})
 
-	turtleSet2 := turtleSet.MaxNOf(2, func(t *model.Turtle) float64 {
-		return float64(t.Who())
-	})
+	turtleSet2 := turtleSet.FirstNOf(2)
 
 	if turtleSet2.Count() != 2 {
 		t.Errorf("Expected turtleSet2 to have 2 turtles")

@@ -127,7 +127,7 @@ func (p *Patch) Neighbors4() *PatchAgentSet {
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 	other := NewPatchAgentSet([]*Patch{})
 
-	for _, patch := range patches.List() {
+	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
 		if patch != p {
 			other.Add(patch)
 		}
@@ -247,6 +247,7 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	return radiansToDegrees(math.Atan2(deltaY, deltaX))
 }
 
+// returns the turtles that are on this patch
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 
 	//is the breed valid
@@ -261,14 +262,12 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 		return NewTurtleAgentSet([]*Turtle{})
 	}
 
-	turtlesMap := make(map[*Turtle]interface{})
-	for turtle := range turtles.turtles {
-		turtlesMap[turtle] = nil
+	agentSet := NewTurtleAgentSet(nil)
+	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+		agentSet.Add(turtle)
 	}
 
-	return &TurtleAgentSet{
-		turtles: turtlesMap,
-	}
+	return agentSet
 }
 
 func (p *Patch) GetOwn(key string) interface{} {

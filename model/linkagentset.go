@@ -6,14 +6,14 @@ import (
 
 // LinkAgentSet is a set of links
 type LinkAgentSet struct {
-	links sortedset.SortedSet
+	links *sortedset.SortedSet
 }
 
 // create a new LinkAgentSet
 func NewLinkAgentSet(links []*Link) *LinkAgentSet {
 
 	linkSet := &LinkAgentSet{
-		links: *sortedset.NewSortedSet(),
+		links: sortedset.NewSortedSet(),
 	}
 
 	for _, link := range links {
@@ -99,7 +99,7 @@ func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
 		link, _ = l.links.Next()
 	}
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }
 
@@ -121,7 +121,7 @@ func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 		link, _ = l.links.Previous()
 	}
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }
 
@@ -182,7 +182,7 @@ func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
 		link, _ = l.links.Next()
 	}
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }
 
@@ -197,7 +197,7 @@ func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
 	}
 
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }
 
@@ -212,7 +212,7 @@ func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
 	}
 
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }
 
@@ -225,6 +225,6 @@ func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
 		}
 	}
 	return &LinkAgentSet{
-		links: *linkSet,
+		links: linkSet,
 	}
 }

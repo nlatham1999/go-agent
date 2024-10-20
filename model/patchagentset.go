@@ -5,12 +5,12 @@ import (
 )
 
 type PatchAgentSet struct {
-	patches sortedset.SortedSet
+	patches *sortedset.SortedSet
 }
 
 func NewPatchAgentSet(patches []*Patch) *PatchAgentSet {
 	patchSet := &PatchAgentSet{
-		patches: *sortedset.NewSortedSet(),
+		patches: sortedset.NewSortedSet(),
 	}
 	for _, patch := range patches {
 		patchSet.patches.Add(patch)
@@ -67,7 +67,7 @@ func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	}
 
 	return &PatchAgentSet{
-		patches: *patchesAtPoints,
+		patches: patchesAtPoints,
 	}
 
 }
@@ -93,7 +93,7 @@ func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSe
 	}
 
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -109,7 +109,7 @@ func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgen
 	}
 
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -131,11 +131,11 @@ func (p *PatchAgentSet) FirstNOf(n int) *PatchAgentSet {
 		patch, _ = p.patches.Next()
 	}
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
-func (p *PatchAgentSet) First(operation PatchFloatOperation) (*Patch, error) {
+func (p *PatchAgentSet) First() (*Patch, error) {
 	patch := p.patches.First()
 	if patch == nil {
 		return nil, ErrNoLinksInAgentSet
@@ -151,7 +151,7 @@ func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
 		patch, _ = p.patches.Previous()
 	}
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -163,6 +163,15 @@ func (p *PatchAgentSet) Last(operation PatchFloatOperation) (*Patch, error) {
 	return patch.(*Patch), nil
 }
 
+func (p *PatchAgentSet) Next() (*Patch, error) {
+	patch, err := p.patches.Next()
+	if err != nil {
+		return nil, ErrNoLinksInAgentSet
+	}
+	return patch.(*Patch), nil
+}
+
+// @TODO make this random
 func (p *PatchAgentSet) OneOf() (*Patch, error) {
 	for _, patch := range p.patches.List() {
 		return patch.(*Patch), nil
@@ -195,7 +204,7 @@ func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
 		patch, _ = p.patches.Next()
 	}
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -210,7 +219,7 @@ func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
 	}
 
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -225,7 +234,7 @@ func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
 	}
 
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }
 
@@ -237,6 +246,6 @@ func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {
 		}
 	}
 	return &PatchAgentSet{
-		patches: *patchSet,
+		patches: patchSet,
 	}
 }

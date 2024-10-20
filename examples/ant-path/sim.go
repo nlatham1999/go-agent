@@ -75,9 +75,10 @@ func (a *AntPath) SetUp() error {
 		},
 	})
 
-	t, err := a.m.Turtles("").MaxOneOf(func(t *model.Turtle) float64 {
+	a.m.Turtles("").SortAsc(func(t *model.Turtle) float64 {
 		return float64(t.Who())
 	})
+	t, err := a.m.Turtles("").First()
 	if err != nil {
 		return err
 	}

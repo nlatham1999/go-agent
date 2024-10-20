@@ -63,7 +63,7 @@ func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	m.whoToTurtles[m.turtlesWhoNumber] = t
 
 	if breedSet != nil {
-		breedSet.turtles.turtles[t] = nil
+		breedSet.turtles.Add(t)
 	}
 
 	//link the turtle to the patch
@@ -114,13 +114,13 @@ func (t *Turtle) SetBreed(name string) {
 	defer t.patch.addTurtle(t)
 
 	if t.breed != "" {
-		delete(t.parent.breeds[t.breed].turtles.turtles, t)
+		t.parent.breeds[t.breed].turtles.Remove(t)
 	}
 
 	t.breed = name
 
 	if name != "" {
-		t.parent.breeds[name].turtles.turtles[t] = nil
+		t.parent.breeds[name].turtles.Add(t)
 	}
 
 	// switch the turtles own variables to the new breed
@@ -170,7 +170,7 @@ func (t *Turtle) CanMove(distance float64) bool {
 // returns an agentset of the node turtles that are tied to the current turtle
 // TODO cleanup
 func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
-	tiedTurtlesMap := make(map[*Turtle]interface{})
+	tiedTurtlesSet := NewTurtleAgentSet(nil)
 	tiedTurtles := []*Turtle{}
 	for l := range t.linkedTurtles.getAllDirectedOutLinks() {
 		if l.TieMode >= minTieMode {
@@ -184,14 +184,14 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 	}
 	for len(tiedTurtles) > 0 {
 		for _, turtle := range tiedTurtles {
-			tiedTurtlesMap[turtle] = nil
+			tiedTurtlesSet.Add(turtle)
 		}
 		newTiedTurtles := []*Turtle{}
 		for _, turtle := range tiedTurtles {
 			for l := range turtle.linkedTurtles.getAllDirectedOutLinks() {
 				if l.TieMode != TieModeNone {
 					otherEnd := l.OtherEnd(turtle)
-					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+					if !tiedTurtlesSet.Contains(otherEnd) && otherEnd != t {
 						newTiedTurtles = append(newTiedTurtles, otherEnd)
 					}
 				}
@@ -199,7 +199,7 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 			for l := range turtle.linkedTurtles.getAllUndirectedLinks() {
 				if l.TieMode != TieModeNone {
 					otherEnd := l.OtherEnd(turtle)
-					if _, found := tiedTurtlesMap[otherEnd]; !found && otherEnd != t {
+					if !tiedTurtlesSet.Contains(otherEnd) && otherEnd != t {
 						newTiedTurtles = append(newTiedTurtles, otherEnd)
 					}
 				}
@@ -208,7 +208,7 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 		tiedTurtles = newTiedTurtles
 	}
 
-	return &TurtleAgentSet{tiedTurtlesMap}
+	return tiedTurtlesSet
 }
 
 func (t *Turtle) Die() {
@@ -516,13 +516,16 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 		return
 	}
 
+	freeDescendents := t.descendents(TieModeFree)
+	fixedDescendents := t.descendents(TieModeFixed)
+
 	// rotate the heading for all descendents where the tiemode is at least free
-	for turtle := range t.descendents(TieModeFree).turtles {
+	for turtle, _ := freeDescendents.First(); turtle != nil; turtle, _ = freeDescendents.Next() {
 		t.rotateTiedTurtle(turtle, headingDifference)
 	}
 
 	// rotate the heading for all descendents where the tiemode is fixed
-	for turtle := range t.descendents(TieModeFixed).turtles {
+	for turtle, _ := fixedDescendents.First(); turtle != nil; turtle, _ = fixedDescendents.Next() {
 		turtle.heading += headingDifference
 	}
 }
@@ -794,8 +797,10 @@ func (t *Turtle) SetXY(x float64, y float64) {
 		return
 	}
 
+	freeDescendents := t.descendents(TieModeFree)
+
 	// move the linked turtles
-	for turtle := range t.descendents(TieModeFree).turtles {
+	for turtle, _ := freeDescendents.First(); turtle != nil; turtle, _ = freeDescendents.Next() {
 		t.moveTiedTurtle(turtle, dx, dy)
 	}
 }
