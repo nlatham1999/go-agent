@@ -20,12 +20,13 @@ func (g *Gol) Model() *model.Model {
 func (g *Gol) Init() {
 	settings := model.ModelSettings{
 		PatchesOwn: map[string]interface{}{
-			"alive": true,
+			"alive":      true,
+			"alive-next": true,
 		},
 		MinPxCor: 0,
-		MaxPxCor: 50,
+		MaxPxCor: 200,
 		MinPyCor: 0,
-		MaxPyCor: 50,
+		MaxPyCor: 200,
 		Globals: map[string]interface{}{
 			"min-neighbors-to-live":      2,
 			"max-neighbors-to-live":      3,
@@ -45,9 +46,11 @@ func (g *Gol) SetUp() error {
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.model.GetGlobal("initial-alive").(float64) {
 				p.SetOwn("alive", true)
+				p.SetOwn("alive-next", true)
 				p.PColor.SetColor(model.Green)
 			} else {
 				p.SetOwn("alive", false)
+				p.SetOwn("alive-next", false)
 				p.PColor.SetColor(model.Black)
 			}
 		},
@@ -78,24 +81,30 @@ func (g *Gol) Go() {
 			alive := p.GetOwnB("alive")
 			if alive {
 				if aliveNeighbors < minNeighborsToLive {
-					p.SetOwn("alive", false)
-					p.PColor.SetColor(model.Black)
+					p.SetOwn("alive-next", false)
 				}
 
 				if aliveNeighbors > maxNeighborsToLive {
-					p.SetOwn("alive", false)
-					p.PColor.SetColor(model.Black)
+					p.SetOwn("alive-next", false)
 				}
 			} else {
-
 				if aliveNeighbors >= minNeighborsToReproduce && aliveNeighbors <= maxNeighborsToReproduce {
-					p.SetOwn("alive", true)
-					p.PColor.SetColor(model.Green)
+					p.SetOwn("alive-next", true)
 				}
 			}
 		},
 	})
 
+	g.model.Patches.Ask([]model.PatchOperation{
+		func(p *model.Patch) {
+			p.SetOwn("alive", p.GetOwnB("alive-next"))
+			if p.GetOwnB("alive") {
+				p.PColor.SetColor(model.Green)
+			} else {
+				p.PColor.SetColor(model.Black)
+			}
+		},
+	})
 }
 
 func (g *Gol) Stats() map[string]interface{} {

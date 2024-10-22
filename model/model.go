@@ -1152,8 +1152,9 @@ func (m *Model) Turtles(breed string) *TurtleAgentSet {
 	return m.breeds[breed].turtles
 }
 
-// returns the turtle agentset for the provided breed that is on the provided patch
-func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
+// returns the turtle agentset for the provided breed that is on patch of the proviced x y coordinates
+// same as TurtlesOnPatch(breed, Patch(x, y))
+func (m *Model) TurtlesAtCoords(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
 	x := int(math.Round(pxcor))
 	y := int(math.Round(pycor))
 
@@ -1166,7 +1167,7 @@ func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAge
 	return patch.TurtlesHere(breed)
 }
 
-// Returns the turtles on the provided patch
+// returns the turtle agentset for the provided breed that is on the provided patch
 func (m *Model) TurtlesOnPatch(breed string, patch *Patch) *TurtleAgentSet {
 	return patch.TurtlesHere(breed)
 }

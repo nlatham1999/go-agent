@@ -79,24 +79,3 @@ func (p *PatchSorter) Less(i, j int) bool {
 func (p *PatchSorter) Swap(i, j int) {
 	p.patches[i], p.patches[j] = p.patches[j], p.patches[i]
 }
-
-type TurtleSorter struct {
-	turtles []*Turtle
-	f       TurtleFloatOperation
-	reverse bool
-}
-
-func (t *TurtleSorter) Len() int {
-	return len(t.turtles)
-}
-
-func (t *TurtleSorter) Less(i, j int) bool {
-	if t.reverse {
-		return t.f(t.turtles[i]) < t.f(t.turtles[j])
-	}
-	return t.f(t.turtles[i]) > t.f(t.turtles[j])
-}
-
-func (t *TurtleSorter) Swap(i, j int) {
-	t.turtles[i], t.turtles[j] = t.turtles[j], t.turtles[i]
-}

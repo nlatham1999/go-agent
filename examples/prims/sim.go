@@ -69,7 +69,7 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 				t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
 					func(l *model.Link) {
 						l.Color.SetColor(model.Gray)
-						l.Hidden = true
+						l.Show()
 					},
 				})
 			}
@@ -112,7 +112,7 @@ func (p *Prims) Go() {
 	//add the link and turtle to the cluster
 	closestLink.SetBreed("placed")
 	closestLink.Color.SetColor(model.Red)
-	closestLink.Hidden = false
+	closestLink.Hide()
 	closestTurtle.SetBreed("placed")
 	closestTurtle.Color.SetColor(model.Red)
 

@@ -41,6 +41,7 @@ var (
 	}
 )
 
+// tie modes
 var (
 	TieModeFixed = TieMode(2)
 	TieModeFree  = TieMode(1)

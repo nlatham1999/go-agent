@@ -6,8 +6,9 @@ import (
 )
 
 type Patch struct {
-	x int
-	y int
+	// should never be changed
+	x int // x coordinate of the patch
+	y int // y coordinate of the patch
 
 	// this corresponds to the position in the patches array
 	// set as x*m.worldWidth + y
@@ -20,7 +21,6 @@ type Patch struct {
 	xFloat64 float64
 	yFloat64 float64
 
-	//same as pcolor
 	PColor Color
 
 	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions

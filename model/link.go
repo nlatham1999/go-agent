@@ -84,19 +84,6 @@ func (l *Link) BreedName() string {
 	return l.breed
 }
 
-// Returns the breed of this link
-func (l *Link) Breed() *linkBreed {
-	if l.breed == "" {
-		return nil
-	}
-
-	if l.directed {
-		return l.parent.directedLinkBreeds[l.breed]
-	} else {
-		return l.parent.undirectedLinkBreeds[l.breed]
-	}
-}
-
 // returns an agentset of the turtles at the ends of the link
 func (l *Link) BothEnds() *TurtleAgentSet {
 	return NewTurtleAgentSet([]*Turtle{l.end1, l.end2})
