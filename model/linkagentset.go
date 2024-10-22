@@ -60,12 +60,14 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 }
 
 // perform the list of operations for all links in the agent set
-func (l *LinkAgentSet) Ask(operations []LinkOperation) {
+func (l *LinkAgentSet) Ask(operation LinkOperation) {
+	if operation == nil {
+		return
+	}
+
 	link := l.links.First()
 	for link != nil {
-		for j := 0; j < len(operations); j++ {
-			operations[j](link.(*Link))
-		}
+		operation(link.(*Link))
 		link, _ = l.links.Next()
 	}
 }

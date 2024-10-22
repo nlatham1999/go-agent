@@ -165,3 +165,54 @@ func TestTurtlesFirstNOf(t *testing.T) {
 		t.Errorf("Expected turtleSet2 to have 2 turtles")
 	}
 }
+
+// func TestTurtlesLooping(t *testing.T) {
+
+// 	settings := model.ModelSettings{}
+// 	m := model.NewModel(settings)
+
+// 	m.CreateTurtles(4, "", []model.TurtleOperation{
+// 		func(t *model.Turtle) {
+// 			t.FaceXY(0, 0)
+// 		},
+// 	})
+
+// 	t1 := m.Turtle("", 0)
+// 	t1.SetXY(5, 5)
+// 	t1.Color = model.Red
+
+// 	t2 := m.Turtle("", 1)
+// 	t2.SetXY(-5, 5)
+// 	t2.Color = model.Blue
+
+// 	t3 := m.Turtle("", 2)
+// 	t3.SetXY(-5, -5)
+// 	t3.Color = model.Green
+
+// 	t4 := m.Turtle("", 3)
+// 	t4.SetXY(5, -5)
+// 	t4.Color = model.Yellow
+
+// 	for turtle, _ := m.Turtles("").First(); turtle != nil; turtle, _ = m.Turtles("").Next() {
+// 		allTurtlesInRadius := m.Turtles("").All(func(t *model.Turtle) bool {
+// 			return t.DistanceTurtle(turtle) < 12
+// 		})
+// 		if !allTurtlesInRadius {
+// 			turtle.Forward(1)
+// 		}
+// 	}
+
+// 	turtle, err := m.Turtles("").First()
+// 	if err != nil {
+// 		t.Errorf("Expected turtle to not be nil")
+// 	}
+// 	for turtle != nil {
+// 		allTurtlesInRadius := m.Turtles("").All(func(t *model.Turtle) bool {
+// 			return t.DistanceTurtle(turtle) < 12
+// 		})
+// 		if !allTurtlesInRadius {
+// 			turtle.Forward(1)
+// 		}
+// 		turtle, _ = m.Turtles("").Next()
+// 	}
+// }

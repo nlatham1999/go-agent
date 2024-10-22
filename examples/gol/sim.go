@@ -42,7 +42,7 @@ func (g *Gol) Init() {
 func (g *Gol) SetUp() error {
 	g.model.ClearAll()
 
-	g.model.Patches.Ask([]model.PatchOperation{
+	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.model.GetGlobal("initial-alive").(float64) {
 				p.SetOwn("alive", true)
@@ -54,7 +54,7 @@ func (g *Gol) SetUp() error {
 				p.PColor.SetColor(model.Black)
 			}
 		},
-	})
+	)
 
 	return nil
 }
@@ -66,7 +66,7 @@ func (g *Gol) Go() {
 	minNeighborsToReproduce := g.model.GetGlobal("min-neighbors-to-reproduce").(int)
 	maxNeighborsToReproduce := g.model.GetGlobal("max-neighbors-to-reproduce").(int)
 
-	g.model.Patches.Ask([]model.PatchOperation{
+	g.model.Patches.Ask(
 		func(p *model.Patch) {
 
 			//get neighboring patches
@@ -93,9 +93,9 @@ func (g *Gol) Go() {
 				}
 			}
 		},
-	})
+	)
 
-	g.model.Patches.Ask([]model.PatchOperation{
+	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			p.SetOwn("alive", p.GetOwnB("alive-next"))
 			if p.GetOwnB("alive") {
@@ -104,7 +104,7 @@ func (g *Gol) Go() {
 				p.PColor.SetColor(model.Black)
 			}
 		},
-	})
+	)
 }
 
 func (g *Gol) Stats() map[string]interface{} {

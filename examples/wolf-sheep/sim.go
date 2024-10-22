@@ -52,7 +52,7 @@ func (ws *WolfSheep) Init() {
 func (ws *WolfSheep) SetUp() error {
 	ws.m.ClearAll()
 
-	ws.m.Patches.Ask([]model.PatchOperation{
+	ws.m.Patches.Ask(
 		func(p *model.Patch) {
 
 			grassRegrowthTime := ws.m.GetGlobal("grass-regrowth-time")
@@ -64,7 +64,7 @@ func (ws *WolfSheep) SetUp() error {
 				p.SetOwn("countdown", ws.m.RandomInt(grassRegrowthTime.(int)))
 			}
 		},
-	})
+	)
 
 	initialNumberSheep, err := ws.m.GetGlobalI("initial-number-sheep")
 	if err != nil {
@@ -115,7 +115,7 @@ func (ws *WolfSheep) SetUp() error {
 	})
 
 	showEnergy, _ := ws.m.GetGlobalB("show-energy")
-	ws.m.Turtles("").Ask([]model.TurtleOperation{
+	ws.m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
@@ -123,7 +123,7 @@ func (ws *WolfSheep) SetUp() error {
 				t.SetLabel("")
 			}
 		},
-	})
+	)
 
 	ws.m.ResetTicks()
 	return nil
@@ -139,8 +139,10 @@ func (ws *WolfSheep) Go() {
 		return
 	}
 
-	ws.m.Turtles("sheep").Ask([]model.TurtleOperation{
+	ws.m.Turtles("sheep").Ask(
 		ws.move,
+	)
+	ws.m.Turtles("sheep").Ask(
 		func(t *model.Turtle) {
 
 			energy, err := t.GetOwnI("energy")
@@ -151,27 +153,41 @@ func (ws *WolfSheep) Go() {
 
 			t.SetOwn("energy", energy-1)
 		},
+	)
+	ws.m.Turtles("sheep").Ask(
 		ws.EatGrass,
+	)
+	ws.m.Turtles("sheep").Ask(
 		ws.Death,
+	)
+	ws.m.Turtles("sheep").Ask(
 		ws.reproduceSheep,
-	})
+	)
 
-	ws.m.Turtles("wolves").Ask([]model.TurtleOperation{
+	ws.m.Turtles("wolves").Ask(
 		ws.move,
+	)
+	ws.m.Turtles("wolves").Ask(
 		func(t *model.Turtle) {
 			t.SetOwn("energy", t.GetOwn("energy").(int)-1)
 		},
+	)
+	ws.m.Turtles("wolves").Ask(
 		ws.EatSheep,
+	)
+	ws.m.Turtles("wolves").Ask(
 		ws.Death,
+	)
+	ws.m.Turtles("wolves").Ask(
 		ws.reproduceWolves,
-	})
+	)
 
-	ws.m.Patches.Ask([]model.PatchOperation{
+	ws.m.Patches.Ask(
 		ws.growGrass,
-	})
+	)
 
 	showEnergy, _ := ws.m.GetGlobalB("show-energy")
-	ws.m.Turtles("").Ask([]model.TurtleOperation{
+	ws.m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
@@ -179,7 +195,7 @@ func (ws *WolfSheep) Go() {
 				t.SetLabel("")
 			}
 		},
-	})
+	)
 
 	ws.m.Tick()
 }

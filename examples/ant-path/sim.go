@@ -83,19 +83,13 @@ func (a *AntPath) SetUp() error {
 		return err
 	}
 
-	t.Ask(
-		[]model.TurtleOperation{
-			func(t *model.Turtle) {
-				t.Color.SetColor(model.Blue)
-			},
-		},
-	)
+	t.Color.SetColor(model.Blue)
 
-	a.m.Turtles("").Ask([]model.TurtleOperation{
+	a.m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			t.SetXY(a.nestX, a.nestY)
 		},
-	})
+	)
 
 	a.m.ResetTicks()
 
@@ -113,7 +107,7 @@ func (a *AntPath) Go() {
 		return
 	}
 
-	a.m.Turtles("leader").Ask([]model.TurtleOperation{
+	a.m.Turtles("leader").Ask(
 		func(t *model.Turtle) {
 			a.wiggle(t, 45)
 			correctPath(t)
@@ -124,9 +118,9 @@ func (a *AntPath) Go() {
 				t.Forward(0.5)
 			}
 		},
-	})
+	)
 
-	a.m.Turtles("follower").Ask([]model.TurtleOperation{
+	a.m.Turtles("follower").Ask(
 		func(t *model.Turtle) {
 			t.FaceTurtle(a.m.Turtle("", t.Who()-1))
 			if a.timeToStart(t) && t.XCor() < a.foodX {
@@ -135,7 +129,7 @@ func (a *AntPath) Go() {
 				t.Forward(0.5)
 			}
 		},
-	})
+	)
 
 	a.m.Tick()
 }

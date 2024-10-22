@@ -75,13 +75,6 @@ func (p *Patch) addTurtle(t *Turtle) {
 	}
 }
 
-// asks the patch to perform the operations
-func (p *Patch) Ask(operations []PatchOperation) {
-	for j := 0; j < len(operations); j++ {
-		operations[j](p)
-	}
-}
-
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
 	if _, ok := p.turtles[t.breed]; ok {
@@ -207,7 +200,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{}) {
 }
 
 // creates new turtles on this patch
-func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
+func (p *Patch) Sprout(breed string, number int, operation TurtleOperation) {
 
 	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
 	for i := 0; i < number; i++ {
@@ -224,7 +217,7 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 		turtlesAdded.Add(t)
 	}
 
-	turtlesAdded.Ask(operations)
+	turtlesAdded.Ask(operation)
 }
 
 // returns the heading that points towards the provided patch

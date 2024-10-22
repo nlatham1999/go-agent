@@ -40,9 +40,9 @@ func (p *Prims) SetUp() error {
 	})
 
 	//for each turtle create a link with every other turtle
-	p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
+	p.model.Turtles("unplaced").Ask(
 		p.createInitialLinks,
-	})
+	)
 
 	p.model.UndirectedLinks("unplaced").SortAsc(func(l *model.Link) float64 {
 		return l.Length()
@@ -63,7 +63,7 @@ func (p *Prims) placeInitialNodes(t *model.Turtle) {
 }
 
 func (p *Prims) createInitialLinks(t *model.Turtle) {
-	p.model.Turtles("unplaced").Ask([]model.TurtleOperation{
+	p.model.Turtles("unplaced").Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 && t.DistanceTurtle(t2) < 10 {
 				t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
@@ -74,7 +74,7 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 				})
 			}
 		},
-	})
+	)
 }
 
 func (p *Prims) Go() {
@@ -118,11 +118,11 @@ func (p *Prims) Go() {
 
 	// if all nodes are placed, kill all unplaced links
 	if p.model.Turtles("placed").Count() == p.model.GetGlobal("nodes").(int) {
-		p.model.UndirectedLinks("unplaced").Ask([]model.LinkOperation{
+		p.model.UndirectedLinks("unplaced").Ask(
 			func(l *model.Link) {
 				l.Die()
 			},
-		})
+		)
 	}
 
 	p.model.Tick()

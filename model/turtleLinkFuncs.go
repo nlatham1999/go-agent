@@ -18,7 +18,7 @@ func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []L
 
 // creates a directed link from the current turtle to the turtles passed in
 // if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operation LinkOperation) {
 	if breed == "" {
 		return
 	}
@@ -32,7 +32,7 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 		linksAdded.Add(l)
 	}
 
-	linksAdded.Ask(operations)
+	linksAdded.Ask(operation)
 }
 
 // creates an undirected breed link from the current turtle with the turtle passed in
@@ -52,7 +52,7 @@ func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations [
 
 // creates an undirected breed link from the current turtle with the turtles passed in
 // if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operation LinkOperation) {
 	linksAdded := NewLinkAgentSet([]*Link{})
 	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
 		l, err := newLink(t.parent, breed, t, turtle, false)
@@ -62,7 +62,7 @@ func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, opera
 		linksAdded.Add(l)
 	}
 
-	linksAdded.Ask(operations)
+	linksAdded.Ask(operation)
 }
 
 // creates a directed breed link from the current turtle with the turtle passed in
@@ -81,7 +81,7 @@ func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations [
 
 // creates a directed breed link from the turtles passed in to the current turtle
 // if a link creation errors, than it is skipped
-func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operations []LinkOperation) {
+func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operation LinkOperation) {
 	linksAdded := NewLinkAgentSet([]*Link{})
 	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
 		l, err := newLink(t.parent, breed, turtle, t, true)
@@ -91,7 +91,7 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 		linksAdded.Add(l)
 	}
 
-	linksAdded.Ask(operations)
+	linksAdded.Ask(operation)
 }
 
 // returns if there is any sort of link between the current turtle and the turtle passed in

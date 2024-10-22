@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/nlatham1999/go-agent/api"
-	"github.com/nlatham1999/go-agent/examples/gol"
+	"github.com/nlatham1999/go-agent/playgound"
 )
 
 // antpath "github.com/nlatham1999/go-agent/examples/ant-path"
@@ -12,9 +12,10 @@ func main() {
 	// sim := antpath.NewAntPath()
 	// sim := simplesim.NewSimpleSim()
 	// sim := wolfsheep.NewWolfSheep()
-	sim := gol.NewGol()
+	// sim := gol.NewGol()
 	// sim := bees.NewBees()
 	// sim := prims.NewPrims()
+	sim := playgound.NewSim()
 
 	agentApi := api.NewApi(sim, api.ApiSettings{
 		StoreSteps: false,

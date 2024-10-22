@@ -44,13 +44,13 @@ func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
 	return false
 }
 
-func (t *TurtleAgentSet) Ask(operations []TurtleOperation) {
-	turtles := t.turtles.List()
+func (t *TurtleAgentSet) Ask(operation TurtleOperation) {
+	if operation == nil {
+		return
+	}
 
-	for _, turtle := range turtles {
-		for j := 0; j < len(operations); j++ {
-			operations[j](turtle.(*Turtle))
-		}
+	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
+		operation(turtle.(*Turtle))
 	}
 }
 

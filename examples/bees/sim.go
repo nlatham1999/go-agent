@@ -43,13 +43,13 @@ func (b *Bees) SetUp() error {
 
 	b.step = 0
 
-	b.model.Patches.Ask([]model.PatchOperation{
+	b.model.Patches.Ask(
 		func(p *model.Patch) {
 			if b.model.RandomInt(100) > 95 {
 				p.SetOwn("nectar", b.model.RandomFloat(100)+450)
 			}
 		},
-	})
+	)
 
 	b.model.Diffuse("nectar", .8)
 	b.model.Diffuse("nectar", .8)
@@ -63,12 +63,12 @@ func (b *Bees) SetUp() error {
 	// b.model.Diffuse("nectar", .1)
 	// b.model.Diffuse("nectar", .1)
 
-	b.model.Patches.Ask([]model.PatchOperation{
+	b.model.Patches.Ask(
 		func(p *model.Patch) {
 			nectar := p.GetOwnI("nectar")
 			p.PColor.SetColorRGB(0, nectar, 0)
 		},
-	})
+	)
 
 	b.model.CreateTurtles(1, "", []model.TurtleOperation{
 		func(t *model.Turtle) {
@@ -106,7 +106,7 @@ func (b *Bees) Go() {
 
 	// first step is to create the foragers based on the scouts' findings
 	if b.step%numSteps == 0 {
-		b.model.Turtles("scouts").Ask([]model.TurtleOperation{
+		b.model.Turtles("scouts").Ask(
 			func(scout *model.Turtle) {
 				searchRadius, _ := scout.GetOwnF("radius")
 				if searchRadius < 1 {
@@ -134,12 +134,12 @@ func (b *Bees) Go() {
 					},
 				})
 			},
-		})
+		)
 	}
 
 	// determine new scout
 	if b.step%numSteps == 1 {
-		b.model.Turtles("scouts").Ask([]model.TurtleOperation{
+		b.model.Turtles("scouts").Ask(
 			func(t *model.Turtle) {
 				foragers := t.LinkNeighbors("")
 
@@ -157,33 +157,33 @@ func (b *Bees) Go() {
 
 				if max.PatchHere().GetOwnF("nectar") > t.PatchHere().GetOwnF("nectar") {
 					t.Die()
-					foragers.WhoAreNotTurtle(max).Ask([]model.TurtleOperation{
+					foragers.WhoAreNotTurtle(max).Ask(
 						func(f *model.Turtle) {
 							f.Die()
 						},
-					})
+					)
 					max.SetBreed("scouts")
 					max.Color.SetColor(model.Yellow)
 				} else {
-					foragers.Ask([]model.TurtleOperation{
+					foragers.Ask(
 						func(f *model.Turtle) {
 							f.Die()
 						},
-					})
+					)
 
 					//shrink the search radius
 					radius, _ := t.GetOwnF("radius")
 					t.SetOwn("radius", radius-.5)
 				}
 			},
-		})
+		)
 	}
 
-	b.model.Links().Ask([]model.LinkOperation{
+	b.model.Links().Ask(
 		func(l *model.Link) {
 			l.Color.SetColor(model.Orange)
 		},
-	})
+	)
 
 	b.step++
 
@@ -197,14 +197,14 @@ func (b *Bees) Model() *model.Model {
 func (b *Bees) Stats() map[string]interface{} {
 
 	stats := map[string]interface{}{}
-	b.model.Turtles("scouts").Ask([]model.TurtleOperation{
+	b.model.Turtles("scouts").Ask(
 		func(t *model.Turtle) {
 			group := t.GetOwn("group")
 			nectar := t.PatchHere().GetOwnI("nectar")
 			radius := t.GetOwn("radius")
 			stats[fmt.Sprintf("Group %v", group)] = fmt.Sprintf("Nectar at Scout: %v, Search Radius: %v", nectar, radius)
 		},
-	})
+	)
 
 	return stats
 }

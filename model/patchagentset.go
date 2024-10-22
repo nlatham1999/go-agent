@@ -44,13 +44,13 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	return false
 }
 
-func (p *PatchAgentSet) Ask(operations []PatchOperation) {
-	patches := p.patches.List()
+func (p *PatchAgentSet) Ask(operation PatchOperation) {
+	if operation == nil {
+		return
+	}
 
-	for _, patch := range patches {
-		for j := 0; j < len(operations); j++ {
-			operations[j](patch.(*Patch))
-		}
+	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
+		operation(patch.(*Patch))
 	}
 }
 

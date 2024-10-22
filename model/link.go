@@ -90,13 +90,6 @@ func (l *Link) BothEnds() *TurtleAgentSet {
 	return NewTurtleAgentSet([]*Turtle{l.end1, l.end2})
 }
 
-// takes in a list of link operations and runs them for the link
-func (l *Link) Ask(operations []LinkOperation) {
-	for j := 0; j < len(operations); j++ {
-		operations[j](l)
-	}
-}
-
 func (l *Link) Die() {
 	l.parent.KillLink(l)
 }

@@ -361,17 +361,13 @@ func TestDiffuse(t *testing.T) {
 	}
 	m := model.NewModel(settings)
 
-	m.Patches.Ask([]model.PatchOperation{
+	m.Patches.Ask(
 		func(p *model.Patch) {
 			p.SetOwn("heat", 0)
 		},
-	})
+	)
 
-	m.Patch(0, 0).Ask([]model.PatchOperation{
-		func(p *model.Patch) {
-			p.SetOwn("heat", 100)
-		},
-	})
+	m.Patch(0, 0).SetOwn("heat", 100)
 
 	p1 := m.Patch(-1, 1)
 	p2 := m.Patch(0, 1)
@@ -477,17 +473,13 @@ func TestDiffuseCorner(t *testing.T) {
 	}
 	m := model.NewModel(settings)
 
-	m.Patches.Ask([]model.PatchOperation{
+	m.Patches.Ask(
 		func(p *model.Patch) {
 			p.SetOwn("heat", 0)
 		},
-	})
+	)
 
-	m.Patch(-15, -15).Ask([]model.PatchOperation{
-		func(p *model.Patch) {
-			p.SetOwn("heat", 100)
-		},
-	})
+	m.Patch(-15, -15).SetOwn("heat", 100)
 
 	p1 := m.Patch(-15, -14)
 	p2 := m.Patch(-14, -14)
@@ -527,17 +519,13 @@ func TestDiffuse4(t *testing.T) {
 	}
 	m := model.NewModel(settings)
 
-	m.Patches.Ask([]model.PatchOperation{
+	m.Patches.Ask(
 		func(p *model.Patch) {
 			p.SetOwn("heat", 0)
 		},
-	})
+	)
 
-	m.Patch(0, 0).Ask([]model.PatchOperation{
-		func(p *model.Patch) {
-			p.SetOwn("heat", 100)
-		},
-	})
+	m.Patch(0, 0).SetOwn("heat", 100)
 
 	p1 := m.Patch(-1, 1)
 	p2 := m.Patch(0, 1)
@@ -741,7 +729,7 @@ func TestModelSize(t *testing.T) {
 
 	m.ClearAll()
 
-	m.Patches.Ask([]model.PatchOperation{
+	m.Patches.Ask(
 		func(p *model.Patch) {
 
 			grassRegrowthTime := m.GetGlobal("grass-regrowth-time")
@@ -753,7 +741,7 @@ func TestModelSize(t *testing.T) {
 				p.SetOwn("countdown", m.RandomInt(grassRegrowthTime.(int)))
 			}
 		},
-	})
+	)
 
 	initialNumberSheep, _ := m.GetGlobalI("initial-number-sheep")
 
@@ -788,7 +776,7 @@ func TestModelSize(t *testing.T) {
 	})
 
 	showEnergy, _ := m.GetGlobalB("show-energy")
-	m.Turtles("").Ask([]model.TurtleOperation{
+	m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
@@ -796,7 +784,7 @@ func TestModelSize(t *testing.T) {
 				t.SetLabel("")
 			}
 		},
-	})
+	)
 
 	m.ResetTicks()
 }

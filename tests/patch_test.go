@@ -171,11 +171,10 @@ func TestPatchNeighbors(t *testing.T) {
 		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors.Ask([]model.PatchOperation{
+	neighbors.Ask(
 		func(p *model.Patch) {
 			p.PColor.SetColor(model.Red)
 		},
-	},
 	)
 
 	//make sure that the patches around the patch are red
@@ -252,10 +251,8 @@ func TestPatchNeighbors(t *testing.T) {
 	p8 = m.Patch(15, 15)
 
 	neighbors.Ask(
-		[]model.PatchOperation{
-			func(p *model.Patch) {
-				p.PColor.SetColor(model.Red)
-			},
+		func(p *model.Patch) {
+			p.PColor.SetColor(model.Red)
 		},
 	)
 
@@ -286,10 +283,8 @@ func TestPatchNeighbors4(t *testing.T) {
 	}
 
 	neighbors.Ask(
-		[]model.PatchOperation{
-			func(p *model.Patch) {
-				p.PColor.SetColor(model.Red)
-			},
+		func(p *model.Patch) {
+			p.PColor.SetColor(model.Red)
 		},
 	)
 
@@ -351,10 +346,8 @@ func TestPatchNeighbors4(t *testing.T) {
 	p4 = m.Patch(15, -15)
 
 	neighbors.Ask(
-		[]model.PatchOperation{
-			func(p *model.Patch) {
-				p.PColor.SetColor(model.Red)
-			},
+		func(p *model.Patch) {
+			p.PColor.SetColor(model.Red)
 		},
 	)
 
@@ -433,7 +426,7 @@ func TestPatchSprout(t *testing.T) {
 	patch := m.Patch(0, 0)
 
 	//sprout a patch
-	patch.Sprout("", 5, []model.TurtleOperation{
+	patch.Sprout("", 5,
 		func(t *model.Turtle) {
 			switch t.Who() {
 			case 0:
@@ -448,7 +441,7 @@ func TestPatchSprout(t *testing.T) {
 				t.Color.SetColor(model.Pink)
 			}
 		},
-	})
+	)
 
 	if m.Turtle("", 0).Color != model.Red {
 		t.Errorf("Expected red turtle")
