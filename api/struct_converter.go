@@ -25,14 +25,14 @@ func convertModelToApiModel(model *model.Model) *Model {
 
 func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
 	apiPatches := make([]Patch, 0, patches.Count())
-	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
+	patches.Ask(func(patch *model.Patch) {
 		apiPatch := Patch{
 			X:     patch.PXCor(),
 			Y:     patch.PYCor(),
 			Color: convertColorToApiColor(patch.PColor),
 		}
 		apiPatches = append(apiPatches, apiPatch)
-	}
+	})
 	return apiPatches
 }
 
@@ -48,7 +48,7 @@ func convertColorToApiColor(color model.Color) Color {
 
 func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 	apiTurtles := make([]Turtle, 0, turtles.Count())
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *model.Turtle) {
 		apiTurtle := Turtle{
 			X:          turtle.XCor(),
 			Y:          turtle.YCor(),
@@ -61,16 +61,16 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 			LabelColor: convertColorToApiColor(turtle.GetLabelColor()),
 		}
 		apiTurtles = append(apiTurtles, apiTurtle)
-	}
+	})
 	return apiTurtles
 }
 
 func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
-	for link, _ := links.First(); link != nil; link, _ = links.Next() {
+	links.Ask(func(link *model.Link) {
 		if link.End1() == nil || link.End2() == nil {
 			fmt.Println("Link has nil ends")
-			return nil
+			return
 		}
 		apiLink := Link{
 			End1:       link.End1().Who(),
@@ -89,6 +89,6 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Hidden:     link.Hidden,
 		}
 		apiLinks = append(apiLinks, apiLink)
-	}
+	})
 	return apiLinks
 }

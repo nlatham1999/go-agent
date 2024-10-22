@@ -131,7 +131,6 @@ func (t *Turtle) SetBreed(name string) {
 }
 
 func (t *Turtle) CanMove(distance float64) bool {
-
 	if t.parent.wrappingY && t.parent.wrappingX {
 		return true
 	}
@@ -514,14 +513,14 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 	fixedDescendents := t.descendents(TieModeFixed)
 
 	// rotate the heading for all descendents where the tiemode is at least free
-	for turtle, _ := freeDescendents.First(); turtle != nil; turtle, _ = freeDescendents.Next() {
+	freeDescendents.Ask(func(turtle *Turtle) {
 		t.rotateTiedTurtle(turtle, headingDifference)
-	}
+	})
 
 	// rotate the heading for all descendents where the tiemode is fixed
-	for turtle, _ := fixedDescendents.First(); turtle != nil; turtle, _ = fixedDescendents.Next() {
+	fixedDescendents.Ask(func(turtle *Turtle) {
 		turtle.heading += headingDifference
-	}
+	})
 }
 
 // swivvels the turtle to the left or right by the amount passed in
@@ -794,9 +793,9 @@ func (t *Turtle) SetXY(x float64, y float64) {
 	freeDescendents := t.descendents(TieModeFree)
 
 	// move the linked turtles
-	for turtle, _ := freeDescendents.First(); turtle != nil; turtle, _ = freeDescendents.Next() {
+	freeDescendents.Ask(func(turtle *Turtle) {
 		t.moveTiedTurtle(turtle, dx, dy)
-	}
+	})
 }
 
 func (t *Turtle) transferPatchOwnership() {

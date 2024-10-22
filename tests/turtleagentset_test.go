@@ -51,6 +51,8 @@ func TestAnyTurtle(t *testing.T) {
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
 	turtle1.Color.SetColor(model.Lime)
+	turtle2.Color.SetColor(model.Black)
+	turtle3.Color.SetColor(model.Black)
 
 	// assert that turtleset has Any of shape "circle"
 	if !turtleSet.Any(func(t *model.Turtle) bool {

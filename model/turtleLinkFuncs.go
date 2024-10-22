@@ -24,13 +24,13 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 	}
 
 	linksAdded := NewLinkAgentSet([]*Link{})
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *Turtle) {
 		l, err := newLink(t.parent, breed, t, turtle, true)
 		if err != nil {
-			continue
+			return
 		}
 		linksAdded.Add(l)
-	}
+	})
 
 	linksAdded.Ask(operation)
 }
@@ -54,13 +54,13 @@ func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations [
 // if a link creation errors, than it is skipped
 func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, operation LinkOperation) {
 	linksAdded := NewLinkAgentSet([]*Link{})
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *Turtle) {
 		l, err := newLink(t.parent, breed, t, turtle, false)
 		if err != nil {
-			continue
+			return
 		}
 		linksAdded.Add(l)
-	}
+	})
 
 	linksAdded.Ask(operation)
 }
@@ -83,13 +83,13 @@ func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations [
 // if a link creation errors, than it is skipped
 func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, operation LinkOperation) {
 	linksAdded := NewLinkAgentSet([]*Link{})
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *Turtle) {
 		l, err := newLink(t.parent, breed, turtle, t, true)
 		if err != nil {
-			continue
+			return
 		}
 		linksAdded.Add(l)
-	}
+	})
 
 	linksAdded.Ask(operation)
 }

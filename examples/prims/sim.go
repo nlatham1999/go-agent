@@ -1,6 +1,9 @@
 package prims
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/nlatham1999/go-agent/api"
 	"github.com/nlatham1999/go-agent/model"
 )
@@ -69,7 +72,7 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 				t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
 					func(l *model.Link) {
 						l.Color.SetColor(model.Gray)
-						l.Show()
+						l.Hide()
 					},
 				})
 			}
@@ -78,32 +81,35 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 }
 
 func (p *Prims) Go() {
-	// start := time.Now()
+	start := time.Now()
 
 	// find the closest link to the cluster
 	var closestLink *model.Link
 	var closestTurtle *model.Turtle
 	links := p.model.UndirectedLinks("unplaced")
-	for link, _ := links.First(); link != nil; link, _ = links.Next() {
-
-		breedName1 := link.End1().BreedName()
-		breedName2 := link.End2().BreedName()
+	done := false
+	links.Ask(func(l *model.Link) {
+		if done {
+			return
+		}
+		breedName1 := l.End1().BreedName()
+		breedName2 := l.End2().BreedName()
 		if breedName1 == "placed" && breedName2 == "placed" {
-			link.Die()
-			continue
+			l.Die()
+			return
 		}
 		if breedName1 == "unplaced" && breedName2 == "unplaced" {
-			continue
+			return
 		}
 
-		closestLink = link
+		closestLink = l
 		if breedName1 == "unplaced" {
-			closestTurtle = link.End1()
+			closestTurtle = l.End1()
 		} else {
-			closestTurtle = link.End2()
+			closestTurtle = l.End2()
 		}
-		break
-	}
+		done = true
+	})
 
 	if closestLink == nil {
 		return
@@ -126,6 +132,8 @@ func (p *Prims) Go() {
 	}
 
 	p.model.Tick()
+
+	fmt.Println("Time taken: ", time.Since(start))
 
 }
 

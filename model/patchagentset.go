@@ -23,25 +23,23 @@ func (p *PatchAgentSet) Add(patch *Patch) {
 }
 
 func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
-	patch := p.patches.First()
-	for patch != nil {
-		if !operation(patch.(*Patch)) {
-			return false
-		}
-		patch, _ = p.patches.Next()
+	if operation == nil {
+		return false
 	}
-	return true
+
+	return p.patches.All(func(a interface{}) bool {
+		return operation(a.(*Patch))
+	})
 }
 
 func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
-	patch := p.patches.First()
-	for patch != nil {
-		if operation(patch.(*Patch)) {
-			return true
-		}
-		patch, _ = p.patches.Next()
+	if operation == nil {
+		return false
 	}
-	return false
+
+	return p.patches.Any(func(a interface{}) bool {
+		return operation(a.(*Patch))
+	})
 }
 
 func (p *PatchAgentSet) Ask(operation PatchOperation) {
@@ -49,9 +47,9 @@ func (p *PatchAgentSet) Ask(operation PatchOperation) {
 		return
 	}
 
-	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
-		operation(patch.(*Patch))
-	}
+	p.patches.Ask(func(a interface{}) {
+		operation(a.(*Patch))
+	})
 }
 
 func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
@@ -155,7 +153,7 @@ func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
 	}
 }
 
-func (p *PatchAgentSet) Last(operation PatchFloatOperation) (*Patch, error) {
+func (p *PatchAgentSet) Last() (*Patch, error) {
 	patch := p.patches.Last()
 	if patch == nil {
 		return nil, ErrNoLinksInAgentSet
@@ -163,13 +161,13 @@ func (p *PatchAgentSet) Last(operation PatchFloatOperation) (*Patch, error) {
 	return patch.(*Patch), nil
 }
 
-func (p *PatchAgentSet) Next() (*Patch, error) {
-	patch, err := p.patches.Next()
-	if err != nil {
-		return nil, ErrNoLinksInAgentSet
-	}
-	return patch.(*Patch), nil
-}
+// func (p *PatchAgentSet) Next() (*Patch, error) {
+// 	patch, err := p.patches.Next()
+// 	if err != nil {
+// 		return nil, ErrNoLinksInAgentSet
+// 	}
+// 	return patch.(*Patch), nil
+// }
 
 // @TODO make this random
 func (p *PatchAgentSet) OneOf() (*Patch, error) {
@@ -240,11 +238,17 @@ func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
 
 func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
-	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
-		if operation(patch.(*Patch)) {
-			patchSet.Add(patch)
-		}
+
+	if operation == nil {
+		return nil
 	}
+
+	p.patches.Ask(func(a interface{}) {
+		if operation(a.(*Patch)) {
+			patchSet.Add(a)
+		}
+	})
+
 	return &PatchAgentSet{
 		patches: patchSet,
 	}

@@ -102,7 +102,7 @@ func NewModel(
 		wrappingX:          settings.WrappingX,
 		wrappingY:          settings.WrappingY,
 		whoToTurtles:       make(map[int]*Turtle),
-		randomGenerator:    rand.New(rand.NewSource(0)),
+		randomGenerator:    rand.New(rand.NewSource(settings.RandomSeed)),
 		modelStart:         time.Now(),
 		Globals:            make(map[string]interface{}),
 	}
@@ -202,7 +202,7 @@ func (m *Model) buildPatches() {
 		}
 	}
 
-	for p, _ := m.Patches.First(); p != nil; p, _ = m.Patches.Next() {
+	m.Patches.Ask(func(p *Patch) {
 		p.patchNeighborsMap = map[*Patch]string{}
 		p.neighborsPatchMap = map[string]*Patch{}
 
@@ -237,7 +237,7 @@ func (m *Model) buildPatches() {
 		bottomLeft := m.bottomLeftNeighbor(p)
 		p.patchNeighborsMap[bottomLeft] = "bottomLeft"
 		p.neighborsPatchMap["bottomLeft"] = bottomLeft
-	}
+	})
 }
 
 func (m *Model) patchIndex(x int, y int) int {
@@ -260,9 +260,9 @@ func (m *Model) ClearLinks() {
 	for breed := range m.undirectedLinkBreeds {
 		m.undirectedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
-	for turtle, _ := m.turtles.First(); turtle != nil; turtle, _ = m.turtles.Next() {
+	m.turtles.Ask(func(turtle *Turtle) {
 		turtle.linkedTurtles = newTurtleLinks()
-	}
+	})
 }
 
 // set the ticks to zero
@@ -272,9 +272,9 @@ func (m *Model) ClearTicks() {
 
 // clear all patches
 func (m *Model) ClearPatches() {
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
-		patch.Reset(m.patchesOwnTemplate)
-	}
+	m.Patches.Ask(func(p *Patch) {
+		p.Reset(m.patchesOwnTemplate)
+	})
 }
 
 // kills all turtles
@@ -289,14 +289,14 @@ func (m *Model) ClearTurtles() {
 	}
 
 	// remove all turtles from patches
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
-		patch.turtles = make(map[string]*TurtleAgentSet)
-	}
+	m.Patches.Ask(func(p *Patch) {
+		p.turtles = make(map[string]*TurtleAgentSet)
+	})
 
 	// clear all turtles
-	for turtle, _ := m.turtles.First(); turtle != nil; turtle, _ = m.turtles.Next() {
+	m.turtles.Ask(func(turtle *Turtle) {
 		*turtle = Turtle{}
-	}
+	})
 
 	m.turtles = NewTurtleAgentSet([]*Turtle{})
 	for breed := range m.breeds {
@@ -348,6 +348,7 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 // create the specified amount of turtles with the specified breed and operations
 // if the breed is empty then it will add it to the general population
 // @TODO return the created turtles as an agentset
+// @TODO should just be a single operation passed in
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
 	if breed != "" {
@@ -357,7 +358,7 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 		}
 	}
 
-	turtles := []*Turtle{}
+	turtles := NewTurtleAgentSet([]*Turtle{})
 
 	end := amount + m.turtlesWhoNumber
 	for m.turtlesWhoNumber < end {
@@ -367,18 +368,18 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 		newTurtle.setHeadingRadians(m.randomGenerator.Float64() * 2 * math.Pi)
 
 		// get a random color from the base colors and set it
-		newTurtle.Color.SetColor(baseColorsList[rand.Intn(len(baseColorsList))])
+		newTurtle.Color.SetColor(baseColorsList[m.randomGenerator.Intn(len(baseColorsList))])
 
-		turtles = append(turtles, newTurtle)
+		turtles.Add(newTurtle)
 
 		m.turtlesWhoNumber++
 	}
 
-	for _, turtle := range turtles {
+	turtles.Ask(func(turtle *Turtle) {
 		for i := 0; i < len(operations); i++ {
 			operations[i](turtle)
 		}
-	}
+	})
 
 	return nil
 }
@@ -494,28 +495,28 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 	diffusions := make(map[*Patch]float64)
 
 	//go through each patch and calculate the diffusion amount
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
+	m.Patches.Ask(func(patch *Patch) {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
-	}
+	})
 
 	//go through each patch and get the new amount
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
+	m.Patches.Ask(func(patch *Patch) {
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors(patch)
 		if neighbors.Count() > 8 || neighbors.Count() < 3 {
-			return errors.New("invalid amount of neighbors")
+			return
 		}
-		for n, _ := neighbors.First(); n != nil; n, _ = neighbors.Next() {
+		neighbors.Ask(func(n *Patch) {
 			amountFromNeighbors += diffusions[n]
-		}
+		})
 
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToKeep := (patchAmount * (1 - percent)) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
 
 		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
-	}
+	})
 
 	return nil
 }
@@ -530,28 +531,28 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	diffusions := make(map[*Patch]float64)
 
 	//go through each patch and calculate the diffusion amount
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
+	m.Patches.Ask(func(patch *Patch) {
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 4
 		diffusions[patch] = amountToGive
-	}
+	})
 
 	//go through each patch and get the new amount
-	for patch, _ := m.Patches.First(); patch != nil; patch, _ = m.Patches.Next() {
+	m.Patches.Ask(func(patch *Patch) {
 		amountFromNeighbors := 0.0
 		neighbors := m.neighbors4(patch)
 		if neighbors.Count() > 4 || neighbors.Count() < 2 {
-			return errors.New("invalid amount of neighbors")
+			return
 		}
-		for n, _ := neighbors.First(); n != nil; n, _ = neighbors.Next() {
+		neighbors.Ask(func(n *Patch) {
 			amountFromNeighbors += diffusions[n]
-		}
+		})
 
 		patchAmount := patch.patchesOwn[patchVariable].(float64)
 		amountToKeep := (patchAmount * (1 - percent)) + (float64(4-neighbors.Count()) * (patchAmount * percent / 4))
 
 		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
-	}
+	})
 
 	return nil
 }
@@ -753,12 +754,12 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 // returns a random int n the provided list
 func (m *Model) OneOfInt(arr []int) interface{} {
 
-	return arr[rand.Intn(len(arr))-1]
+	return arr[m.randomGenerator.Intn(len(arr))-1]
 }
 
 // returns a random int from (0, n]
 func (m *Model) RandomAmount(n int) int {
-	return rand.Intn(n)
+	return m.randomGenerator.Intn(n)
 }
 
 func (m *Model) topLeftNeighbor(p *Patch) *Patch {
@@ -1178,12 +1179,12 @@ func (m *Model) TurtlesOnPatch(breed string, patch *Patch) *TurtleAgentSet {
 func (m *Model) TurtlesOnPatches(breed string, patches *PatchAgentSet) *TurtleAgentSet {
 	turtles := NewTurtleAgentSet(nil)
 
-	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
+	patches.Ask(func(patch *Patch) {
 		s := m.TurtlesOnPatch(breed, patch)
-		for turtle, _ := s.First(); turtle != nil; turtle, _ = s.Next() {
+		s.Ask(func(turtle *Turtle) {
 			turtles.Add(turtle)
-		}
-	}
+		})
+	})
 
 	return turtles
 }
@@ -1202,12 +1203,12 @@ func (m *Model) TurtlesWithTurtle(breed string, turtle *Turtle) *TurtleAgentSet 
 func (m *Model) TurtlesWithTurtles(breed string, turtles *TurtleAgentSet) *TurtleAgentSet {
 	patches := NewPatchAgentSet(nil)
 
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *Turtle) {
 		p := turtle.PatchHere()
 		if p != nil {
 			patches.Add(p)
 		}
-	}
+	})
 
 	return m.TurtlesOnPatches(breed, patches)
 }

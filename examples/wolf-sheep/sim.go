@@ -140,28 +140,18 @@ func (ws *WolfSheep) Go() {
 	}
 
 	ws.m.Turtles("sheep").Ask(
-		ws.move,
-	)
-	ws.m.Turtles("sheep").Ask(
 		func(t *model.Turtle) {
-
+			ws.move(t)
 			energy, err := t.GetOwnI("energy")
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-
 			t.SetOwn("energy", energy-1)
+			ws.EatGrass(t)
+			ws.Death(t)
+			ws.reproduceSheep(t)
 		},
-	)
-	ws.m.Turtles("sheep").Ask(
-		ws.EatGrass,
-	)
-	ws.m.Turtles("sheep").Ask(
-		ws.Death,
-	)
-	ws.m.Turtles("sheep").Ask(
-		ws.reproduceSheep,
 	)
 
 	ws.m.Turtles("wolves").Ask(
@@ -169,17 +159,12 @@ func (ws *WolfSheep) Go() {
 	)
 	ws.m.Turtles("wolves").Ask(
 		func(t *model.Turtle) {
+			ws.move(t)
 			t.SetOwn("energy", t.GetOwn("energy").(int)-1)
+			ws.EatSheep(t)
+			ws.Death(t)
+			ws.reproduceWolves(t)
 		},
-	)
-	ws.m.Turtles("wolves").Ask(
-		ws.EatSheep,
-	)
-	ws.m.Turtles("wolves").Ask(
-		ws.Death,
-	)
-	ws.m.Turtles("wolves").Ask(
-		ws.reproduceWolves,
 	)
 
 	ws.m.Patches.Ask(

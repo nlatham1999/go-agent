@@ -23,25 +23,23 @@ func (t *TurtleAgentSet) Add(turtle *Turtle) {
 }
 
 func (t *TurtleAgentSet) All(operation TurtleBoolOperation) bool {
-	turtle := t.turtles.First()
-	for turtle != nil {
-		if !operation(turtle.(*Turtle)) {
-			return false
-		}
-		turtle, _ = t.turtles.Next()
+	if operation == nil {
+		return false
 	}
-	return true
+
+	return t.turtles.All(func(a interface{}) bool {
+		return operation(a.(*Turtle))
+	})
 }
 
 func (t *TurtleAgentSet) Any(operation TurtleBoolOperation) bool {
-	turtle := t.turtles.First()
-	for turtle != nil {
-		if operation(turtle.(*Turtle)) {
-			return true
-		}
-		turtle, _ = t.turtles.Next()
+	if operation == nil {
+		return false
 	}
-	return false
+
+	return t.turtles.Any(func(a interface{}) bool {
+		return operation(a.(*Turtle))
+	})
 }
 
 func (t *TurtleAgentSet) Ask(operation TurtleOperation) {
@@ -49,9 +47,9 @@ func (t *TurtleAgentSet) Ask(operation TurtleOperation) {
 		return
 	}
 
-	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
-		operation(turtle.(*Turtle))
-	}
+	t.turtles.Ask(func(a interface{}) {
+		operation(a.(*Turtle))
+	})
 }
 
 func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {
@@ -162,13 +160,13 @@ func (t *TurtleAgentSet) Last() (*Turtle, error) {
 	return turtle.(*Turtle), nil
 }
 
-func (t *TurtleAgentSet) Next() (*Turtle, error) {
-	turtle, _ := t.turtles.Next()
-	if turtle == nil {
-		return nil, ErrNoTurtlesInAgentSet
-	}
-	return turtle.(*Turtle), nil
-}
+// func (t *TurtleAgentSet) Next() (*Turtle, error) {
+// 	turtle, _ := t.turtles.Next()
+// 	if turtle == nil {
+// 		return nil, ErrNoTurtlesInAgentSet
+// 	}
+// 	return turtle.(*Turtle), nil
+// }
 
 // @TODO make this random
 func (t *TurtleAgentSet) OneOf() (*Turtle, error) {
@@ -240,11 +238,15 @@ func (t *TurtleAgentSet) WhoAreNotTurtle(turtle *Turtle) *TurtleAgentSet {
 func (t *TurtleAgentSet) With(operation TurtleBoolOperation) *TurtleAgentSet {
 	turtleSet := sortedset.NewSortedSet()
 
-	for turtle := t.turtles.First(); turtle != nil; turtle, _ = t.turtles.Next() {
-		if operation(turtle.(*Turtle)) {
-			turtleSet.Add(turtle)
-		}
+	if operation == nil {
+		return nil
 	}
+
+	t.turtles.Ask(func(a interface{}) {
+		if operation(a.(*Turtle)) {
+			turtleSet.Add(a)
+		}
+	})
 
 	return &TurtleAgentSet{
 		turtles: turtleSet,

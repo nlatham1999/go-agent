@@ -2,7 +2,6 @@ package model
 
 import (
 	"math"
-	"math/rand"
 )
 
 // Patches are agents that resemble the physical space
@@ -121,11 +120,11 @@ func (p *Patch) Neighbors4() *PatchAgentSet {
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 	other := NewPatchAgentSet([]*Patch{})
 
-	for patch, _ := patches.First(); patch != nil; patch, _ = patches.Next() {
+	patches.Ask(func(patch *Patch) {
 		if patch != p {
 			other.Add(patch)
 		}
-	}
+	})
 
 	return other
 }
@@ -209,7 +208,7 @@ func (p *Patch) Sprout(breed string, number int, operation TurtleOperation) {
 		p.parent.turtlesWhoNumber++
 
 		//set the heading to be between 0 and 360
-		heading := rand.Intn(360)
+		heading := p.parent.randomGenerator.Intn(360)
 
 		//convert to radians
 		t.SetHeading(float64(heading))
@@ -257,9 +256,9 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 	}
 
 	agentSet := NewTurtleAgentSet(nil)
-	for turtle, _ := turtles.First(); turtle != nil; turtle, _ = turtles.Next() {
+	turtles.Ask(func(turtle *Turtle) {
 		agentSet.Add(turtle)
-	}
+	})
 
 	return agentSet
 }

@@ -31,14 +31,13 @@ func (l *LinkAgentSet) Add(link *Link) {
 
 // returns true if all the links in the agent set satisfy the operation
 func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
-	link := l.links.First()
-	for link != nil {
-		if !operation(link.(*Link)) {
-			return false
-		}
-		link, _ = l.links.Next()
+	if operation == nil {
+		return false
 	}
-	return true
+
+	return l.links.All(func(a interface{}) bool {
+		return operation(a.(*Link))
+	})
 }
 
 // returns the next link in the set after the given link
@@ -49,14 +48,13 @@ func (l *LinkAgentSet) After(link *Link) (*Link, error) {
 
 // returns true if any of the links in the agent set satisfy the operation
 func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
-	link := l.links.First()
-	for link != nil {
-		if operation(link.(*Link)) {
-			return true
-		}
-		link, _ = l.links.Next()
+	if operation == nil {
+		return false
 	}
-	return false
+
+	return l.links.Any(func(a interface{}) bool {
+		return operation(a.(*Link))
+	})
 }
 
 // perform the list of operations for all links in the agent set
@@ -65,11 +63,9 @@ func (l *LinkAgentSet) Ask(operation LinkOperation) {
 		return
 	}
 
-	link := l.links.First()
-	for link != nil {
-		operation(link.(*Link))
-		link, _ = l.links.Next()
-	}
+	l.links.Ask(func(a interface{}) {
+		operation(a.(*Link))
+	})
 }
 
 // returns true if the link is in the agent set
@@ -93,7 +89,7 @@ func (l *LinkAgentSet) List() []*Link {
 	return v
 }
 
-// returns the top n links in the agent set based on the float operation
+// returns the top n links in the agent set
 func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
 	link := l.links.First()
@@ -106,7 +102,7 @@ func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
 	}
 }
 
-// returns the max link in the agent set based on the float operation
+// returns the max link in the agent set
 func (l *LinkAgentSet) First() (*Link, error) {
 	link := l.links.First()
 	if link == nil {
@@ -115,7 +111,7 @@ func (l *LinkAgentSet) First() (*Link, error) {
 	return link.(*Link), nil
 }
 
-// returns the min n links in the agent set based on the float operation
+// returns the min n links in the agent set
 func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
 	link := l.links.Last()
@@ -128,7 +124,7 @@ func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 	}
 }
 
-// returns the min link in the agent set based on the float operation
+// returns the min link in the agent set
 func (l *LinkAgentSet) Last() (*Link, error) {
 	link := l.links.Last()
 	if link == nil {
@@ -138,13 +134,13 @@ func (l *LinkAgentSet) Last() (*Link, error) {
 }
 
 // returns the next link in the set
-func (l *LinkAgentSet) Next() (*Link, error) {
-	v, err := l.links.Next()
-	if err != nil {
-		return nil, err
-	}
-	return v.(*Link), err
-}
+// func (l *LinkAgentSet) Next() (*Link, error) {
+// 	v, err := l.links.Next()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return v.(*Link), err
+// }
 
 // returns one of the links
 // @TODO make this actually random based on model seed
@@ -222,11 +218,17 @@ func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
 // returns a new agent set that is a subset of the agent set where all satisfy the bool operation
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
-	for link := l.links.First(); link != nil; link, _ = l.links.Next() {
-		if operation(link.(*Link)) {
-			linkSet.Add(link)
-		}
+
+	if operation == nil {
+		return nil
 	}
+
+	l.links.Ask(func(a interface{}) {
+		if operation(a.(*Link)) {
+			linkSet.Add(a)
+		}
+	})
+
 	return &LinkAgentSet{
 		links: linkSet,
 	}
