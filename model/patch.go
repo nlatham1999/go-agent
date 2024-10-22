@@ -5,6 +5,7 @@ import (
 	"math/rand"
 )
 
+// Patches are agents that resemble the physical space
 type Patch struct {
 	// should never be changed
 	x int // x coordinate of the patch
@@ -211,7 +212,7 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation) {
 	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
 	for i := 0; i < number; i++ {
 
-		t := NewTurtle(p.parent, p.parent.turtlesWhoNumber, breed, p.xFloat64, p.yFloat64)
+		t := newTurtle(p.parent, p.parent.turtlesWhoNumber, breed, p.xFloat64, p.yFloat64)
 		p.parent.turtlesWhoNumber++
 
 		//set the heading to be between 0 and 360

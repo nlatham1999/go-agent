@@ -11,9 +11,10 @@ func TestAllTurtle(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(model.ModelSettings{})
 
-	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
-	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
-	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+	u.CreateTurtles(3, "", nil)
+	turtle1 := u.Turtle("", 0)
+	turtle2 := u.Turtle("", 1)
+	turtle3 := u.Turtle("", 2)
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
@@ -42,9 +43,10 @@ func TestAnyTurtle(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(model.ModelSettings{})
 
-	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
-	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
-	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+	u.CreateTurtles(3, "", nil)
+	turtle1 := u.Turtle("", 0)
+	turtle2 := u.Turtle("", 1)
+	turtle3 := u.Turtle("", 2)
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
@@ -104,9 +106,10 @@ func TestTurtlesWhoAreNotInTurtles(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(model.ModelSettings{})
 
-	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
-	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
-	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+	u.CreateTurtles(3, "", nil)
+	turtle1 := u.Turtle("", 0)
+	turtle2 := u.Turtle("", 1)
+	turtle3 := u.Turtle("", 2)
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
@@ -128,9 +131,10 @@ func TestTurtlesWhoAreNotTurtle(t *testing.T) {
 	//create a basic model
 	u := model.NewModel(model.ModelSettings{})
 
-	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
-	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
-	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
+	u.CreateTurtles(3, "", nil)
+	turtle1 := u.Turtle("", 0)
+	turtle2 := u.Turtle("", 1)
+	turtle3 := u.Turtle("", 2)
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3})
 
@@ -147,10 +151,11 @@ func TestTurtlesFirstNOf(t *testing.T) {
 	settings := model.ModelSettings{}
 	u := model.NewModel(settings)
 
-	turtle1 := model.NewTurtle(u, 0, "", 0, 0)
-	turtle2 := model.NewTurtle(u, 1, "", 0, 0)
-	turtle3 := model.NewTurtle(u, 2, "", 0, 0)
-	turtle4 := model.NewTurtle(u, 3, "", 0, 0)
+	u.CreateTurtles(4, "", nil)
+	turtle1 := u.Turtle("", 0)
+	turtle2 := u.Turtle("", 1)
+	turtle3 := u.Turtle("", 2)
+	turtle4 := u.Turtle("", 3)
 
 	turtleSet := model.NewTurtleAgentSet([]*model.Turtle{turtle1, turtle2, turtle3, turtle4})
 

@@ -13,7 +13,8 @@ func TestTurtleBack(t *testing.T) {
 	m := model.NewModel(settings)
 
 	//create a turtle
-	turtle := model.NewTurtle(m, 0, "", 0, 0)
+	m.CreateTurtles(1, "", nil)
+	turtle := m.Turtle("", 0)
 
 	//set the turtle's heading
 	turtle.SetHeading(90)
@@ -562,7 +563,7 @@ func TestTurtleOtherEnd(t *testing.T) {
 	t2 := m.Turtle("", 1)
 
 	// create a new link
-	l, err := model.NewLink(m, "parent-children", t1, t2, true)
+	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}

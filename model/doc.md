@@ -9,10 +9,6 @@ import "github.com/nlatham1999/go-agent/model"
 ## Index
 
 - [Variables](<#variables>)
-- [func ButFirst\(arr \[\]interface\{\}\) \[\]interface\{\}](<#ButFirst>)
-- [func ButLast\(arr \[\]interface\{\}\) \[\]interface\{\}](<#ButLast>)
-- [func Filter\(arr \[\]interface\{\}, pred func\(interface\{\}\) bool\) \[\]interface\{\}](<#Filter>)
-- [func LinkShapes\(\) \[\]string](<#LinkShapes>)
 - [type Color](<#Color>)
   - [func BaseColors\(\) \[\]Color](<#BaseColors>)
   - [func \(c \*Color\) SetColor\(c2 Color\)](<#Color.SetColor>)
@@ -20,10 +16,8 @@ import "github.com/nlatham1999/go-agent/model"
   - [func \(c \*Color\) SetColorRGBA\(red int, green int, blue int, alpha int\)](<#Color.SetColorRGBA>)
 - [type Coordinate](<#Coordinate>)
 - [type Link](<#Link>)
-  - [func NewLink\(model \*Model, breed string, end1 \*Turtle, end2 \*Turtle, directed bool\) \(\*Link, error\)](<#NewLink>)
   - [func \(l \*Link\) Ask\(operations \[\]LinkOperation\)](<#Link.Ask>)
   - [func \(l \*Link\) BothEnds\(\) \*TurtleAgentSet](<#Link.BothEnds>)
-  - [func \(l \*Link\) Breed\(\) \*linkBreed](<#Link.Breed>)
   - [func \(l \*Link\) BreedName\(\) string](<#Link.BreedName>)
   - [func \(l \*Link\) Die\(\)](<#Link.Die>)
   - [func \(l \*Link\) Directed\(\) bool](<#Link.Directed>)
@@ -115,7 +109,7 @@ import "github.com/nlatham1999/go-agent/model"
   - [func \(m \*Model\) Timer\(\) int64](<#Model.Timer>)
   - [func \(m \*Model\) Turtle\(breed string, who int\) \*Turtle](<#Model.Turtle>)
   - [func \(m \*Model\) Turtles\(breed string\) \*TurtleAgentSet](<#Model.Turtles>)
-  - [func \(m \*Model\) TurtlesAt\(breed string, pxcor float64, pycor float64\) \*TurtleAgentSet](<#Model.TurtlesAt>)
+  - [func \(m \*Model\) TurtlesAtCoords\(breed string, pxcor float64, pycor float64\) \*TurtleAgentSet](<#Model.TurtlesAtCoords>)
   - [func \(m \*Model\) TurtlesOnPatch\(breed string, patch \*Patch\) \*TurtleAgentSet](<#Model.TurtlesOnPatch>)
   - [func \(m \*Model\) TurtlesOnPatches\(breed string, patches \*PatchAgentSet\) \*TurtleAgentSet](<#Model.TurtlesOnPatches>)
   - [func \(m \*Model\) TurtlesWithTurtle\(breed string, turtle \*Turtle\) \*TurtleAgentSet](<#Model.TurtlesWithTurtle>)
@@ -186,7 +180,6 @@ import "github.com/nlatham1999/go-agent/model"
   - [func \(p \*PatchSorter\) Swap\(i, j int\)](<#PatchSorter.Swap>)
 - [type TieMode](<#TieMode>)
 - [type Turtle](<#Turtle>)
-  - [func NewTurtle\(m \*Model, who int, breed string, x float64, y float64\) \*Turtle](<#NewTurtle>)
   - [func \(t \*Turtle\) Ask\(operations \[\]TurtleOperation\)](<#Turtle.Ask>)
   - [func \(t \*Turtle\) Back\(distance float64\)](<#Turtle.Back>)
   - [func \(t \*Turtle\) BreedName\(\) string](<#Turtle.BreedName>)
@@ -294,10 +287,6 @@ import "github.com/nlatham1999/go-agent/model"
 - [type TurtleBoolOperation](<#TurtleBoolOperation>)
 - [type TurtleFloatOperation](<#TurtleFloatOperation>)
 - [type TurtleOperation](<#TurtleOperation>)
-- [type TurtleSorter](<#TurtleSorter>)
-  - [func \(t \*TurtleSorter\) Len\(\) int](<#TurtleSorter.Len>)
-  - [func \(t \*TurtleSorter\) Less\(i, j int\) bool](<#TurtleSorter.Less>)
-  - [func \(t \*TurtleSorter\) Swap\(i, j int\)](<#TurtleSorter.Swap>)
 
 
 ## Variables
@@ -326,7 +315,13 @@ var (
 )
 ```
 
-<a name="TieModeFixed"></a>
+<a name="TieModeFixed"></a>The tie mode for a link directs how the turtles are tied together For a link between turtle A and Turtle B:
+
+```
+If A is moved then B is moved if the tie mode is fixed or free and the link is directed with A->B or the link is undirected
+If A is rotated then B is swivelled around A if the tie mode is fixed or free and the link is directed with A->B
+If A is rotated then B is rotated only if the tie mode is fixed and the link is directed with A->B or the link is undirected. If the tie mode is free then B is not rotated
+```
 
 ```go
 var (
@@ -351,7 +346,7 @@ var (
 )
 ```
 
-<a name="ErrNoLinksInAgentSet"></a>
+<a name="ErrNoLinksInAgentSet"></a>Errors
 
 ```go
 var (
@@ -360,42 +355,6 @@ var (
     ErrNoPatchesInAgentSet = fmt.Errorf("no patches in agent set")
 )
 ```
-
-<a name="ButFirst"></a>
-## func [ButFirst](<https://github.com/nlatham1999/go-agent/blob/main/model/util.go#L9>)
-
-```go
-func ButFirst(arr []interface{}) []interface{}
-```
-
-
-
-<a name="ButLast"></a>
-## func [ButLast](<https://github.com/nlatham1999/go-agent/blob/main/model/util.go#L13>)
-
-```go
-func ButLast(arr []interface{}) []interface{}
-```
-
-
-
-<a name="Filter"></a>
-## func [Filter](<https://github.com/nlatham1999/go-agent/blob/main/model/util.go#L17>)
-
-```go
-func Filter(arr []interface{}, pred func(interface{}) bool) []interface{}
-```
-
-
-
-<a name="LinkShapes"></a>
-## func [LinkShapes](<https://github.com/nlatham1999/go-agent/blob/main/model/util.go#L27>)
-
-```go
-func LinkShapes() []string
-```
-
-
 
 <a name="Color"></a>
 ## type [Color](<https://github.com/nlatham1999/go-agent/blob/main/model/color.go#L4-L9>)
@@ -448,9 +407,9 @@ func (c *Color) SetColorRGBA(red int, green int, blue int, alpha int)
 creates a new color with the given red, blue, green, and alpha values
 
 <a name="Coordinate"></a>
-## type [Coordinate](<https://github.com/nlatham1999/go-agent/blob/main/model/coordinate.go#L3-L6>)
+## type [Coordinate](<https://github.com/nlatham1999/go-agent/blob/main/model/coordinate.go#L4-L7>)
 
-
+Simple struct to represent a coordinate
 
 ```go
 type Coordinate struct {
@@ -460,9 +419,9 @@ type Coordinate struct {
 ```
 
 <a name="Link"></a>
-## type [Link](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L11-L25>)
+## type [Link](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L12-L26>)
 
-Link represents a link between two turtles
+A Link represents a connection between two turtles A Link can be be a one way directed link or a two way undirected link
 
 ```go
 type Link struct {
@@ -481,17 +440,8 @@ type Link struct {
 }
 ```
 
-<a name="NewLink"></a>
-### func [NewLink](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L28>)
-
-```go
-func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error)
-```
-
-NewLink creates a new link between two turtles
-
 <a name="Link.Ask"></a>
-### func \(\*Link\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L106>)
+### func \(\*Link\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L94>)
 
 ```go
 func (l *Link) Ask(operations []LinkOperation)
@@ -500,7 +450,7 @@ func (l *Link) Ask(operations []LinkOperation)
 takes in a list of link operations and runs them for the link
 
 <a name="Link.BothEnds"></a>
-### func \(\*Link\) [BothEnds](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L101>)
+### func \(\*Link\) [BothEnds](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L89>)
 
 ```go
 func (l *Link) BothEnds() *TurtleAgentSet
@@ -508,17 +458,8 @@ func (l *Link) BothEnds() *TurtleAgentSet
 
 returns an agentset of the turtles at the ends of the link
 
-<a name="Link.Breed"></a>
-### func \(\*Link\) [Breed](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L88>)
-
-```go
-func (l *Link) Breed() *linkBreed
-```
-
-Returns the breed of this link
-
 <a name="Link.BreedName"></a>
-### func \(\*Link\) [BreedName](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L83>)
+### func \(\*Link\) [BreedName](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L84>)
 
 ```go
 func (l *Link) BreedName() string
@@ -527,7 +468,7 @@ func (l *Link) BreedName() string
 Returns the name of the breed of the link
 
 <a name="Link.Die"></a>
-### func \(\*Link\) [Die](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L112>)
+### func \(\*Link\) [Die](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L100>)
 
 ```go
 func (l *Link) Die()
@@ -536,7 +477,7 @@ func (l *Link) Die()
 
 
 <a name="Link.Directed"></a>
-### func \(\*Link\) [Directed](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L116>)
+### func \(\*Link\) [Directed](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L104>)
 
 ```go
 func (l *Link) Directed() bool
@@ -545,7 +486,7 @@ func (l *Link) Directed() bool
 
 
 <a name="Link.End1"></a>
-### func \(\*Link\) [End1](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L121>)
+### func \(\*Link\) [End1](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L109>)
 
 ```go
 func (l *Link) End1() *Turtle
@@ -554,7 +495,7 @@ func (l *Link) End1() *Turtle
 returns the first end of the link
 
 <a name="Link.End2"></a>
-### func \(\*Link\) [End2](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L126>)
+### func \(\*Link\) [End2](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L114>)
 
 ```go
 func (l *Link) End2() *Turtle
@@ -563,7 +504,7 @@ func (l *Link) End2() *Turtle
 returns the second end of the link
 
 <a name="Link.Heading"></a>
-### func \(\*Link\) [Heading](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L184>)
+### func \(\*Link\) [Heading](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L172>)
 
 ```go
 func (l *Link) Heading() (float64, error)
@@ -572,7 +513,7 @@ func (l *Link) Heading() (float64, error)
 returns the heading in degrees from end1 to end2. Returns an error if the link has zero length
 
 <a name="Link.Hide"></a>
-### func \(\*Link\) [Hide](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L179>)
+### func \(\*Link\) [Hide](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L167>)
 
 ```go
 func (l *Link) Hide()
@@ -581,7 +522,7 @@ func (l *Link) Hide()
 sets the link to be hidden
 
 <a name="Link.Length"></a>
-### func \(\*Link\) [Length](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L204>)
+### func \(\*Link\) [Length](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L192>)
 
 ```go
 func (l *Link) Length() float64
@@ -590,7 +531,7 @@ func (l *Link) Length() float64
 returns the distance between the two ends of the link
 
 <a name="Link.OtherEnd"></a>
-### func \(\*Link\) [OtherEnd](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L209>)
+### func \(\*Link\) [OtherEnd](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L197>)
 
 ```go
 func (l *Link) OtherEnd(t *Turtle) *Turtle
@@ -599,7 +540,7 @@ func (l *Link) OtherEnd(t *Turtle) *Turtle
 returns the other end of the link that is not the given turtle
 
 <a name="Link.SetBreed"></a>
-### func \(\*Link\) [SetBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L131>)
+### func \(\*Link\) [SetBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L119>)
 
 ```go
 func (l *Link) SetBreed(name string)
@@ -608,7 +549,7 @@ func (l *Link) SetBreed(name string)
 sets the link to be a breed
 
 <a name="Link.Show"></a>
-### func \(\*Link\) [Show](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L218>)
+### func \(\*Link\) [Show](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L206>)
 
 ```go
 func (l *Link) Show()
@@ -617,7 +558,7 @@ func (l *Link) Show()
 sets the link to be visible
 
 <a name="Link.Tie"></a>
-### func \(\*Link\) [Tie](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L223>)
+### func \(\*Link\) [Tie](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L211>)
 
 ```go
 func (l *Link) Tie()
@@ -626,7 +567,7 @@ func (l *Link) Tie()
 sets the tie mode to be fixed
 
 <a name="Link.Untie"></a>
-### func \(\*Link\) [Untie](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L228>)
+### func \(\*Link\) [Untie](<https://github.com/nlatham1999/go-agent/blob/main/model/link.go#L216>)
 
 ```go
 func (l *Link) Untie()
@@ -635,9 +576,9 @@ func (l *Link) Untie()
 sets the tie mode to be none
 
 <a name="LinkAgentSet"></a>
-## type [LinkAgentSet](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L8-L10>)
+## type [LinkAgentSet](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L9-L11>)
 
-LinkAgentSet is a set of links
+LinkAgentSet is an ordered set of links than can be sorted implements github.com/nlatham1999/sortedset
 
 ```go
 type LinkAgentSet struct {
@@ -646,7 +587,7 @@ type LinkAgentSet struct {
 ```
 
 <a name="NewLinkAgentSet"></a>
-### func [NewLinkAgentSet](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L13>)
+### func [NewLinkAgentSet](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L14>)
 
 ```go
 func NewLinkAgentSet(links []*Link) *LinkAgentSet
@@ -655,7 +596,7 @@ func NewLinkAgentSet(links []*Link) *LinkAgentSet
 create a new LinkAgentSet
 
 <a name="LinkAgentSet.Add"></a>
-### func \(\*LinkAgentSet\) [Add](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L27>)
+### func \(\*LinkAgentSet\) [Add](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L28>)
 
 ```go
 func (l *LinkAgentSet) Add(link *Link)
@@ -664,7 +605,7 @@ func (l *LinkAgentSet) Add(link *Link)
 add a link to the agent set
 
 <a name="LinkAgentSet.After"></a>
-### func \(\*LinkAgentSet\) [After](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L44>)
+### func \(\*LinkAgentSet\) [After](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L45>)
 
 ```go
 func (l *LinkAgentSet) After(link *Link) (*Link, error)
@@ -673,7 +614,7 @@ func (l *LinkAgentSet) After(link *Link) (*Link, error)
 returns the next link in the set after the given link
 
 <a name="LinkAgentSet.All"></a>
-### func \(\*LinkAgentSet\) [All](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L32>)
+### func \(\*LinkAgentSet\) [All](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L33>)
 
 ```go
 func (l *LinkAgentSet) All(operation LinkBoolOperation) bool
@@ -682,7 +623,7 @@ func (l *LinkAgentSet) All(operation LinkBoolOperation) bool
 returns true if all the links in the agent set satisfy the operation
 
 <a name="LinkAgentSet.Any"></a>
-### func \(\*LinkAgentSet\) [Any](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L50>)
+### func \(\*LinkAgentSet\) [Any](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L51>)
 
 ```go
 func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool
@@ -691,7 +632,7 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool
 returns true if any of the links in the agent set satisfy the operation
 
 <a name="LinkAgentSet.Ask"></a>
-### func \(\*LinkAgentSet\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L62>)
+### func \(\*LinkAgentSet\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L63>)
 
 ```go
 func (l *LinkAgentSet) Ask(operations []LinkOperation)
@@ -700,7 +641,7 @@ func (l *LinkAgentSet) Ask(operations []LinkOperation)
 perform the list of operations for all links in the agent set
 
 <a name="LinkAgentSet.Contains"></a>
-### func \(\*LinkAgentSet\) [Contains](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L73>)
+### func \(\*LinkAgentSet\) [Contains](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L74>)
 
 ```go
 func (l *LinkAgentSet) Contains(link *Link) bool
@@ -709,7 +650,7 @@ func (l *LinkAgentSet) Contains(link *Link) bool
 returns true if the link is in the agent set
 
 <a name="LinkAgentSet.Count"></a>
-### func \(\*LinkAgentSet\) [Count](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L78>)
+### func \(\*LinkAgentSet\) [Count](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L79>)
 
 ```go
 func (l *LinkAgentSet) Count() int
@@ -718,7 +659,7 @@ func (l *LinkAgentSet) Count() int
 returns the length of the agent set
 
 <a name="LinkAgentSet.First"></a>
-### func \(\*LinkAgentSet\) [First](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L107>)
+### func \(\*LinkAgentSet\) [First](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L108>)
 
 ```go
 func (l *LinkAgentSet) First() (*Link, error)
@@ -727,7 +668,7 @@ func (l *LinkAgentSet) First() (*Link, error)
 returns the max link in the agent set based on the float operation
 
 <a name="LinkAgentSet.FirstNOf"></a>
-### func \(\*LinkAgentSet\) [FirstNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L94>)
+### func \(\*LinkAgentSet\) [FirstNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L95>)
 
 ```go
 func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet
@@ -736,7 +677,7 @@ func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet
 returns the top n links in the agent set based on the float operation
 
 <a name="LinkAgentSet.Last"></a>
-### func \(\*LinkAgentSet\) [Last](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L129>)
+### func \(\*LinkAgentSet\) [Last](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L130>)
 
 ```go
 func (l *LinkAgentSet) Last() (*Link, error)
@@ -745,7 +686,7 @@ func (l *LinkAgentSet) Last() (*Link, error)
 returns the min link in the agent set based on the float operation
 
 <a name="LinkAgentSet.LastNOf"></a>
-### func \(\*LinkAgentSet\) [LastNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L116>)
+### func \(\*LinkAgentSet\) [LastNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L117>)
 
 ```go
 func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet
@@ -754,7 +695,7 @@ func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet
 returns the min n links in the agent set based on the float operation
 
 <a name="LinkAgentSet.List"></a>
-### func \(\*LinkAgentSet\) [List](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L83>)
+### func \(\*LinkAgentSet\) [List](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L84>)
 
 ```go
 func (l *LinkAgentSet) List() []*Link
@@ -763,7 +704,7 @@ func (l *LinkAgentSet) List() []*Link
 returns the agent set as a list
 
 <a name="LinkAgentSet.Next"></a>
-### func \(\*LinkAgentSet\) [Next](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L138>)
+### func \(\*LinkAgentSet\) [Next](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L139>)
 
 ```go
 func (l *LinkAgentSet) Next() (*Link, error)
@@ -772,7 +713,7 @@ func (l *LinkAgentSet) Next() (*Link, error)
 returns the next link in the set
 
 <a name="LinkAgentSet.OneOf"></a>
-### func \(\*LinkAgentSet\) [OneOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L148>)
+### func \(\*LinkAgentSet\) [OneOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L149>)
 
 ```go
 func (l *LinkAgentSet) OneOf() (*Link, error)
@@ -781,7 +722,7 @@ func (l *LinkAgentSet) OneOf() (*Link, error)
 returns one of the links @TODO make this actually random based on model seed
 
 <a name="LinkAgentSet.Remove"></a>
-### func \(\*LinkAgentSet\) [Remove](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L157>)
+### func \(\*LinkAgentSet\) [Remove](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L158>)
 
 ```go
 func (l *LinkAgentSet) Remove(link *Link)
@@ -790,7 +731,7 @@ func (l *LinkAgentSet) Remove(link *Link)
 remove a link from the agent set
 
 <a name="LinkAgentSet.SortAsc"></a>
-### func \(\*LinkAgentSet\) [SortAsc](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L162>)
+### func \(\*LinkAgentSet\) [SortAsc](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L163>)
 
 ```go
 func (l *LinkAgentSet) SortAsc(operation LinkFloatOperation)
@@ -799,7 +740,7 @@ func (l *LinkAgentSet) SortAsc(operation LinkFloatOperation)
 sort the agent set based on the float operation in ascending order
 
 <a name="LinkAgentSet.SortDesc"></a>
-### func \(\*LinkAgentSet\) [SortDesc](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L169>)
+### func \(\*LinkAgentSet\) [SortDesc](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L170>)
 
 ```go
 func (l *LinkAgentSet) SortDesc(operation LinkFloatOperation)
@@ -808,7 +749,7 @@ func (l *LinkAgentSet) SortDesc(operation LinkFloatOperation)
 sort the agent set based on the float operation in descending order
 
 <a name="LinkAgentSet.UpToNOf"></a>
-### func \(\*LinkAgentSet\) [UpToNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L177>)
+### func \(\*LinkAgentSet\) [UpToNOf](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L178>)
 
 ```go
 func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet
@@ -817,7 +758,7 @@ func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet
 returns n links or all the links in the agentset if the length is lower than n make this actually random based on model seed
 
 <a name="LinkAgentSet.WhoAreNot"></a>
-### func \(\*LinkAgentSet\) [WhoAreNot](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L190>)
+### func \(\*LinkAgentSet\) [WhoAreNot](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L191>)
 
 ```go
 func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet
@@ -826,7 +767,7 @@ func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet
 returns a new agent set with all the links that are not in the given agents set
 
 <a name="LinkAgentSet.WhoAreNotLink"></a>
-### func \(\*LinkAgentSet\) [WhoAreNotLink](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L205>)
+### func \(\*LinkAgentSet\) [WhoAreNotLink](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L206>)
 
 ```go
 func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet
@@ -835,7 +776,7 @@ func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet
 returns a new agent set with all the links that are not the given link
 
 <a name="LinkAgentSet.With"></a>
-### func \(\*LinkAgentSet\) [With](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L220>)
+### func \(\*LinkAgentSet\) [With](<https://github.com/nlatham1999/go-agent/blob/main/model/linkagentset.go#L221>)
 
 ```go
 func (l *LinkAgentSet) With(operation LinkBoolOperation) *LinkAgentSet
@@ -909,9 +850,9 @@ func (l *LinkSorter) Swap(i, j int)
 
 
 <a name="Model"></a>
-## type [Model](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L13-L51>)
+## type [Model](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L14-L52>)
 
-
+Model holds all the agents and the world
 
 ```go
 type Model struct {
@@ -928,7 +869,7 @@ type Model struct {
 ```
 
 <a name="NewModel"></a>
-### func [NewModel](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L54-L56>)
+### func [NewModel](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L55-L57>)
 
 ```go
 func NewModel(settings ModelSettings) *Model
@@ -937,7 +878,7 @@ func NewModel(settings ModelSettings) *Model
 Create a new model
 
 <a name="Model.ClearAll"></a>
-### func \(\*Model\) [ClearAll](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L247>)
+### func \(\*Model\) [ClearAll](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L248>)
 
 ```go
 func (m *Model) ClearAll()
@@ -946,7 +887,7 @@ func (m *Model) ClearAll()
 clear all patches and turtles and set the ticks to zero
 
 <a name="Model.ClearLinks"></a>
-### func \(\*Model\) [ClearLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L254>)
+### func \(\*Model\) [ClearLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L255>)
 
 ```go
 func (m *Model) ClearLinks()
@@ -955,7 +896,7 @@ func (m *Model) ClearLinks()
 clear all links
 
 <a name="Model.ClearPatches"></a>
-### func \(\*Model\) [ClearPatches](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L273>)
+### func \(\*Model\) [ClearPatches](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L274>)
 
 ```go
 func (m *Model) ClearPatches()
@@ -964,7 +905,7 @@ func (m *Model) ClearPatches()
 clear all patches
 
 <a name="Model.ClearTicks"></a>
-### func \(\*Model\) [ClearTicks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L268>)
+### func \(\*Model\) [ClearTicks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L269>)
 
 ```go
 func (m *Model) ClearTicks()
@@ -973,7 +914,7 @@ func (m *Model) ClearTicks()
 set the ticks to zero
 
 <a name="Model.ClearTurtles"></a>
-### func \(\*Model\) [ClearTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L280>)
+### func \(\*Model\) [ClearTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L281>)
 
 ```go
 func (m *Model) ClearTurtles()
@@ -982,7 +923,7 @@ func (m *Model) ClearTurtles()
 kills all turtles
 
 <a name="Model.CreateOrderedTurtles"></a>
-### func \(\*Model\) [CreateOrderedTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L311>)
+### func \(\*Model\) [CreateOrderedTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L312>)
 
 ```go
 func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []TurtleOperation) error
@@ -991,16 +932,16 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 like create turtles but goes through the list of colors and evenly spaces out the headings
 
 <a name="Model.CreateTurtles"></a>
-### func \(\*Model\) [CreateTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L349>)
+### func \(\*Model\) [CreateTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L351>)
 
 ```go
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error
 ```
 
-create the specified amount of turtles with the specified breed and operations if the breed is empty then it will add it to the general population
+create the specified amount of turtles with the specified breed and operations if the breed is empty then it will add it to the general population @TODO return the created turtles as an agentset
 
 <a name="Model.Diffuse"></a>
-### func \(\*Model\) [Diffuse](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L486>)
+### func \(\*Model\) [Diffuse](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L488>)
 
 ```go
 func (m *Model) Diffuse(patchVariable string, percent float64) error
@@ -1009,7 +950,7 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error
 diffuse the patch variable of each patch to its neighbors
 
 <a name="Model.Diffuse4"></a>
-### func \(\*Model\) [Diffuse4](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L522>)
+### func \(\*Model\) [Diffuse4](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L524>)
 
 ```go
 func (m *Model) Diffuse4(patchVariable string, percent float64) error
@@ -1018,7 +959,7 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error
 diffuse the patch variable of each patch to its neighbors at the top, bottom, left, and right
 
 <a name="Model.DirectedLinks"></a>
-### func \(\*Model\) [DirectedLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L559>)
+### func \(\*Model\) [DirectedLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L561>)
 
 ```go
 func (m *Model) DirectedLinks(breed string) *LinkAgentSet
@@ -1027,7 +968,7 @@ func (m *Model) DirectedLinks(breed string) *LinkAgentSet
 returns the linkset containing the directed links for the specified breed if the breed is empty then it will return the general population of directed links
 
 <a name="Model.DistanceBetweenPoints"></a>
-### func \(\*Model\) [DistanceBetweenPoints](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L581>)
+### func \(\*Model\) [DistanceBetweenPoints](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L583>)
 
 ```go
 func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64
@@ -1036,7 +977,7 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 returns the distance between two points
 
 <a name="Model.GetGlobal"></a>
-### func \(\*Model\) [GetGlobal](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L610>)
+### func \(\*Model\) [GetGlobal](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L612>)
 
 ```go
 func (m *Model) GetGlobal(key string) interface{}
@@ -1045,7 +986,7 @@ func (m *Model) GetGlobal(key string) interface{}
 gets a gobal variable
 
 <a name="Model.GetGlobalB"></a>
-### func \(\*Model\) [GetGlobalB](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L615>)
+### func \(\*Model\) [GetGlobalB](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L617>)
 
 ```go
 func (m *Model) GetGlobalB(key string) (bool, error)
@@ -1054,7 +995,7 @@ func (m *Model) GetGlobalB(key string) (bool, error)
 gets a global variable as a bool
 
 <a name="Model.GetGlobalF"></a>
-### func \(\*Model\) [GetGlobalF](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L645>)
+### func \(\*Model\) [GetGlobalF](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L647>)
 
 ```go
 func (m *Model) GetGlobalF(key string) (float64, error)
@@ -1063,7 +1004,7 @@ func (m *Model) GetGlobalF(key string) (float64, error)
 gets a global variable as a float64
 
 <a name="Model.GetGlobalI"></a>
-### func \(\*Model\) [GetGlobalI](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L629>)
+### func \(\*Model\) [GetGlobalI](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L631>)
 
 ```go
 func (m *Model) GetGlobalI(key string) (int, error)
@@ -1072,7 +1013,7 @@ func (m *Model) GetGlobalI(key string) (int, error)
 gets a global variable as an int
 
 <a name="Model.GetGlobalS"></a>
-### func \(\*Model\) [GetGlobalS](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L661>)
+### func \(\*Model\) [GetGlobalS](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L663>)
 
 ```go
 func (m *Model) GetGlobalS(key string) (string, error)
@@ -1081,7 +1022,7 @@ func (m *Model) GetGlobalS(key string) (string, error)
 gets a global variable as a string
 
 <a name="Model.KillLink"></a>
-### func \(\*Model\) [KillLink](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L461>)
+### func \(\*Model\) [KillLink](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L463>)
 
 ```go
 func (m *Model) KillLink(link *Link)
@@ -1090,7 +1031,7 @@ func (m *Model) KillLink(link *Link)
 kills a link
 
 <a name="Model.KillTurtle"></a>
-### func \(\*Model\) [KillTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L426>)
+### func \(\*Model\) [KillTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L428>)
 
 ```go
 func (m *Model) KillTurtle(turtle *Turtle)
@@ -1099,7 +1040,7 @@ func (m *Model) KillTurtle(turtle *Turtle)
 kills a turtle
 
 <a name="Model.LayoutCircle"></a>
-### func \(\*Model\) [LayoutCircle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L680>)
+### func \(\*Model\) [LayoutCircle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L682>)
 
 ```go
 func (m *Model) LayoutCircle(turtles []*Turtle, radius float64)
@@ -1108,7 +1049,7 @@ func (m *Model) LayoutCircle(turtles []*Turtle, radius float64)
 layout the turtles in a circle with the specified radius
 
 <a name="Model.Link"></a>
-### func \(\*Model\) [Link](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L692>)
+### func \(\*Model\) [Link](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L694>)
 
 ```go
 func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link
@@ -1117,7 +1058,7 @@ func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link
 returns a link between two turtles that connects from turtle1 to turtle2 if the breed is empty then selects from the general population
 
 <a name="Model.LinkDirected"></a>
-### func \(\*Model\) [LinkDirected](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L705>)
+### func \(\*Model\) [LinkDirected](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L707>)
 
 ```go
 func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link
@@ -1126,7 +1067,7 @@ func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link
 returns a link that is directed that connects from turtle1 to turtle2 if the breed is empty then selects from the general population
 
 <a name="Model.Links"></a>
-### func \(\*Model\) [Links](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L576>)
+### func \(\*Model\) [Links](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L578>)
 
 ```go
 func (m *Model) Links() *LinkAgentSet
@@ -1135,7 +1076,7 @@ func (m *Model) Links() *LinkAgentSet
 returns the link agentset containing all the links
 
 <a name="Model.MaxPxCor"></a>
-### func \(\*Model\) [MaxPxCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L718>)
+### func \(\*Model\) [MaxPxCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L720>)
 
 ```go
 func (m *Model) MaxPxCor() int
@@ -1144,7 +1085,7 @@ func (m *Model) MaxPxCor() int
 returns the maximum patch x coordinate the maximum x coordinate for a turtle is MaxPxCor\(\) \+ .5
 
 <a name="Model.MaxPyCor"></a>
-### func \(\*Model\) [MaxPyCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L724>)
+### func \(\*Model\) [MaxPyCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L726>)
 
 ```go
 func (m *Model) MaxPyCor() int
@@ -1153,7 +1094,7 @@ func (m *Model) MaxPyCor() int
 returns the maximum patch y coordinate the maximum y coordinate for a turtle is MaxPyCor\(\) \+ .5
 
 <a name="Model.MinPxCor"></a>
-### func \(\*Model\) [MinPxCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L730>)
+### func \(\*Model\) [MinPxCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L732>)
 
 ```go
 func (m *Model) MinPxCor() int
@@ -1162,7 +1103,7 @@ func (m *Model) MinPxCor() int
 returns the minimum patch x coordinate the minimum x coordinate for a turtle is MinPxCor\(\) \- .5
 
 <a name="Model.MinPyCor"></a>
-### func \(\*Model\) [MinPyCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L736>)
+### func \(\*Model\) [MinPyCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L738>)
 
 ```go
 func (m *Model) MinPyCor() int
@@ -1171,7 +1112,7 @@ func (m *Model) MinPyCor() int
 returns the minimum patch y coordinate the minimum y coordinate for a turtle is MinPyCor\(\) \- .5
 
 <a name="Model.OneOfInt"></a>
-### func \(\*Model\) [OneOfInt](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L752>)
+### func \(\*Model\) [OneOfInt](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L754>)
 
 ```go
 func (m *Model) OneOfInt(arr []int) interface{}
@@ -1180,7 +1121,7 @@ func (m *Model) OneOfInt(arr []int) interface{}
 returns a random int n the provided list
 
 <a name="Model.Patch"></a>
-### func \(\*Model\) [Patch](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1007>)
+### func \(\*Model\) [Patch](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1009>)
 
 ```go
 func (m *Model) Patch(pxcor float64, pycor float64) *Patch
@@ -1189,7 +1130,7 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch
 returns the patch at the provided x y coordinates
 
 <a name="Model.RandomAmount"></a>
-### func \(\*Model\) [RandomAmount](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L758>)
+### func \(\*Model\) [RandomAmount](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L760>)
 
 ```go
 func (m *Model) RandomAmount(n int) int
@@ -1198,7 +1139,7 @@ func (m *Model) RandomAmount(n int) int
 returns a random int from \(0, n\]
 
 <a name="Model.RandomFloat"></a>
-### func \(\*Model\) [RandomFloat](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1031>)
+### func \(\*Model\) [RandomFloat](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1033>)
 
 ```go
 func (m *Model) RandomFloat(number float64) float64
@@ -1207,7 +1148,7 @@ func (m *Model) RandomFloat(number float64) float64
 If number is positive, reports a random floating point number greater than or equal to 0 but strictly less than number. If number is negative, reports a random floating point number less than or equal to 0, but strictly greater than number. If number is zero, the result is always 0.
 
 <a name="Model.RandomInt"></a>
-### func \(\*Model\) [RandomInt](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1038>)
+### func \(\*Model\) [RandomInt](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1040>)
 
 ```go
 func (m *Model) RandomInt(number int) int
@@ -1216,7 +1157,7 @@ func (m *Model) RandomInt(number int) int
 If number is positive, reports a random integer greater than or equal to 0, but strictly less than number. If number is negative, reports a random integer less than or equal to 0, but strictly greater than number. If number is zero, the result is always 0 as well.
 
 <a name="Model.RandomXCor"></a>
-### func \(\*Model\) [RandomXCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1053>)
+### func \(\*Model\) [RandomXCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1055>)
 
 ```go
 func (m *Model) RandomXCor() float64
@@ -1225,7 +1166,7 @@ func (m *Model) RandomXCor() float64
 returns a random x cor that is within the world bounds
 
 <a name="Model.RandomYCor"></a>
-### func \(\*Model\) [RandomYCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1058>)
+### func \(\*Model\) [RandomYCor](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1060>)
 
 ```go
 func (m *Model) RandomYCor() float64
@@ -1234,7 +1175,7 @@ func (m *Model) RandomYCor() float64
 returns a random y cor that is within the world bounds
 
 <a name="Model.ResetTicks"></a>
-### func \(\*Model\) [ResetTicks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1063>)
+### func \(\*Model\) [ResetTicks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1065>)
 
 ```go
 func (m *Model) ResetTicks()
@@ -1243,7 +1184,7 @@ func (m *Model) ResetTicks()
 sets the tick counter to zero
 
 <a name="Model.ResetTimer"></a>
-### func \(\*Model\) [ResetTimer](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1068>)
+### func \(\*Model\) [ResetTimer](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1070>)
 
 ```go
 func (m *Model) ResetTimer()
@@ -1252,7 +1193,7 @@ func (m *Model) ResetTimer()
 resets the timer
 
 <a name="Model.ResizeWorld"></a>
-### func \(\*Model\) [ResizeWorld](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1073>)
+### func \(\*Model\) [ResizeWorld](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1075>)
 
 ```go
 func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int)
@@ -1261,7 +1202,7 @@ func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor i
 resizes the world to the provided bounds
 
 <a name="Model.SetDefaultShapeLinkBreed"></a>
-### func \(\*Model\) [SetDefaultShapeLinkBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1101>)
+### func \(\*Model\) [SetDefaultShapeLinkBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1103>)
 
 ```go
 func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string)
@@ -1270,7 +1211,7 @@ func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string)
 sets the default shape for a directed link breed
 
 <a name="Model.SetDefaultShapeLinks"></a>
-### func \(\*Model\) [SetDefaultShapeLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1091>)
+### func \(\*Model\) [SetDefaultShapeLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1093>)
 
 ```go
 func (m *Model) SetDefaultShapeLinks(shape string)
@@ -1279,7 +1220,7 @@ func (m *Model) SetDefaultShapeLinks(shape string)
 sets the default shape for links
 
 <a name="Model.SetDefaultShapeTurtleBreed"></a>
-### func \(\*Model\) [SetDefaultShapeTurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1106>)
+### func \(\*Model\) [SetDefaultShapeTurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1108>)
 
 ```go
 func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string)
@@ -1288,7 +1229,7 @@ func (m *Model) SetDefaultShapeTurtleBreed(breed string, shape string)
 sets the default shape for a turtle breed
 
 <a name="Model.SetDefaultShapeTurtles"></a>
-### func \(\*Model\) [SetDefaultShapeTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1096>)
+### func \(\*Model\) [SetDefaultShapeTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1098>)
 
 ```go
 func (m *Model) SetDefaultShapeTurtles(shape string)
@@ -1297,7 +1238,7 @@ func (m *Model) SetDefaultShapeTurtles(shape string)
 sets the default shape for turtles
 
 <a name="Model.SetGlobal"></a>
-### func \(\*Model\) [SetGlobal](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L675>)
+### func \(\*Model\) [SetGlobal](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L677>)
 
 ```go
 func (m *Model) SetGlobal(key string, value interface{})
@@ -1306,7 +1247,7 @@ func (m *Model) SetGlobal(key string, value interface{})
 sets a global variable
 
 <a name="Model.Tick"></a>
-### func \(\*Model\) [Tick](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1111>)
+### func \(\*Model\) [Tick](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1113>)
 
 ```go
 func (m *Model) Tick()
@@ -1315,7 +1256,7 @@ func (m *Model) Tick()
 increments the tick counter by one
 
 <a name="Model.TickAdvance"></a>
-### func \(\*Model\) [TickAdvance](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1116>)
+### func \(\*Model\) [TickAdvance](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1118>)
 
 ```go
 func (m *Model) TickAdvance(amount int)
@@ -1324,7 +1265,7 @@ func (m *Model) TickAdvance(amount int)
 increments the tick counter by the provided amount
 
 <a name="Model.Timer"></a>
-### func \(\*Model\) [Timer](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1121>)
+### func \(\*Model\) [Timer](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1123>)
 
 ```go
 func (m *Model) Timer() int64
@@ -1333,7 +1274,7 @@ func (m *Model) Timer() int64
 returns the time since the model was started in milliseconds
 
 <a name="Model.Turtle"></a>
-### func \(\*Model\) [Turtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1128>)
+### func \(\*Model\) [Turtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1130>)
 
 ```go
 func (m *Model) Turtle(breed string, who int) *Turtle
@@ -1342,7 +1283,7 @@ func (m *Model) Turtle(breed string, who int) *Turtle
 provides a turtle from the model given a breed and who number if the breed is empty then selects from the general population if the breed or who number is not found then returns nil
 
 <a name="Model.Turtles"></a>
-### func \(\*Model\) [Turtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1148>)
+### func \(\*Model\) [Turtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1150>)
 
 ```go
 func (m *Model) Turtles(breed string) *TurtleAgentSet
@@ -1350,26 +1291,26 @@ func (m *Model) Turtles(breed string) *TurtleAgentSet
 
 returns the turtle agentset for the provided breed
 
-<a name="Model.TurtlesAt"></a>
-### func \(\*Model\) [TurtlesAt](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1156>)
+<a name="Model.TurtlesAtCoords"></a>
+### func \(\*Model\) [TurtlesAtCoords](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1159>)
 
 ```go
-func (m *Model) TurtlesAt(breed string, pxcor float64, pycor float64) *TurtleAgentSet
+func (m *Model) TurtlesAtCoords(breed string, pxcor float64, pycor float64) *TurtleAgentSet
 ```
 
-returns the turtle agentset for the provided breed that is on the provided patch
+returns the turtle agentset for the provided breed that is on patch of the proviced x y coordinates same as TurtlesOnPatch\(breed, Patch\(x, y\)\)
 
 <a name="Model.TurtlesOnPatch"></a>
-### func \(\*Model\) [TurtlesOnPatch](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1170>)
+### func \(\*Model\) [TurtlesOnPatch](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1173>)
 
 ```go
 func (m *Model) TurtlesOnPatch(breed string, patch *Patch) *TurtleAgentSet
 ```
 
-Returns the turtles on the provided patch
+returns the turtle agentset for the provided breed that is on the provided patch
 
 <a name="Model.TurtlesOnPatches"></a>
-### func \(\*Model\) [TurtlesOnPatches](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1175>)
+### func \(\*Model\) [TurtlesOnPatches](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1178>)
 
 ```go
 func (m *Model) TurtlesOnPatches(breed string, patches *PatchAgentSet) *TurtleAgentSet
@@ -1378,7 +1319,7 @@ func (m *Model) TurtlesOnPatches(breed string, patches *PatchAgentSet) *TurtleAg
 Returns the turtles on the provided patches
 
 <a name="Model.TurtlesWithTurtle"></a>
-### func \(\*Model\) [TurtlesWithTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1189>)
+### func \(\*Model\) [TurtlesWithTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1192>)
 
 ```go
 func (m *Model) TurtlesWithTurtle(breed string, turtle *Turtle) *TurtleAgentSet
@@ -1387,7 +1328,7 @@ func (m *Model) TurtlesWithTurtle(breed string, turtle *Turtle) *TurtleAgentSet
 Returns the turtles on the same patch as the provided turtle
 
 <a name="Model.TurtlesWithTurtles"></a>
-### func \(\*Model\) [TurtlesWithTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1199>)
+### func \(\*Model\) [TurtlesWithTurtles](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1202>)
 
 ```go
 func (m *Model) TurtlesWithTurtles(breed string, turtles *TurtleAgentSet) *TurtleAgentSet
@@ -1396,7 +1337,7 @@ func (m *Model) TurtlesWithTurtles(breed string, turtles *TurtleAgentSet) *Turtl
 Returns the turtles on the same patch as the provided turtle and with the breed provided
 
 <a name="Model.UndirectedLinks"></a>
-### func \(\*Model\) [UndirectedLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L568>)
+### func \(\*Model\) [UndirectedLinks](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L570>)
 
 ```go
 func (m *Model) UndirectedLinks(breed string) *LinkAgentSet
@@ -1405,7 +1346,7 @@ func (m *Model) UndirectedLinks(breed string) *LinkAgentSet
 returns the linkset containing the undirected links for the specified breed if the breed is empty then it will return the general population of undirected links
 
 <a name="Model.WorldHeight"></a>
-### func \(\*Model\) [WorldHeight](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1213>)
+### func \(\*Model\) [WorldHeight](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1216>)
 
 ```go
 func (m *Model) WorldHeight() int
@@ -1414,7 +1355,7 @@ func (m *Model) WorldHeight() int
 returns the world height
 
 <a name="Model.WorldWidth"></a>
-### func \(\*Model\) [WorldWidth](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1218>)
+### func \(\*Model\) [WorldWidth](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1221>)
 
 ```go
 func (m *Model) WorldWidth() int
@@ -1423,7 +1364,7 @@ func (m *Model) WorldWidth() int
 returns the world width
 
 <a name="Model.WrappingXOff"></a>
-### func \(\*Model\) [WrappingXOff](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1233>)
+### func \(\*Model\) [WrappingXOff](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1236>)
 
 ```go
 func (m *Model) WrappingXOff()
@@ -1432,7 +1373,7 @@ func (m *Model) WrappingXOff()
 sets the x coordinate to not wrap
 
 <a name="Model.WrappingXOn"></a>
-### func \(\*Model\) [WrappingXOn](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1223>)
+### func \(\*Model\) [WrappingXOn](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1226>)
 
 ```go
 func (m *Model) WrappingXOn()
@@ -1441,7 +1382,7 @@ func (m *Model) WrappingXOn()
 sets the x coordinate to wrap
 
 <a name="Model.WrappingYOff"></a>
-### func \(\*Model\) [WrappingYOff](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1238>)
+### func \(\*Model\) [WrappingYOff](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1241>)
 
 ```go
 func (m *Model) WrappingYOff()
@@ -1450,7 +1391,7 @@ func (m *Model) WrappingYOff()
 sets the y coordinate to not wrap
 
 <a name="Model.WrappingYOn"></a>
-### func \(\*Model\) [WrappingYOn](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1228>)
+### func \(\*Model\) [WrappingYOn](<https://github.com/nlatham1999/go-agent/blob/main/model/model.go#L1231>)
 
 ```go
 func (m *Model) WrappingYOn()
@@ -1482,14 +1423,12 @@ type ModelSettings struct {
 ```
 
 <a name="Patch"></a>
-## type [Patch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L8-L37>)
+## type [Patch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L9-L38>)
 
-
+Patches are agents that resemble the physical space
 
 ```go
 type Patch struct {
-
-    //same as pcolor
     PColor Color
 
     Label       interface{}
@@ -1499,7 +1438,7 @@ type Patch struct {
 ```
 
 <a name="Patch.Ask"></a>
-### func \(\*Patch\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L78>)
+### func \(\*Patch\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L79>)
 
 ```go
 func (p *Patch) Ask(operations []PatchOperation)
@@ -1508,7 +1447,7 @@ func (p *Patch) Ask(operations []PatchOperation)
 asks the patch to perform the operations
 
 <a name="Patch.DistancePatch"></a>
-### func \(\*Patch\) [DistancePatch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L103>)
+### func \(\*Patch\) [DistancePatch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L104>)
 
 ```go
 func (p *Patch) DistancePatch(patch *Patch) float64
@@ -1517,7 +1456,7 @@ func (p *Patch) DistancePatch(patch *Patch) float64
 returns the distance of this patch to the provided patch
 
 <a name="Patch.DistanceTurtle"></a>
-### func \(\*Patch\) [DistanceTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L98>)
+### func \(\*Patch\) [DistanceTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L99>)
 
 ```go
 func (p *Patch) DistanceTurtle(t *Turtle) float64
@@ -1526,7 +1465,7 @@ func (p *Patch) DistanceTurtle(t *Turtle) float64
 returns the distance of this patch to the provided turtle
 
 <a name="Patch.DistanceXY"></a>
-### func \(\*Patch\) [DistanceXY](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L108>)
+### func \(\*Patch\) [DistanceXY](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L109>)
 
 ```go
 func (p *Patch) DistanceXY(x float64, y float64) float64
@@ -1535,7 +1474,7 @@ func (p *Patch) DistanceXY(x float64, y float64) float64
 Returns the distance of this patch from the provided x y coordinates
 
 <a name="Patch.GetOwn"></a>
-### func \(\*Patch\) [GetOwn](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L273>)
+### func \(\*Patch\) [GetOwn](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L274>)
 
 ```go
 func (p *Patch) GetOwn(key string) interface{}
@@ -1544,7 +1483,7 @@ func (p *Patch) GetOwn(key string) interface{}
 
 
 <a name="Patch.GetOwnB"></a>
-### func \(\*Patch\) [GetOwnB](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L320>)
+### func \(\*Patch\) [GetOwnB](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L321>)
 
 ```go
 func (t *Patch) GetOwnB(key string) bool
@@ -1553,7 +1492,7 @@ func (t *Patch) GetOwnB(key string) bool
 
 
 <a name="Patch.GetOwnF"></a>
-### func \(\*Patch\) [GetOwnF](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L292>)
+### func \(\*Patch\) [GetOwnF](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L293>)
 
 ```go
 func (t *Patch) GetOwnF(key string) float64
@@ -1562,7 +1501,7 @@ func (t *Patch) GetOwnF(key string) float64
 
 
 <a name="Patch.GetOwnI"></a>
-### func \(\*Patch\) [GetOwnI](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L277>)
+### func \(\*Patch\) [GetOwnI](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L278>)
 
 ```go
 func (t *Patch) GetOwnI(key string) int
@@ -1571,7 +1510,7 @@ func (t *Patch) GetOwnI(key string) int
 
 
 <a name="Patch.GetOwnS"></a>
-### func \(\*Patch\) [GetOwnS](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L307>)
+### func \(\*Patch\) [GetOwnS](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L308>)
 
 ```go
 func (t *Patch) GetOwnS(key string) string
@@ -1580,7 +1519,7 @@ func (t *Patch) GetOwnS(key string) string
 
 
 <a name="Patch.Neighbors"></a>
-### func \(\*Patch\) [Neighbors](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L113>)
+### func \(\*Patch\) [Neighbors](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L114>)
 
 ```go
 func (p *Patch) Neighbors() *PatchAgentSet
@@ -1589,7 +1528,7 @@ func (p *Patch) Neighbors() *PatchAgentSet
 returns the neighbors of this patch
 
 <a name="Patch.Neighbors4"></a>
-### func \(\*Patch\) [Neighbors4](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L120>)
+### func \(\*Patch\) [Neighbors4](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L121>)
 
 ```go
 func (p *Patch) Neighbors4() *PatchAgentSet
@@ -1598,7 +1537,7 @@ func (p *Patch) Neighbors4() *PatchAgentSet
 returns the neighbors of this patch that are to the top, bottom, left, and right of this patch
 
 <a name="Patch.Other"></a>
-### func \(\*Patch\) [Other](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L127>)
+### func \(\*Patch\) [Other](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L128>)
 
 ```go
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet
@@ -1607,7 +1546,7 @@ func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet
 returns a set of patches that do not include this patch
 
 <a name="Patch.PXCor"></a>
-### func \(\*Patch\) [PXCor](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L190>)
+### func \(\*Patch\) [PXCor](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L191>)
 
 ```go
 func (p *Patch) PXCor() int
@@ -1616,7 +1555,7 @@ func (p *Patch) PXCor() int
 returns the x coordinate of this patch
 
 <a name="Patch.PYCor"></a>
-### func \(\*Patch\) [PYCor](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L195>)
+### func \(\*Patch\) [PYCor](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L196>)
 
 ```go
 func (p *Patch) PYCor() int
@@ -1625,7 +1564,7 @@ func (p *Patch) PYCor() int
 returns the y coordinate of this patch
 
 <a name="Patch.PatchAt"></a>
-### func \(\*Patch\) [PatchAt](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L140>)
+### func \(\*Patch\) [PatchAt](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L141>)
 
 ```go
 func (p *Patch) PatchAt(dx float64, dy float64) *Patch
@@ -1634,7 +1573,7 @@ func (p *Patch) PatchAt(dx float64, dy float64) *Patch
 gets the patch relavitve to this patch at the given dx dy
 
 <a name="Patch.PatchAtHeadingAndDistance"></a>
-### func \(\*Patch\) [PatchAtHeadingAndDistance](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L182>)
+### func \(\*Patch\) [PatchAtHeadingAndDistance](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L183>)
 
 ```go
 func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch
@@ -1643,7 +1582,7 @@ func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Pa
 gets the patch relavitve to this patch at the given heading and distance
 
 <a name="Patch.Reset"></a>
-### func \(\*Patch\) [Reset](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L200>)
+### func \(\*Patch\) [Reset](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L201>)
 
 ```go
 func (p *Patch) Reset(patchesOwn map[string]interface{})
@@ -1652,7 +1591,7 @@ func (p *Patch) Reset(patchesOwn map[string]interface{})
 resest the patch to the default values
 
 <a name="Patch.SetOwn"></a>
-### func \(\*Patch\) [SetOwn](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L333>)
+### func \(\*Patch\) [SetOwn](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L334>)
 
 ```go
 func (p *Patch) SetOwn(key string, value interface{})
@@ -1661,7 +1600,7 @@ func (p *Patch) SetOwn(key string, value interface{})
 
 
 <a name="Patch.Sprout"></a>
-### func \(\*Patch\) [Sprout](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L209>)
+### func \(\*Patch\) [Sprout](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L210>)
 
 ```go
 func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation)
@@ -1670,7 +1609,7 @@ func (p *Patch) Sprout(breed string, number int, operations []TurtleOperation)
 creates new turtles on this patch
 
 <a name="Patch.TowardsPatch"></a>
-### func \(\*Patch\) [TowardsPatch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L230>)
+### func \(\*Patch\) [TowardsPatch](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L231>)
 
 ```go
 func (p *Patch) TowardsPatch(patch *Patch) float64
@@ -1679,7 +1618,7 @@ func (p *Patch) TowardsPatch(patch *Patch) float64
 returns the heading that points towards the provided patch
 
 <a name="Patch.TowardsTurtle"></a>
-### func \(\*Patch\) [TowardsTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L236>)
+### func \(\*Patch\) [TowardsTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L237>)
 
 ```go
 func (p *Patch) TowardsTurtle(t *Turtle) float64
@@ -1688,7 +1627,7 @@ func (p *Patch) TowardsTurtle(t *Turtle) float64
 returns the heading that points towards the provided turtle
 
 <a name="Patch.TowardsXY"></a>
-### func \(\*Patch\) [TowardsXY](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L242>)
+### func \(\*Patch\) [TowardsXY](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L243>)
 
 ```go
 func (p *Patch) TowardsXY(x float64, y float64) float64
@@ -1697,7 +1636,7 @@ func (p *Patch) TowardsXY(x float64, y float64) float64
 returns the heading that points towards the provided x y coordinates
 
 <a name="Patch.TurtlesHere"></a>
-### func \(\*Patch\) [TurtlesHere](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L251>)
+### func \(\*Patch\) [TurtlesHere](<https://github.com/nlatham1999/go-agent/blob/main/model/patch.go#L252>)
 
 ```go
 func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet
@@ -2021,15 +1960,6 @@ type Turtle struct {
     // contains filtered or unexported fields
 }
 ```
-
-<a name="NewTurtle"></a>
-### func [NewTurtle](<https://github.com/nlatham1999/go-agent/blob/main/model/turtle.go#L35>)
-
-```go
-func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle
-```
-
-@TODO might be faster having the patch passed in as a parameter instead of having to calculate it
 
 <a name="Turtle.Ask"></a>
 ### func \(\*Turtle\) [Ask](<https://github.com/nlatham1999/go-agent/blob/main/model/turtle.go#L91>)
@@ -3005,43 +2935,5 @@ general function for acting on a turtle func\(t \*Turtle\)
 ```go
 type TurtleOperation func(t *Turtle)
 ```
-
-<a name="TurtleSorter"></a>
-## type [TurtleSorter](<https://github.com/nlatham1999/go-agent/blob/main/model/types.go#L83-L87>)
-
-
-
-```go
-type TurtleSorter struct {
-    // contains filtered or unexported fields
-}
-```
-
-<a name="TurtleSorter.Len"></a>
-### func \(\*TurtleSorter\) [Len](<https://github.com/nlatham1999/go-agent/blob/main/model/types.go#L89>)
-
-```go
-func (t *TurtleSorter) Len() int
-```
-
-
-
-<a name="TurtleSorter.Less"></a>
-### func \(\*TurtleSorter\) [Less](<https://github.com/nlatham1999/go-agent/blob/main/model/types.go#L93>)
-
-```go
-func (t *TurtleSorter) Less(i, j int) bool
-```
-
-
-
-<a name="TurtleSorter.Swap"></a>
-### func \(\*TurtleSorter\) [Swap](<https://github.com/nlatham1999/go-agent/blob/main/model/types.go#L100>)
-
-```go
-func (t *TurtleSorter) Swap(i, j int)
-```
-
-
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

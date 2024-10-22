@@ -41,7 +41,12 @@ var (
 	}
 )
 
-// tie modes
+// The tie mode for a link directs how the turtles are tied together
+// For a link between turtle A and Turtle B:
+//
+//	If A is moved then B is moved if the tie mode is fixed or free and the link is directed with A->B or the link is undirected
+//	If A is rotated then B is swivelled around A if the tie mode is fixed or free and the link is directed with A->B
+//	If A is rotated then B is rotated only if the tie mode is fixed and the link is directed with A->B or the link is undirected. If the tie mode is free then B is not rotated
 var (
 	TieModeFixed = TieMode(2)
 	TieModeFree  = TieMode(1)

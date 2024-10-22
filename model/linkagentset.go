@@ -4,7 +4,8 @@ import (
 	"github.com/nlatham1999/sortedset"
 )
 
-// LinkAgentSet is a set of links
+// LinkAgentSet is an ordered set of links than can be sorted
+// implements github.com/nlatham1999/sortedset
 type LinkAgentSet struct {
 	links *sortedset.SortedSet
 }

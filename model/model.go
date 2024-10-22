@@ -10,6 +10,7 @@ import (
 	"github.com/nlatham1999/sortedset"
 )
 
+// Model holds all the agents and the world
 type Model struct {
 	Ticks int
 
@@ -321,7 +322,7 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 	headingAmount := 2 * math.Pi / float64(amount)
 	turtles := []*Turtle{}
 	for m.turtlesWhoNumber < end {
-		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
+		newTurtle := newTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
 
 		// set heading to be random
 		newTurtle.setHeadingRadians(headingAmount * float64(count))
@@ -346,6 +347,7 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 
 // create the specified amount of turtles with the specified breed and operations
 // if the breed is empty then it will add it to the general population
+// @TODO return the created turtles as an agentset
 func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
 
 	if breed != "" {
@@ -359,7 +361,7 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 
 	end := amount + m.turtlesWhoNumber
 	for m.turtlesWhoNumber < end {
-		newTurtle := NewTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
+		newTurtle := newTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
 
 		// set heading to be random
 		newTurtle.setHeadingRadians(m.randomGenerator.Float64() * 2 * math.Pi)

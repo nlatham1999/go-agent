@@ -167,19 +167,19 @@ func TestKillTurtle(t *testing.T) {
 	t3 := m.Turtle("ants", 6)
 	t4 := m.Turtle("ants", 7)
 
-	_, err := model.NewLink(m, "", t1, t2, true)
+	_, err := t1.CreateLinkToTurtle("", t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	_, err = model.NewLink(m, "", t1, t3, true)
+	_, err = t1.CreateLinkToTurtle("", t3, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	_, err = model.NewLink(m, "", t1, t4, false)
+	_, err = t1.CreateLinkToTurtle("", t4, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	_, err = model.NewLink(m, "", t2, t3, false)
+	_, err = t2.CreateLinkToTurtle("", t3, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -227,25 +227,25 @@ func TestModelLink(t *testing.T) {
 	t4 := m.Turtle("ants", 7)
 
 	// create a directed link
-	l1, err := model.NewLink(m, "", t1, t2, true)
+	l1, err := t1.CreateLinkToTurtle("", t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create an undirected link
-	l2, err := model.NewLink(m, "workers", t2, t3, false)
+	l2, err := t2.CreateLinkWithTurtle("workers", t3, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create an undirected link
-	l3, err := model.NewLink(m, "workers", t3, t4, false)
+	l3, err := t3.CreateLinkWithTurtle("workers", t4, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create a directed link
-	l4, err := model.NewLink(m, "", t4, t1, true)
+	l4, err := t4.CreateLinkToTurtle("", t1, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -319,13 +319,13 @@ func TestModelLinkDirected(t *testing.T) {
 	t4 := m.Turtle("ants", 7)
 
 	// create a directed link
-	l1, err := model.NewLink(m, "", t1, t2, true)
+	l1, err := t1.CreateLinkToTurtle("", t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create a directed link
-	l2, err := model.NewLink(m, "workers", t3, t4, true)
+	l2, err := t3.CreateLinkToTurtle("workers", t4, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}

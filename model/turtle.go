@@ -32,7 +32,7 @@ type Turtle struct {
 }
 
 // @TODO might be faster having the patch passed in as a parameter instead of having to calculate it
-func NewTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
+func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 
 	if m == nil {
 		return nil
@@ -452,7 +452,7 @@ func (t *Turtle) Hatch(breed string, amount int, operations []TurtleOperation) {
 		if breed != "" {
 			newBreed = breed
 		}
-		turtles[i] = NewTurtle(t.parent, t.parent.turtlesWhoNumber, newBreed, t.xcor, t.ycor)
+		turtles[i] = newTurtle(t.parent, t.parent.turtlesWhoNumber, newBreed, t.xcor, t.ycor)
 		t.parent.turtlesWhoNumber++
 
 		// copy the variables

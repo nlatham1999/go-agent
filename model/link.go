@@ -7,7 +7,8 @@ import (
 
 type TieMode int
 
-// Link represents a link between two turtles
+// A Link represents a connection between two turtles
+// A Link can be be a one way directed link or a two way undirected link
 type Link struct {
 	Color      Color       // Color of the link
 	end1       *Turtle     // the two ends of the link
@@ -24,8 +25,8 @@ type Link struct {
 	LabelColor Color       // Color of the label
 }
 
-// NewLink creates a new link between two turtles
-func NewLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
+// newLink creates a new link between two turtles
+func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
 
 	// make sure the breed exists
 	if directed {
