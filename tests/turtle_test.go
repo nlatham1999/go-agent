@@ -837,52 +837,52 @@ func TestTurtleInLinkNeighbor(t *testing.T) {
 	// create an undirected link between t7 and t8 that has no breed
 	t7.CreateLinkWithTurtle("", t8, nil)
 
-	v := t1.InLinkNeighbor("parent-children", t2)
+	v := t1.LinkToTurtleExists("parent-children", t2)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t2.InLinkNeighbor("parent-children", t1)
+	v = t2.LinkToTurtleExists("parent-children", t1)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t3.InLinkNeighbor("coworkers", t4)
+	v = t3.LinkToTurtleExists("coworkers", t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t4.InLinkNeighbor("coworkers", t3)
+	v = t4.LinkToTurtleExists("coworkers", t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t5.InLinkNeighbor("", t6)
+	v = t5.LinkToTurtleExists("", t6)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t6.InLinkNeighbor("", t5)
+	v = t6.LinkToTurtleExists("", t5)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t7.InLinkNeighbor("", t8)
+	v = t7.LinkToTurtleExists("", t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t8.InLinkNeighbor("", t7)
+	v = t8.LinkToTurtleExists("", t7)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.InLinkNeighbor("", t2)
+	v = t1.LinkToTurtleExists("", t2)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t2.InLinkNeighbor("", t1)
+	v = t2.LinkToTurtleExists("", t1)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
@@ -928,7 +928,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 	t8.CreateLinkWithTurtle("", t1, nil)
 	t9.CreateLinkWithTurtle("", t1, nil)
 
-	neighbors := t1.InLinkNeighbors("parent-children")
+	neighbors := t1.LinkNeighborsToTurtle("parent-children")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -936,7 +936,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t2 and t3")
 	}
 
-	neighbors = t1.InLinkNeighbors("coworkers")
+	neighbors = t1.LinkNeighborsToTurtle("coworkers")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -944,7 +944,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t4 and t5")
 	}
 
-	neighbors = t1.InLinkNeighbors("")
+	neighbors = t1.LinkNeighborsToTurtle("")
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
 	}
@@ -991,42 +991,42 @@ func TestTurtleLinkNeighbor(t *testing.T) {
 	t8.CreateLinkWithTurtle("", t1, nil)
 	t9.CreateLinkWithTurtle("", t1, nil)
 
-	v := t1.LinkNeighbor("", t2)
+	v := t1.LinkExists("", t2)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkNeighbor("parent-children", t3)
+	v = t1.LinkExists("parent-children", t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkNeighbor("", t4)
+	v = t1.LinkExists("", t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkNeighbor("parent-childres", t5)
+	v = t1.LinkExists("parent-childres", t5)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.LinkNeighbor("", t6)
+	v = t1.LinkExists("", t6)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkNeighbor("parent-children", t7)
+	v = t1.LinkExists("parent-children", t7)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.LinkNeighbor("", t8)
+	v = t1.LinkExists("", t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkNeighbor("coworkers", t9)
+	v = t1.LinkExists("coworkers", t9)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
@@ -1137,47 +1137,47 @@ func TestTurtleOutLinkNeighbor(t *testing.T) {
 	t1.CreateLinkWithTurtle("", t8, nil)
 	t1.CreateLinkWithTurtle("", t9, nil)
 
-	v := t1.OutLinkNeighbor("", t2)
+	v := t1.LinkFromTurtleExists("", t2)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.OutLinkNeighbor("parent-children", t3)
+	v = t1.LinkFromTurtleExists("parent-children", t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.OutLinkNeighbor("", t4)
+	v = t1.LinkFromTurtleExists("", t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.OutLinkNeighbor("parent-childres", t5)
+	v = t1.LinkFromTurtleExists("parent-childres", t5)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.OutLinkNeighbor("", t6)
+	v = t1.LinkFromTurtleExists("", t6)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.OutLinkNeighbor("parent-children", t7)
+	v = t1.LinkFromTurtleExists("parent-children", t7)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.OutLinkNeighbor("", t8)
+	v = t1.LinkFromTurtleExists("", t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.OutLinkNeighbor("coworkers", t9)
+	v = t1.LinkFromTurtleExists("coworkers", t9)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t2.OutLinkNeighbor("parent-children", t1)
+	v = t2.LinkFromTurtleExists("parent-children", t1)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor since it is a directed link")
 	}
@@ -1223,22 +1223,22 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 	t1.CreateLinkWithTurtle("", t8, nil)
 	t1.CreateLinkWithTurtle("", t9, nil)
 
-	neighbors := t1.OutLinkNeighbors("")
+	neighbors := t1.LinkNeighborsFromTurtle("")
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.OutLinkNeighbors("parent-children")
+	neighbors = t1.LinkNeighborsFromTurtle("parent-children")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.OutLinkNeighbors("coworkers")
+	neighbors = t1.LinkNeighborsFromTurtle("coworkers")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t2.OutLinkNeighbors("parent-children")
+	neighbors = t2.LinkNeighborsFromTurtle("parent-children")
 	if neighbors.Count() != 0 {
 		t.Errorf("Expected 0 neighbors, got %d", neighbors.Count())
 	}
@@ -1622,4 +1622,62 @@ func TestTurtleSetBreedPatchHere(t *testing.T) {
 		t.Errorf("Expected turtle to be on patch")
 	}
 
+}
+
+func TestTurtle_Jump(t *testing.T) {
+	// create a basic model
+	settings := model.ModelSettings{
+		WrappingX: false,
+		WrappingY: false,
+		MinPxCor:  -10,
+		MaxPxCor:  10,
+		MinPyCor:  -10,
+		MaxPyCor:  10,
+	}
+
+	m := model.NewModel(settings)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	turtle := m.Turtle("", 0)
+
+	turtle.SetHeading(0)
+	turtle.Jump(5)
+
+	if turtle.XCor() != 5 || turtle.YCor() != 0 {
+		t.Errorf("Expected turtle to jump to (5, 0), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
+
+	// attempt a jump outside of the world bounds
+	turtle.Jump(20)
+
+	if turtle.XCor() != 5 || turtle.YCor() != 0 {
+		t.Errorf("Expected turtle to stay in place")
+	}
+
+	// new model with wrapping
+	settings = model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+		MinPxCor:  -10,
+		MaxPxCor:  10,
+		MinPyCor:  -10,
+		MaxPyCor:  10,
+	}
+
+	m = model.NewModel(settings)
+
+	// create a turtle
+	m.CreateTurtles(1, "", nil)
+
+	turtle = m.Turtle("", 0)
+
+	turtle.SetHeading(0)
+
+	turtle.Jump(16) // extra 1 because of world edges
+
+	if turtle.XCor() != -5 || turtle.YCor() != 0 {
+		t.Errorf("Expected turtle to jump to (-5, 0), got (%v, %v)", turtle.XCor(), turtle.YCor())
+	}
 }

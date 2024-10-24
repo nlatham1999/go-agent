@@ -2,7 +2,7 @@ package model
 
 // describes the relation that a turtle has with other linked turtles
 
-// due to the different maps, the member variables should not be accessed directly
+// due to the complexity of different maps, the member variables should not be accessed directly
 
 type turtleLinks struct {
 

@@ -5,6 +5,8 @@ import (
 	"math"
 )
 
+// Turtle is an agent that can move around the world
+// it can have links to other turtles
 type Turtle struct {
 	xcor float64
 	ycor float64
@@ -88,10 +90,12 @@ func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	return t
 }
 
+// moves the turtle backwards by the distance passed in and in relation to its heading
 func (t *Turtle) Back(distance float64) {
 	t.Forward(-distance)
 }
 
+// returns the breed of the turtle
 func (t *Turtle) BreedName() string {
 	return t.breed
 }
@@ -130,6 +134,7 @@ func (t *Turtle) SetBreed(name string) {
 
 }
 
+// returns if the turtle can move foward by the distance passed in
 func (t *Turtle) CanMove(distance float64) bool {
 	if t.parent.wrappingY && t.parent.wrappingX {
 		return true
@@ -204,6 +209,7 @@ func (t *Turtle) descendents(minTieMode TieMode) *TurtleAgentSet {
 	return tiedTurtlesSet
 }
 
+// kill the turtle
 func (t *Turtle) Die() {
 	t.parent.KillTurtle(t)
 }
@@ -337,14 +343,6 @@ func (t *Turtle) Downhill4(patchVariable string) {
 	}
 }
 
-func (t *Turtle) DX() float64 {
-	return math.Cos(t.heading)
-}
-
-func (t *Turtle) DY() float64 {
-	return math.Sin(t.heading)
-}
-
 // faces the turtle passed in
 func (t *Turtle) FaceTurtle(turtle *Turtle) {
 	t.FaceXY(turtle.xcor, turtle.ycor)
@@ -415,7 +413,7 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 	t.setHeadingRadians(a)
 }
 
-// @TODO it might be better in the future to split the input between a whole and a decimal, so that we don't have to spend time splitting
+// moves the turtle forward by the distance passed in and in relation to its heading
 func (t *Turtle) Forward(distance float64) {
 	intPart := int(distance)
 	decimalPart := distance - float64(intPart)
@@ -477,12 +475,12 @@ func (t *Turtle) Hatch(breed string, amount int, operations []TurtleOperation) {
 	}
 }
 
+// returns the heading of the turtle in degrees
 func (t *Turtle) GetHeading() float64 {
-	// return heading in degrees
 	return radiansToDegrees(t.heading)
 }
 
-// takes in a heading in degrees and sets the heading in radians
+// takes in the heading in degrees and sets the heading of the turtle
 func (t *Turtle) SetHeading(heading float64) {
 
 	//make sure the heading is between -360 and 360
@@ -547,32 +545,23 @@ func (t *Turtle) rotateTiedTurtle(turtle *Turtle, amount float64) {
 	turtle.ycor = newY
 }
 
+// Hide the turtle
 func (t *Turtle) Hide() {
 	t.Hidden = true
 }
 
+// sets the turtle to be in the middle of the world
 func (t *Turtle) Home() {
 	t.SetXY(0, 0)
 }
 
-// @TODO implement
-func (t *Turtle) InConePatches(distance float64, angle float64) []*Patch {
-	return nil
-}
-
-// @TODO implement
-func (t *Turtle) InConeTurtles(distance float64, angle float64) []*Turtle {
-	return nil
-}
-
 // jumps ahead by the distance, if it cannot then it returns false
-// @TODO implement - wrapping and don't call Can Move since that is expensive
 func (t *Turtle) Jump(distance float64) {
-	if t.CanMove(distance) {
-		xcor := t.xcor + distance*math.Cos(t.heading)
-		ycor := t.ycor + distance*math.Sin(t.heading)
-		t.SetXY(xcor, ycor)
-	}
+	// if t.CanMove(distance) {
+	xcor := t.xcor + distance*math.Cos(t.heading)
+	ycor := t.ycor + distance*math.Sin(t.heading)
+	t.SetXY(xcor, ycor)
+	// }
 }
 
 func (t *Turtle) SetLabel(label interface{}) {
@@ -605,14 +594,25 @@ func (t *Turtle) Left(number float64) {
 
 }
 
+// moves the turtle to the patch passed in
 func (t *Turtle) MoveToPatch(patch *Patch) {
+	if patch == nil {
+		return
+	}
+
 	t.SetXY(patch.xFloat64, patch.yFloat64)
 }
 
+// moves the turtle to the x y coordinates passed in
 func (t *Turtle) MoveToTurtle(turtle *Turtle) {
+	if turtle == nil {
+		return
+	}
+
 	t.SetXY(turtle.xcor, turtle.ycor)
 }
 
+// returns the neighbors of the patch that the turtle is on
 func (t *Turtle) Neighbors() *PatchAgentSet {
 	//get the patch the turtle is on
 	p := t.PatchHere()
@@ -626,6 +626,7 @@ func (t *Turtle) Neighbors() *PatchAgentSet {
 	return neighbors
 }
 
+// returns the 4 neighbors of the patch that the turtle is on in the cardinal directions
 func (t *Turtle) Neighbors4() *PatchAgentSet {
 	//get the patch the turtle is on
 	p := t.PatchHere()
@@ -637,11 +638,6 @@ func (t *Turtle) Neighbors4() *PatchAgentSet {
 	neighbors := t.parent.neighbors4(p)
 
 	return neighbors
-}
-
-// TODO implement
-func (t *Turtle) Other(turtles TurtleAgentSet) *TurtleAgentSet {
-	return nil
 }
 
 // returns the end of the given link that is not the current turtle
@@ -663,6 +659,7 @@ func (t *Turtle) GetOwn(key string) interface{} {
 	return nil
 }
 
+// returns the turtle own variable as an int
 func (t *Turtle) GetOwnI(key string) (int, error) {
 	v := t.GetOwn(key)
 	if v == nil {
@@ -678,6 +675,7 @@ func (t *Turtle) GetOwnI(key string) (int, error) {
 	}
 }
 
+// returns the turtle own variable as a float
 func (t *Turtle) GetOwnF(key string) (float64, error) {
 	v := t.GetOwn(key)
 	if v == nil {
@@ -693,6 +691,7 @@ func (t *Turtle) GetOwnF(key string) (float64, error) {
 	}
 }
 
+// returns the turtle own variable as a string
 func (t *Turtle) GetOwnS(key string) (string, error) {
 	v := t.GetOwn(key)
 	if v == nil {
@@ -718,21 +717,24 @@ func (t *Turtle) SetOwn(key string, value interface{}) {
 	}
 }
 
+// returns the patch that is ahead of the turtle by the distance passed in in relation to its heading
 func (t *Turtle) PatchAhead(distance float64) *Patch {
 	distX := t.xcor + distance*math.Cos(t.heading)
 	distY := t.ycor + distance*math.Sin(t.heading)
-	return t.parent.getPatchAtCoords(int(distX), int(distY))
+	return t.parent.Patch(distX, distY)
 }
 
+// returns that patch that is the the left and right of the turtle by the coordinates passed in
 func (t *Turtle) PatchAt(dx float64, dy float64) *Patch {
 
 	//round the coords
-	px := int(math.Round(t.xcor + dx))
-	py := int(math.Round(t.ycor + dy))
+	px := t.xcor + dx
+	py := t.ycor + dy
 
-	return t.parent.getPatchAtCoords(px, py)
+	return t.parent.Patch(px, py)
 }
 
+// returns the patch that is the left of the turtle by the distance passed in and in relation to the heading passed in
 func (t *Turtle) PatchAtHeadingAndDistance(heading float64, distance float64) *Patch {
 	distX := t.xcor + distance*math.Cos(heading)
 	distY := t.ycor + distance*math.Sin(heading)
@@ -756,14 +758,14 @@ func (t *Turtle) PatchLeftAndAhead(angle float64, distance float64) *Patch {
 	rightHeading := t.heading + angle
 	distX := t.xcor + distance*math.Cos(rightHeading)
 	distY := t.ycor + distance*math.Sin(rightHeading)
-	return t.parent.getPatchAtCoords(int(distX), int(distY))
+	return t.parent.Patch(distX, distY)
 }
 
 func (t *Turtle) PatchRightAndAhead(angle float64, distance float64) *Patch {
 	rightHeading := t.heading - angle
 	distX := t.xcor + distance*math.Cos(rightHeading)
 	distY := t.ycor + distance*math.Sin(rightHeading)
-	return t.parent.getPatchAtCoords(int(distX), int(distY))
+	return t.parent.Patch(distX, distY)
 }
 
 // it might be faster to not use mods, the only danger is possible overflow

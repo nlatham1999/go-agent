@@ -741,6 +741,7 @@ func (m *Model) MinPyCor() int {
 }
 
 // does not implement wrappimg, that is the responsibilty of the caller
+// should only be called by Patch()!!! since Patch correctly converts the floats to ints
 func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 	if x < m.minPxCor || x > m.maxPxCor || y < m.minPyCor || y > m.maxPyCor {
 		return nil
@@ -1025,6 +1026,40 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 		y = int(math.Round(pycor))
 	}
 
+	// check if the x and y are within the world bounds
+	// if wrapping is enabled then adjust the x and y to be within the world bounds if needed
+	if x < m.minPxCor {
+		if m.wrappingX {
+			x = m.maxPxCor + 1 + ((x - m.minPxCor) % m.worldWidth)
+		} else {
+			return nil
+		}
+	}
+
+	if y < m.minPyCor {
+		if m.wrappingY {
+			y = m.maxPyCor + 1 + ((y - m.minPyCor) % m.worldHeight)
+		} else {
+			return nil
+		}
+	}
+
+	if x > m.maxPxCor {
+		if m.wrappingX {
+			x = (x-m.maxPxCor)%m.worldWidth + m.minPxCor - 1
+		} else {
+			return nil
+		}
+	}
+
+	if y > m.maxPyCor {
+		if m.wrappingY {
+			y = (y-m.maxPyCor)%m.worldHeight + m.minPyCor - 1
+		} else {
+			return nil
+		}
+	}
+
 	return m.getPatchAtCoords(x, y)
 }
 
@@ -1158,10 +1193,10 @@ func (m *Model) Turtles(breed string) *TurtleAgentSet {
 // returns the turtle agentset for the provided breed that is on patch of the proviced x y coordinates
 // same as TurtlesOnPatch(breed, Patch(x, y))
 func (m *Model) TurtlesAtCoords(breed string, pxcor float64, pycor float64) *TurtleAgentSet {
-	x := int(math.Round(pxcor))
-	y := int(math.Round(pycor))
+	x := math.Round(pxcor)
+	y := math.Round(pycor)
 
-	patch := m.getPatchAtCoords(x, y)
+	patch := m.Patch(x, y)
 
 	if patch == nil {
 		return nil

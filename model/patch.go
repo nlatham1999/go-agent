@@ -132,43 +132,10 @@ func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
 // gets the patch relavitve to this patch at the given dx dy
 func (p *Patch) PatchAt(dx float64, dy float64) *Patch {
 
-	//round the coords
-	x := int(math.Round(p.xFloat64 + dx))
-	y := int(math.Round(p.yFloat64 + dy))
+	x := p.xFloat64 + dx
+	y := p.yFloat64 + dy
 
-	if x < p.parent.minPxCor {
-		if p.parent.wrappingX {
-			x = p.parent.maxPxCor + 1 + ((x - p.parent.minPxCor) % p.parent.worldWidth)
-		} else {
-			return nil
-		}
-	}
-
-	if y < p.parent.minPyCor {
-		if p.parent.wrappingY {
-			y = p.parent.maxPyCor + 1 + ((y - p.parent.minPyCor) % p.parent.worldHeight)
-		} else {
-			return nil
-		}
-	}
-
-	if x > p.parent.maxPxCor {
-		if p.parent.wrappingX {
-			x = (x-p.parent.maxPxCor)%p.parent.worldWidth + p.parent.minPxCor - 1
-		} else {
-			return nil
-		}
-	}
-
-	if y > p.parent.maxPyCor {
-		if p.parent.wrappingY {
-			y = (y-p.parent.maxPyCor)%p.parent.worldHeight + p.parent.minPyCor - 1
-		} else {
-			return nil
-		}
-	}
-
-	return p.parent.getPatchAtCoords(x, y)
+	return p.parent.Patch(x, y)
 }
 
 // gets the patch relavitve to this patch at the given heading and distance

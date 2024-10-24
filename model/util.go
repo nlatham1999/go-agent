@@ -2,6 +2,7 @@ package model
 
 import "math"
 
+// Returns a list of base colors
 func BaseColors() []Color {
 	return baseColorsList
 }

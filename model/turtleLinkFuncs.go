@@ -95,7 +95,7 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 }
 
 // returns if there is any sort of link between the current turtle and the turtle passed in
-func (t *Turtle) LinkNeighbor(breed string, turtle *Turtle) bool {
+func (t *Turtle) LinkExists(breed string, turtle *Turtle) bool {
 	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
 
@@ -106,8 +106,8 @@ func (t *Turtle) LinkNeighbors(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesAll(breed)
 }
 
-// returns if there is a directed link from turtle to t or an undirected link connecting the two
-func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
+// returns if there is a directed link from turtle passed in to the current turtle or an undirected link connecting the two
+func (t *Turtle) LinkToTurtleExists(breed string, turtle *Turtle) bool {
 
 	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
@@ -117,17 +117,18 @@ func (t *Turtle) InLinkNeighbor(breed string, turtle *Turtle) bool {
 //	or an undirected link connecting the two
 //
 // basically all turtles where there is a path from the turtle to the current turtle
-func (t *Turtle) InLinkNeighbors(breed string) *TurtleAgentSet {
+func (t *Turtle) LinkNeighborsToTurtle(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesIncoming(breed)
 }
 
-// returns whether there is a directed link connecting t to turtle or an undirected link connecting the two
-func (t *Turtle) OutLinkNeighbor(breed string, turtle *Turtle) bool {
+// returns whether there is a directed link connecting the current turtle to the turtle passed in or an undirected link connecting the two
+// (this -> turtle) or (this <-> turtle)
+func (t *Turtle) LinkFromTurtleExists(breed string, turtle *Turtle) bool {
 	return t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
 }
 
 // returns all turtles that have a directed link from the current turtle to them
-func (t *Turtle) OutLinkNeighbors(breed string) *TurtleAgentSet {
+func (t *Turtle) LinkNeighborsFromTurtle(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesOutgoing(breed)
 }
 

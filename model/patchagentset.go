@@ -4,10 +4,13 @@ import (
 	"github.com/nlatham1999/sortedset"
 )
 
+// PatchAgentSet is an ordered set of patches than can be sorted
+// implements github.com/nlatham1999/sortedset
 type PatchAgentSet struct {
 	patches *sortedset.SortedSet
 }
 
+// create a new PatchAgentSet
 func NewPatchAgentSet(patches []*Patch) *PatchAgentSet {
 	patchSet := &PatchAgentSet{
 		patches: sortedset.NewSortedSet(),
@@ -18,10 +21,12 @@ func NewPatchAgentSet(patches []*Patch) *PatchAgentSet {
 	return patchSet
 }
 
+// add a patch to the agent set
 func (p *PatchAgentSet) Add(patch *Patch) {
 	p.patches.Add(patch)
 }
 
+// returns true if all the patches in the agent set satisfy the operation
 func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
 	if operation == nil {
 		return false
@@ -32,6 +37,7 @@ func (p *PatchAgentSet) All(operation PatchBoolOperation) bool {
 	})
 }
 
+// returns true if any of the patches in the agent set satisfy the operation
 func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	if operation == nil {
 		return false
@@ -42,6 +48,7 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	})
 }
 
+// perform the list of operations for all patches in the agent set
 func (p *PatchAgentSet) Ask(operation PatchOperation) {
 	if operation == nil {
 		return
@@ -52,6 +59,7 @@ func (p *PatchAgentSet) Ask(operation PatchOperation) {
 	})
 }
 
+// returns a subset of patches that are at the given coordinates
 func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 	// create a map of the patches
 	patchesAtPoints := sortedset.NewSortedSet()
@@ -70,14 +78,17 @@ func (p *PatchAgentSet) AtPoints(m *Model, points []Coordinate) *PatchAgentSet {
 
 }
 
+// returns true if the patch is in the agent set
 func (p *PatchAgentSet) Contains(patch *Patch) bool {
 	return p.patches.Contains(patch)
 }
 
+// returns the number of patches in the agent set
 func (p *PatchAgentSet) Count() int {
 	return p.patches.Len()
 }
 
+// returns a subset of patches that are in the radius of the given patch
 func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 
@@ -95,6 +106,7 @@ func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSe
 	}
 }
 
+// returns a subset of patches that are in the radius of the given turtle
 func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 
@@ -111,6 +123,7 @@ func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgen
 	}
 }
 
+// returns the agent set as a list
 func (p *PatchAgentSet) List() []*Patch {
 	v := []*Patch{}
 	patch := p.patches.First()
@@ -121,6 +134,7 @@ func (p *PatchAgentSet) List() []*Patch {
 	return v
 }
 
+// returns the first n patches in the agent set
 func (p *PatchAgentSet) FirstNOf(n int) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 	patch := p.patches.First()
@@ -133,6 +147,7 @@ func (p *PatchAgentSet) FirstNOf(n int) *PatchAgentSet {
 	}
 }
 
+// returns the first patch in the agent set
 func (p *PatchAgentSet) First() (*Patch, error) {
 	patch := p.patches.First()
 	if patch == nil {
@@ -141,6 +156,7 @@ func (p *PatchAgentSet) First() (*Patch, error) {
 	return patch.(*Patch), nil
 }
 
+// returns the last n patches in the agent set
 func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 	patch := p.patches.Last()
@@ -153,6 +169,7 @@ func (p *PatchAgentSet) LastNOf(n int) *PatchAgentSet {
 	}
 }
 
+// returns the last patch in the agent set
 func (p *PatchAgentSet) Last() (*Patch, error) {
 	patch := p.patches.Last()
 	if patch == nil {
@@ -169,41 +186,23 @@ func (p *PatchAgentSet) Last() (*Patch, error) {
 // 	return patch.(*Patch), nil
 // }
 
-// @TODO make this random
-func (p *PatchAgentSet) OneOf() (*Patch, error) {
-	for _, patch := range p.patches.List() {
-		return patch.(*Patch), nil
-	}
-
-	return nil, ErrNoLinksInAgentSet
-}
-
+// remove a patch from the agent set
 func (p *PatchAgentSet) Remove(patch *Patch) {
 	p.patches.Remove(patch)
 }
 
+// sort the patches in the agent set in ascending order based on the float operation
 func (p *PatchAgentSet) SortAsc(operation PatchFloatOperation) {
 	p.patches.SortAsc(func(a interface{}) interface{} {
 		return operation(a.(*Patch))
 	})
 }
 
+// sort the patches in the agent set in descending order based on the float operation
 func (p *PatchAgentSet) SortDesc(operation PatchFloatOperation) {
 	p.patches.SortDesc(func(a interface{}) interface{} {
 		return operation(a.(*Patch))
 	})
-}
-
-func (p *PatchAgentSet) UpToNOf(n int) *PatchAgentSet {
-	patchSet := sortedset.NewSortedSet()
-	patch := p.patches.First()
-	for i := 0; i < n && patch != nil; i++ {
-		patchSet.Add(patch)
-		patch, _ = p.patches.Next()
-	}
-	return &PatchAgentSet{
-		patches: patchSet,
-	}
 }
 
 // returns a new PatchAgentSet with all the patches that are not in the given PatchAgentSet
@@ -236,6 +235,7 @@ func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
 	}
 }
 
+// returns a new agent set that contains all the patches that satisfy the operation
 func (p *PatchAgentSet) With(operation PatchBoolOperation) *PatchAgentSet {
 	patchSet := sortedset.NewSortedSet()
 

@@ -40,12 +40,6 @@ func (l *LinkAgentSet) All(operation LinkBoolOperation) bool {
 	})
 }
 
-// returns the next link in the set after the given link
-func (l *LinkAgentSet) After(link *Link) (*Link, error) {
-	v, err := l.links.After(link)
-	return v.(*Link), err
-}
-
 // returns true if any of the links in the agent set satisfy the operation
 func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 	if operation == nil {
@@ -102,7 +96,7 @@ func (l *LinkAgentSet) FirstNOf(n int) *LinkAgentSet {
 	}
 }
 
-// returns the max link in the agent set
+// returns the first link in the agent set
 func (l *LinkAgentSet) First() (*Link, error) {
 	link := l.links.First()
 	if link == nil {
@@ -111,7 +105,7 @@ func (l *LinkAgentSet) First() (*Link, error) {
 	return link.(*Link), nil
 }
 
-// returns the min n links in the agent set
+// returns the last n links in the agent set
 func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 	linkSet := sortedset.NewSortedSet()
 	link := l.links.Last()
@@ -124,7 +118,7 @@ func (l *LinkAgentSet) LastNOf(n int) *LinkAgentSet {
 	}
 }
 
-// returns the min link in the agent set
+// returns the last link in the agent set
 func (l *LinkAgentSet) Last() (*Link, error) {
 	link := l.links.Last()
 	if link == nil {
@@ -141,16 +135,6 @@ func (l *LinkAgentSet) Last() (*Link, error) {
 // 	}
 // 	return v.(*Link), err
 // }
-
-// returns one of the links
-// @TODO make this actually random based on model seed
-func (l *LinkAgentSet) OneOf() (*Link, error) {
-	for _, link := range l.links.List() {
-		return link.(*Link), nil
-	}
-
-	return nil, ErrNoLinksInAgentSet
-}
 
 // remove a link from the agent set
 func (l *LinkAgentSet) Remove(link *Link) {
@@ -169,20 +153,6 @@ func (l *LinkAgentSet) SortDesc(operation LinkFloatOperation) {
 	l.links.SortDesc(func(a interface{}) interface{} {
 		return operation(a.(*Link))
 	})
-}
-
-// returns n links or all the links in the agentset if the length is lower than n
-// make this actually random based on model seed
-func (l *LinkAgentSet) UpToNOf(n int) *LinkAgentSet {
-	linkSet := sortedset.NewSortedSet()
-	link := l.links.First()
-	for i := 0; i < n && link != nil; i++ {
-		linkSet.Add(link)
-		link, _ = l.links.Next()
-	}
-	return &LinkAgentSet{
-		links: linkSet,
-	}
 }
 
 // returns a new agent set with all the links that are not in the given agents set
