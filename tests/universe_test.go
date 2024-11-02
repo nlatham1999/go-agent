@@ -33,7 +33,7 @@ func TestCreateTurtles(t *testing.T) {
 	}
 
 	// creating a turtle with a nonexistent breed should return an error
-	err := environment.CreateTurtles(5, "nonexistent", nil)
+	_, err := environment.CreateTurtles(5, "nonexistent", nil)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -747,7 +747,7 @@ func TestModelSize(t *testing.T) {
 
 	sheepGainFromFood, _ := m.GetGlobalI("sheep-gain-from-food")
 
-	m.CreateTurtles(initialNumberSheep, "sheep", []model.TurtleOperation{
+	m.CreateTurtles(initialNumberSheep, "sheep",
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -757,13 +757,13 @@ func TestModelSize(t *testing.T) {
 			t.SetXY(m.RandomXCor(), m.RandomYCor())
 			t.SetSize(.5)
 		},
-	})
+	)
 
 	initialNumberWolves, _ := m.GetGlobalI("initial-number-wolves")
 
 	wolfGainFromFood, _ := m.GetGlobalI("wolf-gain-from-food")
 
-	m.CreateTurtles(initialNumberWolves, "wolves", []model.TurtleOperation{
+	m.CreateTurtles(initialNumberWolves, "wolves",
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
@@ -773,7 +773,7 @@ func TestModelSize(t *testing.T) {
 			t.SetXY(float64(m.RandomXCor()), m.RandomYCor())
 			t.SetSize(.5)
 		},
-	})
+	)
 
 	showEnergy, _ := m.GetGlobalB("show-energy")
 	m.Turtles("").Ask(

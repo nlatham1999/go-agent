@@ -1,5 +1,5 @@
-fix descendents so it doesn't grab so many copies
-make sure when we are creating a link, that it does not already exist
 
+Make it so that the Api html generation isn't the ugliest code to ever exist
 
-add a NewBreeds function
+Rethink Tie Modes
+- having it be free tied and fixed makes no sense

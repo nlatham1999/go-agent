@@ -3,13 +3,13 @@ package model
 // all api functions for turtles that deal with links
 
 // creates a directed link from the current turtle to the turtle passed in
-func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
+func (t *Turtle) CreateLinkToTurtle(breed string, turtle *Turtle, operation LinkOperation) (*Link, error) {
 	l, err := newLink(t.parent, breed, t, turtle, true)
 	if err != nil {
 		return l, err
 	}
 
-	for _, operation := range operations {
+	if operation != nil {
 		operation(l)
 	}
 
@@ -36,13 +36,13 @@ func (t *Turtle) CreateLinksToSet(breed string, turtles *TurtleAgentSet, operati
 }
 
 // creates an undirected breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
+func (t *Turtle) CreateLinkWithTurtle(breed string, turtle *Turtle, operation LinkOperation) (*Link, error) {
 	l, err := newLink(t.parent, breed, t, turtle, false)
 	if err != nil {
 		return l, err
 	}
 
-	for _, operation := range operations {
+	if operation != nil {
 		operation(l)
 	}
 
@@ -66,13 +66,13 @@ func (t *Turtle) CreateLinksWithSet(breed string, turtles *TurtleAgentSet, opera
 }
 
 // creates a directed breed link from the current turtle with the turtle passed in
-func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operations []LinkOperation) (*Link, error) {
+func (t *Turtle) CreateLinkFromTurtle(breed string, turtle *Turtle, operation LinkOperation) (*Link, error) {
 	l, err := newLink(t.parent, breed, turtle, t, true)
 	if err != nil {
 		return l, err
 	}
 
-	for _, operation := range operations {
+	if operation != nil {
 		operation(l)
 	}
 

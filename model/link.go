@@ -5,8 +5,6 @@ import (
 	"math"
 )
 
-type TieMode int
-
 // A Link represents a connection between two turtles
 // A Link can be be a one way directed link or a two way undirected link
 type Link struct {
@@ -56,6 +54,7 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 		parent:   model,
 		Size:     1,
 		Hidden:   false,
+		Color:    White,
 	}
 
 	model.links.Add(l)
@@ -200,12 +199,16 @@ func (l *Link) Show() {
 	l.Hidden = false
 }
 
-// sets the tie mode to be fixed
+// sets the tie mode to be closely tied
 func (l *Link) Tie() {
-	l.TieMode = TieModeFixed
+	l.TieMode.MoveTiedTurtle = true
+	l.TieMode.SwivelTiedTurtle = true
+	l.TieMode.RotateTiedTurtle = true
 }
 
-// sets the tie mode to be none
+// sets the tie mode to completely free
 func (l *Link) Untie() {
-	l.TieMode = TieModeNone
+	l.TieMode.MoveTiedTurtle = false
+	l.TieMode.SwivelTiedTurtle = false
+	l.TieMode.RotateTiedTurtle = false
 }

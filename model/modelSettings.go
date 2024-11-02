@@ -1,6 +1,6 @@
 package model
 
-// modelSettings is a struct that holds the settings for the model
+// modelSettings holds the settings for the model
 type ModelSettings struct {
 	PatchesOwn           map[string]interface{}
 	TurtlesOwn           map[string]interface{}

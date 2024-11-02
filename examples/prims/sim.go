@@ -38,9 +38,9 @@ func (p *Prims) SetUp() error {
 
 	numNodes := p.model.GetGlobal("nodes").(int)
 
-	p.model.CreateTurtles(numNodes, "unplaced", []model.TurtleOperation{
+	p.model.CreateTurtles(numNodes, "unplaced",
 		p.placeInitialNodes,
-	})
+	)
 
 	//for each turtle create a link with every other turtle
 	p.model.Turtles("unplaced").Ask(
@@ -69,12 +69,12 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 	p.model.Turtles("unplaced").Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 && t.DistanceTurtle(t2) < 10 {
-				t.CreateLinkWithTurtle("unplaced", t2, []model.LinkOperation{
+				t.CreateLinkWithTurtle("unplaced", t2,
 					func(l *model.Link) {
 						l.Color.SetColor(model.Gray)
 						l.Hide()
 					},
-				})
+				)
 			}
 		},
 	)

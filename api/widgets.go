@@ -9,6 +9,7 @@ type Widget struct {
 	MaxValue        string `json:"maxValue"`
 	DefaultValue    string `json:"defaultValue"`
 	StepAmount      string `json:"stepAmount"`
+	Target          func() `json:"target"`
 }
 
 func (w *Widget) Render() string {
@@ -36,6 +37,10 @@ func (w *Widget) Render() string {
 		html += `hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `"
 		oninput="document.getElementById('` + labelId + `').innerText = this.value;">`
 	}
+	if w.WidgetType == "button" {
+		html += `<button id="` + id + `" hx-swap="none" hx-get="/updatedynamic" hx-trigger="click" hx-vals='{"` + w.TargetVariable + `": "test"}'>` + w.PrettyName + `</button>`
+	}
+
 	html += "</div>"
 	return html
 }

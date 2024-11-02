@@ -61,19 +61,19 @@ func (a *AntPath) SetUp() error {
 	a.foodX = float64(a.m.MaxPxCor()) - 10
 	a.foodY = 0
 
-	a.m.CreateTurtles(1, "leader", []model.TurtleOperation{
+	a.m.CreateTurtles(1, "leader",
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Red)
 		},
-	})
+	)
 
 	numAnts := a.m.GetGlobal("num-turtles").(int)
-	a.m.CreateTurtles(numAnts-1, "follower", []model.TurtleOperation{
+	a.m.CreateTurtles(numAnts-1, "follower",
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)
 			t.SetHeading(0)
 		},
-	})
+	)
 
 	a.m.Turtles("").SortAsc(func(t *model.Turtle) float64 {
 		return float64(t.Who())

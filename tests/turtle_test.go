@@ -783,12 +783,12 @@ func TestFaceXY(t *testing.T) {
 	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
-	m.CreateTurtles(1, "", []model.TurtleOperation{
+	m.CreateTurtles(1, "",
 		func(t *model.Turtle) {
 			t.SetXY(0, 5)
 			t.SetHeading(270)
 		},
-	})
+	)
 
 	if m.Turtle("", 0).GetHeading() != 270 {
 		t.Errorf("Expected turtle to face 270 degrees, got %v", m.Turtle("", 0).GetHeading())

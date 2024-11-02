@@ -229,72 +229,74 @@ func (t *turtleLinks) getLinkDirected(breed string, turtle *Turtle) *Link {
 
 // get all the turtles that are connected to the current turtle
 func (t *turtleLinks) getTurtlesIncoming(breed string) *TurtleAgentSet {
-	turtles := make([]*Turtle, 0)
+	agentSet := NewTurtleAgentSet(nil)
 	if breed == "" {
 		for turtle := range t.allTurtlesDirectedIn {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.allTurtlesUndirected {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	} else {
 		for turtle := range t.turtlesDirectedInBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.turtlesUndirectedBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	}
 
-	return NewTurtleAgentSet(turtles)
+	return agentSet
 }
 
+// gets all the turtles that are connected from the current turtle with a path from the current turtle to the target turtle
+// so undirected links are included
 func (t *turtleLinks) getTurtlesOutgoing(breed string) *TurtleAgentSet {
-	turtles := make([]*Turtle, 0)
+	agentSet := NewTurtleAgentSet(nil)
 	if breed == "" {
 		for turtle := range t.allTurtlesDirectedOut {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.allTurtlesUndirected {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	} else {
 		for turtle := range t.turtlesDirectedOutBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.turtlesUndirectedBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	}
 
-	return NewTurtleAgentSet(turtles)
+	return agentSet
 }
 
 func (t *turtleLinks) getTurtlesAll(breed string) *TurtleAgentSet {
-	turtles := make([]*Turtle, 0)
+	agentSet := NewTurtleAgentSet(nil)
 	if breed == "" {
 		for turtle := range t.allTurtlesDirectedOut {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.allTurtlesDirectedIn {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.allTurtlesUndirected {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	} else {
 		for turtle := range t.turtlesDirectedOutBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.turtlesDirectedInBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 		for turtle := range t.turtlesUndirectedBreed[breed] {
-			turtles = append(turtles, turtle)
+			agentSet.Add(turtle)
 		}
 	}
 
-	return NewTurtleAgentSet(turtles)
+	return agentSet
 }
 
 // returns all links that have an incoming path to the turtle. This includes undirected links

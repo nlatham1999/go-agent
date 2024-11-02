@@ -269,10 +269,20 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 	// Loop through all query parameters
 	for name, values := range queryParams {
 		// Assuming there's only one value per query parameter (HTMX serializes like this)
-		value := values[0]
+		var value string
+		if len(values) > 0 {
+			value = values[0]
+		}
 		// go through widgets and update the dynamic variable
 		for _, widget := range a.Model.Widgets() {
 			if widget.TargetVariable == name {
+
+				// If the widget is a button, just call the target function
+				if widget.WidgetType == "button" {
+					widget.Target()
+					continue
+				}
+
 				// Update the dynamic variable
 				if widget.WidgetValueType == "int" {
 					intValue, err := strconv.Atoi(value)
@@ -297,7 +307,6 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 
 	// Respond to the client (for demonstration purposes)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Dynamic variables processed"))
 }
 
 func (a *Api) setTickValueHandler(w http.ResponseWriter, r *http.Request) {

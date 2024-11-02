@@ -2,12 +2,10 @@ package playgound
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/nlatham1999/go-agent/api"
 	"github.com/nlatham1999/go-agent/model"
-	"go.uber.org/atomic"
 )
 
 // Init()        // runs at the very beginning
@@ -33,12 +31,16 @@ func (s *Sim) Model() *model.Model {
 
 func (s *Sim) Init() {
 	settings := model.ModelSettings{
-		WrappingX: true,
-		WrappingY: true,
-		MinPxCor:  -100,
-		MaxPxCor:  100,
-		MinPyCor:  -100,
-		MaxPyCor:  100,
+		WrappingX: false,
+		WrappingY: false,
+		MinPxCor:  -10,
+		MaxPxCor:  10,
+		MinPyCor:  -10,
+		MaxPyCor:  10,
+		Globals: map[string]interface{}{
+			"max-length":  10.0,
+			"num-turtles": 2,
+		},
 	}
 
 	s.model = model.NewModel(settings)
@@ -46,15 +48,23 @@ func (s *Sim) Init() {
 
 func (s *Sim) SetUp() error {
 
-	fmt.Println("hitting setup")
-
 	s.model.ClearAll()
 
-	s.model.CreateTurtles(180, "", []model.TurtleOperation{
-		func(t *model.Turtle) {
-			t.SetXY(-90, float64(t.Who()-90))
-			t.SetHeading(0)
-		},
+	// s.model.CreateTurtles(100, "", func(t *model.Turtle) {
+	// 	t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
+	// })
+
+	s.model.CreateTurtles(s.model.GetGlobal("num-turtles").(int), "", func(t *model.Turtle) {
+		t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
+	})
+
+	s.model.Turtles("").Ask(func(t *model.Turtle) {
+		s.model.Turtles("").Ask(func(t2 *model.Turtle) {
+			t.CreateLinkWithTurtle("", t2, func(l *model.Link) {
+				l.TieMode = model.TieModeAllTied
+				// fmt.Println("Link created", l.TieMode)
+			})
+		})
 	})
 
 	return nil
@@ -65,47 +75,33 @@ func (s *Sim) Go() {
 	// t1 := s.model.Turtle("", 2)
 	// t1.Forward(10)
 
-	timeNow := time.Now()
+	s.RotateTurtleTest()
 
-	// s.Routines()
-	count := 0
-	s.model.Turtles("").Ask(func(t *model.Turtle) {
-		t.Forward(float64(count))
-		count++
-	})
-
-	fmt.Println("Time taken: ", time.Since(timeNow))
 }
 
-func (s *Sim) Routines() {
+func (s Sim) CreateGraph() {
+	start := time.Now()
 
-	turtleChannel := make(chan *model.Turtle)
+	s.model.ClearLinks()
 
-	go func() {
-		s.model.Turtles("").Ask(func(t *model.Turtle) {
-			turtleChannel <- t
+	turtles := s.model.Turtles("")
+	turtles.Ask(func(t *model.Turtle) {
+
+		tInRadius := s.model.Turtles("").InRadiusTurtle(s.model.GetGlobal("max-length").(float64), t)
+
+		tInRadius.Ask(func(t2 *model.Turtle) {
+			t.CreateLinkWithTurtle("", t2, func(l *model.Link) {
+				// l.TieMode = model.TieModeAllTied
+				// fmt.Println("Link created", l.TieMode)
+			})
 		})
-		close(turtleChannel)
-	}()
+	})
 
-	var wg sync.WaitGroup
-	numRoutines := 45
+	turtles.Ask(func(t *model.Turtle) {
+		t.SetSize(float64(t.LinkNeighbors("").Count()) / 1000)
+	})
 
-	//count as a uber atomic counter
-	count := atomic.NewInt64(0)
-
-	for i := 0; i < numRoutines; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for t := range turtleChannel {
-				t.Forward(float64(count.Load()))
-				count.Inc()
-			}
-		}()
-	}
-
-	wg.Wait()
+	fmt.Println("Time taken: ", time.Since(start))
 }
 
 func (s *Sim) Stats() map[string]interface{} {
@@ -116,6 +112,57 @@ func (s *Sim) Stop() bool {
 	return false
 }
 
+func (s *Sim) ChangeColor() {
+	turtles := s.model.Turtles("")
+	turtles.Ask(func(t *model.Turtle) {
+		t.Color.SetColor(s.model.RandomColor())
+	})
+}
+
+func (s *Sim) RotateTurtleTest() {
+	fmt.Println("Rotating turtle")
+	// t1 := s.model.Turtle("", 0)
+	// t1.Right(1)
+	// t2 := s.model.Turtle("", 1)
+	// t2.Right(1)
+
+	s.model.Turtles("").Ask(func(t *model.Turtle) {
+		t.Right(1)
+	})
+}
+
 func (s *Sim) Widgets() []api.Widget {
-	return nil
+	return []api.Widget{
+		{
+			PrettyName:      "Max Length",
+			TargetVariable:  "max-length",
+			WidgetType:      "slider",
+			WidgetValueType: "float",
+			MinValue:        ".01",
+			MaxValue:        "20",
+			DefaultValue:    "10",
+			StepAmount:      ".01",
+		},
+		{
+			PrettyName:     "Change Color",
+			TargetVariable: "change-color",
+			Target:         s.ChangeColor,
+			WidgetType:     "button",
+		},
+		{
+			PrettyName:     "Rotate Turtle 1",
+			TargetVariable: "rotate-turtle-1",
+			Target:         s.RotateTurtleTest,
+			WidgetType:     "button",
+		},
+		{
+			PrettyName:      "Number of Turtles",
+			TargetVariable:  "num-turtles",
+			WidgetType:      "slider",
+			WidgetValueType: "int",
+			MinValue:        "1",
+			MaxValue:        "100",
+			DefaultValue:    "2",
+		},
+	}
 }

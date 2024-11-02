@@ -51,7 +51,7 @@ func (l *LinkAgentSet) Any(operation LinkBoolOperation) bool {
 	})
 }
 
-// perform the list of operations for all links in the agent set
+// perform the operation for all links in the agent set
 func (l *LinkAgentSet) Ask(operation LinkOperation) {
 	if operation == nil {
 		return
@@ -74,13 +74,11 @@ func (l *LinkAgentSet) Count() int {
 
 // returns the agent set as a list
 func (l *LinkAgentSet) List() []*Link {
-	v := []*Link{}
-	link := l.links.First()
-	for link != nil {
-		v = append(v, link.(*Link))
-		link, _ = l.links.Next()
-	}
-	return v
+	links := make([]*Link, 0)
+	l.links.Ask(func(a interface{}) {
+		links = append(links, a.(*Link))
+	})
+	return links
 }
 
 // returns the top n links in the agent set
@@ -157,31 +155,15 @@ func (l *LinkAgentSet) SortDesc(operation LinkFloatOperation) {
 
 // returns a new agent set with all the links that are not in the given agents set
 func (l *LinkAgentSet) WhoAreNot(links *LinkAgentSet) *LinkAgentSet {
-	linkSet := sortedset.NewSortedSet()
-
-	for link := l.links.First(); link != nil; link, _ = l.links.Next() {
-		if !links.Contains(link.(*Link)) {
-			linkSet.Add(link)
-		}
-	}
-
 	return &LinkAgentSet{
-		links: linkSet,
+		links: l.links.Difference(links.links),
 	}
 }
 
 // returns a new agent set with all the links that are not the given link
 func (l *LinkAgentSet) WhoAreNotLink(link *Link) *LinkAgentSet {
-	linkSet := sortedset.NewSortedSet()
-
-	for l1 := l.links.First(); l1 != nil; l1, _ = l.links.Next() {
-		if l1.(*Link) != link {
-			linkSet.Add(l1)
-		}
-	}
-
 	return &LinkAgentSet{
-		links: linkSet,
+		links: l.links.Difference(sortedset.NewSortedSet(link)),
 	}
 }
 

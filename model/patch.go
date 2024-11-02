@@ -23,7 +23,7 @@ type Patch struct {
 
 	PColor Color
 
-	//@TODO instead it might be faster having a PatchesOwn for each data type to reduce type assertions
+	//instead it might be faster having a PatchesOwn for each data type to reduce type assertions
 	patchesOwn map[string]interface{}
 
 	Label       interface{}

@@ -309,7 +309,7 @@ func (m *Model) ClearTurtles() {
 }
 
 // like create turtles but goes through the list of colors and evenly spaces out the headings
-func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []TurtleOperation) error {
+func (m *Model) CreateOrderedTurtles(breed string, amount int, operation TurtleOperation) error {
 	if breed != "" {
 		_, found := m.breeds[breed]
 		if !found {
@@ -337,24 +337,22 @@ func (m *Model) CreateOrderedTurtles(breed string, amount int, operations []Turt
 	}
 
 	for _, turtle := range turtles {
-		for i := 0; i < len(operations); i++ {
-			operations[i](turtle)
+		if operation != nil {
+			operation(turtle)
 		}
 	}
 
 	return nil
 }
 
-// create the specified amount of turtles with the specified breed and operations
+// create the specified amount of turtles with the specified breed and operation
 // if the breed is empty then it will add it to the general population
-// @TODO return the created turtles as an agentset
-// @TODO should just be a single operation passed in
-func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOperation) error {
+func (m *Model) CreateTurtles(amount int, breed string, operation TurtleOperation) (*TurtleAgentSet, error) {
 
 	if breed != "" {
 		_, found := m.breeds[breed]
 		if !found {
-			return errors.New("breed not found")
+			return nil, errors.New("breed not found")
 		}
 	}
 
@@ -375,13 +373,9 @@ func (m *Model) CreateTurtles(amount int, breed string, operations []TurtleOpera
 		m.turtlesWhoNumber++
 	}
 
-	turtles.Ask(func(turtle *Turtle) {
-		for i := 0; i < len(operations); i++ {
-			operations[i](turtle)
-		}
-	})
+	turtles.Ask(operation)
 
-	return nil
+	return turtles, nil
 }
 
 // if the topology allows it then convert the x y to within bounds if it is outside of the world
@@ -1063,6 +1057,10 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 	return m.getPatchAtCoords(x, y)
 }
 
+func (m *Model) RandomColor() Color {
+	return baseColorsList[m.randomGenerator.Intn(len(baseColorsList))]
+}
+
 // If number is positive, reports a random floating point number greater than or equal to 0 but strictly less than number.
 // If number is negative, reports a random floating point number less than or equal to 0, but strictly greater than number.
 // If number is zero, the result is always 0.
@@ -1105,24 +1103,6 @@ func (m *Model) ResetTicks() {
 // resets the timer
 func (m *Model) ResetTimer() {
 	m.modelStart = time.Now()
-}
-
-// resizes the world to the provided bounds
-func (m *Model) ResizeWorld(minPxcor int, maxPxcor int, minPycor int, maxPycor int) {
-	m.minPxCor = minPxcor
-	m.maxPxCor = maxPxcor
-	m.minPyCor = minPycor
-	m.maxPyCor = maxPycor
-	m.maxXCor = float64(maxPxcor) + .5
-	m.maxYCor = float64(maxPycor) + .5
-	m.minXCor = float64(minPxcor) - .5
-	m.minYCor = float64(minPycor) - .5
-	m.worldWidth = maxPxcor - minPxcor + 1
-	m.worldHeight = maxPycor - minPycor + 1
-
-	m.buildPatches()
-
-	//@TODO: resize the turtles
 }
 
 // sets the default shape for links

@@ -291,11 +291,11 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(3, "", []model.TurtleOperation{
+	m.CreateTurtles(3, "",
 		func(t *model.Turtle) {
 			t.SetHeading(0)
 		},
-	})
+	)
 
 	t1 := m.Turtle("", 0)
 	t2 := m.Turtle("", 1)
@@ -315,19 +315,19 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l1.TieMode = model.TieModeFixed
+	l1.TieMode = model.TieModeAllTied
 
 	l2, err := t2.CreateLinkToTurtle("parent-children", t3, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l2.TieMode = model.TieModeFixed
+	l2.TieMode = model.TieModeAllTied
 
 	l3, err := t3.CreateLinkToTurtle("parent-children", t1, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l3.TieMode = model.TieModeFixed
+	l3.TieMode = model.TieModeAllTied
 
 	// rotate the turtles
 	t1.Right(10)
@@ -400,7 +400,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l4.TieMode = model.TieModeFixed
+	l4.TieMode = model.TieModeAllTied
 
 	// rotate t1
 	t4.Right(20)
@@ -413,7 +413,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	// revert the rotation
 	l4.TieMode = model.TieModeNone
 	t4.Left(10)
-	l4.TieMode = model.TieModeFixed
+	l4.TieMode = model.TieModeAllTied
 
 	m.WrappingXOn()
 
@@ -435,7 +435,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l5.TieMode = model.TieModeFixed
+	l5.TieMode = model.TieModeAllTied
 
 	// rotate t6
 	t6.Left(20)
@@ -456,11 +456,11 @@ func TestMovingTiedTurtles(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", []model.TurtleOperation{
+	m.CreateTurtles(2, "",
 		func(t *model.Turtle) {
 			t.SetHeading(0)
 		},
-	})
+	)
 
 	t1 := m.Turtle("", 0)
 	t2 := m.Turtle("", 1)
@@ -473,7 +473,7 @@ func TestMovingTiedTurtles(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
-	l.TieMode = model.TieModeFixed
+	l.TieMode = model.TieModeAllTied
 
 	// move t1 forward
 	t1.Forward(5)

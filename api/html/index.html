@@ -122,9 +122,9 @@
                 hx-target="this">
     </div>
 
-    <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .01s" style="visibility: hidden;">Load Content</button>
+    <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button>
 
-    <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .01s" style="visibility: hidden;">Load Stats</button>
+    <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .001s" style="visibility: hidden;">Load Stats</button>
 
     {{ .Widgets }}
 

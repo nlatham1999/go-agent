@@ -48,7 +48,7 @@ func (p *PatchAgentSet) Any(operation PatchBoolOperation) bool {
 	})
 }
 
-// perform the list of operations for all patches in the agent set
+// perform the operation for all patches in the agent set
 func (p *PatchAgentSet) Ask(operation PatchOperation) {
 	if operation == nil {
 		return
@@ -90,48 +90,25 @@ func (p *PatchAgentSet) Count() int {
 
 // returns a subset of patches that are in the radius of the given patch
 func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet {
-	patchSet := sortedset.NewSortedSet()
-
-	patchIter := p.patches.First()
-	for patchIter != nil {
-		distance := patchIter.(*Patch).DistancePatch(patch)
-		if distance <= radius {
-			patchSet.Add(patchIter)
-		}
-		patchIter, _ = p.patches.Next()
-	}
-
-	return &PatchAgentSet{
-		patches: patchSet,
-	}
+	return p.With(func(p *Patch) bool {
+		return p.DistancePatch(patch) <= radius
+	})
 }
 
 // returns a subset of patches that are in the radius of the given turtle
 func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgentSet {
-	patchSet := sortedset.NewSortedSet()
-
-	patchIter := p.patches.First()
-	for patchIter != nil {
-		if patchIter.(*Patch).DistanceTurtle(turtle) <= radius {
-			patchSet.Add(patchIter)
-		}
-		patchIter, _ = p.patches.Next()
-	}
-
-	return &PatchAgentSet{
-		patches: patchSet,
-	}
+	return p.With(func(p *Patch) bool {
+		return p.DistanceTurtle(turtle) <= radius
+	})
 }
 
 // returns the agent set as a list
 func (p *PatchAgentSet) List() []*Patch {
-	v := []*Patch{}
-	patch := p.patches.First()
-	for patch != nil {
-		v = append(v, patch.(*Patch))
-		patch, _ = p.patches.Next()
-	}
-	return v
+	patches := make([]*Patch, 0)
+	p.patches.Ask(func(a interface{}) {
+		patches = append(patches, a.(*Patch))
+	})
+	return patches
 }
 
 // returns the first n patches in the agent set
@@ -207,31 +184,15 @@ func (p *PatchAgentSet) SortDesc(operation PatchFloatOperation) {
 
 // returns a new PatchAgentSet with all the patches that are not in the given PatchAgentSet
 func (p *PatchAgentSet) WhoAreNot(patches *PatchAgentSet) *PatchAgentSet {
-	patchSet := sortedset.NewSortedSet()
-
-	for patch := p.patches.First(); patch != nil; patch, _ = p.patches.Next() {
-		if !patches.Contains(patch.(*Patch)) {
-			patchSet.Add(patch)
-		}
-	}
-
 	return &PatchAgentSet{
-		patches: patchSet,
+		patches: p.patches.Difference(patches.patches),
 	}
 }
 
 // returns a new PatchAgentSet with all the patches that are not the given patch
 func (p *PatchAgentSet) WhoAreNotPatch(patch *Patch) *PatchAgentSet {
-	patchSet := sortedset.NewSortedSet()
-
-	for p1 := p.patches.First(); p1 != nil; p1, _ = p.patches.Next() {
-		if p1.(*Patch) != patch {
-			patchSet.Add(p1)
-		}
-	}
-
 	return &PatchAgentSet{
-		patches: patchSet,
+		patches: p.patches.Difference(sortedset.NewSortedSet(patch)),
 	}
 }
 

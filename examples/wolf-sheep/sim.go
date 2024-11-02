@@ -78,7 +78,7 @@ func (ws *WolfSheep) SetUp() error {
 		return err
 	}
 
-	ws.m.CreateTurtles(initialNumberSheep, "sheep", []model.TurtleOperation{
+	ws.m.CreateTurtles(initialNumberSheep, "sheep",
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -88,7 +88,7 @@ func (ws *WolfSheep) SetUp() error {
 			t.SetXY(ws.m.RandomXCor(), ws.m.RandomYCor())
 			t.SetSize(.5)
 		},
-	})
+	)
 
 	initialNumberWolves, err := ws.m.GetGlobalI("initial-number-wolves")
 	if err != nil {
@@ -102,7 +102,7 @@ func (ws *WolfSheep) SetUp() error {
 		return err
 	}
 
-	ws.m.CreateTurtles(initialNumberWolves, "wolves", []model.TurtleOperation{
+	ws.m.CreateTurtles(initialNumberWolves, "wolves",
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
@@ -112,7 +112,7 @@ func (ws *WolfSheep) SetUp() error {
 			t.SetXY(float64(ws.m.RandomXCor()), ws.m.RandomYCor())
 			t.SetSize(.5)
 		},
-	})
+	)
 
 	showEnergy, _ := ws.m.GetGlobalB("show-energy")
 	ws.m.Turtles("").Ask(
@@ -211,12 +211,12 @@ func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
 	if ws.m.RandomFloat(100) < ws.m.GetGlobal("sheep-reproduce-rate").(float64) {
 
 		t.SetOwn("energy", energy/2)
-		t.Hatch("", 1, []model.TurtleOperation{
+		t.Hatch("", 1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
 				t.Forward(1)
 			},
-		})
+		)
 	}
 }
 
@@ -231,17 +231,17 @@ func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
 	}
 	if ws.m.RandomFloat(100) < ws.m.GetGlobal("sheep-reproduce-rate").(float64) {
 		t.SetOwn("energy", energy/2)
-		t.Hatch("", 1, []model.TurtleOperation{
+		t.Hatch("", 1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
 				t.Forward(1)
 			},
-		})
+		)
 	}
 }
 
 func (ws *WolfSheep) EatSheep(t *model.Turtle) {
-	prey, err := t.PatchHere().TurtlesHere("sheep").OneOf()
+	prey, err := t.PatchHere().TurtlesHere("sheep").First()
 	if err != nil {
 		return
 	}

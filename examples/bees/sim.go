@@ -70,23 +70,23 @@ func (b *Bees) SetUp() error {
 		},
 	)
 
-	b.model.CreateTurtles(1, "", []model.TurtleOperation{
+	b.model.CreateTurtles(1, "",
 		func(t *model.Turtle) {
 			t.SetXY(0, 0)
 		},
-	})
-	b.model.CreateTurtles(1, "", []model.TurtleOperation{
+	)
+	b.model.CreateTurtles(1, "",
 		func(t *model.Turtle) {
 			t.SetXY(1, 0)
 			t.CreateLinkWithTurtle("", b.model.Turtle("", 0), nil)
 		},
-	})
+	)
 
 	b.model.Patch(0, 0).PColor.SetColor(model.Red)
 	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
 
 	numScouts, _ := b.model.GetGlobalI("scouts")
-	b.model.CreateTurtles(numScouts, "scouts", []model.TurtleOperation{
+	b.model.CreateTurtles(numScouts, "scouts",
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.Color.SetColor(model.Yellow)
@@ -94,7 +94,7 @@ func (b *Bees) SetUp() error {
 			t.SetLabel(t.PatchHere().GetOwnI("nectar"))
 			t.SetOwn("group", t.Who())
 		},
-	})
+	)
 
 	b.model.ResetTicks()
 
@@ -118,21 +118,21 @@ func (b *Bees) Go() {
 				if nectar > 30 {
 					numForagers = 4
 				}
-				scout.Hatch("foragers", numForagers, []model.TurtleOperation{
+				scout.Hatch("foragers", numForagers,
 					func(forager *model.Turtle) {
 						forager.SetSize(.8)
 						forager.Color.SetColor(model.Red)
 						forager.SetHeading(b.model.RandomFloat(360))
 						forager.Forward(b.model.RandomFloat(searchRadius))
-						scout.CreateLinkWithTurtle("", forager, []model.LinkOperation{
+						scout.CreateLinkWithTurtle("", forager,
 							func(l *model.Link) {
 								l.Label = l.Length()
 								l.LabelColor = model.Red
 							},
-						})
+						)
 						forager.SetLabel(forager.PatchHere().GetOwnI("nectar"))
 					},
-				})
+				)
 			},
 		)
 	}
@@ -147,7 +147,7 @@ func (b *Bees) Go() {
 					return
 				}
 
-				foragers.SortAsc(func(f *model.Turtle) float64 {
+				foragers.SortDesc(func(f *model.Turtle) float64 {
 					return f.PatchHere().GetOwnF("nectar")
 				})
 				max, err := foragers.First()
