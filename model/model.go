@@ -734,6 +734,22 @@ func (m *Model) MinPyCor() int {
 	return m.minPyCor
 }
 
+func (m *Model) MaxXCor() float64 {
+	return m.maxXCor
+}
+
+func (m *Model) MaxYCor() float64 {
+	return m.maxYCor
+}
+
+func (m *Model) MinXCor() float64 {
+	return m.minXCor
+}
+
+func (m *Model) MinYCor() float64 {
+	return m.minYCor
+}
+
 // does not implement wrappimg, that is the responsibilty of the caller
 // should only be called by Patch()!!! since Patch correctly converts the floats to ints
 func (m *Model) getPatchAtCoords(x int, y int) *Patch {
@@ -748,7 +764,6 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 
 // returns a random int n the provided list
 func (m *Model) OneOfInt(arr []int) interface{} {
-
 	return arr[m.randomGenerator.Intn(len(arr))-1]
 }
 

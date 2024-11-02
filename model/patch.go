@@ -118,15 +118,7 @@ func (p *Patch) Neighbors4() *PatchAgentSet {
 
 // returns a set of patches that do not include this patch
 func (p *Patch) Other(patches *PatchAgentSet) *PatchAgentSet {
-	other := NewPatchAgentSet([]*Patch{})
-
-	patches.Ask(func(patch *Patch) {
-		if patch != p {
-			other.Add(patch)
-		}
-	})
-
-	return other
+	return patches.WhoAreNotPatch(p)
 }
 
 // gets the patch relavitve to this patch at the given dx dy

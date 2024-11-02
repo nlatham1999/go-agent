@@ -52,3 +52,8 @@ var (
 	DownAngle         float64 = 270.0
 	DownAndRightAngle float64 = 315.0
 )
+
+// empty breed
+var (
+	BreedNone = ""
+)

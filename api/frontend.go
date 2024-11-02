@@ -120,19 +120,21 @@ func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSi
 }
 
 func (a *Api) renderTurtle(tmpl *strings.Builder, turtle Turtle, model *Model, patchSize int) {
+	// fmt.Println(patchSize, turtle.Size)
 	turtleSize := int(float64(patchSize) * turtle.Size)
+	// fmt.Println(turtleSize)
 	if turtleSize < 1 {
 		turtleSize = 1
 	}
-	turtleOffset := (patchSize - turtleSize) / 2
+	turtleOffset := ((patchSize) - turtleSize) / 2
 	relativeX := turtle.X - float64(model.MinPxCor)
 	relativeY := turtle.Y - float64(model.MinPyCor)
 	tmpl.WriteString(fmt.Sprintf(`
 			<div 
 				class="turtle" 
 				style="
-					width: %d;
-					height: %d;
+					width: %dpx;
+					height: %dpx;
 					left: %vpx; 
 					top: %vpx;
 					background-color: rgba(%d,%d,%d,%d);
