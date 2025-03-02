@@ -141,7 +141,7 @@ func (b *Bees) Go() {
 	if b.step%numSteps == 1 {
 		b.model.Turtles("scouts").Ask(
 			func(t *model.Turtle) {
-				foragers := t.LinkNeighbors("")
+				foragers := t.LinkedTurtles("")
 
 				if foragers.Count() == 0 {
 					return

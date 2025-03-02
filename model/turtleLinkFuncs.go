@@ -102,7 +102,7 @@ func (t *Turtle) LinkExists(breed string, turtle *Turtle) bool {
 // returns all turtles that are linked to the current turtle
 //
 //	incoming, outgoing, or undirected
-func (t *Turtle) LinkNeighbors(breed string) *TurtleAgentSet {
+func (t *Turtle) LinkedTurtles(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesAll(breed)
 }
 
@@ -117,7 +117,7 @@ func (t *Turtle) LinkToTurtleExists(breed string, turtle *Turtle) bool {
 //	or an undirected link connecting the two
 //
 // basically all turtles where there is a path from the turtle to the current turtle
-func (t *Turtle) LinkNeighborsToTurtle(breed string) *TurtleAgentSet {
+func (t *Turtle) LinkedTurtlesToThis(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesIncoming(breed)
 }
 
@@ -128,11 +128,12 @@ func (t *Turtle) LinkFromTurtleExists(breed string, turtle *Turtle) bool {
 }
 
 // returns all turtles that have a directed link from the current turtle to them
-func (t *Turtle) LinkNeighborsFromTurtle(breed string) *TurtleAgentSet {
+func (t *Turtle) LinkedTurtlesFromThis(breed string) *TurtleAgentSet {
 	return t.linkedTurtles.getTurtlesOutgoing(breed)
 }
 
-// finds a link from the turtle passed int to the current turtle
+// finds a link from the turtle passed int to the current turtle (turtle -> this)
+// to get all the links use InLinks
 func (t *Turtle) LinkFrom(breed string, turtle *Turtle) *Link {
 
 	if turtle.linkedTurtles == nil {
@@ -142,7 +143,8 @@ func (t *Turtle) LinkFrom(breed string, turtle *Turtle) *Link {
 	return turtle.linkedTurtles.getLink(breed, t)
 }
 
-// finds a link from the current turtle to the turtle passed in
+// finds a link from the current turtle to the turtle passed in (this -> turtle)
+// To get all the links use OutLinks
 func (t *Turtle) LinkTo(breed string, turtle *Turtle) *Link {
 	if t.linkedTurtles == nil {
 		return nil
@@ -151,7 +153,8 @@ func (t *Turtle) LinkTo(breed string, turtle *Turtle) *Link {
 	return t.linkedTurtles.getLink(breed, turtle)
 }
 
-// finds a link between the current turtle and the turtle passed in
+// finds a link between the current turtle and the turtle passed in (this <-> turtle)
+// to get all the links use Links
 func (t *Turtle) LinkWith(breed string, turtle *Turtle) *Link {
 	if t.linkedTurtles != nil {
 		if link := t.linkedTurtles.getLink(breed, turtle); link != nil {
@@ -179,8 +182,74 @@ func (t *Turtle) InLinks(breed string) *LinkAgentSet {
 	return t.linkedTurtles.getLinksIncoming(breed)
 }
 
-// returns all outgoing links that are connected to the turtle
+// returns all outgoing links that are connected from the turtle
 // this includes directed links going out and undirected links
 func (t *Turtle) OutLinks(breed string) *LinkAgentSet {
 	return t.linkedTurtles.getLinksOutgoing(breed)
+}
+
+// returns the end of the given link that is not the current turtle
+func (t *Turtle) OtherEnd(link *Link) *Turtle {
+	if link.end1 == t {
+		return link.end2
+	}
+	if link.end2 == t {
+		return link.end1
+	}
+	return nil
+}
+
+func (t *Turtle) descendents(checkForRotated bool, checkForMoving bool, checkForSwivelling bool) *TurtleAgentSet {
+	d := NewTurtleAgentSet([]*Turtle{})
+	outgoing := t.linkedTurtles.getLinksOutgoing("")
+	for outgoing.Count() > 0 {
+		l, _ := outgoing.First()
+
+		if checkForRotated && !l.TieMode.RotateTiedTurtle {
+			outgoing.Remove(l)
+			continue
+		}
+
+		if checkForMoving && !l.TieMode.MoveTiedTurtle {
+			outgoing.Remove(l)
+			continue
+		}
+
+		if checkForSwivelling && !l.TieMode.SwivelTiedTurtle {
+			outgoing.Remove(l)
+			continue
+		}
+
+		t1 := l.end1
+		t2 := l.end2
+
+		if t1 != t && !d.Contains(t1) {
+			d.Add(t1)
+			nextLinks := t1.linkedTurtles.getLinksOutgoing("")
+			nextLinks.Ask(func(l2 *Link) {
+				if d.Contains(l2.end2) && d.Contains(l2.end1) {
+					return
+				}
+				if !outgoing.Contains(l2) {
+					outgoing.Add(l2)
+				}
+			})
+		}
+
+		if t2 != t && !d.Contains(t2) {
+			d.Add(t2)
+			nextLinks := t2.linkedTurtles.getLinksOutgoing("")
+			nextLinks.Ask(func(l2 *Link) {
+				if d.Contains(l2.end2) && d.Contains(l2.end1) {
+					return
+				}
+				if !outgoing.Contains(l2) {
+					outgoing.Add(l2)
+				}
+			})
+		}
+
+		outgoing.Remove(l)
+	}
+	return d
 }

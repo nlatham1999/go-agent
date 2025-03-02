@@ -164,61 +164,6 @@ func (t *Turtle) CanMove(distance float64) bool {
 	return true
 }
 
-func (t *Turtle) descendents(checkForRotated bool, checkForMoving bool, checkForSwivelling bool) *TurtleAgentSet {
-	d := NewTurtleAgentSet([]*Turtle{})
-	outgoing := t.linkedTurtles.getLinksOutgoing("")
-	for outgoing.Count() > 0 {
-		l, _ := outgoing.First()
-
-		if checkForRotated && !l.TieMode.RotateTiedTurtle {
-			outgoing.Remove(l)
-			continue
-		}
-
-		if checkForMoving && !l.TieMode.MoveTiedTurtle {
-			outgoing.Remove(l)
-			continue
-		}
-
-		if checkForSwivelling && !l.TieMode.SwivelTiedTurtle {
-			outgoing.Remove(l)
-			continue
-		}
-
-		t1 := l.end1
-		t2 := l.end2
-
-		if t1 != t && !d.Contains(t1) {
-			d.Add(t1)
-			nextLinks := t1.linkedTurtles.getLinksOutgoing("")
-			nextLinks.Ask(func(l2 *Link) {
-				if d.Contains(l2.end2) && d.Contains(l2.end1) {
-					return
-				}
-				if !outgoing.Contains(l2) {
-					outgoing.Add(l2)
-				}
-			})
-		}
-
-		if t2 != t && !d.Contains(t2) {
-			d.Add(t2)
-			nextLinks := t2.linkedTurtles.getLinksOutgoing("")
-			nextLinks.Ask(func(l2 *Link) {
-				if d.Contains(l2.end2) && d.Contains(l2.end1) {
-					return
-				}
-				if !outgoing.Contains(l2) {
-					outgoing.Add(l2)
-				}
-			})
-		}
-
-		outgoing.Remove(l)
-	}
-	return d
-}
-
 // kill the turtle
 func (t *Turtle) Die() {
 	t.parent.KillTurtle(t)
@@ -648,14 +593,6 @@ func (t *Turtle) Neighbors4() *PatchAgentSet {
 	neighbors := t.parent.neighbors4(p)
 
 	return neighbors
-}
-
-// returns the end of the given link that is not the current turtle
-func (t *Turtle) OtherEnd(link *Link) *Turtle {
-	if link.end1 == t {
-		return link.end2
-	}
-	return link.end1
 }
 
 // returns the turtle own variable

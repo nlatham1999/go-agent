@@ -928,7 +928,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 	t8.CreateLinkWithTurtle("", t1, nil)
 	t9.CreateLinkWithTurtle("", t1, nil)
 
-	neighbors := t1.LinkNeighborsToTurtle("parent-children")
+	neighbors := t1.LinkedTurtlesToThis("parent-children")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -936,7 +936,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t2 and t3")
 	}
 
-	neighbors = t1.LinkNeighborsToTurtle("coworkers")
+	neighbors = t1.LinkedTurtlesToThis("coworkers")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -944,7 +944,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t4 and t5")
 	}
 
-	neighbors = t1.LinkNeighborsToTurtle("")
+	neighbors = t1.LinkedTurtlesToThis("")
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
 	}
@@ -1072,22 +1072,22 @@ func TestTurtleLinkNeighbors(t *testing.T) {
 	t8.CreateLinkWithTurtle("", t1, nil)
 	t9.CreateLinkWithTurtle("", t1, nil)
 
-	neighbors := t1.LinkNeighbors("")
+	neighbors := t1.LinkedTurtles("")
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkNeighbors("parent-children")
+	neighbors = t1.LinkedTurtles("parent-children")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkNeighbors("coworkers")
+	neighbors = t1.LinkedTurtles("coworkers")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t2.LinkNeighbors("parent-children")
+	neighbors = t2.LinkedTurtles("parent-children")
 	if neighbors.Count() != 1 {
 		t.Errorf("Expected 1 neighbor, got %d", neighbors.Count())
 	}
@@ -1223,22 +1223,22 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 	t1.CreateLinkWithTurtle("", t8, nil)
 	t1.CreateLinkWithTurtle("", t9, nil)
 
-	neighbors := t1.LinkNeighborsFromTurtle("")
+	neighbors := t1.LinkedTurtlesFromThis("")
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkNeighborsFromTurtle("parent-children")
+	neighbors = t1.LinkedTurtlesFromThis("parent-children")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkNeighborsFromTurtle("coworkers")
+	neighbors = t1.LinkedTurtlesFromThis("coworkers")
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t2.LinkNeighborsFromTurtle("parent-children")
+	neighbors = t2.LinkedTurtlesFromThis("parent-children")
 	if neighbors.Count() != 0 {
 		t.Errorf("Expected 0 neighbors, got %d", neighbors.Count())
 	}
@@ -1580,19 +1580,19 @@ func TestTurtlesLinksDying(t *testing.T) {
 
 	t1.CreateLinkWithTurtle("", t2, nil)
 	t1.Die()
-	if t2.LinkNeighbors("").Count() != 0 {
+	if t2.LinkedTurtles("").Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 
 	t3.CreateLinkToTurtle("", t4, nil)
 	t3.Die()
-	if t4.LinkNeighbors("").Count() != 0 {
+	if t4.LinkedTurtles("").Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 
 	t5.CreateLinkFromTurtle("", t6, nil)
 	t5.Die()
-	if t6.LinkNeighbors("").Count() != 0 {
+	if t6.LinkedTurtles("").Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 

@@ -98,7 +98,7 @@ func (s Sim) CreateGraph() {
 	})
 
 	turtles.Ask(func(t *model.Turtle) {
-		t.SetSize(float64(t.LinkNeighbors("").Count()) / 1000)
+		t.SetSize(float64(t.LinkedTurtles("").Count()) / 1000)
 	})
 
 	fmt.Println("Time taken: ", time.Since(start))
