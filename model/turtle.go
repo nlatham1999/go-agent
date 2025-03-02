@@ -27,9 +27,6 @@ type Turtle struct {
 	turtlesOwnGeneral map[string]interface{} // turtles own variables
 	turtlesOwnBreed   map[string]interface{} // turtles own variables
 
-	// turtles the current turtle is linked to/by/with
-	linkedTurtles *turtleLinks
-
 	patch *Patch //patch the turtle is on
 }
 
@@ -49,16 +46,18 @@ func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	}
 
 	t := &Turtle{
-		who:           who,
-		parent:        m,
-		xcor:          x,
-		ycor:          y,
-		breed:         breed,
-		linkedTurtles: newTurtleLinks(),
-		size:          .8,
-		label:         "",
-		labelColor:    Black,
+		who:        who,
+		parent:     m,
+		xcor:       x,
+		ycor:       y,
+		breed:      breed,
+		size:       .8,
+		label:      "",
+		labelColor: Black,
 	}
+
+	// add in the linked turtles
+	t.parent.linkedTurtles[t] = newTurtleLinks()
 
 	m.turtles.Add(t)
 	m.whoToTurtles[m.turtlesWhoNumber] = t
@@ -458,7 +457,7 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 
 	t.heading = heading
 
-	if t.linkedTurtles.count() == 0 {
+	if t.parent.linkedTurtles[t].count() == 0 {
 		return
 	}
 
@@ -735,7 +734,7 @@ func (t *Turtle) SetXY(x float64, y float64) {
 
 	t.transferPatchOwnership()
 
-	if t.linkedTurtles.count() == 0 {
+	if t.parent.linkedTurtles[t].count() == 0 {
 		return
 	}
 
