@@ -38,11 +38,11 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	}
 
 	// make sure the link doesn't already exist
-	if directed && end1.linkedTurtles.existsOutgoing(breed, end2) {
+	if directed && model.linkedTurtles[end1].existsOutgoing(breed, end2) {
 		return nil, fmt.Errorf("Link already exists")
 	}
 
-	if !directed && end1.linkedTurtles.existsUndirected(breed, end2) {
+	if !directed && model.linkedTurtles[end1].existsUndirected(breed, end2) {
 		return nil, fmt.Errorf("Link already exists")
 	}
 
@@ -69,11 +69,11 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	// add the link to the turtle's link map
 	if directed {
-		end1.linkedTurtles.addDirectedOutBreed(breed, end2, l)
-		end2.linkedTurtles.addDirectedInBreed(breed, end1, l)
+		model.linkedTurtles[end1].addDirectedOutBreed(breed, end2, l)
+		model.linkedTurtles[end2].addDirectedInBreed(breed, end1, l)
 	} else {
-		end1.linkedTurtles.addUndirectedBreed(breed, end2, l)
-		end2.linkedTurtles.addUndirectedBreed(breed, end1, l)
+		model.linkedTurtles[end1].addUndirectedBreed(breed, end2, l)
+		model.linkedTurtles[end2].addUndirectedBreed(breed, end1, l)
 	}
 
 	return l, nil
@@ -147,11 +147,11 @@ func (l *Link) SetBreed(name string) {
 
 	//change the breed on the turtles
 	if l.directed {
-		l.end1.linkedTurtles.changeDirectedOutBreed(oldBreedName, name, l.end2, l)
-		l.end2.linkedTurtles.changeDirectedInBreed(oldBreedName, name, l.end1, l)
+		l.parent.linkedTurtles[l.end1].changeDirectedOutBreed(oldBreedName, name, l.end2, l)
+		l.parent.linkedTurtles[l.end2].changeDirectedInBreed(oldBreedName, name, l.end1, l)
 	} else {
-		l.end1.linkedTurtles.changeUndirectedBreed(oldBreedName, name, l.end2, l)
-		l.end2.linkedTurtles.changeUndirectedBreed(oldBreedName, name, l.end1, l)
+		l.parent.linkedTurtles[l.end1].changeUndirectedBreed(oldBreedName, name, l.end2, l)
+		l.parent.linkedTurtles[l.end2].changeUndirectedBreed(oldBreedName, name, l.end1, l)
 	}
 }
 

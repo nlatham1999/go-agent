@@ -1,5 +1,3 @@
 
-Make it so that the Api html generation isn't the ugliest code to ever exist
-
-Rethink Tie Modes
-- having it be free tied and fixed makes no sense
+- Make it so that the Api html generation isn't the ugliest code to ever exist
+- switch the breedname string params to be the turtlebreed and linkbreed types

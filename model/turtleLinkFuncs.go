@@ -96,20 +96,20 @@ func (t *Turtle) CreateLinksFromSet(breed string, turtles *TurtleAgentSet, opera
 
 // returns if there is any sort of link between the current turtle and the turtle passed in
 func (t *Turtle) LinkExists(breed string, turtle *Turtle) bool {
-	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
+	return t.parent.linkedTurtles[t].existsIncoming(breed, turtle) || t.parent.linkedTurtles[t].existsOutgoing(breed, turtle) || t.parent.linkedTurtles[t].existsUndirected(breed, turtle)
 }
 
 // returns all turtles that are linked to the current turtle
 //
 //	incoming, outgoing, or undirected
 func (t *Turtle) LinkedTurtles(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesAll(breed)
+	return t.parent.linkedTurtles[t].getTurtlesAll(breed)
 }
 
 // returns if there is a directed link from turtle passed in to the current turtle or an undirected link connecting the two
 func (t *Turtle) LinkToTurtleExists(breed string, turtle *Turtle) bool {
 
-	return t.linkedTurtles.existsIncoming(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
+	return t.parent.linkedTurtles[t].existsIncoming(breed, turtle) || t.parent.linkedTurtles[t].existsUndirected(breed, turtle)
 }
 
 // returns all turtles that have a directed link to the current turtle
@@ -118,52 +118,52 @@ func (t *Turtle) LinkToTurtleExists(breed string, turtle *Turtle) bool {
 //
 // basically all turtles where there is a path from the turtle to the current turtle
 func (t *Turtle) LinkedTurtlesToThis(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesIncoming(breed)
+	return t.parent.linkedTurtles[t].getTurtlesIncoming(breed)
 }
 
 // returns whether there is a directed link connecting the current turtle to the turtle passed in or an undirected link connecting the two
 // (this -> turtle) or (this <-> turtle)
 func (t *Turtle) LinkFromTurtleExists(breed string, turtle *Turtle) bool {
-	return t.linkedTurtles.existsOutgoing(breed, turtle) || t.linkedTurtles.existsUndirected(breed, turtle)
+	return t.parent.linkedTurtles[t].existsOutgoing(breed, turtle) || t.parent.linkedTurtles[t].existsUndirected(breed, turtle)
 }
 
 // returns all turtles that have a directed link from the current turtle to them
 func (t *Turtle) LinkedTurtlesFromThis(breed string) *TurtleAgentSet {
-	return t.linkedTurtles.getTurtlesOutgoing(breed)
+	return t.parent.linkedTurtles[t].getTurtlesOutgoing(breed)
 }
 
 // finds a link from the turtle passed int to the current turtle (turtle -> this)
 // to get all the links use InLinks
 func (t *Turtle) LinkFrom(breed string, turtle *Turtle) *Link {
 
-	if turtle.linkedTurtles == nil {
+	if turtle.parent.linkedTurtles[turtle] == nil {
 		return nil
 	}
 
-	return turtle.linkedTurtles.getLink(breed, t)
+	return turtle.parent.linkedTurtles[turtle].getLink(breed, t)
 }
 
 // finds a link from the current turtle to the turtle passed in (this -> turtle)
 // To get all the links use OutLinks
 func (t *Turtle) LinkTo(breed string, turtle *Turtle) *Link {
-	if t.linkedTurtles == nil {
+	if t.parent.linkedTurtles[t] == nil {
 		return nil
 	}
 
-	return t.linkedTurtles.getLink(breed, turtle)
+	return t.parent.linkedTurtles[t].getLink(breed, turtle)
 }
 
 // finds a link between the current turtle and the turtle passed in (this <-> turtle)
 // to get all the links use Links
 func (t *Turtle) LinkWith(breed string, turtle *Turtle) *Link {
-	if t.linkedTurtles != nil {
-		if link := t.linkedTurtles.getLink(breed, turtle); link != nil {
+	if t.parent.linkedTurtles[t] != nil {
+		if link := t.parent.linkedTurtles[t].getLink(breed, turtle); link != nil {
 			return link
 		}
 	}
 
-	if turtle.linkedTurtles != nil {
-		if link := turtle.linkedTurtles.getLink(breed, t); link != nil {
+	if turtle.parent.linkedTurtles[t] != nil {
+		if link := turtle.parent.linkedTurtles[t].getLink(breed, t); link != nil {
 			return link
 		}
 	}
@@ -173,19 +173,19 @@ func (t *Turtle) LinkWith(breed string, turtle *Turtle) *Link {
 
 // returns all links that are connected to a turtle, undirected or directed, incoming or outgoing
 func (t *Turtle) Links(breed string) *LinkAgentSet {
-	return t.linkedTurtles.getLinksAll(breed)
+	return t.parent.linkedTurtles[t].getLinksAll(breed)
 }
 
 // returns all incoming links that are connected to the turtle
 // this includes directed links going in and undirected links
 func (t *Turtle) InLinks(breed string) *LinkAgentSet {
-	return t.linkedTurtles.getLinksIncoming(breed)
+	return t.parent.linkedTurtles[t].getLinksIncoming(breed)
 }
 
 // returns all outgoing links that are connected from the turtle
 // this includes directed links going out and undirected links
 func (t *Turtle) OutLinks(breed string) *LinkAgentSet {
-	return t.linkedTurtles.getLinksOutgoing(breed)
+	return t.parent.linkedTurtles[t].getLinksOutgoing(breed)
 }
 
 // returns the end of the given link that is not the current turtle
@@ -201,7 +201,7 @@ func (t *Turtle) OtherEnd(link *Link) *Turtle {
 
 func (t *Turtle) descendents(checkForRotated bool, checkForMoving bool, checkForSwivelling bool) *TurtleAgentSet {
 	d := NewTurtleAgentSet([]*Turtle{})
-	outgoing := t.linkedTurtles.getLinksOutgoing("")
+	outgoing := t.parent.linkedTurtles[t].getLinksOutgoing("")
 	for outgoing.Count() > 0 {
 		l, _ := outgoing.First()
 
@@ -225,7 +225,7 @@ func (t *Turtle) descendents(checkForRotated bool, checkForMoving bool, checkFor
 
 		if t1 != t && !d.Contains(t1) {
 			d.Add(t1)
-			nextLinks := t1.linkedTurtles.getLinksOutgoing("")
+			nextLinks := t1.parent.linkedTurtles[t1].getLinksOutgoing("")
 			nextLinks.Ask(func(l2 *Link) {
 				if d.Contains(l2.end2) && d.Contains(l2.end1) {
 					return
@@ -238,7 +238,7 @@ func (t *Turtle) descendents(checkForRotated bool, checkForMoving bool, checkFor
 
 		if t2 != t && !d.Contains(t2) {
 			d.Add(t2)
-			nextLinks := t2.linkedTurtles.getLinksOutgoing("")
+			nextLinks := t2.parent.linkedTurtles[t2].getLinksOutgoing("")
 			nextLinks.Ask(func(l2 *Link) {
 				if d.Contains(l2.end2) && d.Contains(l2.end1) {
 					return

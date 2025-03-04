@@ -49,6 +49,9 @@ type Model struct {
 	modelStart time.Time
 
 	Globals map[string]interface{}
+
+	// turtles the current turtle is linked to/by/with
+	linkedTurtles map[*Turtle]*turtleLinks
 }
 
 // Create a new model
@@ -105,6 +108,7 @@ func NewModel(
 		randomGenerator:    rand.New(rand.NewSource(settings.RandomSeed)),
 		modelStart:         time.Now(),
 		Globals:            make(map[string]interface{}),
+		linkedTurtles:      make(map[*Turtle]*turtleLinks),
 	}
 
 	//construct turtle breeds
@@ -261,7 +265,7 @@ func (m *Model) ClearLinks() {
 		m.undirectedLinkBreeds[breed].links = NewLinkAgentSet([]*Link{})
 	}
 	m.turtles.Ask(func(turtle *Turtle) {
-		turtle.linkedTurtles = newTurtleLinks()
+		m.linkedTurtles[turtle] = newTurtleLinks()
 	})
 }
 
@@ -437,17 +441,17 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 	}
 
 	// kill all directed out links
-	for link := range turtle.linkedTurtles.getAllDirectedOutLinks() {
+	for link := range m.linkedTurtles[turtle].getAllDirectedOutLinks() {
 		m.KillLink(link)
 	}
 
 	// kill all directed in links
-	for link := range turtle.linkedTurtles.getAllDirectedInLinks() {
+	for link := range m.linkedTurtles[turtle].getAllDirectedInLinks() {
 		m.KillLink(link)
 	}
 
 	// kill all undirected links
-	for link := range turtle.linkedTurtles.getAllUndirectedLinks() {
+	for link := range m.linkedTurtles[turtle].getAllUndirectedLinks() {
 		m.KillLink(link)
 	}
 
@@ -469,11 +473,11 @@ func (m *Model) KillLink(link *Link) {
 
 	// remove the link from the turtles
 	if link.directed {
-		link.end1.linkedTurtles.removeDirectedOutBreed(link.breed, link.end2, link)
-		link.end2.linkedTurtles.removeDirectedInBreed(link.breed, link.end1, link)
+		m.linkedTurtles[link.end1].removeDirectedOutBreed(link.breed, link.end2, link)
+		m.linkedTurtles[link.end2].removeDirectedInBreed(link.breed, link.end1, link)
 	} else {
-		link.end1.linkedTurtles.removeUndirectedBreed(link.breed, link.end2, link)
-		link.end2.linkedTurtles.removeUndirectedBreed(link.breed, link.end1, link)
+		m.linkedTurtles[link.end1].removeUndirectedBreed(link.breed, link.end2, link)
+		m.linkedTurtles[link.end2].removeUndirectedBreed(link.breed, link.end1, link)
 	}
 
 	*link = Link{}
@@ -694,7 +698,7 @@ func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link {
 		return nil
 	}
 
-	return t1.linkedTurtles.getLink(breed, t2)
+	return m.linkedTurtles[t1].getLink(breed, t2)
 }
 
 // returns a link that is directed that connects from turtle1 to turtle2
@@ -707,7 +711,7 @@ func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
 		return nil
 	}
 
-	return t1.linkedTurtles.getLinkDirected(breed, t2)
+	return m.linkedTurtles[t1].getLinkDirected(breed, t2)
 }
 
 // returns the maximum patch x coordinate

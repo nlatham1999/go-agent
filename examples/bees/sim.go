@@ -7,6 +7,9 @@ import (
 	"github.com/nlatham1999/go-agent/model"
 )
 
+// enforce that Bees implements the ModelInterface interface
+var _ api.ModelInterface = (*Bees)(nil)
+
 type Bees struct {
 	model *model.Model
 	step  int
@@ -38,6 +41,10 @@ func (b *Bees) Init() {
 }
 
 func (b *Bees) SetUp() error {
+
+	if b.model == nil {
+		return fmt.Errorf("model is nil")
+	}
 
 	b.model.ClearAll()
 
