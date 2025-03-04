@@ -1,15 +1,18 @@
 package api
 
 type Widget struct {
-	PrettyName      string `json:"prettyName"`
-	TargetVariable  string `json:"targetVariable"`
-	WidgetType      string `json:"widgetType"`
-	WidgetValueType string `json:"widgetValueType"`
-	MinValue        string `json:"minValue"`
-	MaxValue        string `json:"maxValue"`
-	DefaultValue    string `json:"defaultValue"`
-	StepAmount      string `json:"stepAmount"`
-	Target          func() `json:"target"`
+	PrettyName         string   `json:"prettyName"`
+	TargetVariable     string   `json:"targetVariable"`
+	WidgetType         string   `json:"widgetType"`
+	WidgetValueType    string   `json:"widgetValueType"`
+	MinValue           string   `json:"minValue"`
+	MaxValue           string   `json:"maxValue"`
+	DefaultValue       string   `json:"defaultValue"`
+	StepAmount         string   `json:"stepAmount"`
+	Target             func()   `json:"target"`
+	ValuePointerInt    *int     `json:"valuePointerInt"`
+	ValuePointerFloat  *float64 `json:"valuePointerFloat"`
+	ValuePointerString *string  `json:"valuePointerString"`
 }
 
 func (w *Widget) Render() string {

@@ -13,6 +13,8 @@ var _ api.ModelInterface = (*Bees)(nil)
 type Bees struct {
 	model *model.Model
 	step  int
+
+	scouts int
 }
 
 func NewBees() *Bees {
@@ -31,12 +33,11 @@ func (b *Bees) Init() {
 			"radius": 10.0,
 			"group":  0,
 		},
-		Globals: map[string]interface{}{
-			"scouts": 3,
-		},
 	}
 
 	b.model = model.NewModel(modelSettings)
+
+	b.scouts = 3
 
 }
 
@@ -92,8 +93,7 @@ func (b *Bees) SetUp() error {
 	b.model.Patch(0, 0).PColor.SetColor(model.Red)
 	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
 
-	numScouts, _ := b.model.GetGlobalI("scouts")
-	b.model.CreateTurtles(numScouts, "scouts",
+	b.model.CreateTurtles(b.scouts, "scouts",
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.Color.SetColor(model.Yellow)

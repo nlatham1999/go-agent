@@ -10,6 +10,8 @@ import (
 
 type Prims struct {
 	model *model.Model
+
+	nodes int
 }
 
 func NewPrims() *Prims {
@@ -20,25 +22,22 @@ func (p *Prims) Init() {
 	modelSettings := model.ModelSettings{
 		TurtleBreeds:         []string{"unplaced", "placed"},
 		UndirectedLinkBreeds: []string{"unplaced", "placed"},
-		Globals: map[string]interface{}{
-			"nodes": 5,
-		},
-		MinPxCor: 0,
-		MinPyCor: 0,
-		MaxPxCor: 100,
-		MaxPyCor: 100,
+		MinPxCor:             0,
+		MinPyCor:             0,
+		MaxPxCor:             100,
+		MaxPyCor:             100,
 	}
 
 	p.model = model.NewModel(modelSettings)
+
+	p.nodes = 5
 }
 
 func (p *Prims) SetUp() error {
 
 	p.model.ClearAll()
 
-	numNodes := p.model.GetGlobal("nodes").(int)
-
-	p.model.CreateTurtles(numNodes, "unplaced",
+	p.model.CreateTurtles(p.nodes, "unplaced",
 		p.placeInitialNodes,
 	)
 
@@ -123,7 +122,7 @@ func (p *Prims) Go() {
 	closestTurtle.Color.SetColor(model.Red)
 
 	// if all nodes are placed, kill all unplaced links
-	if p.model.Turtles("placed").Count() == p.model.GetGlobal("nodes").(int) {
+	if p.model.Turtles("placed").Count() == p.nodes {
 		p.model.UndirectedLinks("unplaced").Ask(
 			func(l *model.Link) {
 				l.Die()
@@ -150,7 +149,7 @@ func (p *Prims) Stats() map[string]interface{} {
 }
 
 func (p *Prims) Stop() bool {
-	return p.model.UndirectedLinks("placed").Count() >= p.model.GetGlobal("nodes").(int)-2
+	return p.model.UndirectedLinks("placed").Count() >= p.nodes-2
 }
 
 func (p *Prims) Widgets() []api.Widget {
