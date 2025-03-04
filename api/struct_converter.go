@@ -8,17 +8,16 @@ import (
 
 func convertModelToApiModel(model *model.Model) *Model {
 	apiModel := Model{
-		Patches:          convertPatchSetToApiPatchSet(model.Patches),
-		Turtles:          convertTurtleSetToApiTurtleSet(model.Turtles("")),
-		Links:            convertLinkSetToApiLinkSet(model.Links()),
-		DynamicVariables: model.Globals,
-		Ticks:            model.Ticks,
-		WorldWidth:       model.WorldWidth(),
-		WorldHeight:      model.WorldHeight(),
-		MinPxCor:         model.MinPxCor(),
-		MaxPxCor:         model.MaxPxCor(),
-		MinPyCor:         model.MinPyCor(),
-		MaxPyCor:         model.MaxPyCor(),
+		Patches:     convertPatchSetToApiPatchSet(model.Patches),
+		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles("")),
+		Links:       convertLinkSetToApiLinkSet(model.Links()),
+		Ticks:       model.Ticks,
+		WorldWidth:  model.WorldWidth(),
+		WorldHeight: model.WorldHeight(),
+		MinPxCor:    model.MinPxCor(),
+		MaxPxCor:    model.MaxPxCor(),
+		MinPyCor:    model.MinPyCor(),
+		MaxPyCor:    model.MaxPyCor(),
 	}
 	return &apiModel
 }

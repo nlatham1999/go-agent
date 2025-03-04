@@ -18,7 +18,9 @@ import (
 // Widgets() []Widget             // returns the widgets of the model
 
 type Sim struct {
-	model *model.Model
+	model      *model.Model
+	numTurtles int
+	maxLength  float64
 }
 
 func NewSim() *Sim {
@@ -37,13 +39,12 @@ func (s *Sim) Init() {
 		MaxPxCor:  10,
 		MinPyCor:  -10,
 		MaxPyCor:  10,
-		Globals: map[string]interface{}{
-			"max-length":  10.0,
-			"num-turtles": 2,
-		},
 	}
 
 	s.model = model.NewModel(settings)
+
+	s.numTurtles = 2
+	s.maxLength = 10.0
 }
 
 func (s *Sim) SetUp() error {
@@ -54,7 +55,7 @@ func (s *Sim) SetUp() error {
 	// 	t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
 	// })
 
-	s.model.CreateTurtles(s.model.GetGlobal("num-turtles").(int), "", func(t *model.Turtle) {
+	s.model.CreateTurtles(s.numTurtles, "", func(t *model.Turtle) {
 		t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
 	})
 
@@ -87,7 +88,7 @@ func (s Sim) CreateGraph() {
 	turtles := s.model.Turtles("")
 	turtles.Ask(func(t *model.Turtle) {
 
-		tInRadius := s.model.Turtles("").InRadiusTurtle(s.model.GetGlobal("max-length").(float64), t)
+		tInRadius := s.model.Turtles("").InRadiusTurtle(s.maxLength, t)
 
 		tInRadius.Ask(func(t2 *model.Turtle) {
 			t.CreateLinkWithTurtle("", t2, func(l *model.Link) {

@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -47,8 +46,6 @@ type Model struct {
 	randomGenerator *rand.Rand
 
 	modelStart time.Time
-
-	Globals map[string]interface{}
 
 	// turtles the current turtle is linked to/by/with
 	linkedTurtles map[*Turtle]*turtleLinks
@@ -107,7 +104,6 @@ func NewModel(
 		whoToTurtles:       make(map[int]*Turtle),
 		randomGenerator:    rand.New(rand.NewSource(settings.RandomSeed)),
 		modelStart:         time.Now(),
-		Globals:            make(map[string]interface{}),
 		linkedTurtles:      make(map[*Turtle]*turtleLinks),
 	}
 
@@ -181,11 +177,6 @@ func NewModel(
 
 	// build patches
 	model.buildPatches()
-
-	// build globals
-	for key, value := range settings.Globals {
-		model.Globals[key] = value
-	}
 
 	return model
 }
@@ -605,76 +596,6 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	}
 
 	return distance
-}
-
-// gets a gobal variable
-func (m *Model) GetGlobal(key string) interface{} {
-	return m.Globals[key]
-}
-
-// gets a global variable as a bool
-func (m *Model) GetGlobalB(key string) (bool, error) {
-	v := m.Globals[key]
-	if v == nil {
-		return false, fmt.Errorf("global %s not found", key)
-	}
-	switch v := v.(type) {
-	case bool:
-		return v, nil
-	default:
-		return false, fmt.Errorf("global %s is not a bool", key)
-	}
-}
-
-// gets a global variable as an int
-func (m *Model) GetGlobalI(key string) (int, error) {
-	v := m.Globals[key]
-	if v == nil {
-		return 0, fmt.Errorf("global %s not found", key)
-	}
-	switch v := v.(type) {
-	case int:
-		return v, nil
-	case float64:
-		return int(v), nil
-	default:
-		return 0, fmt.Errorf("global %s is not an int", key)
-	}
-}
-
-// gets a global variable as a float64
-func (m *Model) GetGlobalF(key string) (float64, error) {
-	v := m.Globals[key]
-	if v == nil {
-		return 0, fmt.Errorf("global %s not found", key)
-	}
-	switch v := v.(type) {
-	case int:
-		return float64(v), nil
-	case float64:
-		return v, nil
-	default:
-		return 0, fmt.Errorf("global %s is not a float64", key)
-	}
-}
-
-// gets a global variable as a string
-func (m *Model) GetGlobalS(key string) (string, error) {
-	v := m.Globals[key]
-	if v == nil {
-		return "", fmt.Errorf("global %s not found", key)
-	}
-	switch v := v.(type) {
-	case string:
-		return v, nil
-	default:
-		return "", fmt.Errorf("global %s is not a string", key)
-	}
-}
-
-// sets a global variable
-func (m *Model) SetGlobal(key string, value interface{}) {
-	m.Globals[key] = value
 }
 
 // layout the turtles in a circle with the specified radius

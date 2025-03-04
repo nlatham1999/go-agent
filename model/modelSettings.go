@@ -10,7 +10,6 @@ type ModelSettings struct {
 	UndirectedLinkBreeds []string
 	WrappingX            bool
 	WrappingY            bool
-	Globals              map[string]interface{}
 	MinPxCor             int
 	MaxPxCor             int
 	MinPyCor             int

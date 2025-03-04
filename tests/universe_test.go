@@ -708,17 +708,6 @@ func TestModelSize(t *testing.T) {
 		PatchesOwn: map[string]interface{}{
 			"countdown": int(0),
 		},
-		Globals: map[string]interface{}{
-			"show-energy":           true,
-			"max-sheep":             300,
-			"grass-regrowth-time":   30,
-			"initial-number-sheep":  20,
-			"initial-number-wolves": 4,
-			"wolf-gain-from-food":   2,
-			"sheep-gain-from-food":  2,
-			"sheep-reproduce-rate":  50.0,
-			"wolf-reprodue-rate":    40.0,
-		},
 		MinPxCor: 0,
 		MaxPxCor: 50,
 		MinPyCor: 0,
@@ -732,20 +721,20 @@ func TestModelSize(t *testing.T) {
 	m.Patches.Ask(
 		func(p *model.Patch) {
 
-			grassRegrowthTime := m.GetGlobal("grass-regrowth-time")
+			grassRegrowthTime := 30
 			if m.RandomFloat(1) < 0.5 {
 				p.PColor.SetColor(model.Green)
-				p.SetOwn("countdown", grassRegrowthTime.(int))
+				p.SetOwn("countdown", grassRegrowthTime)
 			} else {
 				p.PColor.SetColor(model.Brown)
-				p.SetOwn("countdown", m.RandomInt(grassRegrowthTime.(int)))
+				p.SetOwn("countdown", m.RandomInt(grassRegrowthTime))
 			}
 		},
 	)
 
-	initialNumberSheep, _ := m.GetGlobalI("initial-number-sheep")
+	initialNumberSheep := 20
 
-	sheepGainFromFood, _ := m.GetGlobalI("sheep-gain-from-food")
+	sheepGainFromFood := 2
 
 	m.CreateTurtles(initialNumberSheep, "sheep",
 		func(t *model.Turtle) {
@@ -759,9 +748,9 @@ func TestModelSize(t *testing.T) {
 		},
 	)
 
-	initialNumberWolves, _ := m.GetGlobalI("initial-number-wolves")
+	initialNumberWolves := 4
 
-	wolfGainFromFood, _ := m.GetGlobalI("wolf-gain-from-food")
+	wolfGainFromFood := 2
 
 	m.CreateTurtles(initialNumberWolves, "wolves",
 		func(t *model.Turtle) {
@@ -775,7 +764,7 @@ func TestModelSize(t *testing.T) {
 		},
 	)
 
-	showEnergy, _ := m.GetGlobalB("show-energy")
+	showEnergy := true
 	m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if showEnergy {

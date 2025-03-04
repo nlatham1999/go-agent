@@ -20,6 +20,9 @@ type AntPath struct {
 	startDelay int
 
 	timerVal int64
+
+	maxTicks   int
+	numTurtles int
 }
 
 func NewAntPath() *AntPath {
@@ -41,12 +44,12 @@ func (a *AntPath) Init() {
 	}
 	a.m = model.NewModel(settings)
 
-	a.m.SetGlobal("max-ticks", 5000)
-	a.m.SetGlobal("num-turtles", 100)
-
 	if a.m != nil {
 		fmt.Println("Model initialized")
 	}
+
+	a.maxTicks = 5000
+	a.numTurtles = 100
 }
 
 func (a *AntPath) SetUp() error {
@@ -67,8 +70,7 @@ func (a *AntPath) SetUp() error {
 		},
 	)
 
-	numAnts := a.m.GetGlobal("num-turtles").(int)
-	a.m.CreateTurtles(numAnts-1, "follower",
+	a.m.CreateTurtles(a.numTurtles-1, "follower",
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)
 			t.SetHeading(0)

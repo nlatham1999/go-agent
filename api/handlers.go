@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"text/template"
@@ -273,6 +274,9 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 		if len(values) > 0 {
 			value = values[0]
 		}
+
+		fmt.Println("Updating dynamic variable", name, "with value", value)
+
 		// go through widgets and update the dynamic variable
 		for _, widget := range a.Model.Widgets() {
 			if widget.TargetVariable == name {
@@ -289,15 +293,28 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 					if err != nil {
 						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
 					}
-					a.Model.Model().SetGlobal(name, intValue)
+					if widget.ValuePointerInt == nil {
+						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+						continue
+					}
+					*widget.ValuePointerInt = intValue
 				} else if widget.WidgetValueType == "float" {
 					floatValue, err := strconv.ParseFloat(value, 64)
 					if err != nil {
 						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
+						continue
 					}
-					a.Model.Model().SetGlobal(name, floatValue)
+					if widget.ValuePointerFloat == nil {
+						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+						continue
+					}
+					*widget.ValuePointerFloat = floatValue
 				} else {
-					a.Model.Model().SetGlobal(name, value)
+					if widget.ValuePointerString == nil {
+						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+						continue
+					}
+					*widget.ValuePointerString = value
 				}
 			}
 		}

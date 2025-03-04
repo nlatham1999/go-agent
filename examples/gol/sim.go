@@ -7,6 +7,12 @@ import (
 
 type Gol struct {
 	model *model.Model
+
+	minNeighborsToLive      int
+	maxNeighborsToLive      int
+	minNeighborsToReproduce int
+	maxNeighborsToReproduce int
+	initialAlive            float64
 }
 
 func NewGol() *Gol {
@@ -27,16 +33,15 @@ func (g *Gol) Init() {
 		MaxPxCor: 200,
 		MinPyCor: 0,
 		MaxPyCor: 200,
-		Globals: map[string]interface{}{
-			"min-neighbors-to-live":      2,
-			"max-neighbors-to-live":      3,
-			"min-neighbors-to-reproduce": 3,
-			"max-neighbors-to-reproduce": 3,
-			"initial-alive":              0.5,
-		},
 	}
 
 	g.model = model.NewModel(settings)
+
+	g.minNeighborsToLive = 2
+	g.maxNeighborsToLive = 3
+	g.minNeighborsToReproduce = 3
+	g.maxNeighborsToReproduce = 3
+	g.initialAlive = 0.5
 }
 
 func (g *Gol) SetUp() error {
@@ -44,7 +49,7 @@ func (g *Gol) SetUp() error {
 
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
-			if v := g.model.RandomFloat(1); v < g.model.GetGlobal("initial-alive").(float64) {
+			if v := g.model.RandomFloat(1); v < g.initialAlive {
 				p.SetOwn("alive", true)
 				p.SetOwn("alive-next", true)
 				p.PColor.SetColor(model.Green)
@@ -61,11 +66,6 @@ func (g *Gol) SetUp() error {
 
 func (g *Gol) Go() {
 
-	minNeighborsToLive := g.model.GetGlobal("min-neighbors-to-live").(int)
-	maxNeighborsToLive := g.model.GetGlobal("max-neighbors-to-live").(int)
-	minNeighborsToReproduce := g.model.GetGlobal("min-neighbors-to-reproduce").(int)
-	maxNeighborsToReproduce := g.model.GetGlobal("max-neighbors-to-reproduce").(int)
-
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
 
@@ -80,15 +80,15 @@ func (g *Gol) Go() {
 
 			alive := p.GetOwnB("alive")
 			if alive {
-				if aliveNeighbors < minNeighborsToLive {
+				if aliveNeighbors < g.minNeighborsToLive {
 					p.SetOwn("alive-next", false)
 				}
 
-				if aliveNeighbors > maxNeighborsToLive {
+				if aliveNeighbors > g.maxNeighborsToLive {
 					p.SetOwn("alive-next", false)
 				}
 			} else {
-				if aliveNeighbors >= minNeighborsToReproduce && aliveNeighbors <= maxNeighborsToReproduce {
+				if aliveNeighbors >= g.minNeighborsToReproduce && aliveNeighbors <= g.maxNeighborsToReproduce {
 					p.SetOwn("alive-next", true)
 				}
 			}

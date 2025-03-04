@@ -1,17 +1,16 @@
 package api
 
 type Model struct {
-	Patches          []Patch  `json:"patches"`
-	Turtles          []Turtle `json:"turtles"`
-	Links            []Link   `json:"links"`
-	DynamicVariables map[string]interface{}
-	Ticks            int `json:"ticks"`
-	WorldWidth       int `json:"width"`
-	WorldHeight      int `json:"height"`
-	MinPxCor         int `json:"minPxCor"`
-	MaxPxCor         int `json:"maxPxCor"`
-	MinPyCor         int `json:"minPyCor"`
-	MaxPyCor         int `json:"maxPyCor"`
+	Patches     []Patch  `json:"patches"`
+	Turtles     []Turtle `json:"turtles"`
+	Links       []Link   `json:"links"`
+	Ticks       int      `json:"ticks"`
+	WorldWidth  int      `json:"width"`
+	WorldHeight int      `json:"height"`
+	MinPxCor    int      `json:"minPxCor"`
+	MaxPxCor    int      `json:"maxPxCor"`
+	MinPyCor    int      `json:"minPyCor"`
+	MaxPyCor    int      `json:"maxPyCor"`
 }
 
 type Patch struct {
