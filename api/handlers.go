@@ -15,6 +15,8 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("Setting up model")
+
 	if a.goRepeatRunning {
 		a.stopRepeating <- struct{}{}
 		a.goRepeatRunning = false
@@ -154,22 +156,22 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
-	queryParams := r.URL.Query()
+	// queryParams := r.URL.Query()
 
 	// Get the 'width' and 'height' parameters from the query string
-	widthStr := queryParams.Get("width")
-	heightStr := queryParams.Get("height")
-	width, err := strconv.Atoi(widthStr)
-	if err != nil {
-		http.Error(w, "Invalid width parameter", http.StatusBadRequest)
-		return
-	}
+	// widthStr := queryParams.Get("width")
+	// heightStr := queryParams.Get("height")
+	// width, err := strconv.Atoi(widthStr)
+	// if err != nil {
+	// 	http.Error(w, "Invalid width parameter", http.StatusBadRequest)
+	// 	return
+	// }
 
-	height, err := strconv.Atoi(heightStr)
-	if err != nil {
-		http.Error(w, "Invalid height parameter", http.StatusBadRequest)
-		return
-	}
+	// height, err := strconv.Atoi(heightStr)
+	// if err != nil {
+	// 	http.Error(w, "Invalid height parameter", http.StatusBadRequest)
+	// 	return
+	// }
 
 	// either load the model at the current tick or at the tick stored
 	var model *Model
@@ -183,15 +185,20 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 		model = convertModelToApiModel(a.Model.Model())
 	}
 
-	// Get the HTML template for rendering
-	tmpl := a.getFrontend(width, height, model)
+	//return the model as json
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(model)
 
-	// Execute the template
-	_, err = w.Write([]byte(tmpl))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// // Get the HTML template for rendering
+	// tmpl := a.getFrontend(width, height, model)
+
+	// // Execute the template
+	// _, err = w.Write([]byte(tmpl))
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 }
 
 func (a *Api) loadStatsHandler(w http.ResponseWriter, r *http.Request) {
