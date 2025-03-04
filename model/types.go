@@ -37,3 +37,9 @@ type TurtleBoolOperation func(t *Turtle) bool
 // general function that takes in a turtle and returns a float
 // func(t *Turtle) float64
 type TurtleFloatOperation func(t *Turtle) float64
+
+// the name of the link breed
+type LinkBreed string
+
+// the name of the turtle breed
+type TurtleBreed string
