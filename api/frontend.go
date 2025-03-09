@@ -10,6 +10,9 @@ import (
 //go:embed html/index.html
 var indexHTML string
 
+//go:embed html/threejs.html
+var threejsHTML string
+
 var (
 	statsKeys = []string{}
 )
@@ -198,13 +201,12 @@ func (a *Api) getPatchSize(screenWidth int, screenHeight int, worldWidth int, wo
 }
 
 func (a *Api) buildWidgets() string {
-	html := `<div id="widgetContainer">`
+	html := ""
 
 	// Add widgets here
 	for _, widget := range a.Model.Widgets() {
 		html += widget.Render()
 	}
 
-	html += `</div>`
 	return html
 }
