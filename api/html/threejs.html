@@ -100,6 +100,18 @@
             console.error("Scene groups not initialized!");
             return;
         }
+        patchGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+        turtleGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+        linkGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
         patchGroup.clear();
         turtleGroup.clear();
         linkGroup.clear();
@@ -112,18 +124,6 @@
         let maxPatchWidth = screenWidth / model.width;
         let maxPatchHeight = screenHeight / model.height;
         let patchSize = Math.min(maxPatchWidth, maxPatchHeight);
-        console.log("Patch Size: ", patchSize, "model width", model.width, "model height", model.height, "screen width", screenWidth, "screen height", screenHeight);
-
-        // let patchSize = 75;
-
-        
-        // const geometry2 = new THREE.PlaneGeometry(patchSize, patchSize);
-        // const material2 = new THREE.MeshBasicMaterial({ 
-        //     color: new THREE.Color(255, 255, 255) 
-        // });
-        // const square2 = new THREE.Mesh(geometry2, material2);
-        // square2.position.set(900, 900, 0);
-        // patchGroup.add(square2);
 
         const halfWidth = (model.width * patchSize) / 2;
         const halfHeight = (model.height * patchSize) / 2;
@@ -180,9 +180,6 @@
         });
     }
 
-   
-
-
     // Initialize Three.js
     window.onload = init;
 
@@ -192,9 +189,11 @@
         const now = performance.now();
         if (!isFetching && now - lastUpdateTime >= 50) {  
             isFetching = true;
-            await fetchDataAndUpdateScene();  // wait for fetch to finish
+            fetchDataAndUpdateScene();  // wait for fetch to finish
             lastUpdateTime = performance.now();
             isFetching = false;
+        } else {
+            console.log("Skipping frame...");
         }
         requestAnimationFrame(fetchAndRender);
     }
