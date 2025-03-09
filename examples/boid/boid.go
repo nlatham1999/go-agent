@@ -36,10 +36,10 @@ func (b *Boid) Init() {
 			"vx": .01,
 			"vy": .01,
 		},
-		MinPxCor: 0,
-		MinPyCor: 0,
-		MaxPxCor: 1,
-		MaxPyCor: 1,
+		MinPxCor: -5,
+		MinPyCor: -5,
+		MaxPxCor: 5,
+		MaxPyCor: 5,
 	}
 
 	b.model = model.NewModel(modelSettings)
@@ -88,6 +88,8 @@ func (b *Boid) Go() {
 			b.updatePosition(t)
 		},
 	)
+
+	b.model.Tick()
 }
 
 // seperation stage

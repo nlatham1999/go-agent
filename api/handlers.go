@@ -137,6 +137,7 @@ func (a *Api) loop() {
 }
 
 func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
+
 	tmpl, err := template.New("content").Parse(indexHTML)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -149,6 +150,15 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.Execute(w, data)
+
+	// load the threejs html as a string
+	jsTml, err := template.New("content").Parse(threejsHTML)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsTml.Execute(w, nil)
 }
 
 func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
@@ -156,22 +166,22 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
-	// queryParams := r.URL.Query()
+	queryParams := r.URL.Query()
 
 	// Get the 'width' and 'height' parameters from the query string
-	// widthStr := queryParams.Get("width")
-	// heightStr := queryParams.Get("height")
-	// width, err := strconv.Atoi(widthStr)
-	// if err != nil {
-	// 	http.Error(w, "Invalid width parameter", http.StatusBadRequest)
-	// 	return
-	// }
+	widthStr := queryParams.Get("width")
+	heightStr := queryParams.Get("height")
+	width, err := strconv.Atoi(widthStr)
+	if err != nil {
+		http.Error(w, "Invalid width parameter", http.StatusBadRequest)
+		return
+	}
 
-	// height, err := strconv.Atoi(heightStr)
-	// if err != nil {
-	// 	http.Error(w, "Invalid height parameter", http.StatusBadRequest)
-	// 	return
-	// }
+	height, err := strconv.Atoi(heightStr)
+	if err != nil {
+		http.Error(w, "Invalid height parameter", http.StatusBadRequest)
+		return
+	}
 
 	// either load the model at the current tick or at the tick stored
 	var model *Model
@@ -190,15 +200,15 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(model)
 
-	// // Get the HTML template for rendering
-	// tmpl := a.getFrontend(width, height, model)
+	// Get the HTML template for rendering
+	tmpl := a.getFrontend(width, height, model)
 
-	// // Execute the template
-	// _, err = w.Write([]byte(tmpl))
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	// Execute the template
+	_, err = w.Write([]byte(tmpl))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (a *Api) loadStatsHandler(w http.ResponseWriter, r *http.Request) {
@@ -226,8 +236,10 @@ func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid speed parameter", http.StatusBadRequest)
 		return
 	}
+	speed = 100 - speed
 
 	// Update the speed
+	fmt.Println("Updating speed to", speed)
 	a.simulationSpeed = time.Duration(speed) * time.Millisecond
 
 	w.WriteHeader(http.StatusOK)
