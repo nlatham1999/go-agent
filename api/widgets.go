@@ -9,7 +9,7 @@ type Widget struct {
 	MaxValue           string   `json:"maxValue"`
 	DefaultValue       string   `json:"defaultValue"`
 	StepAmount         string   `json:"stepAmount"`
-	Target             func()   `json:"target"`
+	Target             func()   `json:"target"` // this is a function that will be called when the widget is interacted with if the type is a button
 	ValuePointerInt    *int     `json:"valuePointerInt"`
 	ValuePointerFloat  *float64 `json:"valuePointerFloat"`
 	ValuePointerString *string  `json:"valuePointerString"`

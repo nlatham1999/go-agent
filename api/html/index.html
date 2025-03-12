@@ -75,6 +75,12 @@
             background-color: rgb(33, 36, 37);
             border-radius: 5px;
             padding: 1vw;
+            overflow: scroll;
+            scroll-behavior: smooth;
+            /* add a scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: rgb(69, 69, 69) rgb(33, 36, 37);
+
         }
         .patch {
             position: absolute;
@@ -110,7 +116,7 @@
         </div>
         <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
             hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
-            oninput="document.getElementById('sliderValue').innerText = 100 - this.value;">
+            oninput="document.getElementById('sliderValue').innerText = this.value;">
     </div>
 
     <div id="replayTickContainer">
@@ -122,11 +128,13 @@
                 hx-target="this">
     </div>
 
-    <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button>
+    <!-- <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button> -->
 
     <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .001s" style="visibility: hidden;">Load Stats</button>
 
-    {{ .Widgets }}
+    <div id="widgetContainer">
+        {{ .Widgets }}
+    </div>
 
     <div id="content">
         <!-- Content will be loaded here -->
@@ -135,6 +143,8 @@
     <div id="statsContainer">
         <!-- Stats will be loaded here -->
     </div>
+
+    <div id="threejs-container"></div>
 
 
 </body>

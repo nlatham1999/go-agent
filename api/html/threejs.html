@@ -1,0 +1,251 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+<script>
+    let scene, camera, renderer;
+    let patchGroup, turtleGroup, linkGroup;
+
+    function init() {
+
+
+        if (renderer) {
+            renderer.dispose();
+            document.getElementById("threejs-container").innerHTML = ""; // clear old canvas
+        }
+
+        if (!document.createElement("canvas").getContext("webgl")) {
+            console.error("WebGL is not supported in this browser.");
+            alert("WebGL is not supported on your browser. Try enabling it or using another browser.");
+        } else {
+            console.log("WebGL is supported");
+        }
+        // Get screen dimensions
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        //right half of the screen
+        let viewWidth = screenWidth * 0.5;
+
+        // minus 1vw to have margin on the right
+        viewWidth = viewWidth - (viewWidth * 0.01);
+
+        // 1vh margin on top and bottom
+        let viewHeight = screenHeight - (screenHeight * 0.02);
+
+        // Create Scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x008000); // Green background
+
+        // Camera
+        camera = new THREE.OrthographicCamera(
+            -viewWidth, viewWidth, viewHeight, -viewHeight,  
+            0.1, 1000
+        );
+        camera.position.set(0, 0, 100);
+        camera.lookAt(0, 0, 0);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(viewWidth, viewHeight);
+        renderer.domElement.style.position = "absolute";
+        renderer.domElement.style.left = "50vw";
+        renderer.domElement.style.top = "1vh";
+        renderer.domElement.addEventListener("webglcontextlost", (event) => {
+            event.preventDefault();
+            console.warn("WebGL context lost! Restarting...");
+            init();
+        });
+
+        // Append to correct div
+        const container = document.getElementById("threejs-container");
+        if (container) {
+            container.appendChild(renderer.domElement);
+        } else {
+            console.error("Container not found!");
+        }
+
+        // Groups to store objects
+        patchGroup = new THREE.Group();
+        turtleGroup = new THREE.Group();
+        linkGroup = new THREE.Group();
+
+        scene.add(patchGroup);
+        scene.add(turtleGroup);
+        scene.add(linkGroup);
+
+        animate();
+    }
+
+    function animate() {
+        renderer.render(scene, camera);
+        setTimeout(animate, 16);
+    }
+
+
+    async function fetchDataAndUpdateScene() {
+
+        try {
+            const response = await fetch(`/model`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const model = await response.json();
+            updateScene(model);
+        } catch (error) {
+            console.error("Error fetching simulation data:", error);
+        } 
+    }
+
+    function updateScene(model) {
+
+        
+        if (!patchGroup || !turtleGroup || !linkGroup) {
+            console.error("Scene groups not initialized!");
+            return;
+        }
+
+        patchGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+        turtleGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+        linkGroup.children.forEach(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+        patchGroup.clear();
+        turtleGroup.clear();
+        linkGroup.clear();
+
+
+        let screenWidth = window.innerWidth + 1;
+        let screenHeight = window.innerHeight + 1;
+        screenWidth = screenWidth / 2;
+        screenWidth = screenWidth - (screenWidth * 0.01);
+        let maxPatchWidth = screenWidth / model.width;
+        let maxPatchHeight = screenHeight / model.height;
+        let patchSize = Math.min(maxPatchWidth, maxPatchHeight);
+
+        const halfWidth = (model.width * patchSize) / 2;
+        const halfHeight = (model.height * patchSize) / 2;
+
+        camera.left = -halfWidth;
+        camera.right = halfWidth;
+        camera.top = halfHeight;
+        camera.bottom = -halfHeight;
+        camera.updateProjectionMatrix();
+
+        // Create Patches (squares)
+        model.patches.forEach(patch => {
+            const geometry = new THREE.PlaneGeometry(patchSize, patchSize);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: new THREE.Color(patch.color.r / 255, patch.color.g / 255, patch.color.b / 255) 
+            });
+            const square = new THREE.Mesh(geometry, material);
+            const relativeX = patch.x;
+            const relativeY = patch.y;
+            square.position.set(relativeX * patchSize, relativeY * patchSize, 0);
+            patchGroup.add(square);
+        });
+
+        // Create Turtles (circles)
+        model.turtles.forEach(turtle => {
+            if (turtle.shape == "circle") {
+                buildCircleTurtle(turtle, patchSize);
+            } else if (turtle.shape == "triangle") {
+                buildTriangleTurtle(turtle, patchSize);
+            }
+        });
+
+        // Create Links (lines)
+        model.links.forEach(link => {
+            if (!link.hidden) {
+                const material = new THREE.LineBasicMaterial({ 
+                    color: new THREE.Color(link.color.r / 255, link.color.g / 255, link.color.b / 255) 
+                });
+
+                const points = [
+                    new THREE.Vector3((link.end1X - model.width / 2) * patchSize, (link.end1Y - model.height / 2) * patchSize, 0.05),
+                    new THREE.Vector3((link.end2X - model.width / 2) * patchSize, (link.end2Y - model.height / 2) * patchSize, 0.05)
+                ];
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry, material);
+                linkGroup.add(line);
+            }
+        });
+    }
+
+    function buildCircleTurtle(turtle, patchSize) {
+        const geometry = new THREE.CircleGeometry(turtle.size * patchSize * 0.5, 32);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255) 
+        });
+        const circle = new THREE.Mesh(geometry, material);
+        const relativeX = turtle.x;
+        const relativeY = turtle.y;
+        const turtleOffset = 0;
+        circle.position.set(relativeX*patchSize-turtleOffset, relativeY*patchSize-turtleOffset, 0.1);
+        turtleGroup.add(circle);
+    }
+
+    function buildTriangleTurtle(turtle, patchSize) {
+        const geometry = new THREE.BufferGeometry();
+
+        const size = turtle.size * patchSize * 0.5;
+        const height = Math.sqrt(3) * size; // equilateral triangle height
+
+        // define vertices with the triangle pointing along +X (so 0 degrees = right)
+        const vertices = new Float32Array([
+            height / 2, 0, 0,    // tip of the triangle (facing default direction)
+            -height / 2, -size, 0, // bottom left
+            -height / 2, size, 0  // bottom right
+        ]);
+        // const vertices = new Float32Array([
+        //     height, 0, 0,    // tip of the triangle (facing default direction)
+        //     -height / 2, -size, 0, // bottom left
+        //     -height / 2, size, 0  // bottom right
+        // ]);
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+        const material = new THREE.MeshBasicMaterial({ 
+            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255),
+            side: THREE.DoubleSide
+        });
+
+        const triangle = new THREE.Mesh(geometry, material);
+
+        // Positioning
+        const relativeX = turtle.x;
+        const relativeY = turtle.y;
+        triangle.position.set(relativeX * patchSize, relativeY * patchSize, 0.1);
+
+        // Correct rotation: default points right (+X), so apply `heading` directly
+        triangle.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
+
+        turtleGroup.add(triangle);
+    }
+
+
+
+    // Initialize Three.js
+    window.onload = init;
+
+    let lastUpdateTime = 0;
+    let isFetching = false;
+    async function fetchAndRender() {
+        const now = performance.now();
+        if (!isFetching && now - lastUpdateTime >= 50) {  
+            isFetching = true;
+            fetchDataAndUpdateScene();  // wait for fetch to finish
+            lastUpdateTime = performance.now();
+            isFetching = false;
+        } else {
+            console.log("Skipping frame...");
+        }
+        requestAnimationFrame(fetchAndRender);
+    }
+    requestAnimationFrame(fetchAndRender);
+
+</script>

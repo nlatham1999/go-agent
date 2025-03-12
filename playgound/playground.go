@@ -2,7 +2,7 @@ package playgound
 
 import (
 	"fmt"
-	"time"
+	"math"
 
 	"github.com/nlatham1999/go-agent/api"
 	"github.com/nlatham1999/go-agent/model"
@@ -17,10 +17,10 @@ import (
 // Stop() bool                    // on whether to stop the model
 // Widgets() []Widget             // returns the widgets of the model
 
+var _ api.ModelInterface = &Sim{}
+
 type Sim struct {
-	model      *model.Model
-	numTurtles int
-	maxLength  float64
+	model *model.Model
 }
 
 func NewSim() *Sim {
@@ -42,30 +42,30 @@ func (s *Sim) Init() {
 	}
 
 	s.model = model.NewModel(settings)
-
-	s.numTurtles = 2
-	s.maxLength = 10.0
 }
 
 func (s *Sim) SetUp() error {
 
 	s.model.ClearAll()
 
-	// s.model.CreateTurtles(100, "", func(t *model.Turtle) {
-	// 	t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
-	// })
+	s.model.Patches.Ask(func(p *model.Patch) {
 
-	s.model.CreateTurtles(s.numTurtles, "", func(t *model.Turtle) {
-		t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
+		p.PColor.SetColor(model.Color{
+			Red:   int(math.Abs(float64(p.PXCor() * p.PYCor() * 8))),
+			Green: int(math.Abs(float64(p.PXCor() * p.PYCor() * 8))),
+			Blue:  int(math.Abs(float64(p.PXCor() * p.PYCor() * 8))),
+			Alpha: 1,
+		})
 	})
 
-	s.model.Turtles("").Ask(func(t *model.Turtle) {
-		s.model.Turtles("").Ask(func(t2 *model.Turtle) {
-			t.CreateLinkWithTurtle("", t2, func(l *model.Link) {
-				l.TieMode = model.TieModeAllTied
-				// fmt.Println("Link created", l.TieMode)
-			})
-		})
+	s.model.Patch(0, 0).PColor.SetColor(model.Green)
+
+	s.model.CreateTurtles(1, "", func(t *model.Turtle) {
+		t.SetXY(0, 0)
+		t.SetSize(1)
+		t.SetHeading(90)
+		t.Shape = "triangle"
+		t.Color.SetColor(model.Red)
 	})
 
 	return nil
@@ -73,36 +73,14 @@ func (s *Sim) SetUp() error {
 
 func (s *Sim) Go() {
 
+	// s.model.Patches.Ask(func(p *model.Patch) {
+	// 	p.PColor.SetColor(s.model.RandomColor())
+	// })
 	// t1 := s.model.Turtle("", 2)
 	// t1.Forward(10)
 
-	s.RotateTurtleTest()
+	s.model.Tick()
 
-}
-
-func (s Sim) CreateGraph() {
-	start := time.Now()
-
-	s.model.ClearLinks()
-
-	turtles := s.model.Turtles("")
-	turtles.Ask(func(t *model.Turtle) {
-
-		tInRadius := s.model.Turtles("").InRadiusTurtle(s.maxLength, t)
-
-		tInRadius.Ask(func(t2 *model.Turtle) {
-			t.CreateLinkWithTurtle("", t2, func(l *model.Link) {
-				// l.TieMode = model.TieModeAllTied
-				// fmt.Println("Link created", l.TieMode)
-			})
-		})
-	})
-
-	turtles.Ask(func(t *model.Turtle) {
-		t.SetSize(float64(t.LinkedTurtles("").Count()) / 1000)
-	})
-
-	fmt.Println("Time taken: ", time.Since(start))
 }
 
 func (s *Sim) Stats() map[string]interface{} {
@@ -113,57 +91,48 @@ func (s *Sim) Stop() bool {
 	return false
 }
 
-func (s *Sim) ChangeColor() {
-	turtles := s.model.Turtles("")
-	turtles.Ask(func(t *model.Turtle) {
-		t.Color.SetColor(s.model.RandomColor())
-	})
+func (s *Sim) MoveForward() {
+	t1 := s.model.Turtle("", 0)
+	fmt.Println("Moving forward")
+	t1.Forward(1)
 }
 
-func (s *Sim) RotateTurtleTest() {
-	fmt.Println("Rotating turtle")
-	// t1 := s.model.Turtle("", 0)
-	// t1.Right(1)
-	// t2 := s.model.Turtle("", 1)
-	// t2.Right(1)
-
-	s.model.Turtles("").Ask(func(t *model.Turtle) {
-		t.Right(1)
-	})
+func (s *Sim) Rotate() {
+	t1 := s.model.Turtle("", 0)
+	fmt.Println("Rotating")
+	t1.Right(10)
 }
+
+/*
+type Widget struct {
+	PrettyName         string   `json:"prettyName"`
+	TargetVariable     string   `json:"targetVariable"`
+	WidgetType         string   `json:"widgetType"`
+	WidgetValueType    string   `json:"widgetValueType"`
+	MinValue           string   `json:"minValue"`
+	MaxValue           string   `json:"maxValue"`
+	DefaultValue       string   `json:"defaultValue"`
+	StepAmount         string   `json:"stepAmount"`
+	Target             func()   `json:"target"`
+	ValuePointerInt    *int     `json:"valuePointerInt"`
+	ValuePointerFloat  *float64 `json:"valuePointerFloat"`
+	ValuePointerString *string  `json:"valuePointerString"`
+}
+*/
 
 func (s *Sim) Widgets() []api.Widget {
 	return []api.Widget{
 		{
-			PrettyName:      "Max Length",
-			TargetVariable:  "max-length",
-			WidgetType:      "slider",
-			WidgetValueType: "float",
-			MinValue:        ".01",
-			MaxValue:        "20",
-			DefaultValue:    "10",
-			StepAmount:      ".01",
-		},
-		{
-			PrettyName:     "Change Color",
-			TargetVariable: "change-color",
-			Target:         s.ChangeColor,
+			PrettyName:     "Move Forward",
+			TargetVariable: "move-forward",
 			WidgetType:     "button",
+			Target:         s.MoveForward,
 		},
 		{
-			PrettyName:     "Rotate Turtle 1",
-			TargetVariable: "rotate-turtle-1",
-			Target:         s.RotateTurtleTest,
+			PrettyName:     "Rotate",
+			TargetVariable: "rotate",
 			WidgetType:     "button",
-		},
-		{
-			PrettyName:      "Number of Turtles",
-			TargetVariable:  "num-turtles",
-			WidgetType:      "slider",
-			WidgetValueType: "int",
-			MinValue:        "1",
-			MaxValue:        "100",
-			DefaultValue:    "2",
+			Target:         s.Rotate,
 		},
 	}
 }

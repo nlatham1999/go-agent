@@ -15,6 +15,8 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("Setting up model")
+
 	if a.goRepeatRunning {
 		a.stopRepeating <- struct{}{}
 		a.goRepeatRunning = false
@@ -135,6 +137,7 @@ func (a *Api) loop() {
 }
 
 func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
+
 	tmpl, err := template.New("content").Parse(indexHTML)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -147,6 +150,15 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.Execute(w, data)
+
+	// load the threejs html as a string
+	jsTml, err := template.New("content").Parse(threejsHTML)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsTml.Execute(w, nil)
 }
 
 func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
@@ -182,6 +194,11 @@ func (a *Api) loadHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		model = convertModelToApiModel(a.Model.Model())
 	}
+
+	//return the model as json
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(model)
 
 	// Get the HTML template for rendering
 	tmpl := a.getFrontend(width, height, model)
@@ -219,8 +236,10 @@ func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid speed parameter", http.StatusBadRequest)
 		return
 	}
+	speed = 100 - speed
 
 	// Update the speed
+	fmt.Println("Updating speed to", speed)
 	a.simulationSpeed = time.Duration(speed) * time.Millisecond
 
 	w.WriteHeader(http.StatusOK)
@@ -274,8 +293,6 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 		if len(values) > 0 {
 			value = values[0]
 		}
-
-		fmt.Println("Updating dynamic variable", name, "with value", value)
 
 		// go through widgets and update the dynamic variable
 		for _, widget := range a.Model.Widgets() {
