@@ -100,6 +100,7 @@
             console.error("Scene groups not initialized!");
             return;
         }
+
         patchGroup.children.forEach(obj => {
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
@@ -149,16 +150,11 @@
 
         // Create Turtles (circles)
         model.turtles.forEach(turtle => {
-            const geometry = new THREE.CircleGeometry(turtle.size * patchSize * 0.5, 32);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255) 
-            });
-            const circle = new THREE.Mesh(geometry, material);
-            const relativeX = turtle.x;
-            const relativeY = turtle.y;
-            const turtleOffset = (patchSize - turtle.size) / 2;
-            circle.position.set(relativeX*patchSize+turtleOffset, relativeY*patchSize+turtleOffset, 0.1);
-            turtleGroup.add(circle);
+            if (turtle.shape == "circle") {
+                buildCircleTurtle(turtle, patchSize);
+            } else if (turtle.shape == "triangle") {
+                buildTriangleTurtle(turtle, patchSize);
+            }
         });
 
         // Create Links (lines)
@@ -179,6 +175,59 @@
             }
         });
     }
+
+    function buildCircleTurtle(turtle, patchSize) {
+        const geometry = new THREE.CircleGeometry(turtle.size * patchSize * 0.5, 32);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255) 
+        });
+        const circle = new THREE.Mesh(geometry, material);
+        const relativeX = turtle.x;
+        const relativeY = turtle.y;
+        const turtleOffset = 0;
+        circle.position.set(relativeX*patchSize-turtleOffset, relativeY*patchSize-turtleOffset, 0.1);
+        turtleGroup.add(circle);
+    }
+
+    function buildTriangleTurtle(turtle, patchSize) {
+        const geometry = new THREE.BufferGeometry();
+
+        const size = turtle.size * patchSize * 0.5;
+        const height = Math.sqrt(3) * size; // equilateral triangle height
+
+        // define vertices with the triangle pointing along +X (so 0 degrees = right)
+        const vertices = new Float32Array([
+            height / 2, 0, 0,    // tip of the triangle (facing default direction)
+            -height / 2, -size, 0, // bottom left
+            -height / 2, size, 0  // bottom right
+        ]);
+        // const vertices = new Float32Array([
+        //     height, 0, 0,    // tip of the triangle (facing default direction)
+        //     -height / 2, -size, 0, // bottom left
+        //     -height / 2, size, 0  // bottom right
+        // ]);
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+        const material = new THREE.MeshBasicMaterial({ 
+            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255),
+            side: THREE.DoubleSide
+        });
+
+        const triangle = new THREE.Mesh(geometry, material);
+
+        // Positioning
+        const relativeX = turtle.x;
+        const relativeY = turtle.y;
+        triangle.position.set(relativeX * patchSize, relativeY * patchSize, 0.1);
+
+        // Correct rotation: default points right (+X), so apply `heading` directly
+        triangle.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
+
+        turtleGroup.add(triangle);
+    }
+
+
 
     // Initialize Three.js
     window.onload = init;

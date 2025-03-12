@@ -65,6 +65,7 @@ func (b *Boid) SetUp() error {
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.SetSize(b.turtleSize)
+			t.Shape = "triangle"
 		},
 	)
 

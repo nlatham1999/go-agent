@@ -54,6 +54,7 @@ func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		size:       .8,
 		label:      "",
 		labelColor: Black,
+		Shape:      "circle",
 	}
 
 	// add in the linked turtles

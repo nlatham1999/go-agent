@@ -294,8 +294,6 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 			value = values[0]
 		}
 
-		fmt.Println("Updating dynamic variable", name, "with value", value)
-
 		// go through widgets and update the dynamic variable
 		for _, widget := range a.Model.Widgets() {
 			if widget.TargetVariable == name {
