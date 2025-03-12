@@ -118,22 +118,43 @@
         linkGroup.clear();
 
 
-        let screenWidth = window.innerWidth + 1;
-        let screenHeight = window.innerHeight + 1;
+        // get the screen dimensions
+        let screenWidth = window.innerWidth; // right half
+        let screenHeight = window.innerHeight; // account for margins
         screenWidth = screenWidth / 2;
         screenWidth = screenWidth - (screenWidth * 0.01);
+
+        // Calculate patch size
         let maxPatchWidth = screenWidth / model.width;
         let maxPatchHeight = screenHeight / model.height;
         let patchSize = Math.min(maxPatchWidth, maxPatchHeight);
 
+        // Update camera
         const halfWidth = (model.width * patchSize) / 2;
         const halfHeight = (model.height * patchSize) / 2;
-
         camera.left = -halfWidth;
         camera.right = halfWidth;
         camera.top = halfHeight;
         camera.bottom = -halfHeight;
         camera.updateProjectionMatrix();
+
+        // Update renderer
+        const aspectRatio = model.width / model.height;
+        let viewWidth, viewHeight;
+        if ( screenHeight / model.height > screenWidth /  model.width) {
+            viewWidth = screenWidth;
+            viewHeight = screenWidth / aspectRatio;
+        } else {
+            viewHeight = screenHeight;
+            viewWidth = screenHeight * aspectRatio;
+        }
+        renderer.setSize(viewWidth, viewHeight);
+        renderer.domElement.style.width = `${viewWidth}px`;
+        renderer.domElement.style.height = `${viewHeight}px`;
+
+        // set an offset to center the model
+        offsetX = (model.maxPxCor + model.minPxCor) / 2;
+        offsetY = (model.maxPyCor + model.minPyCor) / 2; 
 
         // Create Patches (squares)
         model.patches.forEach(patch => {
@@ -144,16 +165,16 @@
             const square = new THREE.Mesh(geometry, material);
             const relativeX = patch.x;
             const relativeY = patch.y;
-            square.position.set(relativeX * patchSize, relativeY * patchSize, 0);
+            square.position.set((relativeX-offsetX) * patchSize, (relativeY-offsetY) * patchSize, 0);
             patchGroup.add(square);
         });
 
         // Create Turtles (circles)
         model.turtles.forEach(turtle => {
             if (turtle.shape == "circle") {
-                buildCircleTurtle(turtle, patchSize);
+                buildCircleTurtle(turtle, patchSize, offsetX, offsetY);
             } else if (turtle.shape == "triangle") {
-                buildTriangleTurtle(turtle, patchSize);
+                buildTriangleTurtle(turtle, patchSize, offsetX, offsetY);
             }
         });
 
@@ -176,7 +197,7 @@
         });
     }
 
-    function buildCircleTurtle(turtle, patchSize) {
+    function buildCircleTurtle(turtle, patchSize, offsetX, offsetY) {
         const geometry = new THREE.CircleGeometry(turtle.size * patchSize * 0.5, 32);
         const material = new THREE.MeshBasicMaterial({ 
             color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255) 
@@ -185,11 +206,11 @@
         const relativeX = turtle.x;
         const relativeY = turtle.y;
         const turtleOffset = 0;
-        circle.position.set(relativeX*patchSize-turtleOffset, relativeY*patchSize-turtleOffset, 0.1);
+        circle.position.set((relativeX - offsetX) * patchSize - turtleOffset, (relativeY - offsetY) * patchSize - turtleOffset, 0.1);
         turtleGroup.add(circle);
     }
 
-    function buildTriangleTurtle(turtle, patchSize) {
+    function buildTriangleTurtle(turtle, patchSize, offsetX, offsetY) {
         const geometry = new THREE.BufferGeometry();
 
         const size = turtle.size * patchSize * 0.5;
@@ -219,7 +240,7 @@
         // Positioning
         const relativeX = turtle.x;
         const relativeY = turtle.y;
-        triangle.position.set(relativeX * patchSize, relativeY * patchSize, 0.1);
+        triangle.position.set((relativeX - offsetX) * patchSize, (relativeY - offsetY) * patchSize, 0.1);
 
         // Correct rotation: default points right (+X), so apply `heading` directly
         triangle.rotation.z = THREE.MathUtils.degToRad(turtle.heading);

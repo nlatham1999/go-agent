@@ -239,7 +239,6 @@ func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
 	speed = 100 - speed
 
 	// Update the speed
-	fmt.Println("Updating speed to", speed)
 	a.simulationSpeed = time.Duration(speed) * time.Millisecond
 
 	w.WriteHeader(http.StatusOK)

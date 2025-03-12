@@ -9,6 +9,7 @@ func main() {
 
 	// sim := playgound.NewSim()
 	sim := boid.NewBoid()
+	// sim := gol.NewGol()
 
 	agentApi := api.NewApi(sim, api.ApiSettings{
 		StoreSteps: false,

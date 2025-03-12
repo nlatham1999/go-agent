@@ -5,6 +5,8 @@ import (
 	"github.com/nlatham1999/go-agent/model"
 )
 
+var _ api.ModelInterface = &Gol{}
+
 type Gol struct {
 	model *model.Model
 
@@ -29,10 +31,10 @@ func (g *Gol) Init() {
 			"alive":      true,
 			"alive-next": true,
 		},
-		MinPxCor: 0,
-		MaxPxCor: 200,
-		MinPyCor: 0,
-		MaxPyCor: 200,
+		MinPxCor: -10,
+		MaxPxCor: 0,
+		MinPyCor: -10,
+		MaxPyCor: 0,
 	}
 
 	g.model = model.NewModel(settings)
@@ -105,6 +107,8 @@ func (g *Gol) Go() {
 			}
 		},
 	)
+
+	g.model.Tick()
 }
 
 func (g *Gol) Stats() map[string]interface{} {
@@ -131,6 +135,7 @@ func (g *Gol) Widgets() []api.Widget {
 			MinValue:        "1",
 			MaxValue:        "8",
 			DefaultValue:    "2",
+			ValuePointerInt: &g.minNeighborsToLive,
 		},
 		{
 			PrettyName:      "Max Neighbors To Live",
@@ -140,6 +145,7 @@ func (g *Gol) Widgets() []api.Widget {
 			MinValue:        "1",
 			MaxValue:        "8",
 			DefaultValue:    "3",
+			ValuePointerInt: &g.maxNeighborsToLive,
 		},
 		{
 			PrettyName:      "Min Neighbors To Reproduce",
@@ -149,6 +155,7 @@ func (g *Gol) Widgets() []api.Widget {
 			MinValue:        "1",
 			MaxValue:        "8",
 			DefaultValue:    "3",
+			ValuePointerInt: &g.minNeighborsToReproduce,
 		},
 		{
 			PrettyName:      "Max Neighbors To Reproduce",
@@ -158,16 +165,18 @@ func (g *Gol) Widgets() []api.Widget {
 			MinValue:        "1",
 			MaxValue:        "8",
 			DefaultValue:    "3",
+			ValuePointerInt: &g.maxNeighborsToReproduce,
 		},
 		{
-			PrettyName:      "Initial Alive",
-			TargetVariable:  "initial-alive",
-			WidgetType:      "slider",
-			WidgetValueType: "float",
-			MinValue:        "0",
-			MaxValue:        "1",
-			DefaultValue:    "0.5",
-			StepAmount:      "0.01",
+			PrettyName:        "Initial Alive",
+			TargetVariable:    "initial-alive",
+			WidgetType:        "slider",
+			WidgetValueType:   "float",
+			MinValue:          "0",
+			MaxValue:          "1",
+			DefaultValue:      "0.5",
+			StepAmount:        "0.01",
+			ValuePointerFloat: &g.initialAlive,
 		},
 	}
 }
