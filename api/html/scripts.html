@@ -1,0 +1,90 @@
+<script>
+    const goOnceButton = document.getElementById('goOnce');
+    const goRepeatButton = document.getElementById('goRepeat');
+    const replayTickContainer = document.getElementById('replayTickContainer');
+    const replayTick = document.getElementById('replayTick');
+    const loadButton = document.getElementById('loadButton');
+    const setupButton = document.getElementById('setup');
+    const contentDiv = document.getElementById('content');
+
+    // Function to update visibility based on goRepeatButton's inner text
+    function updateVisibility() {
+        if (goRepeatButton.innerText === "Pause") {
+            // replayTickContainer.setAttribute('disabled', true);
+            replayTick.disabled = true;
+        } else {
+            // replayTickContainer.setAttribute('disabled', false);
+            replayTick.disabled = false;
+        }
+    }
+
+    // Add an event listener to the goRepeat button to change text and update visibility
+    goRepeatButton.addEventListener('click', function() {
+        if (document.getElementById('goRepeat').innerText == 'Play') {
+            document.getElementById('goRepeat').innerText = 'Pause';
+        } else {
+            document.getElementById('goRepeat').innerText = 'Play';
+        }
+        updateVisibility();
+    });
+
+    setupButton.addEventListener('click', function() {
+        goRepeatButton.innerText = "Play"
+    })
+
+    // Initial check on page load
+    updateVisibility();
+
+    // event listener on go to make the tickValue current
+    goOnceButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    // event listener on go to make the tickValue current
+    goRepeatButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    let savedScrollPosition = 0;
+
+    // loadButton.addEventListener('htmx:beforeRequest', function() {
+    //     // Save the current scroll position before the content is refreshed
+    //     statsContainer = document.getElementById('statsContainer');
+    //     savedScrollPosition = statsContainer.scrollTop;
+    //     console.log('Saved scroll position:', savedScrollPosition);
+    // });
+
+    // contentDiv.addEventListener('htmx:afterSwap', function() {
+    //     // Restore the saved scroll position after the content is updated
+    //     statsContainer = document.getElementById('statsContainer');
+    //     statsContainer.scrollTop = savedScrollPosition;
+    //     console.log('Restored scroll position:', savedScrollPosition);
+    // });
+
+    // make the widget draggable
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".widget").forEach(widget => {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            widget.addEventListener("mousedown", (e) => {
+                if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return; // prevent dragging inside inputs
+                isDragging = true;
+                offsetX = e.clientX - widget.offsetLeft;
+                offsetY = e.clientY - widget.offsetTop;
+                widget.style.cursor = "grabbing";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                widget.style.left = e.clientX - offsetX + "px";
+                widget.style.top = e.clientY - offsetY + "px";
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                widget.style.cursor = "grab";
+            });
+        });
+    });
+</script>

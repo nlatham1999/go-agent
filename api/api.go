@@ -70,7 +70,6 @@ func (a *Api) Serve() {
 	r.HandleFunc("/modelat", a.modelAtHandler)
 
 	//frontend handlers
-	r.HandleFunc("/load", a.loadHandler)
 	r.HandleFunc("/loadstats", a.loadStatsHandler)
 	r.HandleFunc("/updatespeed", a.updateSpeedHandler)
 	r.HandleFunc("/updatedynamic", a.updateDynamicVariableHandler)

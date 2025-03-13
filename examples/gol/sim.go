@@ -31,10 +31,10 @@ func (g *Gol) Init() {
 			"alive":      true,
 			"alive-next": true,
 		},
-		MinPxCor: -10,
-		MaxPxCor: 0,
-		MinPyCor: -10,
-		MaxPyCor: 0,
+		MinPxCor: 0,
+		MaxPxCor: 20,
+		MinPyCor: 0,
+		MaxPyCor: 20,
 	}
 
 	g.model = model.NewModel(settings)

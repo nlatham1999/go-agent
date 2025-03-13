@@ -6,94 +6,7 @@
     <title>Go Agent</title>
     <script src="https://unpkg.com/htmx.org@1.8.0"></script>
 
-    <style>
-
-        h1 {
-            position: absolute;
-            left: 1vw;
-            top: 1vh;
-            color: white;
-        }
-        body {
-            font-family: Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: rgb(42, 45, 46);
-            color: white;
-        }
-        button {
-            font-size: x-large;
-            background-color: rgb(35, 124, 47);
-            border-radius: 10%;
-            color: white;
-            border-color: rgb(35, 124, 47);
-            box-shadow: none;
-            border-style: none;
-        }
-        #buttonsContainer {
-            position: absolute;
-            left: 1vw;
-            top: 10vh;
-            transform: translateY(-50%);
-            width: 15vw;
-        }
-        #speedSliderContainer {
-            position: absolute;
-            left: 16vw;
-            top: 10vh;
-            transform: translateY(-50%);
-            width: 15vw;
-            color: white;
-        }
-        #replayTickContainer {
-            position: absolute;
-            left: 32vw;
-            top: 10vh;
-            transform: translateY(-50%);
-            width: 15vw;
-        }
-        #statsContainer {
-            position: absolute;
-            left: 1vw;
-            top: 15vh;
-            height: 30vh;
-            width: 40vw;
-            border: 4px solid rgb(69, 69, 69);
-            border-radius: 5px;
-            padding: 1vw;
-            overflow: auto;
-            border: 4px solid rgb(69, 69, 69);
-            background-color: rgb(33, 36, 37);
-        }
-        #widgetContainer {
-            position: absolute;
-            left: 1vw;
-            top: 50vh;
-            height: 40vh;
-            width: 40vw;
-            border: 4px solid rgb(69, 69, 69);
-            background-color: rgb(33, 36, 37);
-            border-radius: 5px;
-            padding: 1vw;
-            overflow: scroll;
-            scroll-behavior: smooth;
-            /* add a scrollbar */
-            scrollbar-width: thin;
-            scrollbar-color: rgb(69, 69, 69) rgb(33, 36, 37);
-
-        }
-        .patch {
-            position: absolute;
-            transform: translateY(4vh);
-        }
-        .turtle {
-            position: absolute;
-            border-radius: 50%;
-            transform: translateY(4vh);
-            text-align: center;
-            align-items: center;
-        }
-    </style>
+    
 </head>
 <body>
     <h1>{{ .Title }}</h1>
@@ -130,97 +43,22 @@
 
     <!-- <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button> -->
 
-    <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .001s" style="visibility: hidden;">Load Stats</button>
+    <!-- <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .001s" style="visibility: hidden;">Load Stats</button> -->
 
     <div id="widgetContainer">
         {{ .Widgets }}
     </div>
 
-    <div id="content">
+    <!-- <div id="content"> -->
         <!-- Content will be loaded here -->
-    </div>
+    <!-- </div> -->
 
-    <div id="statsContainer">
+    <!-- <div id="statsContainer"> -->
         <!-- Stats will be loaded here -->
-    </div>
+    <!-- </div> -->
 
     <div id="threejs-container"></div>
 
 
 </body>
-<script>
-
-    const goOnceButton = document.getElementById('goOnce');
-    const goRepeatButton = document.getElementById('goRepeat');
-    const replayTickContainer = document.getElementById('replayTickContainer');
-    const replayTick = document.getElementById('replayTick');
-    const loadButton = document.getElementById('loadButton');
-    const setupButton = document.getElementById('setup');
-    const contentDiv = document.getElementById('content');
-
-    // Function to update visibility based on goRepeatButton's inner text
-    function updateVisibility() {
-        if (goRepeatButton.innerText === "Pause") {
-            // replayTickContainer.setAttribute('disabled', true);
-            replayTick.disabled = true;
-        } else {
-            // replayTickContainer.setAttribute('disabled', false);
-            replayTick.disabled = false;
-        }
-    }
-
-    // Add an event listener to the goRepeat button to change text and update visibility
-    goRepeatButton.addEventListener('click', function() {
-        if (document.getElementById('goRepeat').innerText == 'Play') {
-            document.getElementById('goRepeat').innerText = 'Pause';
-        } else {
-            document.getElementById('goRepeat').innerText = 'Play';
-        }
-        updateVisibility();
-    });
-
-    setupButton.addEventListener('click', function() {
-        goRepeatButton.innerText = "Play"
-    })
-
-    // Initial check on page load
-    updateVisibility();
-
-    // event listener on go to make the tickValue current
-    goOnceButton.addEventListener('click', function() {
-        tickValue = 'current';
-    });
-
-    // event listener on go to make the tickValue current
-    goRepeatButton.addEventListener('click', function() {
-        tickValue = 'current';
-    });
-
-    loadButton.addEventListener('htmx:configRequest', function (event) {
-        // Capture the screen width and height
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        // Add the width and height to the request parameters
-        event.detail.parameters['width'] = width;
-        event.detail.parameters['height'] = height;
-    });
-
-
-    let savedScrollPosition = 0;
-
-    loadButton.addEventListener('htmx:beforeRequest', function() {
-        // Save the current scroll position before the content is refreshed
-        statsContainer = document.getElementById('statsContainer');
-        savedScrollPosition = statsContainer.scrollTop;
-        console.log('Saved scroll position:', savedScrollPosition);
-    });
-
-    contentDiv.addEventListener('htmx:afterSwap', function() {
-        // Restore the saved scroll position after the content is updated
-        statsContainer = document.getElementById('statsContainer');
-        statsContainer.scrollTop = savedScrollPosition;
-        console.log('Restored scroll position:', savedScrollPosition);
-    });
-</script>
 </html>
