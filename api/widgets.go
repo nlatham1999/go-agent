@@ -21,7 +21,7 @@ func (w *Widget) Render(offset int) string {
 
 	id := w.TargetVariable + "-widget"
 
-	html := "<div class='widget' style='top:" + fmt.Sprintf("%d", offset*50) + "px;'>"
+	html := "<div class='widget' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
 	//label for id
 	if w.WidgetType == "text" {
 		html += `<label for="` + id + `">` + w.PrettyName + `</label>`
@@ -48,6 +48,5 @@ func (w *Widget) Render(offset int) string {
 
 	html += "</div>"
 
-	fmt.Println(html)
 	return html
 }

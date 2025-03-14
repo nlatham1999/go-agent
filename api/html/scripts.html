@@ -1,7 +1,10 @@
 <script>
+
+    const goRepeatText = document.getElementById('goRepeat').innerText;
+
     const goOnceButton = document.getElementById('goOnce');
     const goRepeatButton = document.getElementById('goRepeat');
-    const replayTickContainer = document.getElementById('replayTickContainer');
+    const replayTickContainer = document.getElementById('replayTick');
     const replayTick = document.getElementById('replayTick');
     const loadButton = document.getElementById('loadButton');
     const setupButton = document.getElementById('setup');
@@ -9,7 +12,7 @@
 
     // Function to update visibility based on goRepeatButton's inner text
     function updateVisibility() {
-        if (goRepeatButton.innerText === "Pause") {
+        if (goRepeatButton.innerText === '\u00A0\u00A0\u00A0Pause\u00A0\u00A0\u00A0') {
             // replayTickContainer.setAttribute('disabled', true);
             replayTick.disabled = true;
         } else {
@@ -20,16 +23,16 @@
 
     // Add an event listener to the goRepeat button to change text and update visibility
     goRepeatButton.addEventListener('click', function() {
-        if (document.getElementById('goRepeat').innerText == 'Play') {
-            document.getElementById('goRepeat').innerText = 'Pause';
+        if (document.getElementById('goRepeat').innerText == goRepeatText) {
+            document.getElementById('goRepeat').innerText = '\u00A0\u00A0\u00A0Pause\u00A0\u00A0\u00A0\u00A0';
         } else {
-            document.getElementById('goRepeat').innerText = 'Play';
+            document.getElementById('goRepeat').innerText = goRepeatText;
         }
         updateVisibility();
     });
 
     setupButton.addEventListener('click', function() {
-        goRepeatButton.innerText = "Play"
+        goRepeatButton.innerText = goRepeatText;
     })
 
     // Initial check on page load
@@ -87,4 +90,38 @@
             });
         });
     });
+
+    // function to /loadstats that will load the stats every .5 seconds
+    function updateStats() {
+        fetch('/loadstats')
+            .then(response => response.json())
+            .then(data => {
+                Object.entries(data).forEach(([key, value]) => {
+                    let statDiv = document.getElementById(`stats-${key}`);
+                    if (statDiv) {
+                        statDiv.textContent = `${key}: ${value}`;
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading stats:', error));
+    }
+
+    setInterval(updateStats, 500);
+
+    // if goOnce is clicked, set replayTick to empty string
+    goOnceButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+    // if goRepeat is clicked, set replayTick to empty string
+    goRepeatButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+    // if setup is clicked, set replayTick to empty string
+    setupButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+
 </script>

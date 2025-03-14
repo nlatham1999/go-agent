@@ -5,57 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Agent</title>
     <script src="https://unpkg.com/htmx.org@1.8.0"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
     
 </head>
-<body>
+<body class="nunito-font">
     <h1>{{ .Title }}</h1>
 
-    <div id="buttonsContainer">
-        <button id="setup" hx-post="/setup" hx-swap="none">Setup</button>
-
-        <button id="goOnce" hx-post="/go" hx-swap="none">Go</button>
-        <button 
-            id="goRepeat"
-            hx-post="/gorepeat" hx-swap="none"
-        >
-            Play
-        </button>
-    </div>
-
-    <div id="speedSliderContainer">
-        <div>
-            <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
+    <div id="modelControls">
+        <div class="buttonGroup">
+            <button id="setup" hx-post="/setup" hx-swap="none">Setup</button>
+            <button id="goOnce" hx-post="/go" hx-swap="none">Go</button>
+            <button 
+                id="goRepeat"
+                hx-post="/gorepeat" hx-swap="none"
+            >
+                Go Repeat
+            </button>
         </div>
-        <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
-            hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
-            oninput="document.getElementById('sliderValue').innerText = this.value;">
+
+        <div class="labelAndInput" id="speedControl">
+            <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
+            <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
+                hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
+                oninput="document.getElementById('sliderValue').innerText = this.value;">
+        </div>
+
+        
+        <div class="labelAndInput">
+            <label for="replayTick">Replay For Tick:</label>
+            <input id="replayTick" type="number" name="tick"
+                    hx-get="/settick"
+                    hx-trigger="change" 
+                    hx-include="#replayTick"
+                    hx-target="this">
+        </div>
     </div>
-
-    <div id="replayTickContainer">
-        <label for="replayTick">Replay For Tick:</label>
-        <input id="replayTick" type="number" name="tick"
-                hx-get="/settick"
-                hx-trigger="change" 
-                hx-include="#replayTick"
-                hx-target="this">
-    </div>
-
-    <!-- <button id="loadButton" hx-get="/load" hx-target="#content" hx-trigger="every .001s" style="visibility: hidden;">Load Content</button> -->
-
-    <!-- <button id="statsButton" hx-get="/loadstats" hx-target="#statsContainer" hx-trigger="every .001s" style="visibility: hidden;">Load Stats</button> -->
 
     <div id="widgetContainer">
         {{ .Widgets }}
     </div>
-
-    <!-- <div id="content"> -->
-        <!-- Content will be loaded here -->
-    <!-- </div> -->
-
-    <!-- <div id="statsContainer"> -->
-        <!-- Stats will be loaded here -->
-    <!-- </div> -->
 
     <div id="threejs-container"></div>
 

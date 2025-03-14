@@ -145,7 +145,7 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]interface{}{
-		"Title":   "Go Agent",
+		"Title":   a.settings.Title,
 		"Widgets": a.buildWidgets(),
 	}
 
@@ -178,17 +178,23 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) loadStatsHandler(w http.ResponseWriter, r *http.Request) {
 
-	// a.funcMutext.Lock()
-	// defer a.funcMutext.Unlock()
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
 
-	// // tmpl := a.renderStats()
+	// get the stats
+	stats := a.Model.Stats()
 
-	// // Execute the template
-	// _, err := w.Write([]byte(tmpl))
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	if stats == nil {
+		stats = map[string]interface{}{}
+	}
+
+	// add in the tick
+	stats["ticks"] = a.Model.Model().Ticks
+
+	//return the stats as json
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stats)
 }
 
 func (a *Api) updateSpeedHandler(w http.ResponseWriter, r *http.Request) {
@@ -222,6 +228,7 @@ func (a *Api) modelHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) modelAtHandler(w http.ResponseWriter, r *http.Request) {
+
 	queryParams := r.URL.Query()
 	step := queryParams.Get("step")
 	stepInt, err := strconv.Atoi(step)
@@ -309,7 +316,6 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 
 func (a *Api) setTickValueHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
-
 	tickValue := queryParams.Get("tick")
 	tick, err := strconv.Atoi(tickValue)
 	if err != nil {

@@ -29,6 +29,7 @@ type Api struct {
 }
 
 type ApiSettings struct {
+	Title      string
 	StoreSteps bool // Whether to store steps
 	MaxSteps   int  // Maximum number of steps to store. Default is 1000
 }
@@ -37,6 +38,10 @@ func NewApi(model ModelInterface, settings ApiSettings) *Api {
 
 	if settings.StoreSteps && settings.MaxSteps == 0 {
 		settings.MaxSteps = 1000 // Default value
+	}
+
+	if settings.Title == "" {
+		settings.Title = "Go Agent"
 	}
 
 	return &Api{
