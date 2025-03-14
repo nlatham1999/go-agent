@@ -83,8 +83,15 @@
 
     async function fetchDataAndUpdateScene() {
 
+        let endpoint = "/model";
+
+        if (document.getElementById("replayTick").value != "") {
+            console.log("Replaying for tick:", document.getElementById("replayTick").value);
+            endpoint = "/modelat?step=" + document.getElementById("replayTick").value;
+        }
+
         try {
-            const response = await fetch(`/model`);
+            const response = await fetch(endpoint);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const model = await response.json();
             updateScene(model);

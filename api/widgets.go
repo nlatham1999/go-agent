@@ -1,5 +1,7 @@
 package api
 
+import "fmt"
+
 type Widget struct {
 	PrettyName         string   `json:"prettyName"`
 	TargetVariable     string   `json:"targetVariable"`
@@ -15,11 +17,11 @@ type Widget struct {
 	ValuePointerString *string  `json:"valuePointerString"`
 }
 
-func (w *Widget) Render() string {
+func (w *Widget) Render(offset int) string {
 
 	id := w.TargetVariable + "-widget"
 
-	html := "<div>"
+	html := "<div class='widget' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
 	//label for id
 	if w.WidgetType == "text" {
 		html += `<label for="` + id + `">` + w.PrettyName + `</label>`
@@ -45,5 +47,6 @@ func (w *Widget) Render() string {
 	}
 
 	html += "</div>"
+
 	return html
 }

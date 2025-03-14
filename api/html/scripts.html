@@ -1,0 +1,127 @@
+<script>
+
+    const goRepeatText = document.getElementById('goRepeat').innerText;
+
+    const goOnceButton = document.getElementById('goOnce');
+    const goRepeatButton = document.getElementById('goRepeat');
+    const replayTickContainer = document.getElementById('replayTick');
+    const replayTick = document.getElementById('replayTick');
+    const loadButton = document.getElementById('loadButton');
+    const setupButton = document.getElementById('setup');
+    const contentDiv = document.getElementById('content');
+
+    // Function to update visibility based on goRepeatButton's inner text
+    function updateVisibility() {
+        if (goRepeatButton.innerText === '\u00A0\u00A0\u00A0Pause\u00A0\u00A0\u00A0') {
+            // replayTickContainer.setAttribute('disabled', true);
+            replayTick.disabled = true;
+        } else {
+            // replayTickContainer.setAttribute('disabled', false);
+            replayTick.disabled = false;
+        }
+    }
+
+    // Add an event listener to the goRepeat button to change text and update visibility
+    goRepeatButton.addEventListener('click', function() {
+        if (document.getElementById('goRepeat').innerText == goRepeatText) {
+            document.getElementById('goRepeat').innerText = '\u00A0\u00A0\u00A0Pause\u00A0\u00A0\u00A0\u00A0';
+        } else {
+            document.getElementById('goRepeat').innerText = goRepeatText;
+        }
+        updateVisibility();
+    });
+
+    setupButton.addEventListener('click', function() {
+        goRepeatButton.innerText = goRepeatText;
+    })
+
+    // Initial check on page load
+    updateVisibility();
+
+    // event listener on go to make the tickValue current
+    goOnceButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    // event listener on go to make the tickValue current
+    goRepeatButton.addEventListener('click', function() {
+        tickValue = 'current';
+    });
+
+    let savedScrollPosition = 0;
+
+    // loadButton.addEventListener('htmx:beforeRequest', function() {
+    //     // Save the current scroll position before the content is refreshed
+    //     statsContainer = document.getElementById('statsContainer');
+    //     savedScrollPosition = statsContainer.scrollTop;
+    //     console.log('Saved scroll position:', savedScrollPosition);
+    // });
+
+    // contentDiv.addEventListener('htmx:afterSwap', function() {
+    //     // Restore the saved scroll position after the content is updated
+    //     statsContainer = document.getElementById('statsContainer');
+    //     statsContainer.scrollTop = savedScrollPosition;
+    //     console.log('Restored scroll position:', savedScrollPosition);
+    // });
+
+    // make the widget draggable
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".widget").forEach(widget => {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            widget.addEventListener("mousedown", (e) => {
+                if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return; // prevent dragging inside inputs
+                isDragging = true;
+                offsetX = e.clientX - widget.offsetLeft;
+                offsetY = e.clientY - widget.offsetTop;
+                widget.style.cursor = "grabbing";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                widget.style.left = e.clientX - offsetX + "px";
+                widget.style.top = e.clientY - offsetY + "px";
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                widget.style.cursor = "grab";
+            });
+        });
+    });
+
+    // function to /loadstats that will load the stats every .5 seconds
+    function updateStats() {
+        fetch('/loadstats')
+            .then(response => response.json())
+            .then(data => {
+                Object.entries(data).forEach(([key, value]) => {
+                    let statDiv = document.getElementById(`stats-${key}`);
+                    if (statDiv) {
+                        statDiv.textContent = `${key}: ${value}`;
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading stats:', error));
+    }
+
+    setInterval(updateStats, 500);
+
+    // if goOnce is clicked, set replayTick to empty string
+    goOnceButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+    // if goRepeat is clicked, set replayTick to empty string
+    goRepeatButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+    // if setup is clicked, set replayTick to empty string
+    setupButton.addEventListener('click', function() {
+        replayTick.value = '';
+    });
+
+
+</script>

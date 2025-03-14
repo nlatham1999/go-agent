@@ -503,6 +503,144 @@ func TestTurtleDistanceTurtle(t *testing.T) {
 	}
 }
 
+// test DistanceTurtle with wrapping
+func TestTurtleDistanceTurtleWrappingY(t *testing.T) {
+
+	// create a basic model with wrapping
+	settings := model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+		MinPxCor:  -15,
+		MinPyCor:  -15,
+		MaxPxCor:  15,
+		MaxPyCor:  15,
+	}
+
+	m := model.NewModel(settings)
+
+	// create two turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// set the position of the turtles
+	t1.SetXY(0, -14)
+	t2.SetXY(0, 14)
+
+	// get the distance between the turtles
+	distance := t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 3 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+}
+
+// test DistanceTurtle with wrapping X
+func TestTurtleDistanceTurtleWrappingX(t *testing.T) {
+
+	// create a basic model with wrapping
+	settings := model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+		MinPxCor:  -15,
+		MinPyCor:  -15,
+		MaxPxCor:  15,
+		MaxPyCor:  15,
+	}
+
+	m := model.NewModel(settings)
+
+	// create two turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// set the position of the turtles
+	t1.SetXY(-14, 0)
+	t2.SetXY(14, 0)
+
+	// get the distance between the turtles
+	distance := t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 3 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+}
+
+// test DistanceTurtle with wrapping X and Y
+func TestTurtleDistanceTurtleWrappingXY(t *testing.T) {
+
+	// create a basic model with wrapping
+	settings := model.ModelSettings{
+		WrappingX: true,
+		WrappingY: true,
+		MinPxCor:  -15,
+		MinPyCor:  -15,
+		MaxPxCor:  15,
+		MaxPyCor:  15,
+	}
+
+	m := model.NewModel(settings)
+
+	// create two turtles
+	m.CreateTurtles(2, "", nil)
+
+	t1 := m.Turtle("", 0)
+	t2 := m.Turtle("", 1)
+
+	// set the position of the turtles to be 3,4,5 triangle
+	t1.SetXY(-13, -14)
+	t2.SetXY(14, 14)
+
+	// get the distance between the turtles
+	distance := t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 5 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+
+	// set the position of the turtles to be 3,4,5 triangle
+	t1.SetXY(-14, -14)
+	t2.SetXY(13, 14)
+
+	// get the distance between the turtles
+	distance = t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 5 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+
+	// set the position of the turtles to be 3,4,5 triangle
+	t1.SetXY(-14, -13)
+	t2.SetXY(14, 14)
+
+	// get the distance between the turtles
+	distance = t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 5 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+
+	// set the position of the turtles to be 3,4,5 triangle
+	t1.SetXY(-14, -14)
+	t2.SetXY(14, 13)
+
+	// get the distance between the turtles
+	distance = t1.DistanceTurtle(t2)
+
+	// assert that the distance is 2
+	if distance != 5 {
+		t.Errorf("Expected distance to be 2, got %v", distance)
+	}
+}
+
 func TestTurtleDistancePatch(t *testing.T) {
 
 	// create a basic model

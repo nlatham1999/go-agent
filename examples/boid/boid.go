@@ -54,7 +54,7 @@ func (b *Boid) Init() {
 	b.margin = .2
 	b.minSpeed = 0.03
 	b.maxSpeed = 0.06
-	b.turtleSize = 0.03
+	b.turtleSize = 0.16
 
 }
 
@@ -231,10 +231,10 @@ func (b *Boid) Widgets() []api.Widget {
 			WidgetType:        "slider",
 			WidgetValueType:   "float",
 			TargetVariable:    "turtle-size",
-			MinValue:          "0.03",
+			MinValue:          "0.01",
 			MaxValue:          "1",
 			StepAmount:        "0.01",
-			DefaultValue:      "0.9",
+			DefaultValue:      "0.16",
 			ValuePointerFloat: &b.turtleSize,
 		},
 		{

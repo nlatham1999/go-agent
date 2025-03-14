@@ -21,7 +21,7 @@ when changing the breed should the turtles own change?
 change the linkedTurtles map in turtles to be flat
     - use a struct as a key
 
-having colors be rbg, hsb, or a scale color is too complicated for  a backend, this is more frontend material
+having colors be options between rbg, hsb, or a scale color is too complicated for  a backend, this is more frontend material
     - all colors should just be rgb
 
 wrapping should have vertical and horizontal options
@@ -38,3 +38,6 @@ why have linkedTurtles and linkedTurtlesConnectedFrom?
 
 
  patches own should not contain ints, only floats, this is for diffusing
+
+why have seperate endpoints for stats and model? 
+ - so that the user has the option to only grab the bare necessities

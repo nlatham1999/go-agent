@@ -13,54 +13,40 @@ var indexHTML string
 //go:embed html/threejs.html
 var threejsHTML string
 
+//go:embed html/scripts.html
+var scriptsHTML string
+
+//go:embed html/style.html
+var styleHTML string
+
 var (
 	statsKeys = []string{}
 )
 
-func (a *Api) getFrontend(width int, height int, model *Model) string {
-
-	patchSize := a.getPatchSize(width, height, model.WorldWidth, model.WorldHeight)
-
-	var tmpl strings.Builder
-	tmpl.WriteString(`<div class="grid-container patch-grid" style="position: absolute; left: 50%; top: 5px;">`)
-
-	// Render patches
-	for _, patch := range model.Patches {
-		a.renderPatch(&tmpl, patch, model, patchSize)
-	}
-
-	// Render links
-	for _, link := range model.Links {
-		a.renderLink(&tmpl, link, model, patchSize, float64(height))
-	}
-
-	// Render turtles
-	for _, turtle := range model.Turtles {
-		a.renderTurtle(&tmpl, turtle, model, patchSize)
-	}
-
-	tmpl.WriteString(`</div>`)
-
-	return tmpl.String()
-}
-
-func (a *Api) renderStats() string {
-
-	var tmpl strings.Builder
-
-	// Render stats
+func (a *Api) renderStatsAsWidgets() (string, int) {
+	html := ""
 	stats := a.Model.Stats()
-	if len(statsKeys) == 0 || len(statsKeys) != len(stats) {
-		for key := range stats {
-			statsKeys = append(statsKeys, key)
-		}
-	}
-	tmpl.WriteString(`<div>Ticks: ` + fmt.Sprintf("%d", a.Model.Model().Ticks) + `</div>`)
-	for _, key := range statsKeys {
-		tmpl.WriteString(`<div>` + key + `: ` + fmt.Sprintf("%v", stats[key]) + `</div>`)
-	}
 
-	return tmpl.String()
+	//tick stat
+	html += fmt.Sprintf(`
+		<div class="widget widget-stats">
+			<div id="stats-ticks">Ticks : %d</div>
+		</div>
+	`, a.Model.Model().Ticks)
+
+	count := 2
+	for key, value := range stats {
+		if value == nil {
+			value = "null"
+		}
+		html += fmt.Sprintf(`
+		<div class="widget widget-stats" style="top: %dpx;">
+			<div id="stats-%s">%s : %v</div>
+		</div>
+		`, count*20, key, key, value)
+		count++
+	}
+	return html, len(stats) + 1
 }
 
 func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSize int, screenHeight float64) {
@@ -122,90 +108,16 @@ func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSi
 
 }
 
-func (a *Api) renderTurtle(tmpl *strings.Builder, turtle Turtle, model *Model, patchSize int) {
-	// fmt.Println(patchSize, turtle.Size)
-	turtleSize := int(float64(patchSize) * turtle.Size)
-	// fmt.Println(turtleSize)
-	if turtleSize < 1 {
-		turtleSize = 1
-	}
-	turtleOffset := ((patchSize) - turtleSize) / 2
-	relativeX := turtle.X - float64(model.MinPxCor)
-	relativeY := turtle.Y - float64(model.MinPyCor)
-	tmpl.WriteString(fmt.Sprintf(`
-			<div 
-				class="turtle" 
-				style="
-					width: %dpx;
-					height: %dpx;
-					left: %vpx; 
-					top: %vpx;
-					background-color: rgba(%d,%d,%d,%d);
-					color: rgba(%d,%d,%d,%d);
-					"
-			>
-			`+fmt.Sprintf("%v", turtle.Label)+`
-			</div>
-		`, turtleSize, turtleSize, relativeX*float64(patchSize)+float64(turtleOffset), relativeY*float64(patchSize)+float64(turtleOffset),
-		turtle.Color.Red, turtle.Color.Green, turtle.Color.Blue, turtle.Color.Alpha,
-		turtle.LabelColor.Red, turtle.LabelColor.Green, turtle.LabelColor.Blue, turtle.LabelColor.Alpha,
-	))
-}
-
-func (a *Api) renderPatch(tmpl *strings.Builder, patch Patch, model *Model, patchSize int) {
-	relativeX := patch.X - model.MinPxCor
-	relativeY := patch.Y - model.MinPyCor
-	tmpl.WriteString(fmt.Sprintf(`
-			<div 
-				class="patch" 
-				style="
-					width: %dpx;
-					height: %dpx;
-					left: %dpx; 
-					top: %dpx;
-					background-color: rgba(%d,%d,%d,%d);
-				"
-			>
-			</div>
-		`, patchSize, patchSize, relativeX*patchSize, relativeY*patchSize,
-		patch.Color.Red, patch.Color.Green, patch.Color.Blue, patch.Color.Alpha,
-	))
-}
-
-func (a *Api) getPatchSize(screenWidth int, screenHeight int, worldWidth int, worldHeight int) int {
-
-	// add 1 to worldWidth and worldHeight to account for the extra .5 on each side
-	worldWidth++
-	worldHeight++
-
-	//can only take up 50% of the width of the screen
-	screenWidth = screenWidth / 2
-
-	// leave a 1% margin on the left and right
-	screenWidth = screenWidth - (screenWidth / 50)
-
-	// leave a 1% margin on the top and bottom
-	screenHeight = screenHeight - int(float64(screenHeight)*.02)
-
-	//calculate the max width of the patches
-	maxPatchWidth := screenWidth / worldWidth
-
-	//calculate the max height of the patches
-	maxPatchHeight := screenHeight / worldHeight
-
-	//return the minimum of the two
-	if maxPatchWidth < maxPatchHeight {
-		return maxPatchWidth
-	}
-	return maxPatchHeight
-}
-
 func (a *Api) buildWidgets() string {
-	html := ""
+
+	// Add stats widget
+	html, count := a.renderStatsAsWidgets()
 
 	// Add widgets here
+	count++
 	for _, widget := range a.Model.Widgets() {
-		html += widget.Render()
+		html += widget.Render(count)
+		count++
 	}
 
 	return html
