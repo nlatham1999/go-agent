@@ -13,8 +13,8 @@ func TestTurtleBack(t *testing.T) {
 	m := model.NewModel(settings)
 
 	//create a turtle
-	m.CreateTurtles(1, "", nil)
-	turtle := m.Turtle("", 0)
+	m.CreateTurtles(1, nil)
+	turtle := m.Turtle(0)
 
 	//set the turtle's heading
 	turtle.SetHeading(90)
@@ -37,16 +37,18 @@ func TestTurtleBack(t *testing.T) {
 
 func TestTurtleBreedName(t *testing.T) {
 
+	ants := model.NewTurtleBreed("ants", "", nil)
+
 	//create a basic model
 	settings := model.ModelSettings{
-		TurtleBreeds: []string{"ants"},
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
-	m := model.NewModel(settings)
+	_ = model.NewModel(settings)
 
 	//create a turtle
-	m.CreateTurtles(1, "ants", nil)
+	ants.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("ants", 0)
+	turtle := ants.Turtle(0)
 	//assert that the turtle's breed is "ants"
 	if turtle.BreedName() != "ants" {
 		t.Errorf("Expected turtle to have breed 'ants'")
@@ -55,16 +57,18 @@ func TestTurtleBreedName(t *testing.T) {
 
 func TestTurtleBreed(t *testing.T) {
 
+	ants := model.NewTurtleBreed("ants", "", nil)
+
 	//create a basic model
 	settings := model.ModelSettings{
-		TurtleBreeds: []string{"ants"},
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
-	m := model.NewModel(settings)
+	_ = model.NewModel(settings)
 
 	//create a turtle
-	m.CreateTurtles(1, "ants", nil)
+	ants.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("ants", 0)
+	turtle := ants.Turtle(0)
 
 	if turtle.BreedName() == "" {
 		t.Errorf("Expected turtle to have a breed")
@@ -77,16 +81,19 @@ func TestTurtleBreed(t *testing.T) {
 
 func TestTurtleSetBreed(t *testing.T) {
 
+	ants := model.NewTurtleBreed("ants", "", nil)
+	beetles := model.NewTurtleBreed("beetles", "", nil)
+
 	//create a basic model
 	settings := model.ModelSettings{
-		TurtleBreeds: []string{"ants", "beetles"},
+		TurtleBreeds: []*model.TurtleBreed{ants, beetles},
 	}
 	m := model.NewModel(settings)
 
 	//create a turtle
-	m.CreateTurtles(5, "ants", nil)
+	ants.CreateTurtles(5, nil)
 
-	turtle := m.Turtle("ants", 0)
+	turtle := ants.Turtle(0)
 
 	turtle.SetBreed("beetles")
 
@@ -94,21 +101,21 @@ func TestTurtleSetBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have breed 'beetles'")
 	}
 
-	turtle = m.Turtle("ants", 0)
+	turtle = ants.Turtle(0)
 
 	if turtle != nil {
 		t.Errorf("Expected turtle to not exist in breed 'ants'")
 	}
 
-	turtle = m.Turtle("beetles", 0)
+	turtle = beetles.Turtle(0)
 
 	if turtle == nil {
 		t.Errorf("Expected turtle to exist in breed 'beetles'")
 	}
 
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle = m.Turtle("", 5)
+	turtle = m.Turtle(5)
 
 	if turtle.BreedName() != "" {
 		t.Errorf("Expected turtle to have breed ''")
@@ -120,7 +127,7 @@ func TestTurtleSetBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have breed 'ants'")
 	}
 
-	turtle = m.Turtle("ants", 5)
+	turtle = ants.Turtle(5)
 
 	if turtle == nil {
 		t.Errorf("Expected turtle to exist in breed 'ants'")
@@ -134,9 +141,9 @@ func TestTurtlesOwn(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 
 	// get the turtle's own
 	mood := turtle.GetProperty("mood")
@@ -155,21 +162,18 @@ func TestTurtlesOwn(t *testing.T) {
 		"mood": 0,
 	}
 
-	breedsOwn := map[string]map[string]interface{}{
-		"ants": antsOwn,
-	}
+	ants := model.NewTurtleBreed("ants", "", antsOwn)
 
 	settings = model.ModelSettings{
-		TurtleProperties:      turtlesOwn,
-		TurtleBreedProperties: breedsOwn,
-		TurtleBreeds:          []string{"ants"},
+		TurtleProperties: turtlesOwn,
+		TurtleBreeds:     []*model.TurtleBreed{ants},
 	}
-	m2 := model.NewModel(settings)
+	_ = model.NewModel(settings)
 
 	// create a turtle
-	m2.CreateTurtles(1, "ants", nil)
+	ants.CreateTurtles(1, nil)
 
-	turtle = m2.Turtle("", 0)
+	turtle = ants.Turtle(0)
 
 	// get the turtle's own
 	mood = turtle.GetProperty("mood")
@@ -190,19 +194,18 @@ func TestTurtlesOwn(t *testing.T) {
 		"wingspan": 10,
 	}
 
-	breedsOwn["beetles"] = beetlesOwn
+	beetles := model.NewTurtleBreed("beetles", "", beetlesOwn)
 
 	settings = model.ModelSettings{
-		TurtleProperties:      turtlesOwn,
-		TurtleBreedProperties: breedsOwn,
-		TurtleBreeds:          []string{"ants", "beetles"},
+		TurtleProperties: turtlesOwn,
+		TurtleBreeds:     []*model.TurtleBreed{ants, beetles},
 	}
-	m3 := model.NewModel(settings)
+	_ = model.NewModel(settings)
 
 	// create a turtle
-	m3.CreateTurtles(1, "beetles", nil)
+	beetles.CreateTurtles(1, nil)
 
-	turtle = m3.Turtle("beetles", 0)
+	turtle = beetles.Turtle(0)
 
 	//change the breed
 	turtle.SetBreed("ants")
@@ -235,10 +238,10 @@ func TestTurtleCreateLinkToTurtle(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -261,11 +264,11 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(3, "", nil)
+	m.CreateTurtles(3, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
@@ -303,10 +306,10 @@ func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	t1.CreateLinkWithTurtle("coworkers", t2, nil)
@@ -343,11 +346,11 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(3, "", nil)
+	m.CreateTurtles(3, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
@@ -399,10 +402,10 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	t1.CreateLinkFromTurtle("parent-children", t2, nil)
@@ -431,11 +434,11 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(3, "", nil)
+	m.CreateTurtles(3, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
@@ -485,10 +488,10 @@ func TestTurtleDistanceTurtle(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create two turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// set the position of the turtles
 	t1.SetXY(0, 0)
@@ -519,10 +522,10 @@ func TestTurtleDistanceTurtleWrappingY(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create two turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// set the position of the turtles
 	t1.SetXY(0, -14)
@@ -553,10 +556,10 @@ func TestTurtleDistanceTurtleWrappingX(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create two turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// set the position of the turtles
 	t1.SetXY(-14, 0)
@@ -587,10 +590,10 @@ func TestTurtleDistanceTurtleWrappingXY(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create two turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// set the position of the turtles to be 3,4,5 triangle
 	t1.SetXY(-13, -14)
@@ -647,9 +650,9 @@ func TestTurtleDistancePatch(t *testing.T) {
 	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	t1 := m.Turtle("", 0)
+	t1 := m.Turtle(0)
 
 	// set the position of the turtle
 	t1.SetXY(0, 0)
@@ -669,9 +672,9 @@ func TestTurtleDistanceXY(t *testing.T) {
 	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	t1 := m.Turtle("", 0)
+	t1 := m.Turtle(0)
 
 	// set the position of the turtle
 	t1.SetXY(0, 0)
@@ -695,10 +698,10 @@ func TestTurtleOtherEnd(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -733,9 +736,9 @@ func TestTurtleSetXY(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 
 	turtle.SetXY(15.4999, 15.4999)
 
@@ -771,7 +774,7 @@ func TestTurtleDownhill(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
 	// get the 9 patches around the turtle
 	p1 := m.Patch(0, 0)
@@ -795,7 +798,7 @@ func TestTurtleDownhill(t *testing.T) {
 	p8.SetProperty("chemical", 7.0)
 	p9.SetProperty("chemical", 8.0)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 	turtle.Downhill("chemical")
 
 	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
@@ -826,7 +829,7 @@ func TestTurtleDownhill4(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
 	// get the 5 patches around the turtle
 	p1 := m.Patch(0, 0)
@@ -842,7 +845,7 @@ func TestTurtleDownhill4(t *testing.T) {
 	p4.SetProperty("chemical", 3.0)
 	p5.SetProperty("chemical", 4.0)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 	turtle.Downhill4("chemical")
 
 	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
@@ -867,10 +870,10 @@ func TestTurtleFaceTurtle(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create two turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	t1.SetXY(-14, 14)
 	t2.SetXY(14, -14)
@@ -921,23 +924,23 @@ func TestFaceXY(t *testing.T) {
 	m := model.NewModel(model.ModelSettings{})
 
 	// create a turtle
-	m.CreateTurtles(1, "",
+	m.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(0, 5)
 			t.SetHeading(270)
 		},
 	)
 
-	if m.Turtle("", 0).GetHeading() != 270 {
-		t.Errorf("Expected turtle to face 270 degrees, got %v", m.Turtle("", 0).GetHeading())
+	if m.Turtle(0).GetHeading() != 270 {
+		t.Errorf("Expected turtle to face 270 degrees, got %v", m.Turtle(0).GetHeading())
 	}
 
 	// face the turtle towards the point (5, 0)
-	m.Turtle("", 0).FaceXY(5, 0)
+	m.Turtle(0).FaceXY(5, 0)
 
 	// make sure the turtle is facing 0 degrees
-	if m.Turtle("", 0).GetHeading() != 315 {
-		t.Errorf("Expected turtle to face 315 degrees, got %v", m.Turtle("", 0).GetHeading())
+	if m.Turtle(0).GetHeading() != 315 {
+		t.Errorf("Expected turtle to face 315 degrees, got %v", m.Turtle(0).GetHeading())
 	}
 
 }
@@ -952,16 +955,16 @@ func TestTurtleInLinkNeighbor(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(8, "", nil)
+	m.CreateTurtles(8, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
 
 	// create a directed link between t1 and t2
 	t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -1038,17 +1041,17 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
 	t2.CreateLinkToTurtle("parent-children", t1, nil)
@@ -1101,17 +1104,17 @@ func TestTurtleLinkNeighbor(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
 	t2.CreateLinkToTurtle("parent-children", t1, nil)
@@ -1182,17 +1185,17 @@ func TestTurtleLinkNeighbors(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
 	t2.CreateLinkToTurtle("parent-children", t1, nil)
@@ -1247,17 +1250,17 @@ func TestTurtleOutLinkNeighbor(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
 	t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -1333,17 +1336,17 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
 	t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -1392,17 +1395,17 @@ func TestTurtleMyLinks(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(9, "", nil)
+	m.CreateTurtles(9, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
-	t8 := m.Turtle("", 7)
-	t9 := m.Turtle("", 8)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
+	t8 := m.Turtle(7)
+	t9 := m.Turtle(8)
 
 	// directed unbreeded link from t1 to t2
 	t1.CreateLinkToTurtle("", t2, nil)
@@ -1512,29 +1515,30 @@ func TestTurtleMyLinks(t *testing.T) {
 
 func TestTurtleTurtlesHere(t *testing.T) {
 
-	turtleBreeds := []string{"ants"}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	// create a basic model with an ants breed for turtles
 	settings := model.ModelSettings{
-		TurtleBreeds: turtleBreeds,
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
-	m.CreateTurtles(2, "ants", nil)
+	m.CreateTurtles(2, nil)
+	ants.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("ants", 2)
-	t4 := m.Turtle("ants", 3)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+
+	t3 := ants.Turtle(2)
+	t4 := ants.Turtle(3)
 
 	t1.SetXY(1, 1)
 	t2.SetXY(2, 2)
 	t3.SetXY(2, 2)
 	t4.SetXY(3, 3)
 
-	turtles := t1.TurtlesHere("")
+	turtles := t1.TurtlesHere()
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
 	}
@@ -1542,12 +1546,13 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t1")
 	}
 
-	turtles = t1.TurtlesHere("ants")
+	turtles = ants.TurtlesOnPatch(t1.PatchHere())
+	// turtles = t1.TurtlesHere("ants")
 	if turtles.Count() != 0 {
 		t.Errorf("Expected 0 turtles, got %d", turtles.Count())
 	}
 
-	turtles = t2.TurtlesHere("")
+	turtles = t2.TurtlesHere()
 	if turtles.Count() != 2 {
 		t.Errorf("Expected 2 turtles, got %d", turtles.Count())
 	}
@@ -1555,7 +1560,8 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t2 and t3")
 	}
 
-	turtles = t2.TurtlesHere("ants")
+	turtles = ants.TurtlesWithTurtle(t2)
+	// turtles = t2.TurtlesHere("ants")
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
 	}
@@ -1563,7 +1569,8 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t3")
 	}
 
-	turtles = t3.TurtlesHere("ants")
+	turtles = ants.TurtlesWithTurtle(t1)
+	// turtles = t3.TurtlesHere("ants")
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
 	}
@@ -1571,7 +1578,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t3")
 	}
 
-	turtles = t4.TurtlesHere("")
+	turtles = t4.TurtlesHere()
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
 	}
@@ -1594,7 +1601,7 @@ func TestTurtleUphill(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
 	// get the 9 patches around the turtle
 	p1 := m.Patch(0, 0)
@@ -1618,7 +1625,7 @@ func TestTurtleUphill(t *testing.T) {
 	p8.SetProperty("chemical", 7.0)
 	p9.SetProperty("chemical", 8.0)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 	turtle.Uphill("chemical")
 
 	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
@@ -1649,7 +1656,7 @@ func TestTurtleUphill4(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
 	// get the 5 patches around the turtle
 	p1 := m.Patch(0, 0)
@@ -1665,7 +1672,7 @@ func TestTurtleUphill4(t *testing.T) {
 	p4.SetProperty("chemical", 3.0)
 	p5.SetProperty("chemical", 4.0)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 	turtle.Uphill4("chemical")
 
 	// make sure that the turtle's position has not changed since the patch it is on has the lowest chemical value
@@ -1688,9 +1695,9 @@ func TestTurtleTowardsXY(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 
 	turtle.SetXY(0, 0)
 
@@ -1707,14 +1714,14 @@ func TestTurtlesLinksDying(t *testing.T) {
 
 	m := model.NewModel(settings)
 
-	m.CreateTurtles(6, "", nil)
+	m.CreateTurtles(6, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
-	t6 := m.Turtle("", 5)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
+	t6 := m.Turtle(5)
 
 	t1.CreateLinkWithTurtle("", t2, nil)
 	t1.Die()
@@ -1737,26 +1744,29 @@ func TestTurtlesLinksDying(t *testing.T) {
 }
 
 func TestTurtleSetBreedPatchHere(t *testing.T) {
+
+	scouts := model.NewTurtleBreed("scouts", "", nil)
+	foragers := model.NewTurtleBreed("foragers", "", nil)
+
 	settings := model.ModelSettings{
-		TurtleBreeds: []string{
-			"scouts",
-			"foragers",
-		},
+		TurtleBreeds: []*model.TurtleBreed{scouts, foragers},
 	}
 
-	m := model.NewModel(settings)
+	_ = model.NewModel(settings)
 
-	m.CreateTurtles(1, "scouts", nil)
+	// m.CreateTurtles(1, "scouts", nil)
+	scouts.CreateTurtles(1, nil)
 
-	t1 := m.Turtle("scouts", 0)
+	// t1 := m.Turtle("scouts", 0)
+	t1 := scouts.Turtle(0)
 
-	if t1.PatchHere().TurtlesHere("scouts").Count() != 1 {
+	if scouts.TurtlesOnPatch(t1.PatchHere()).Count() != 1 {
 		t.Errorf("Expected turtle to be on patch")
 	}
 
 	t1.SetBreed("foragers")
 
-	if t1.PatchHere().TurtlesHere("foragers").Count() != 1 {
+	if foragers.TurtlesOnPatch(t1.PatchHere()).Count() != 1 {
 		t.Errorf("Expected turtle to be on patch")
 	}
 
@@ -1776,9 +1786,9 @@ func TestTurtle_Jump(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 
 	turtle.SetHeading(0)
 	turtle.Jump(5)
@@ -1807,9 +1817,9 @@ func TestTurtle_Jump(t *testing.T) {
 	m = model.NewModel(settings)
 
 	// create a turtle
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	turtle = m.Turtle("", 0)
+	turtle = m.Turtle(0)
 
 	turtle.SetHeading(0)
 

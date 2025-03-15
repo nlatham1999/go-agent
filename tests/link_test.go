@@ -17,10 +17,10 @@ func TestLinkCreation(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link that will fail
 
@@ -69,10 +69,10 @@ func TestLinkBreedName(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -95,10 +95,10 @@ func TestLinkBreed(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -121,10 +121,10 @@ func TestLinkSetBreed(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -168,10 +168,10 @@ func TestLinkBothEnds(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -202,10 +202,10 @@ func TestLinkHeading(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -261,10 +261,10 @@ func TestLinkOtherEnd(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -291,15 +291,15 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(3, "",
+	m.CreateTurtles(3,
 		func(t *model.Turtle) {
 			t.SetHeading(0)
 		},
 	)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
 
 	t1.SetHeading(30)
 	t1.SetXY(0, 0)
@@ -391,9 +391,9 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	}
 
 	// create another turtle at 14, 14 that is fixed to t1
-	m.CreateTurtles(2, "", nil)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
+	m.CreateTurtles(2, nil)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
 	t4.SetXY(0, 0)
 	t5.SetXY(14, 14)
 	l4, err := t4.CreateLinkToTurtle("parent-children", t5, nil)
@@ -424,9 +424,9 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	}
 
 	// create another 2 turtles, t6 at 0,0 and t7 at -14, 14 that is fixed to t6
-	m.CreateTurtles(2, "", nil)
-	t6 := m.Turtle("", 5)
-	t7 := m.Turtle("", 6)
+	m.CreateTurtles(2, nil)
+	t6 := m.Turtle(5)
+	t7 := m.Turtle(6)
 
 	t6.SetXY(0, 0)
 	t7.SetXY(-14, 14)
@@ -456,14 +456,14 @@ func TestMovingTiedTurtles(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "",
+	m.CreateTurtles(2,
 		func(t *model.Turtle) {
 			t.SetHeading(0)
 		},
 	)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	t1.SetXY(0, 0)
 	t2.SetXY(3, 4)
@@ -524,10 +524,10 @@ func TestLinkCreationNoDuplicates(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create some turtles
-	m.CreateTurtles(2, "", nil)
+	m.CreateTurtles(2, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	// create a new link
 	_, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
@@ -564,10 +564,10 @@ func TestLinkBreedSetting(t *testing.T) {
 
 	m := model.NewModel(modelSettings)
 
-	m.CreateTurtles(4, "", nil)
+	m.CreateTurtles(4, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
 
 	l, err := t1.CreateLinkWithTurtle("a", t2, nil)
 	if err != nil {
@@ -608,8 +608,8 @@ func TestLinkBreedSetting(t *testing.T) {
 		t.Errorf("Turtle 2 should have 1 link of breed b")
 	}
 
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
 
 	l, err = t3.CreateLinkToTurtle("c", t4, nil)
 	if err != nil {
@@ -661,13 +661,13 @@ func TestLinkDying(t *testing.T) {
 
 	m := model.NewModel(modelSettings)
 
-	m.CreateTurtles(5, "", nil)
+	m.CreateTurtles(5, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
-	t5 := m.Turtle("", 4)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
+	t5 := m.Turtle(4)
 
 	t1.CreateLinkWithTurtle("a", t2, nil)
 	t1.CreateLinkWithTurtle("a", t3, nil)

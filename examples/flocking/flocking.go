@@ -51,7 +51,7 @@ func (f *Flocking) Init() {
 
 func (f *Flocking) SetUp() error {
 	f.model.ClearAll()
-	_, err := f.model.CreateTurtles(f.population, "", func(t *model.Turtle) {
+	_, err := f.model.CreateTurtles(f.population, func(t *model.Turtle) {
 		t.Color = f.model.RandomColor()
 		t.SetSize(.5)
 		t.SetXY(f.model.RandomXCor(), f.model.RandomYCor())
@@ -68,11 +68,11 @@ func (f *Flocking) SetUp() error {
 }
 
 func (f *Flocking) Go() {
-	f.model.Turtles("").Ask(
+	f.model.Turtles().Ask(
 		f.flock,
 	)
 
-	f.model.Turtles("").Ask(
+	f.model.Turtles().Ask(
 		func(t *model.Turtle) {
 			t.Forward(1)
 		},
@@ -104,7 +104,7 @@ func (f *Flocking) findFlockmates(t *model.Turtle) {
 	t.SetProperty("nearest-neighbor", nil)
 
 	minDistance := 1000000.0
-	f.model.Turtles("").Ask(
+	f.model.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			distance := t.DistanceTurtle(t2)
 			if t != t2 && distance < f.vision {

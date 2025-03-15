@@ -60,7 +60,7 @@ func (s *Sim) SetUp() error {
 
 	s.model.Patch(0, 0).PColor.SetColor(model.Green)
 
-	s.model.CreateTurtles(1, "", func(t *model.Turtle) {
+	s.model.CreateTurtles(1, func(t *model.Turtle) {
 		t.SetXY(0, 0)
 		t.SetSize(1)
 		t.SetHeading(90)
@@ -92,13 +92,13 @@ func (s *Sim) Stop() bool {
 }
 
 func (s *Sim) MoveForward() {
-	t1 := s.model.Turtle("", 0)
+	t1 := s.model.Turtle(0)
 	fmt.Println("Moving forward")
 	t1.Forward(1)
 }
 
 func (s *Sim) Rotate() {
-	t1 := s.model.Turtle("", 0)
+	t1 := s.model.Turtle(0)
 	fmt.Println("Rotating")
 	t1.Right(10)
 }

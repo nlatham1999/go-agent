@@ -31,8 +31,11 @@ func (ws *WolfSheep) Model() *model.Model {
 
 func (ws *WolfSheep) Init() {
 
+	sheep := model.NewTurtleBreed("sheep", "", nil)
+	wolves := model.NewTurtleBreed("wolves", "", nil)
+
 	modelSettings := model.ModelSettings{
-		TurtleBreeds: []string{"sheep", "wolves"},
+		TurtleBreeds: []*model.TurtleBreed{sheep, wolves},
 		TurtleProperties: map[string]interface{}{
 			"energy": 0,
 		},
@@ -74,7 +77,10 @@ func (ws *WolfSheep) SetUp() error {
 		},
 	)
 
-	ws.m.CreateTurtles(ws.initialNumberSheep, "sheep",
+	sheep := ws.m.TurtleBreed("sheep")
+	wolves := ws.m.TurtleBreed("wolves")
+
+	sheep.CreateTurtles(ws.initialNumberSheep,
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -86,7 +92,7 @@ func (ws *WolfSheep) SetUp() error {
 		},
 	)
 
-	ws.m.CreateTurtles(ws.initialNumberWolves, "wolves",
+	wolves.CreateTurtles(ws.initialNumberWolves,
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
@@ -98,7 +104,7 @@ func (ws *WolfSheep) SetUp() error {
 		},
 	)
 
-	ws.m.Turtles("").Ask(
+	ws.m.Turtles().Ask(
 		func(t *model.Turtle) {
 			if ws.showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))
@@ -113,16 +119,19 @@ func (ws *WolfSheep) SetUp() error {
 }
 
 func (ws *WolfSheep) Go() {
-	if ws.m.Turtles("").Count() == 0 {
+	if ws.m.Turtles().Count() == 0 {
 		return
 	}
 
-	if ws.m.Turtles("wolves").Count() == 0 && ws.m.Turtles("sheep").Count() > ws.maxSheep {
+	wolves := ws.m.TurtleBreed("wolves")
+	sheep := ws.m.TurtleBreed("sheep")
+
+	if wolves.Turtles().Count() == 0 && sheep.Turtles().Count() > ws.maxSheep {
 		fmt.Println("The sheep have inherited the earth")
 		return
 	}
 
-	ws.m.Turtles("sheep").Ask(
+	sheep.Turtles().Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
 			energy, err := t.GetPropI("energy")
@@ -137,10 +146,10 @@ func (ws *WolfSheep) Go() {
 		},
 	)
 
-	ws.m.Turtles("wolves").Ask(
+	wolves.Turtles().Ask(
 		ws.move,
 	)
-	ws.m.Turtles("wolves").Ask(
+	wolves.Turtles().Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
 			t.SetProperty("energy", t.GetProperty("energy").(int)-1)
@@ -154,7 +163,7 @@ func (ws *WolfSheep) Go() {
 		ws.growGrass,
 	)
 
-	ws.m.Turtles("").Ask(
+	wolves.Turtles().Ask(
 		func(t *model.Turtle) {
 			if ws.showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))
@@ -192,7 +201,7 @@ func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
 	if ws.m.RandomFloat(100) < ws.sheepReproduceRate {
 
 		t.SetProperty("energy", energy/2)
-		t.Hatch("", 1,
+		t.Hatch(1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
 				t.Forward(1)
@@ -212,7 +221,7 @@ func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
 	}
 	if ws.m.RandomFloat(100) < ws.sheepReproduceRate {
 		t.SetProperty("energy", energy/2)
-		t.Hatch("", 1,
+		t.Hatch(1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
 				t.Forward(1)
@@ -222,7 +231,10 @@ func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) EatSheep(t *model.Turtle) {
-	prey, err := t.PatchHere().TurtlesHere("sheep").First()
+
+	sheep := ws.m.TurtleBreed("sheep")
+
+	prey, err := sheep.TurtlesWithTurtle(t).First()
 	if err != nil {
 		return
 	}
@@ -261,11 +273,14 @@ func (ws *WolfSheep) Stats() map[string]interface{} {
 
 // stop the model when all the ants have reached the food
 func (ws *WolfSheep) Stop() bool {
-	if ws.m.Turtles("").Count() == 0 {
+	if ws.m.Turtles().Count() == 0 {
 		return true
 	}
 
-	if ws.m.Turtles("wolves").Count() == 0 && ws.m.Turtles("sheep").Count() > ws.maxSheep {
+	wolves := ws.m.TurtleBreed("wolves")
+	sheep := ws.m.TurtleBreed("sheep")
+
+	if wolves.Turtles().Count() == 0 && sheep.Turtles().Count() > ws.maxSheep {
 		fmt.Println("The sheep have inherited the earth")
 		return true
 	}

@@ -19,8 +19,12 @@ func NewPrims() *Prims {
 }
 
 func (p *Prims) Init() {
+
+	placed := model.NewTurtleBreed("placed", "", nil)
+	unplaced := model.NewTurtleBreed("unplaced", "", nil)
+
 	modelSettings := model.ModelSettings{
-		TurtleBreeds:         []string{"unplaced", "placed"},
+		TurtleBreeds:         []*model.TurtleBreed{placed, unplaced},
 		UndirectedLinkBreeds: []string{"unplaced", "placed"},
 		MinPxCor:             0,
 		MinPyCor:             0,
@@ -37,12 +41,13 @@ func (p *Prims) SetUp() error {
 
 	p.model.ClearAll()
 
-	p.model.CreateTurtles(p.nodes, "unplaced",
+	unplaced := p.model.TurtleBreed("unplaced")
+	unplaced.CreateTurtles(p.nodes,
 		p.placeInitialNodes,
 	)
 
 	//for each turtle create a link with every other turtle
-	p.model.Turtles("unplaced").Ask(
+	unplaced.Turtles().Ask(
 		p.createInitialLinks,
 	)
 
@@ -50,7 +55,7 @@ func (p *Prims) SetUp() error {
 		return l.Length()
 	})
 
-	t0 := p.model.Turtle("", 0)
+	t0 := p.model.Turtle(0)
 	t0.Color.SetColor(model.Red)
 	t0.SetBreed("placed")
 
@@ -65,7 +70,8 @@ func (p *Prims) placeInitialNodes(t *model.Turtle) {
 }
 
 func (p *Prims) createInitialLinks(t *model.Turtle) {
-	p.model.Turtles("unplaced").Ask(
+	unplaced := p.model.TurtleBreed("unplaced")
+	unplaced.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 && t.DistanceTurtle(t2) < 10 {
 				t.CreateLinkWithTurtle("unplaced", t2,
@@ -122,7 +128,8 @@ func (p *Prims) Go() {
 	closestTurtle.Color.SetColor(model.Red)
 
 	// if all nodes are placed, kill all unplaced links
-	if p.model.Turtles("placed").Count() == p.nodes {
+	placed := p.model.TurtleBreed("placed")
+	if placed.Turtles().Count() == p.nodes {
 		p.model.UndirectedLinks("unplaced").Ask(
 			func(l *model.Link) {
 				l.Die()
@@ -141,9 +148,13 @@ func (p *Prims) Model() *model.Model {
 }
 
 func (p *Prims) Stats() map[string]interface{} {
+
+	placed := p.model.TurtleBreed("placed")
+	unplaced := p.model.TurtleBreed("unplaced")
+
 	return map[string]interface{}{
-		"Placed nodes":    p.model.Turtles("placed").Count(),
-		"Unplaced nodes":  p.model.Turtles("unplaced").Count(),
+		"Placed nodes":    placed.Turtles().Count(),
+		"Unplaced nodes":  unplaced.Turtles().Count(),
 		"potential links": p.model.UndirectedLinks("unplaced").Count(),
 	}
 }

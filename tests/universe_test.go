@@ -8,132 +8,116 @@ import (
 )
 
 func TestCreateTurtles(t *testing.T) {
-	breeds := []string{
-		"ants",
-	}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	settings := model.ModelSettings{
-		TurtleBreeds: breeds,
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
 	environment := model.NewModel(settings)
 
 	// creating turtles without a breed should add them to the default breed
-	environment.CreateTurtles(5, "", nil)
-	if environment.Turtles("").Count() != 5 {
-		t.Errorf("Expected 5 turtles, got %d", environment.Turtles("").Count())
+	environment.CreateTurtles(5, nil)
+	if environment.Turtles().Count() != 5 {
+		t.Errorf("Expected 5 turtles, got %d", environment.Turtles().Count())
 	}
 
 	// creating turtles with a breed should add them to that breed and the default breed
-	environment.CreateTurtles(5, "ants", nil)
-	if environment.Turtles("").Count() != 10 {
-		t.Errorf("Expected 10 turtles, got %d", environment.Turtles("").Count())
+	ants.CreateTurtles(5, nil)
+	if environment.Turtles().Count() != 10 {
+		t.Errorf("Expected 10 turtles, got %d", environment.Turtles().Count())
 	}
-	if environment.Turtles("ants").Count() != 5 {
-		t.Errorf("Expected 5 ants, got %d", environment.Turtles("ants").Count())
+	if ants.Turtles().Count() != 5 {
+		t.Errorf("Expected 5 ants, got %d", ants.Turtles().Count())
 	}
 
-	// creating a turtle with a nonexistent breed should return an error
-	_, err := environment.CreateTurtles(5, "nonexistent", nil)
-	if err == nil {
-		t.Errorf("Expected error, got nil")
-	}
 }
 
 func TestTurtle(t *testing.T) {
-	breeds := []string{
-		"ants",
-	}
+
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	settings := model.ModelSettings{
-		TurtleBreeds: breeds,
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
 	environment := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
-	environment.CreateTurtles(5, "", nil)
-	environment.CreateTurtles(5, "ants", nil)
+	environment.CreateTurtles(5, nil)
+	ants.CreateTurtles(5, nil)
 
 	// get turtle from general pop
-	turtle := environment.Turtle("", 0)
+	turtle := environment.Turtle(0)
 	if turtle == nil {
 		t.Errorf("Expected turtle, got nil")
 	}
 
 	// get turtle from ants pop when it should not exist
-	turtle = environment.Turtle("ants", 0)
+	turtle = ants.Turtle(0)
 	if turtle != nil {
 		t.Errorf("Expected nil, got turtle")
 	}
 
 	// get turtle from ants pop when it should exist
-	turtle = environment.Turtle("ants", 5)
+	turtle = ants.Turtle(5)
 	if turtle == nil {
 		t.Errorf("Expected turtle, got nil")
 	}
 
 	// get turtle from general pop when it should not exist
-	turtle = environment.Turtle("", 12)
+	turtle = environment.Turtle(12)
 	if turtle != nil {
 		t.Errorf("Expected nil, got turtle")
 	}
 
 	// get turtle that is an ant from general pop when it should exist
-	turtle = environment.Turtle("", 7)
+	turtle = environment.Turtle(7)
 	if turtle == nil {
 		t.Errorf("Expected turtle, got nil")
-	}
-
-	// get turtle that belongs to nonexistent breed
-	turtle = environment.Turtle("elephants", 0)
-	if turtle != nil {
-		t.Errorf("Expected nil, got turtle")
 	}
 }
 
 func TestClearTurtles(t *testing.T) {
-	breeds := []string{
-		"ants",
-	}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	settings := model.ModelSettings{
-		TurtleBreeds: breeds,
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
 	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
-	m.CreateTurtles(5, "", nil)
-	m.CreateTurtles(5, "ants", nil)
+	m.CreateTurtles(5, nil)
+	ants.CreateTurtles(5, nil)
 
-	ref := m.Turtle("", 0)
+	ref := m.Turtle(0)
 	ref.SetXY(1, 1)
 
-	if m.Patch(0, 0).TurtlesHere("").Count() != 9 {
-		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere("").Count())
+	if m.Patch(0, 0).TurtlesHere().Count() != 9 {
+		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere().Count())
 	}
 
 	// clear general turtles
 	m.ClearTurtles()
-	if m.Turtles("").Count() != 0 {
-		t.Errorf("Expected 0 turtles, got %d", m.Turtles("").Count())
+	if m.Turtles().Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", m.Turtles().Count())
 	}
 
 	if ref.XCor() != 0 {
 		t.Errorf("Expected turtle to be reset")
 	}
 
-	t1 := m.Turtle("", 0)
+	t1 := m.Turtle(0)
 	if t1 != nil {
 		t.Errorf("Expected nil, got turtle")
 	}
 
 	p := m.Patch(0, 0)
-	if p.TurtlesHere("").Count() != 0 {
-		t.Errorf("Expected 0 turtles, got %d", p.TurtlesHere("").Count())
+	if p.TurtlesHere().Count() != 0 {
+		t.Errorf("Expected 0 turtles, got %d", p.TurtlesHere().Count())
 	}
 
-	m.CreateTurtles(1, "", nil)
+	m.CreateTurtles(1, nil)
 
-	t1 = m.Turtle("", 0)
+	t1 = m.Turtle(0)
 	if t1 == nil {
 		t.Errorf("Expected turtle, got nil")
 	}
@@ -142,30 +126,29 @@ func TestClearTurtles(t *testing.T) {
 
 func TestKillTurtle(t *testing.T) {
 
-	breeds := []string{
-		"ants",
-	}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	settings := model.ModelSettings{
-		TurtleBreeds: breeds,
+		TurtleBreeds: []*model.TurtleBreed{ants},
 	}
 	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
-	m.CreateTurtles(5, "", nil)
-	m.CreateTurtles(5, "ants", nil)
+	m.CreateTurtles(5, nil)
+	// m.CreateTurtles(5, "ants", nil)
+	ants.CreateTurtles(5, nil)
 
-	ref := m.Turtle("", 0)
+	ref := m.Turtle(0)
 	ref.SetXY(1, 1)
 
-	if m.Patch(0, 0).TurtlesHere("").Count() != 9 {
-		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere("").Count())
+	if m.Patch(0, 0).TurtlesHere().Count() != 9 {
+		t.Errorf("Expected 10 turtles, got %d", m.Patch(0, 0).TurtlesHere().Count())
 	}
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("ants", 5)
-	t3 := m.Turtle("ants", 6)
-	t4 := m.Turtle("ants", 7)
+	t1 := m.Turtle(0)
+	t2 := ants.Turtle(5)
+	t3 := ants.Turtle(6)
+	t4 := ants.Turtle(7)
 
 	_, err := t1.CreateLinkToTurtle("", t2, nil)
 	if err != nil {
@@ -185,9 +168,9 @@ func TestKillTurtle(t *testing.T) {
 	}
 
 	// kill general turtle
-	m.KillTurtle(m.Turtle("", 0))
-	if m.Turtles("").Count() != 9 {
-		t.Errorf("Expected 9 turtles, got %d", m.Turtles("").Count())
+	m.KillTurtle(m.Turtle(0))
+	if m.Turtles().Count() != 9 {
+		t.Errorf("Expected 9 turtles, got %d", m.Turtles().Count())
 	}
 
 	if ref.XCor() != 0 {
@@ -203,28 +186,26 @@ func TestKillTurtle(t *testing.T) {
 // tests the model link function
 func TestModelLink(t *testing.T) {
 
-	breeds := []string{
-		"ants",
-	}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	undirectedLinkBreeds := []string{
 		"workers",
 	}
 
 	settings := model.ModelSettings{
-		TurtleBreeds:         breeds,
+		TurtleBreeds:         []*model.TurtleBreed{ants},
 		UndirectedLinkBreeds: undirectedLinkBreeds,
 	}
 	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
-	m.CreateTurtles(5, "", nil)
-	m.CreateTurtles(5, "ants", nil)
+	m.CreateTurtles(5, nil)
+	ants.CreateTurtles(5, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("ants", 5)
-	t3 := m.Turtle("ants", 6)
-	t4 := m.Turtle("ants", 7)
+	t1 := m.Turtle(0)
+	t2 := ants.Turtle(5)
+	t3 := ants.Turtle(6)
+	t4 := ants.Turtle(7)
 
 	// create a directed link
 	l1, err := t1.CreateLinkToTurtle("", t2, nil)
@@ -295,28 +276,26 @@ func TestModelLink(t *testing.T) {
 // tests the model LinkDirected function which is like Link but only for directed links
 func TestModelLinkDirected(t *testing.T) {
 
-	breeds := []string{
-		"ants",
-	}
+	ants := model.NewTurtleBreed("ants", "", nil)
 
 	directedLinkBreeds := []string{
 		"workers",
 	}
 
 	settings := model.ModelSettings{
-		TurtleBreeds:       breeds,
+		TurtleBreeds:       []*model.TurtleBreed{ants},
 		DirectedLinkBreeds: directedLinkBreeds,
 	}
 	m := model.NewModel(settings)
 
 	// create 5 general turtle and five ants
-	m.CreateTurtles(5, "", nil)
-	m.CreateTurtles(5, "ants", nil)
+	m.CreateTurtles(5, nil)
+	ants.CreateTurtles(5, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("ants", 5)
-	t3 := m.Turtle("ants", 6)
-	t4 := m.Turtle("ants", 7)
+	t1 := m.Turtle(0)
+	t2 := ants.Turtle(5)
+	t3 := ants.Turtle(6)
+	t4 := ants.Turtle(7)
 
 	// create a directed link
 	l1, err := t1.CreateLinkToTurtle("", t2, nil)
@@ -626,17 +605,17 @@ func TestTurtlesOnPatch(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create 5 turtles on a patch
-	m.CreateTurtles(5, "", nil)
+	m.CreateTurtles(5, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
 
 	t1.SetXY(1, 1)
 	t2.SetXY(1, 1)
 	t3.SetXY(1, 1)
 
-	turtles := m.TurtlesOnPatch("", m.Patch(1, 1))
+	turtles := m.TurtlesOnPatch(m.Patch(1, 1))
 
 	if turtles.Count() != 3 {
 		t.Errorf("Expected 3 turtles, got %d", turtles.Count())
@@ -662,12 +641,12 @@ func TestTurtlesOnPatches(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// create 5 turtles on a patch
-	m.CreateTurtles(5, "", nil)
+	m.CreateTurtles(5, nil)
 
-	t1 := m.Turtle("", 0)
-	t2 := m.Turtle("", 1)
-	t3 := m.Turtle("", 2)
-	t4 := m.Turtle("", 3)
+	t1 := m.Turtle(0)
+	t2 := m.Turtle(1)
+	t3 := m.Turtle(2)
+	t4 := m.Turtle(3)
 
 	t1.SetXY(1, 1)
 	t2.SetXY(1, 1)
@@ -676,7 +655,7 @@ func TestTurtlesOnPatches(t *testing.T) {
 
 	patchSet := model.NewPatchAgentSet([]*model.Patch{m.Patch(1, 1), m.Patch(1, 2)})
 
-	turtles := m.TurtlesOnPatches("", patchSet)
+	turtles := m.TurtlesOnPatches(patchSet)
 
 	if turtles.Count() != 4 {
 		t.Errorf("Expected 4 turtles, got %d", turtles.Count())
@@ -700,8 +679,12 @@ func TestTurtlesOnPatches(t *testing.T) {
 }
 
 func TestModelSize(t *testing.T) {
+
+	sheep := model.NewTurtleBreed("sheep", "", nil)
+	wolves := model.NewTurtleBreed("wolves", "", nil)
+
 	modelSettings := model.ModelSettings{
-		TurtleBreeds: []string{"sheep", "wolves"},
+		TurtleBreeds: []*model.TurtleBreed{sheep, wolves},
 		TurtleProperties: map[string]interface{}{
 			"energy": 0,
 		},
@@ -736,7 +719,7 @@ func TestModelSize(t *testing.T) {
 
 	sheepGainFromFood := 2
 
-	m.CreateTurtles(initialNumberSheep, "sheep",
+	sheep.CreateTurtles(initialNumberSheep,
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -752,7 +735,7 @@ func TestModelSize(t *testing.T) {
 
 	wolfGainFromFood := 2
 
-	m.CreateTurtles(initialNumberWolves, "wolves",
+	wolves.CreateTurtles(initialNumberWolves,
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
@@ -765,7 +748,7 @@ func TestModelSize(t *testing.T) {
 	)
 
 	showEnergy := true
-	m.Turtles("").Ask(
+	m.Turtles().Ask(
 		func(t *model.Turtle) {
 			if showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))

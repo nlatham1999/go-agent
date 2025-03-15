@@ -24,11 +24,15 @@ func NewBees() *Bees {
 }
 
 func (b *Bees) Init() {
+
+	scouts := model.NewTurtleBreed("scouts", "", nil)
+	foragers := model.NewTurtleBreed("foragers", "", nil)
+
 	modelSettings := model.ModelSettings{
 		PatchProperties: map[string]interface{}{
 			"nectar": 0.0,
 		},
-		TurtleBreeds: []string{"scouts", "foragers"},
+		TurtleBreeds: []*model.TurtleBreed{scouts, foragers},
 		TurtleProperties: map[string]interface{}{
 			"radius": 10.0,
 			"group":  0,
@@ -78,22 +82,23 @@ func (b *Bees) SetUp() error {
 		},
 	)
 
-	b.model.CreateTurtles(1, "",
+	b.model.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(0, 0)
 		},
 	)
-	b.model.CreateTurtles(1, "",
+	b.model.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(1, 0)
-			t.CreateLinkWithTurtle("", b.model.Turtle("", 0), nil)
+			t.CreateLinkWithTurtle("", b.model.Turtle(0), nil)
 		},
 	)
 
 	b.model.Patch(0, 0).PColor.SetColor(model.Red)
 	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
 
-	b.model.CreateTurtles(b.scouts, "scouts",
+	scouts := b.model.TurtleBreed("scouts")
+	scouts.CreateTurtles(b.scouts,
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.Color.SetColor(model.Yellow)
@@ -112,8 +117,10 @@ func (b *Bees) Go() {
 	numSteps := 2
 
 	// first step is to create the foragers based on the scouts' findings
+	scouts := b.model.TurtleBreed("scouts")
+	foragers := b.model.TurtleBreed("foragers")
 	if b.step%numSteps == 0 {
-		b.model.Turtles("scouts").Ask(
+		scouts.Turtles().Ask(
 			func(scout *model.Turtle) {
 				searchRadius, _ := scout.GetPropF("radius")
 				if searchRadius < 1 {
@@ -125,28 +132,23 @@ func (b *Bees) Go() {
 				if nectar > 30 {
 					numForagers = 4
 				}
-				scout.Hatch("foragers", numForagers,
-					func(forager *model.Turtle) {
-						forager.SetSize(.8)
-						forager.Color.SetColor(model.Red)
-						forager.SetHeading(b.model.RandomFloat(360))
-						forager.Forward(b.model.RandomFloat(searchRadius))
-						scout.CreateLinkWithTurtle("", forager,
-							func(l *model.Link) {
-								l.Label = l.Length()
-								l.LabelColor = model.Red
-							},
-						)
-						forager.SetLabel(forager.PatchHere().GetPropI("nectar"))
-					},
-				)
+				foragers.CreateTurtles(numForagers, func(forager *model.Turtle) {
+					forager.SetSize(.8)
+					forager.Color.SetColor(model.Red)
+					forager.SetHeading(b.model.RandomFloat(360))
+					forager.Forward(b.model.RandomFloat(searchRadius))
+					scout.CreateLinkWithTurtle("", forager, nil)
+					forager.SetLabel(forager.PatchHere().GetPropI("nectar"))
+					forager.SetXY(scout.XCor(), scout.YCor())
+				})
+
 			},
 		)
 	}
 
 	// determine new scout
 	if b.step%numSteps == 1 {
-		b.model.Turtles("scouts").Ask(
+		scouts.Turtles().Ask(
 			func(t *model.Turtle) {
 				foragers := t.LinkedTurtles("")
 
@@ -203,8 +205,9 @@ func (b *Bees) Model() *model.Model {
 
 func (b *Bees) Stats() map[string]interface{} {
 
+	scouts := b.model.TurtleBreed("scouts")
 	stats := map[string]interface{}{}
-	b.model.Turtles("scouts").Ask(
+	scouts.Turtles().Ask(
 		func(t *model.Turtle) {
 			group := t.GetProperty("group")
 			nectar := t.PatchHere().GetPropI("nectar")
@@ -217,7 +220,8 @@ func (b *Bees) Stats() map[string]interface{} {
 }
 
 func (b *Bees) Stop() bool {
-	return b.model.Turtles("scouts").All(func(t *model.Turtle) bool {
+	scouts := b.model.TurtleBreed("scouts")
+	return scouts.Turtles().All(func(t *model.Turtle) bool {
 		radius, _ := t.GetPropF("radius")
 		return radius < 1
 	})

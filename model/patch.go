@@ -199,17 +199,22 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 	return radiansToDegrees(math.Atan2(deltaY, deltaX))
 }
 
-// returns the turtles that are on this patch
-func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
+// returns the turtles that are on this patch regardless of breed
+// if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
+func (p *Patch) TurtlesHere() *TurtleAgentSet {
+	return p.turtlesHereBreeded("")
+}
+
+func (p *Patch) turtlesHereBreeded(breedName string) *TurtleAgentSet {
 
 	//is the breed valid
-	if breed != "" {
-		if _, ok := p.turtles[breed]; !ok {
+	if breedName != "" {
+		if _, ok := p.turtles[breedName]; !ok {
 			return NewTurtleAgentSet([]*Turtle{})
 		}
 	}
 
-	turtles := p.turtles[breed]
+	turtles := p.turtles[breedName]
 	if turtles == nil {
 		return NewTurtleAgentSet([]*Turtle{})
 	}

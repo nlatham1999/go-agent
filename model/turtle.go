@@ -30,17 +30,17 @@ type Turtle struct {
 	patch *Patch //patch the turtle is on
 }
 
-func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
+func newTurtle(m *Model, who int, breedName string, x float64, y float64) *Turtle {
 
 	if m == nil {
 		return nil
 	}
 
 	//if the breed is nonexistent then return nil
-	var breedSet *turtleBreed = nil
-	if breed != "" {
+	var breedSet *TurtleBreed = nil
+	if breedName != "" {
 		found := false
-		if breedSet, found = m.breeds[breed]; !found {
+		if breedSet, found = m.breeds[breedName]; !found {
 			return nil
 		}
 	}
@@ -50,7 +50,7 @@ func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 		parent:     m,
 		xcor:       x,
 		ycor:       y,
-		breed:      breed,
+		breed:      breedName,
 		size:       .8,
 		label:      "",
 		labelColor: Black,
@@ -389,16 +389,11 @@ func (t *Turtle) Forward(distance float64) {
 }
 
 // creates new turtles that are a copy of the current turtle
-// if a breed is passed in then the new turtles will be of that breed
-func (t *Turtle) Hatch(breed string, amount int, operation TurtleOperation) {
+func (t *Turtle) Hatch(amount int, operation TurtleOperation) {
 
 	turtles := make([]*Turtle, amount)
 	for i := 0; i < amount; i++ {
-		newBreed := t.breed
-		if breed != "" {
-			newBreed = breed
-		}
-		turtles[i] = newTurtle(t.parent, t.parent.turtlesWhoNumber, newBreed, t.xcor, t.ycor)
+		turtles[i] = newTurtle(t.parent, t.parent.turtlesWhoNumber, t.breed, t.xcor, t.ycor)
 		t.parent.turtlesWhoNumber++
 
 		// copy the variables
@@ -416,10 +411,8 @@ func (t *Turtle) Hatch(breed string, amount int, operation TurtleOperation) {
 		}
 
 		// copy the breed variables if the breed is the same
-		if t.breed == newBreed {
-			for key, value := range t.turtlePropertiesBreed {
-				turtles[i].turtlePropertiesBreed[key] = value
-			}
+		for key, value := range t.turtlePropertiesBreed {
+			turtles[i].turtlePropertiesBreed[key] = value
 		}
 	}
 
@@ -804,9 +797,11 @@ func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 	return radiansToDegrees(math.Atan2(y-t.ycor, x-t.xcor))
 }
 
-// returns the turtles that are on the patch
-func (t *Turtle) TurtlesHere(breed string) *TurtleAgentSet {
-	return t.PatchHere().TurtlesHere(breed)
+// returns the turtles that are on the patch regardless of breed
+// if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
+// @TODO this function, is it needed?
+func (t *Turtle) TurtlesHere() *TurtleAgentSet {
+	return t.PatchHere().turtlesHereBreeded("")
 }
 
 func (t *Turtle) Uphill(patchVariable string) {

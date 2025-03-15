@@ -160,13 +160,13 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 	//create a patchset
 	patchSet := model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
-	m.CreateTurtles(1, "",
+	m.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(-15, -14)
 		},
 	)
 
-	turtle := m.Turtle("", 0)
+	turtle := m.Turtle(0)
 
 	//get the patches in radius
 	patchSetInRadius := patchSet.InRadiusTurtle(1, turtle)
@@ -195,13 +195,13 @@ func TestPatchesInRadiusTurtle(t *testing.T) {
 	//create a patchset
 	patchSet = model.NewPatchAgentSet([]*model.Patch{patch1, patch2, patch3, patch4, patch5, patch6, patch7, patch8})
 
-	m.CreateTurtles(1, "",
+	m.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(-15, -15)
 		},
 	)
 
-	turtle = m.Turtle("", 0)
+	turtle = m.Turtle(0)
 
 	//get the patches in radius
 	patchSetInRadius = patchSet.InRadiusTurtle(1, turtle)
