@@ -21,7 +21,7 @@ func NewTurtleBreed(name string, defaultShape string, turtleProperties map[strin
 		name:                     name,
 		model:                    nil,
 		turtles:                  NewTurtleAgentSet(nil),
-		turtlePropertiesTemplate: make(map[string]interface{}),
+		turtlePropertiesTemplate: turtleProperties,
 	}
 }
 
@@ -72,7 +72,7 @@ func (tb *TurtleBreed) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet 
 
 // Returns the turtles on the same patch as the provided turtle
 func (tb *TurtleBreed) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
-	return tb.model.turtlesWithTurtleBreeded("", turtle)
+	return tb.model.turtlesWithTurtleBreeded(tb.name, turtle)
 }
 
 // Returns the turtles on the same patch as the provided turtle

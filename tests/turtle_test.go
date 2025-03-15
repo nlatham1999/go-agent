@@ -1561,6 +1561,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 	}
 
 	turtles = ants.TurtlesWithTurtle(t2)
+	// turtles = ants.TurtlesOnPatch(t2.PatchHere())
 	// turtles = t2.TurtlesHere("ants")
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
@@ -1569,7 +1570,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t3")
 	}
 
-	turtles = ants.TurtlesWithTurtle(t1)
+	turtles = ants.TurtlesOnPatch(t3.PatchHere())
 	// turtles = t3.TurtlesHere("ants")
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
