@@ -27,7 +27,7 @@ func NewTurtleBreed(name string, defaultShape string, turtleProperties map[strin
 
 // create the specified amount of turtles with the specified operation
 func (tb *TurtleBreed) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAgentSet, error) {
-	return tb.model.createTurtlesBreeded(amount, tb.name, operation)
+	return tb.model.createTurtlesBreeded(amount, tb, operation)
 }
 
 // sets the default shape for a turtle breed
@@ -57,25 +57,25 @@ func (tb *TurtleBreed) Turtles() *TurtleAgentSet {
 // returns the turtle agentset that is on patch of the proviced x y coordinates that belong to the breed
 // same as TurtlesOnPatch(breed, Patch(x, y))
 func (tb *TurtleBreed) TurtlesAtCoords(pxcor float64, pycor float64) *TurtleAgentSet {
-	return tb.model.turtlesAtCoordsBreeded(tb.name, pxcor, pycor)
+	return tb.model.turtlesAtCoordsBreeded(tb, pxcor, pycor)
 }
 
 // returns the turtle agentset that is on the provided patch
 func (tb *TurtleBreed) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
-	return tb.model.turtlesOnPatchBreeded(tb.name, patch)
+	return tb.model.turtlesOnPatchBreeded(tb, patch)
 }
 
 // Returns the turtles on the provided patches
 func (tb *TurtleBreed) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
-	return tb.model.turtlesOnPatchesBreeded(tb.name, patches)
+	return tb.model.turtlesOnPatchesBreeded(tb, patches)
 }
 
 // Returns the turtles on the same patch as the provided turtle
 func (tb *TurtleBreed) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
-	return tb.model.turtlesWithTurtleBreeded(tb.name, turtle)
+	return tb.model.turtlesWithTurtleBreeded(tb, turtle)
 }
 
 // Returns the turtles on the same patch as the provided turtle
 func (tb *TurtleBreed) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
-	return tb.model.turtlesWithTurtlesBreeded(tb.name, turtles)
+	return tb.model.turtlesWithTurtlesBreeded(tb, turtles)
 }

@@ -29,7 +29,7 @@ type Patch struct {
 	Label       interface{}
 	PlabelColor Color
 
-	turtles map[string]*TurtleAgentSet // sets of turtles keyed by breed
+	turtles map[*TurtleBreed]*TurtleAgentSet // sets of turtles keyed by breed
 
 	// patch to string and string to patch for the neighbors
 	patchNeighborsMap map[*Patch]string
@@ -44,7 +44,7 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 		xFloat64: float64(x),
 		yFloat64: float64(y),
 		PColor:   Color{},
-		turtles:  make(map[string]*TurtleAgentSet),
+		turtles:  make(map[*TurtleBreed]*TurtleAgentSet),
 		parent:   m,
 	}
 
@@ -60,29 +60,32 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
-	if _, ok := p.turtles[t.breed.name]; !ok {
-		p.turtles[t.breed.name] = NewTurtleAgentSet([]*Turtle{})
+	if _, ok := p.turtles[t.breed]; !ok {
+		p.turtles[t.breed] = NewTurtleAgentSet([]*Turtle{})
 	}
-	p.turtles[t.breed.name].Add(t)
+	p.turtles[t.breed].Add(t)
 
 	// if the breed is provided, add it to the general set of turtles as well
-	if t.breed != nil {
-		if _, ok := p.turtles[""]; !ok {
-			p.turtles[""] = NewTurtleAgentSet([]*Turtle{})
+	if t.breed.name != "" {
+		generalBreed := p.parent.breeds[BreedNone]
+		if _, ok := p.turtles[generalBreed]; !ok {
+			p.turtles[generalBreed] = NewTurtleAgentSet([]*Turtle{})
 		}
-		p.turtles[""].Add(t)
+		p.turtles[generalBreed].Add(t)
 	}
 }
 
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
-	if _, ok := p.turtles[t.breed.name]; ok {
-		p.turtles[t.breed.name].Remove(t)
+	if _, ok := p.turtles[t.breed]; ok {
+		p.turtles[t.breed].Remove(t)
 	}
 
-	if t.breed != nil {
-		if _, ok := p.turtles[""]; ok {
-			p.turtles[""].Remove(t)
+	// if the breed is provided, remove it from the general set of turtles as well
+	if t.breed.name != "" {
+		generalBreed := p.parent.breeds[BreedNone]
+		if _, ok := p.turtles[generalBreed]; ok {
+			p.turtles[generalBreed].Remove(t)
 		}
 	}
 }
@@ -159,15 +162,13 @@ func (p *Patch) Reset(patchProperties map[string]interface{}) {
 
 // creates new turtles on this patch
 func (p *Patch) Sprout(number int, operation TurtleOperation) {
-	p.sproutBreeded("", number, operation)
+
+	generalBreed := p.parent.breeds[BreedNone]
+
+	p.sproutBreeded(generalBreed, number, operation)
 }
 
-func (p *Patch) sproutBreeded(breedName string, number int, operation TurtleOperation) {
-
-	breed, found := p.parent.breeds[breedName]
-	if !found {
-		return
-	}
+func (p *Patch) sproutBreeded(breed *TurtleBreed, number int, operation TurtleOperation) {
 
 	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
 	for i := 0; i < number; i++ {
@@ -211,19 +212,20 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 // returns the turtles that are on this patch regardless of breed
 // if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
 func (p *Patch) TurtlesHere() *TurtleAgentSet {
-	return p.turtlesHereBreeded("")
+
+	generalBreed := p.parent.breeds[BreedNone]
+
+	return p.turtlesHereBreeded(generalBreed)
 }
 
-func (p *Patch) turtlesHereBreeded(breedName string) *TurtleAgentSet {
+func (p *Patch) turtlesHereBreeded(breed *TurtleBreed) *TurtleAgentSet {
 
 	//is the breed valid
-	if breedName != "" {
-		if _, ok := p.turtles[breedName]; !ok {
-			return NewTurtleAgentSet([]*Turtle{})
-		}
+	if _, ok := p.turtles[breed]; !ok {
+		return NewTurtleAgentSet([]*Turtle{})
 	}
 
-	turtles := p.turtles[breedName]
+	turtles := p.turtles[breed]
 	if turtles == nil {
 		return NewTurtleAgentSet([]*Turtle{})
 	}

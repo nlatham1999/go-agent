@@ -61,10 +61,10 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 	if directed {
 		model.directedLinkBreeds[breed].links.Add(l)
-		model.directedLinkBreeds[""].links.Add(l)
+		model.directedLinkBreeds[BreedNone].links.Add(l)
 	} else {
 		model.undirectedLinkBreeds[breed].links.Add(l)
-		model.undirectedLinkBreeds[""].links.Add(l)
+		model.undirectedLinkBreeds[BreedNone].links.Add(l)
 	}
 
 	// add the link to the turtle's link map

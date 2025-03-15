@@ -145,15 +145,15 @@ func NewModel(
 	model.turtles = NewTurtleAgentSet([]*Turtle{})
 
 	// create a breed with no name for the general population
-	model.breeds[""] = NewTurtleBreed("", "", make(map[string]interface{}))
-	model.breeds[""].model = model
+	model.breeds[BreedNone] = NewTurtleBreed("", "", make(map[string]interface{}))
+	model.breeds[BreedNone].model = model
 
 	if settings.TurtleProperties != nil {
 		for key, value := range settings.TurtleProperties {
-			model.breeds[""].turtlePropertiesTemplate[key] = value
+			model.breeds[BreedNone].turtlePropertiesTemplate[key] = value
 		}
 	} else {
-		model.breeds[""].turtlePropertiesTemplate = make(map[string]interface{})
+		model.breeds[BreedNone].turtlePropertiesTemplate = make(map[string]interface{})
 	}
 
 	//construct general link set
@@ -273,7 +273,7 @@ func (m *Model) ClearTurtles() {
 
 	// remove all turtles from patches
 	m.Patches.Ask(func(p *Patch) {
-		p.turtles = make(map[string]*TurtleAgentSet)
+		p.turtles = make(map[*TurtleBreed]*TurtleAgentSet)
 	})
 
 	// clear all turtles
@@ -293,15 +293,13 @@ func (m *Model) ClearTurtles() {
 
 // create the specified amount of turtles with the specified operation
 func (m *Model) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAgentSet, error) {
-	return m.createTurtlesBreeded(amount, "", operation)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.createTurtlesBreeded(amount, generalBreed, operation)
 }
 
-func (m *Model) createTurtlesBreeded(amount int, breedName string, operation TurtleOperation) (*TurtleAgentSet, error) {
-
-	breed, found := m.breeds[breedName]
-	if !found {
-		return nil, errors.New("breed not found")
-	}
+func (m *Model) createTurtlesBreeded(amount int, breed *TurtleBreed, operation TurtleOperation) (*TurtleAgentSet, error) {
 
 	turtles := NewTurtleAgentSet([]*Turtle{})
 
@@ -377,9 +375,10 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 
 	p := turtle.PatchHere()
 	if p != nil {
-		p.turtles[""].Remove(turtle)
+		generalBreed := m.breeds[BreedNone]
+		p.turtles[generalBreed].Remove(turtle)
 		if turtle.breed != nil {
-			p.turtles[turtle.breed.name].Remove(turtle)
+			p.turtles[turtle.breed].Remove(turtle)
 		}
 	}
 
@@ -1046,10 +1045,13 @@ func (m *Model) Turtles() *TurtleAgentSet {
 // returns the turtle agentset that is on patch of the proviced x y coordinates
 // same as TurtlesOnPatch(breed, Patch(x, y))
 func (m *Model) TurtlesAtCoords(pxcor float64, pycor float64) *TurtleAgentSet {
-	return m.turtlesAtCoordsBreeded("", pxcor, pycor)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.turtlesAtCoordsBreeded(generalBreed, pxcor, pycor)
 }
 
-func (m *Model) turtlesAtCoordsBreeded(breedName string, pxcor float64, pycor float64) *TurtleAgentSet {
+func (m *Model) turtlesAtCoordsBreeded(breed *TurtleBreed, pxcor float64, pycor float64) *TurtleAgentSet {
 	x := math.Round(pxcor)
 	y := math.Round(pycor)
 
@@ -1059,28 +1061,34 @@ func (m *Model) turtlesAtCoordsBreeded(breedName string, pxcor float64, pycor fl
 		return nil
 	}
 
-	return patch.turtlesHereBreeded(breedName)
+	return patch.turtlesHereBreeded(breed)
 }
 
 // returns the turtle agentset that is on the provided patch
 func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
-	return m.turtlesOnPatchBreeded("", patch)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.turtlesOnPatchBreeded(generalBreed, patch)
 }
 
-func (m *Model) turtlesOnPatchBreeded(breedName string, patch *Patch) *TurtleAgentSet {
-	return patch.turtlesHereBreeded(breedName)
+func (m *Model) turtlesOnPatchBreeded(breed *TurtleBreed, patch *Patch) *TurtleAgentSet {
+	return patch.turtlesHereBreeded(breed)
 }
 
 // Returns the turtles on the provided patches
 func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
-	return m.turtlesOnPatchesBreeded("", patches)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.turtlesOnPatchesBreeded(generalBreed, patches)
 }
 
-func (m *Model) turtlesOnPatchesBreeded(breedName string, patches *PatchAgentSet) *TurtleAgentSet {
+func (m *Model) turtlesOnPatchesBreeded(breed *TurtleBreed, patches *PatchAgentSet) *TurtleAgentSet {
 	turtles := NewTurtleAgentSet(nil)
 
 	patches.Ask(func(patch *Patch) {
-		s := m.turtlesOnPatchBreeded(breedName, patch)
+		s := m.turtlesOnPatchBreeded(breed, patch)
 		s.Ask(func(turtle *Turtle) {
 			turtles.Add(turtle)
 		})
@@ -1091,24 +1099,30 @@ func (m *Model) turtlesOnPatchesBreeded(breedName string, patches *PatchAgentSet
 
 // Returns the turtles on the same patch as the provided turtle
 func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
-	return m.turtlesWithTurtleBreeded("", turtle)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.turtlesWithTurtleBreeded(generalBreed, turtle)
 }
 
-func (m *Model) turtlesWithTurtleBreeded(breedName string, turtle *Turtle) *TurtleAgentSet {
+func (m *Model) turtlesWithTurtleBreeded(breed *TurtleBreed, turtle *Turtle) *TurtleAgentSet {
 	p := turtle.PatchHere()
 	if p == nil {
 		return nil
 	}
 
-	return p.turtlesHereBreeded(breedName)
+	return p.turtlesHereBreeded(breed)
 }
 
 // Returns the turtles on the same patch as the provided turtle
 func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
-	return m.turtlesWithTurtlesBreeded("", turtles)
+
+	generalBreed := m.breeds[BreedNone]
+
+	return m.turtlesWithTurtlesBreeded(generalBreed, turtles)
 }
 
-func (m *Model) turtlesWithTurtlesBreeded(breedName string, turtles *TurtleAgentSet) *TurtleAgentSet {
+func (m *Model) turtlesWithTurtlesBreeded(breed *TurtleBreed, turtles *TurtleAgentSet) *TurtleAgentSet {
 	patches := NewPatchAgentSet(nil)
 
 	turtles.Ask(func(turtle *Turtle) {
@@ -1118,7 +1132,7 @@ func (m *Model) turtlesWithTurtlesBreeded(breedName string, turtles *TurtleAgent
 		}
 	})
 
-	return m.turtlesOnPatchesBreeded(breedName, patches)
+	return m.turtlesOnPatchesBreeded(breed, patches)
 }
 
 // returns the world height

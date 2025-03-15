@@ -66,7 +66,7 @@ func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Tur
 	//breed specific variables can override general variables
 	t.turtlePropertiesGeneral = make(map[string]interface{})
 	t.turtlePropertiesBreed = make(map[string]interface{})
-	generalTemplate := m.breeds[""].turtlePropertiesTemplate
+	generalTemplate := m.breeds[BreedNone].turtlePropertiesTemplate
 	for key, value := range generalTemplate {
 		t.turtlePropertiesGeneral[key] = value
 	}
@@ -796,7 +796,10 @@ func (t *Turtle) TowardsXY(x float64, y float64) float64 {
 // if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
 // @TODO this function, is it needed?
 func (t *Turtle) TurtlesHere() *TurtleAgentSet {
-	return t.PatchHere().turtlesHereBreeded("")
+
+	generalBreed := t.parent.breeds[BreedNone]
+
+	return t.PatchHere().turtlesHereBreeded(generalBreed)
 }
 
 func (t *Turtle) Uphill(patchVariable string) {
