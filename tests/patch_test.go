@@ -426,7 +426,7 @@ func TestPatchSprout(t *testing.T) {
 	patch := m.Patch(0, 0)
 
 	//sprout a patch
-	patch.Sprout("", 5,
+	patch.Sprout(5,
 		func(t *model.Turtle) {
 			switch t.Who() {
 			case 0:

@@ -297,18 +297,17 @@ func (m *Model) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAge
 }
 
 func (m *Model) createTurtlesBreeded(amount int, breedName string, operation TurtleOperation) (*TurtleAgentSet, error) {
-	if breedName != "" {
-		_, found := m.breeds[breedName]
-		if !found {
-			return nil, errors.New("breed not found")
-		}
+
+	breed, found := m.breeds[breedName]
+	if !found {
+		return nil, errors.New("breed not found")
 	}
 
 	turtles := NewTurtleAgentSet([]*Turtle{})
 
 	end := amount + m.turtlesWhoNumber
 	for m.turtlesWhoNumber < end {
-		newTurtle := newTurtle(m, m.turtlesWhoNumber, breedName, 0, 0)
+		newTurtle := newTurtle(m, m.turtlesWhoNumber, breed, 0, 0)
 
 		// set heading to be random
 		newTurtle.setHeadingRadians(m.randomGenerator.Float64() * 2 * math.Pi)
@@ -371,16 +370,16 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 func (m *Model) KillTurtle(turtle *Turtle) {
 
 	m.turtles.Remove(turtle)
-	if turtle.breed != "" {
-		m.breeds[turtle.breed].turtles.Remove(turtle)
+	if turtle.breed != nil {
+		m.breeds[turtle.breed.name].turtles.Remove(turtle)
 	}
 	delete(m.whoToTurtles, turtle.who)
 
 	p := turtle.PatchHere()
 	if p != nil {
 		p.turtles[""].Remove(turtle)
-		if turtle.breed != "" {
-			p.turtles[turtle.breed].Remove(turtle)
+		if turtle.breed != nil {
+			p.turtles[turtle.breed.name].Remove(turtle)
 		}
 	}
 
@@ -1035,17 +1034,7 @@ func (m *Model) Turtle(who int) *Turtle {
 	if t == nil {
 		return nil //turtle not found
 	}
-	// if breed == "" {
-	// 	return t
-	// } else {
-	// 	if m.breeds[breed] == nil {
-	// 		return nil //breed not found
-	// 	}
-	// 	if t.breed != breed {
-	// 		return nil //turtle not found for that breed
-	// 	}
-	// 	return t
-	// }
+
 	return t
 }
 

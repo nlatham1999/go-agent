@@ -16,7 +16,7 @@ type Turtle struct {
 	Color   Color
 	heading float64 //direction the turtle is facing in radians
 	Hidden  bool    //if the turtle is hidden
-	breed   string
+	breed   *TurtleBreed
 	Shape   string
 
 	parent *Model //model the turtle belongs too
@@ -30,19 +30,10 @@ type Turtle struct {
 	patch *Patch //patch the turtle is on
 }
 
-func newTurtle(m *Model, who int, breedName string, x float64, y float64) *Turtle {
+func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Turtle {
 
 	if m == nil {
 		return nil
-	}
-
-	//if the breed is nonexistent then return nil
-	var breedSet *TurtleBreed = nil
-	if breedName != "" {
-		found := false
-		if breedSet, found = m.breeds[breedName]; !found {
-			return nil
-		}
 	}
 
 	t := &Turtle{
@@ -50,7 +41,7 @@ func newTurtle(m *Model, who int, breedName string, x float64, y float64) *Turtl
 		parent:     m,
 		xcor:       x,
 		ycor:       y,
-		breed:      breedName,
+		breed:      breed,
 		size:       .8,
 		label:      "",
 		labelColor: Black,
@@ -63,8 +54,8 @@ func newTurtle(m *Model, who int, breedName string, x float64, y float64) *Turtl
 	m.turtles.Add(t)
 	m.whoToTurtles[m.turtlesWhoNumber] = t
 
-	if breedSet != nil {
-		breedSet.turtles.Add(t)
+	if breed != nil {
+		breed.turtles.Add(t)
 	}
 
 	//link the turtle to the patch
@@ -79,8 +70,8 @@ func newTurtle(m *Model, who int, breedName string, x float64, y float64) *Turtl
 	for key, value := range generalTemplate {
 		t.turtlePropertiesGeneral[key] = value
 	}
-	if breedSet != nil {
-		breedTemplate := breedSet.turtlePropertiesTemplate
+	if breed != nil {
+		breedTemplate := breed.turtlePropertiesTemplate
 		for key, value := range breedTemplate {
 			t.turtlePropertiesBreed[key] = value
 		}
@@ -96,13 +87,17 @@ func (t *Turtle) Back(distance float64) {
 
 // returns the breed of the turtle
 func (t *Turtle) BreedName() string {
-	return t.breed
+	if t.breed == nil {
+		return ""
+	}
+
+	return t.breed.name
 }
 
 // Sets the breed of the turtle to the name passed in
-func (t *Turtle) SetBreed(name string) {
+func (t *Turtle) SetBreed(breed *TurtleBreed) {
 
-	if t.breed == name {
+	if t.breed == breed {
 		return
 	}
 
@@ -110,20 +105,20 @@ func (t *Turtle) SetBreed(name string) {
 	t.patch.removeTurtle(t)
 	defer t.patch.addTurtle(t)
 
-	if t.breed != "" {
-		t.parent.breeds[t.breed].turtles.Remove(t)
+	if t.breed != nil {
+		t.parent.breeds[t.breed.name].turtles.Remove(t)
 	}
 
-	t.breed = name
+	t.breed = breed
 
-	if name != "" {
-		t.parent.breeds[name].turtles.Add(t)
+	if t.breed != nil {
+		t.parent.breeds[t.breed.name].turtles.Add(t)
 	}
 
 	// switch the turtles properties variables to the new breed
 	t.turtlePropertiesBreed = make(map[string]interface{})
-	if name != "" {
-		breedTemplate := t.parent.breeds[name].turtlePropertiesTemplate
+	if t.breed != nil {
+		breedTemplate := t.parent.breeds[t.breed.name].turtlePropertiesTemplate
 		for key, value := range breedTemplate {
 			t.turtlePropertiesBreed[key] = value
 		}

@@ -95,7 +95,7 @@ func TestTurtleSetBreed(t *testing.T) {
 
 	turtle := ants.Turtle(0)
 
-	turtle.SetBreed("beetles")
+	turtle.SetBreed(beetles)
 
 	if turtle.BreedName() != "beetles" {
 		t.Errorf("Expected turtle to have breed 'beetles'")
@@ -121,7 +121,7 @@ func TestTurtleSetBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have breed ''")
 	}
 
-	turtle.SetBreed("ants")
+	turtle.SetBreed(ants)
 
 	if turtle.BreedName() != "ants" {
 		t.Errorf("Expected turtle to have breed 'ants'")
@@ -208,7 +208,7 @@ func TestTurtlesOwn(t *testing.T) {
 	turtle = beetles.Turtle(0)
 
 	//change the breed
-	turtle.SetBreed("ants")
+	turtle.SetBreed(ants)
 
 	wingspan := turtle.GetProperty("wingspan")
 
@@ -1765,7 +1765,7 @@ func TestTurtleSetBreedPatchHere(t *testing.T) {
 		t.Errorf("Expected turtle to be on patch")
 	}
 
-	t1.SetBreed("foragers")
+	t1.SetBreed(foragers)
 
 	if foragers.TurtlesOnPatch(t1.PatchHere()).Count() != 1 {
 		t.Errorf("Expected turtle to be on patch")

@@ -171,7 +171,7 @@ func (b *Bees) Go() {
 							f.Die()
 						},
 					)
-					max.SetBreed("scouts")
+					max.SetBreed(scouts)
 					max.Color.SetColor(model.Yellow)
 				} else {
 					foragers.Ask(

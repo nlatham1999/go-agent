@@ -60,13 +60,13 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
-	if _, ok := p.turtles[t.breed]; !ok {
-		p.turtles[t.breed] = NewTurtleAgentSet([]*Turtle{})
+	if _, ok := p.turtles[t.breed.name]; !ok {
+		p.turtles[t.breed.name] = NewTurtleAgentSet([]*Turtle{})
 	}
-	p.turtles[t.breed].Add(t)
+	p.turtles[t.breed.name].Add(t)
 
 	// if the breed is provided, add it to the general set of turtles as well
-	if t.breed != "" {
+	if t.breed != nil {
 		if _, ok := p.turtles[""]; !ok {
 			p.turtles[""] = NewTurtleAgentSet([]*Turtle{})
 		}
@@ -76,11 +76,11 @@ func (p *Patch) addTurtle(t *Turtle) {
 
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
-	if _, ok := p.turtles[t.breed]; ok {
-		p.turtles[t.breed].Remove(t)
+	if _, ok := p.turtles[t.breed.name]; ok {
+		p.turtles[t.breed.name].Remove(t)
 	}
 
-	if t.breed != "" {
+	if t.breed != nil {
 		if _, ok := p.turtles[""]; ok {
 			p.turtles[""].Remove(t)
 		}
@@ -158,7 +158,16 @@ func (p *Patch) Reset(patchProperties map[string]interface{}) {
 }
 
 // creates new turtles on this patch
-func (p *Patch) Sprout(breed string, number int, operation TurtleOperation) {
+func (p *Patch) Sprout(number int, operation TurtleOperation) {
+	p.sproutBreeded("", number, operation)
+}
+
+func (p *Patch) sproutBreeded(breedName string, number int, operation TurtleOperation) {
+
+	breed, found := p.parent.breeds[breedName]
+	if !found {
+		return
+	}
 
 	turtlesAdded := NewTurtleAgentSet([]*Turtle{})
 	for i := 0; i < number; i++ {

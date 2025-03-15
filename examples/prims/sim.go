@@ -57,7 +57,10 @@ func (p *Prims) SetUp() error {
 
 	t0 := p.model.Turtle(0)
 	t0.Color.SetColor(model.Red)
-	t0.SetBreed("placed")
+
+	placed := p.model.TurtleBreed("placed")
+
+	t0.SetBreed(placed)
 
 	p.model.ResetTicks()
 	return nil
@@ -120,15 +123,16 @@ func (p *Prims) Go() {
 		return
 	}
 
+	placed := p.model.TurtleBreed("placed")
+
 	//add the link and turtle to the cluster
 	closestLink.SetBreed("placed")
 	closestLink.Color.SetColor(model.Red)
 	closestLink.Hide()
-	closestTurtle.SetBreed("placed")
+	closestTurtle.SetBreed(placed)
 	closestTurtle.Color.SetColor(model.Red)
 
 	// if all nodes are placed, kill all unplaced links
-	placed := p.model.TurtleBreed("placed")
 	if placed.Turtles().Count() == p.nodes {
 		p.model.UndirectedLinks("unplaced").Ask(
 			func(l *model.Link) {

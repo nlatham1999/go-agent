@@ -42,7 +42,7 @@ func (tb *TurtleBreed) Turtle(who int) *Turtle {
 		return nil //turtle not found
 	}
 
-	if t.breed != tb.name {
+	if t.breed != tb {
 		return nil //turtle not in this breed
 	}
 
