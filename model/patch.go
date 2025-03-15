@@ -24,7 +24,7 @@ type Patch struct {
 	PColor Color
 
 	//instead it might be faster having a PatchesOwn for each data type to reduce type assertions
-	patchesOwn map[string]interface{}
+	patchProperties map[string]interface{}
 
 	Label       interface{}
 	PlabelColor Color
@@ -36,7 +36,7 @@ type Patch struct {
 	neighborsPatchMap map[string]*Patch
 }
 
-func newPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch {
+func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *Patch {
 
 	patch := &Patch{
 		x:        x,
@@ -50,9 +50,9 @@ func newPatch(m *Model, patchesOwn map[string]interface{}, x int, y int) *Patch 
 
 	patch.PColor.SetColor(Black)
 
-	patch.patchesOwn = map[string]interface{}{}
-	for key, value := range patchesOwn {
-		patch.patchesOwn[key] = value
+	patch.patchProperties = map[string]interface{}{}
+	for key, value := range patchProperties {
+		patch.patchProperties[key] = value
 	}
 
 	return patch
@@ -149,11 +149,11 @@ func (p *Patch) PYCor() int {
 }
 
 // resest the patch to the default values
-func (p *Patch) Reset(patchesOwn map[string]interface{}) {
+func (p *Patch) Reset(patchProperties map[string]interface{}) {
 	p.PColor.SetColor(Black)
 
-	for key, value := range patchesOwn {
-		p.patchesOwn[key] = value
+	for key, value := range patchProperties {
+		p.patchProperties[key] = value
 	}
 }
 
@@ -222,12 +222,12 @@ func (p *Patch) TurtlesHere(breed string) *TurtleAgentSet {
 	return agentSet
 }
 
-func (p *Patch) GetOwn(key string) interface{} {
-	return p.patchesOwn[key]
+func (p *Patch) GetProperty(key string) interface{} {
+	return p.patchProperties[key]
 }
 
-func (t *Patch) GetOwnI(key string) int {
-	v := t.GetOwn(key)
+func (t *Patch) GetPropI(key string) int {
+	v := t.GetProperty(key)
 	if v == nil {
 		return 0
 	}
@@ -241,8 +241,8 @@ func (t *Patch) GetOwnI(key string) int {
 	}
 }
 
-func (t *Patch) GetOwnF(key string) float64 {
-	v := t.GetOwn(key)
+func (t *Patch) GetPropF(key string) float64 {
+	v := t.GetProperty(key)
 	if v == nil {
 		return 0
 	}
@@ -256,8 +256,8 @@ func (t *Patch) GetOwnF(key string) float64 {
 	}
 }
 
-func (t *Patch) GetOwnS(key string) string {
-	v := t.GetOwn(key)
+func (t *Patch) GetPropS(key string) string {
+	v := t.GetProperty(key)
 	if v == nil {
 		return ""
 	}
@@ -269,8 +269,8 @@ func (t *Patch) GetOwnS(key string) string {
 	}
 }
 
-func (t *Patch) GetOwnB(key string) bool {
-	v := t.GetOwn(key)
+func (t *Patch) GetPropB(key string) bool {
+	v := t.GetProperty(key)
 	if v == nil {
 		return false
 	}
@@ -282,14 +282,14 @@ func (t *Patch) GetOwnB(key string) bool {
 	}
 }
 
-func (p *Patch) SetOwn(key string, value interface{}) {
+func (p *Patch) SetProperty(key string, value interface{}) {
 	// if the value is an int, convert it to a float64
 	if _, ok := value.(int); ok {
 		value = float64(value.(int))
 	}
 
-	if _, ok := p.patchesOwn[key]; !ok {
+	if _, ok := p.patchProperties[key]; !ok {
 		return
 	}
-	p.patchesOwn[key] = value
+	p.patchProperties[key] = value
 }

@@ -24,8 +24,8 @@ type Turtle struct {
 	label      interface{}
 	labelColor Color
 
-	turtlesOwnGeneral map[string]interface{} // turtles own variables
-	turtlesOwnBreed   map[string]interface{} // turtles own variables
+	turtlePropertiesGeneral map[string]interface{} // turtles own variables
+	turtlePropertiesBreed   map[string]interface{} // turtle properties variables
 
 	patch *Patch //patch the turtle is on
 }
@@ -71,18 +71,18 @@ func newTurtle(m *Model, who int, breed string, x float64, y float64) *Turtle {
 	t.patch = t.PatchHere()
 	t.patch.addTurtle(t)
 
-	//set the turtle own variables
+	//set the turtle properties variables
 	//breed specific variables can override general variables
-	t.turtlesOwnGeneral = make(map[string]interface{})
-	t.turtlesOwnBreed = make(map[string]interface{})
-	generalTemplate := m.breeds[""].turtlesOwnTemplate
+	t.turtlePropertiesGeneral = make(map[string]interface{})
+	t.turtlePropertiesBreed = make(map[string]interface{})
+	generalTemplate := m.breeds[""].turtlePropertiesTemplate
 	for key, value := range generalTemplate {
-		t.turtlesOwnGeneral[key] = value
+		t.turtlePropertiesGeneral[key] = value
 	}
 	if breedSet != nil {
-		breedTemplate := breedSet.turtlesOwnTemplate
+		breedTemplate := breedSet.turtlePropertiesTemplate
 		for key, value := range breedTemplate {
-			t.turtlesOwnBreed[key] = value
+			t.turtlePropertiesBreed[key] = value
 		}
 	}
 
@@ -120,12 +120,12 @@ func (t *Turtle) SetBreed(name string) {
 		t.parent.breeds[name].turtles.Add(t)
 	}
 
-	// switch the turtles own variables to the new breed
-	t.turtlesOwnBreed = make(map[string]interface{})
+	// switch the turtles properties variables to the new breed
+	t.turtlePropertiesBreed = make(map[string]interface{})
 	if name != "" {
-		breedTemplate := t.parent.breeds[name].turtlesOwnTemplate
+		breedTemplate := t.parent.breeds[name].turtlePropertiesTemplate
 		for key, value := range breedTemplate {
-			t.turtlesOwnBreed[key] = value
+			t.turtlePropertiesBreed[key] = value
 		}
 	}
 
@@ -191,20 +191,20 @@ func (t *Turtle) Downhill(patchVariable string) {
 	p := t.PatchHere()
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
 		return
 	}
 
 	minPatch := p
-	minValue := minPatch.patchesOwn[patchVariable].(float64)
+	minValue := minPatch.patchProperties[patchVariable].(float64)
 
 	for patch := range p.patchNeighborsMap {
 		if patch == nil {
 			continue
 		}
-		if patch.patchesOwn[patchVariable].(float64) < minValue {
+		if patch.patchProperties[patchVariable].(float64) < minValue {
 			minPatch = patch
-			minValue = patch.patchesOwn[patchVariable].(float64)
+			minValue = patch.patchProperties[patchVariable].(float64)
 		}
 	}
 
@@ -265,17 +265,17 @@ func (t *Turtle) Downhill4(patchVariable string) {
 	}
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
 		return
 	}
 
 	minPatch := t.PatchHere()
-	minValue := minPatch.patchesOwn[patchVariable].(float64)
+	minValue := minPatch.patchProperties[patchVariable].(float64)
 
 	for patch := range neighborsMap {
-		if patch.patchesOwn[patchVariable].(float64) < minValue {
+		if patch.patchProperties[patchVariable].(float64) < minValue {
 			minPatch = patch
-			minValue = patch.patchesOwn[patchVariable].(float64)
+			minValue = patch.patchProperties[patchVariable].(float64)
 		}
 	}
 
@@ -410,15 +410,15 @@ func (t *Turtle) Hatch(breed string, amount int, operation TurtleOperation) {
 		turtles[i].label = t.label
 		turtles[i].labelColor = t.labelColor
 
-		// copy the own variables
-		for key, value := range t.turtlesOwnGeneral {
-			turtles[i].turtlesOwnGeneral[key] = value
+		// copy the property variables
+		for key, value := range t.turtlePropertiesGeneral {
+			turtles[i].turtlePropertiesGeneral[key] = value
 		}
 
 		// copy the breed variables if the breed is the same
 		if t.breed == newBreed {
-			for key, value := range t.turtlesOwnBreed {
-				turtles[i].turtlesOwnBreed[key] = value
+			for key, value := range t.turtlePropertiesBreed {
+				turtles[i].turtlePropertiesBreed[key] = value
 			}
 		}
 	}
@@ -595,20 +595,20 @@ func (t *Turtle) Neighbors4() *PatchAgentSet {
 	return neighbors
 }
 
-// returns the turtle own variable
-func (t *Turtle) GetOwn(key string) interface{} {
-	if val, found := t.turtlesOwnBreed[key]; found {
+// returns the turtle property variable
+func (t *Turtle) GetProperty(key string) interface{} {
+	if val, found := t.turtlePropertiesBreed[key]; found {
 		return val
 	}
-	if val, found := t.turtlesOwnGeneral[key]; found {
+	if val, found := t.turtlePropertiesGeneral[key]; found {
 		return val
 	}
 	return nil
 }
 
-// returns the turtle own variable as an int
-func (t *Turtle) GetOwnI(key string) (int, error) {
-	v := t.GetOwn(key)
+// returns the turtle property variable as an int
+func (t *Turtle) GetPropI(key string) (int, error) {
+	v := t.GetProperty(key)
 	if v == nil {
 		return 0, fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
@@ -622,9 +622,9 @@ func (t *Turtle) GetOwnI(key string) (int, error) {
 	}
 }
 
-// returns the turtle own variable as a float
-func (t *Turtle) GetOwnF(key string) (float64, error) {
-	v := t.GetOwn(key)
+// returns the turtle property variable as a float
+func (t *Turtle) GetPropF(key string) (float64, error) {
+	v := t.GetProperty(key)
 	if v == nil {
 		return 0, fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
@@ -638,9 +638,9 @@ func (t *Turtle) GetOwnF(key string) (float64, error) {
 	}
 }
 
-// returns the turtle own variable as a string
-func (t *Turtle) GetOwnS(key string) (string, error) {
-	v := t.GetOwn(key)
+// returns the turtle property variable as a string
+func (t *Turtle) GetPropS(key string) (string, error) {
+	v := t.GetProperty(key)
 	if v == nil {
 		return "", fmt.Errorf(fmt.Sprintf("key not found: %s", key))
 	}
@@ -652,14 +652,14 @@ func (t *Turtle) GetOwnS(key string) (string, error) {
 	}
 }
 
-// sets the turtle own variable
-func (t *Turtle) SetOwn(key string, value interface{}) {
-	if _, found := t.turtlesOwnBreed[key]; found {
-		t.turtlesOwnBreed[key] = value
+// sets the turtle property variable
+func (t *Turtle) SetProperty(key string, value interface{}) {
+	if _, found := t.turtlePropertiesBreed[key]; found {
+		t.turtlePropertiesBreed[key] = value
 		return
 	} else {
-		if _, found := t.turtlesOwnGeneral[key]; found {
-			t.turtlesOwnGeneral[key] = value
+		if _, found := t.turtlePropertiesGeneral[key]; found {
+			t.turtlePropertiesGeneral[key] = value
 		}
 	}
 }
@@ -813,20 +813,20 @@ func (t *Turtle) Uphill(patchVariable string) {
 	p := t.PatchHere()
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
 		return
 	}
 
 	minPatch := p
-	minValue := minPatch.patchesOwn[patchVariable].(float64)
+	minValue := minPatch.patchProperties[patchVariable].(float64)
 
 	for patch := range p.patchNeighborsMap {
 		if patch == nil {
 			continue
 		}
-		if patch.patchesOwn[patchVariable].(float64) > minValue {
+		if patch.patchProperties[patchVariable].(float64) > minValue {
 			minPatch = patch
-			minValue = patch.patchesOwn[patchVariable].(float64)
+			minValue = patch.patchProperties[patchVariable].(float64)
 		}
 	}
 
@@ -885,17 +885,17 @@ func (t *Turtle) Uphill4(patchVariable string) {
 	}
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchesOwnTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
 		return
 	}
 
 	minPatch := t.PatchHere()
-	minValue := minPatch.patchesOwn[patchVariable].(float64)
+	minValue := minPatch.patchProperties[patchVariable].(float64)
 
 	for patch := range neighborsMap {
-		if patch.patchesOwn[patchVariable].(float64) > minValue {
+		if patch.patchProperties[patchVariable].(float64) > minValue {
 			minPatch = patch
-			minValue = patch.patchesOwn[patchVariable].(float64)
+			minValue = patch.patchProperties[patchVariable].(float64)
 		}
 	}
 

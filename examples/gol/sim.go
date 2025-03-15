@@ -27,7 +27,7 @@ func (g *Gol) Model() *model.Model {
 
 func (g *Gol) Init() {
 	settings := model.ModelSettings{
-		PatchesOwn: map[string]interface{}{
+		PatchProperties: map[string]interface{}{
 			"alive":      true,
 			"alive-next": true,
 		},
@@ -52,12 +52,12 @@ func (g *Gol) SetUp() error {
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.initialAlive {
-				p.SetOwn("alive", true)
-				p.SetOwn("alive-next", true)
+				p.SetProperty("alive", true)
+				p.SetProperty("alive-next", true)
 				p.PColor.SetColor(model.Green)
 			} else {
-				p.SetOwn("alive", false)
-				p.SetOwn("alive-next", false)
+				p.SetProperty("alive", false)
+				p.SetProperty("alive-next", false)
 				p.PColor.SetColor(model.Black)
 			}
 		},
@@ -76,22 +76,22 @@ func (g *Gol) Go() {
 
 			//count the number of alive neighbors
 			aliveNeighbors := neighbors.With(func(p *model.Patch) bool {
-				alive := p.GetOwnB("alive")
+				alive := p.GetPropB("alive")
 				return alive
 			}).Count()
 
-			alive := p.GetOwnB("alive")
+			alive := p.GetPropB("alive")
 			if alive {
 				if aliveNeighbors < g.minNeighborsToLive {
-					p.SetOwn("alive-next", false)
+					p.SetProperty("alive-next", false)
 				}
 
 				if aliveNeighbors > g.maxNeighborsToLive {
-					p.SetOwn("alive-next", false)
+					p.SetProperty("alive-next", false)
 				}
 			} else {
 				if aliveNeighbors >= g.minNeighborsToReproduce && aliveNeighbors <= g.maxNeighborsToReproduce {
-					p.SetOwn("alive-next", true)
+					p.SetProperty("alive-next", true)
 				}
 			}
 		},
@@ -99,8 +99,8 @@ func (g *Gol) Go() {
 
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
-			p.SetOwn("alive", p.GetOwnB("alive-next"))
-			if p.GetOwnB("alive") {
+			p.SetProperty("alive", p.GetPropB("alive-next"))
+			if p.GetPropB("alive") {
 				p.PColor.SetColor(model.Green)
 			} else {
 				p.PColor.SetColor(model.Black)
@@ -114,14 +114,14 @@ func (g *Gol) Go() {
 func (g *Gol) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
-			return p.GetOwnB("alive")
+			return p.GetPropB("alive")
 		}).Count(),
 	}
 }
 
 func (g *Gol) Stop() bool {
 	return g.model.Patches.All(func(p *model.Patch) bool {
-		return !p.GetOwnB("alive")
+		return !p.GetPropB("alive")
 	})
 }
 

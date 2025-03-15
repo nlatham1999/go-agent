@@ -139,7 +139,7 @@ func TestTurtlesOwn(t *testing.T) {
 	turtle := m.Turtle("", 0)
 
 	// get the turtle's own
-	mood := turtle.GetOwn("mood")
+	mood := turtle.GetProperty("mood")
 
 	if mood != nil {
 		t.Errorf("Expected turtle to not have own 'mood'")
@@ -160,9 +160,9 @@ func TestTurtlesOwn(t *testing.T) {
 	}
 
 	settings = model.ModelSettings{
-		TurtlesOwn:      turtlesOwn,
-		TurtleBreedsOwn: breedsOwn,
-		TurtleBreeds:    []string{"ants"},
+		TurtleProperties:      turtlesOwn,
+		TurtleBreedProperties: breedsOwn,
+		TurtleBreeds:          []string{"ants"},
 	}
 	m2 := model.NewModel(settings)
 
@@ -172,13 +172,13 @@ func TestTurtlesOwn(t *testing.T) {
 	turtle = m2.Turtle("", 0)
 
 	// get the turtle's own
-	mood = turtle.GetOwn("mood")
+	mood = turtle.GetProperty("mood")
 
 	if mood != 0 {
 		t.Errorf("Expected turtle to have own 'mood' with value 0, got %v", mood)
 	}
 
-	age := turtle.GetOwn("age")
+	age := turtle.GetProperty("age")
 
 	if age != 5 {
 		t.Errorf("Expected turtle to have own 'age' with value 5")
@@ -193,9 +193,9 @@ func TestTurtlesOwn(t *testing.T) {
 	breedsOwn["beetles"] = beetlesOwn
 
 	settings = model.ModelSettings{
-		TurtlesOwn:      turtlesOwn,
-		TurtleBreedsOwn: breedsOwn,
-		TurtleBreeds:    []string{"ants", "beetles"},
+		TurtleProperties:      turtlesOwn,
+		TurtleBreedProperties: breedsOwn,
+		TurtleBreeds:          []string{"ants", "beetles"},
 	}
 	m3 := model.NewModel(settings)
 
@@ -207,13 +207,13 @@ func TestTurtlesOwn(t *testing.T) {
 	//change the breed
 	turtle.SetBreed("ants")
 
-	wingspan := turtle.GetOwn("wingspan")
+	wingspan := turtle.GetProperty("wingspan")
 
 	if wingspan != nil {
 		t.Errorf("Expected turtle to not have own 'wingspan'")
 	}
 
-	mood = turtle.GetOwn("mood")
+	mood = turtle.GetProperty("mood")
 
 	if mood == nil {
 		t.Errorf("Expected turtle to have own 'mood'")
@@ -766,7 +766,7 @@ func TestTurtleDownhill(t *testing.T) {
 	}
 
 	settings := model.ModelSettings{
-		PatchesOwn: patchesOwn,
+		PatchProperties: patchesOwn,
 	}
 	m := model.NewModel(settings)
 
@@ -785,15 +785,15 @@ func TestTurtleDownhill(t *testing.T) {
 	p9 := m.Patch(-1, -1)
 
 	// set the chemical value of the patches
-	p1.SetOwn("chemical", 0.0)
-	p2.SetOwn("chemical", 1.0)
-	p3.SetOwn("chemical", 2.0)
-	p4.SetOwn("chemical", 3.0)
-	p5.SetOwn("chemical", 4.0)
-	p6.SetOwn("chemical", 5.0)
-	p7.SetOwn("chemical", 6.0)
-	p8.SetOwn("chemical", 7.0)
-	p9.SetOwn("chemical", 8.0)
+	p1.SetProperty("chemical", 0.0)
+	p2.SetProperty("chemical", 1.0)
+	p3.SetProperty("chemical", 2.0)
+	p4.SetProperty("chemical", 3.0)
+	p5.SetProperty("chemical", 4.0)
+	p6.SetProperty("chemical", 5.0)
+	p7.SetProperty("chemical", 6.0)
+	p8.SetProperty("chemical", 7.0)
+	p9.SetProperty("chemical", 8.0)
 
 	turtle := m.Turtle("", 0)
 	turtle.Downhill("chemical")
@@ -803,7 +803,7 @@ func TestTurtleDownhill(t *testing.T) {
 		t.Errorf("Expected turtle to stay in place")
 	}
 
-	p1.SetOwn("chemical", 9.0)
+	p1.SetProperty("chemical", 9.0)
 	turtle.Downhill("chemical")
 
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value
@@ -821,7 +821,7 @@ func TestTurtleDownhill4(t *testing.T) {
 	}
 
 	settings := model.ModelSettings{
-		PatchesOwn: patchesOwn,
+		PatchProperties: patchesOwn,
 	}
 	m := model.NewModel(settings)
 
@@ -836,11 +836,11 @@ func TestTurtleDownhill4(t *testing.T) {
 	p5 := m.Patch(-1, 0)
 
 	// set the chemical value of the patches
-	p1.SetOwn("chemical", 0.0)
-	p2.SetOwn("chemical", 1.0)
-	p3.SetOwn("chemical", 2.0)
-	p4.SetOwn("chemical", 3.0)
-	p5.SetOwn("chemical", 4.0)
+	p1.SetProperty("chemical", 0.0)
+	p2.SetProperty("chemical", 1.0)
+	p3.SetProperty("chemical", 2.0)
+	p4.SetProperty("chemical", 3.0)
+	p5.SetProperty("chemical", 4.0)
 
 	turtle := m.Turtle("", 0)
 	turtle.Downhill4("chemical")
@@ -850,7 +850,7 @@ func TestTurtleDownhill4(t *testing.T) {
 		t.Errorf("Expected turtle to stay in place")
 	}
 
-	p1.SetOwn("chemical", 4.0)
+	p1.SetProperty("chemical", 4.0)
 	turtle.Downhill4("chemical")
 
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value
@@ -1589,7 +1589,7 @@ func TestTurtleUphill(t *testing.T) {
 	}
 
 	settings := model.ModelSettings{
-		PatchesOwn: patchesOwn,
+		PatchProperties: patchesOwn,
 	}
 	m := model.NewModel(settings)
 
@@ -1608,15 +1608,15 @@ func TestTurtleUphill(t *testing.T) {
 	p9 := m.Patch(-1, -1)
 
 	// set the chemical value of the patches
-	p1.SetOwn("chemical", 10.0)
-	p2.SetOwn("chemical", 1.0)
-	p3.SetOwn("chemical", 2.0)
-	p4.SetOwn("chemical", 3.0)
-	p5.SetOwn("chemical", 4.0)
-	p6.SetOwn("chemical", 0.0)
-	p7.SetOwn("chemical", 6.0)
-	p8.SetOwn("chemical", 7.0)
-	p9.SetOwn("chemical", 8.0)
+	p1.SetProperty("chemical", 10.0)
+	p2.SetProperty("chemical", 1.0)
+	p3.SetProperty("chemical", 2.0)
+	p4.SetProperty("chemical", 3.0)
+	p5.SetProperty("chemical", 4.0)
+	p6.SetProperty("chemical", 0.0)
+	p7.SetProperty("chemical", 6.0)
+	p8.SetProperty("chemical", 7.0)
+	p9.SetProperty("chemical", 8.0)
 
 	turtle := m.Turtle("", 0)
 	turtle.Uphill("chemical")
@@ -1626,7 +1626,7 @@ func TestTurtleUphill(t *testing.T) {
 		t.Errorf("Expected turtle to stay in place")
 	}
 
-	p1.SetOwn("chemical", -5.0)
+	p1.SetProperty("chemical", -5.0)
 	turtle.Uphill("chemical")
 
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value
@@ -1644,7 +1644,7 @@ func TestTurtleUphill4(t *testing.T) {
 	}
 
 	settings := model.ModelSettings{
-		PatchesOwn: patchesOwn,
+		PatchProperties: patchesOwn,
 	}
 	m := model.NewModel(settings)
 
@@ -1659,11 +1659,11 @@ func TestTurtleUphill4(t *testing.T) {
 	p5 := m.Patch(-1, 0)
 
 	// set the chemical value of the patches
-	p1.SetOwn("chemical", 14.0)
-	p2.SetOwn("chemical", 11.0)
-	p3.SetOwn("chemical", 2.0)
-	p4.SetOwn("chemical", 3.0)
-	p5.SetOwn("chemical", 4.0)
+	p1.SetProperty("chemical", 14.0)
+	p2.SetProperty("chemical", 11.0)
+	p3.SetProperty("chemical", 2.0)
+	p4.SetProperty("chemical", 3.0)
+	p5.SetProperty("chemical", 4.0)
 
 	turtle := m.Turtle("", 0)
 	turtle.Uphill4("chemical")
@@ -1673,7 +1673,7 @@ func TestTurtleUphill4(t *testing.T) {
 		t.Errorf("Expected turtle to stay in place")
 	}
 
-	p1.SetOwn("chemical", 4.0)
+	p1.SetProperty("chemical", 4.0)
 	turtle.Uphill4("chemical")
 
 	// make sure that the turtle's position has changed to the patch with the lowest chemical value

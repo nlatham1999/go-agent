@@ -33,10 +33,10 @@ func (ws *WolfSheep) Init() {
 
 	modelSettings := model.ModelSettings{
 		TurtleBreeds: []string{"sheep", "wolves"},
-		TurtlesOwn: map[string]interface{}{
+		TurtleProperties: map[string]interface{}{
 			"energy": 0,
 		},
-		PatchesOwn: map[string]interface{}{
+		PatchProperties: map[string]interface{}{
 			"countdown": int(0),
 		},
 		MinPxCor: -15,
@@ -66,10 +66,10 @@ func (ws *WolfSheep) SetUp() error {
 
 			if ws.m.RandomFloat(1) < 0.5 {
 				p.PColor.SetColor(model.Green)
-				p.SetOwn("countdown", ws.grassRegrowthTime)
+				p.SetProperty("countdown", ws.grassRegrowthTime)
 			} else {
 				p.PColor.SetColor(model.Brown)
-				p.SetOwn("countdown", ws.grassRegrowthTime)
+				p.SetProperty("countdown", ws.grassRegrowthTime)
 			}
 		},
 	)
@@ -80,7 +80,7 @@ func (ws *WolfSheep) SetUp() error {
 			t.Color.SetColor(model.White)
 			// t.Size(1.5)
 			t.SetLabelColor(model.Blue)
-			t.SetOwn("energy", ws.m.RandomInt(2*ws.sheepGainFromFood))
+			t.SetProperty("energy", ws.m.RandomInt(2*ws.sheepGainFromFood))
 			t.SetXY(ws.m.RandomXCor(), ws.m.RandomYCor())
 			t.SetSize(.5)
 		},
@@ -92,7 +92,7 @@ func (ws *WolfSheep) SetUp() error {
 			t.Color.SetColor(model.Black)
 			// t.Size(2)
 			t.SetLabelColor(model.White)
-			t.SetOwn("energy", ws.m.RandomInt(2*ws.wolfGainFromFood))
+			t.SetProperty("energy", ws.m.RandomInt(2*ws.wolfGainFromFood))
 			t.SetXY(float64(ws.m.RandomXCor()), ws.m.RandomYCor())
 			t.SetSize(.5)
 		},
@@ -101,7 +101,7 @@ func (ws *WolfSheep) SetUp() error {
 	ws.m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if ws.showEnergy {
-				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
+				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))
 			} else {
 				t.SetLabel("")
 			}
@@ -125,12 +125,12 @@ func (ws *WolfSheep) Go() {
 	ws.m.Turtles("sheep").Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
-			energy, err := t.GetOwnI("energy")
+			energy, err := t.GetPropI("energy")
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-			t.SetOwn("energy", energy-1)
+			t.SetProperty("energy", energy-1)
 			ws.EatGrass(t)
 			ws.Death(t)
 			ws.reproduceSheep(t)
@@ -143,7 +143,7 @@ func (ws *WolfSheep) Go() {
 	ws.m.Turtles("wolves").Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
-			t.SetOwn("energy", t.GetOwn("energy").(int)-1)
+			t.SetProperty("energy", t.GetProperty("energy").(int)-1)
 			ws.EatSheep(t)
 			ws.Death(t)
 			ws.reproduceWolves(t)
@@ -157,7 +157,7 @@ func (ws *WolfSheep) Go() {
 	ws.m.Turtles("").Ask(
 		func(t *model.Turtle) {
 			if ws.showEnergy {
-				t.SetLabel(fmt.Sprintf("%v", t.GetOwn("energy")))
+				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))
 			} else {
 				t.SetLabel("")
 			}
@@ -176,12 +176,12 @@ func (ws *WolfSheep) move(t *model.Turtle) {
 func (ws *WolfSheep) EatGrass(t *model.Turtle) {
 	if t.PatchHere().PColor == model.Green {
 		t.PatchHere().PColor.SetColor(model.Brown)
-		t.SetOwn("energy", t.GetOwn("energy").(int)+ws.sheepGainFromFood)
+		t.SetProperty("energy", t.GetProperty("energy").(int)+ws.sheepGainFromFood)
 	}
 }
 
 func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
-	energy, err := t.GetOwnI("energy")
+	energy, err := t.GetPropI("energy")
 	if err != nil {
 		return
 	}
@@ -191,7 +191,7 @@ func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
 	}
 	if ws.m.RandomFloat(100) < ws.sheepReproduceRate {
 
-		t.SetOwn("energy", energy/2)
+		t.SetProperty("energy", energy/2)
 		t.Hatch("", 1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
@@ -202,7 +202,7 @@ func (ws *WolfSheep) reproduceSheep(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
-	energy, err := t.GetOwnI("energy")
+	energy, err := t.GetPropI("energy")
 	if err != nil {
 		return
 	}
@@ -211,7 +211,7 @@ func (ws *WolfSheep) reproduceWolves(t *model.Turtle) {
 		return
 	}
 	if ws.m.RandomFloat(100) < ws.sheepReproduceRate {
-		t.SetOwn("energy", energy/2)
+		t.SetProperty("energy", energy/2)
 		t.Hatch("", 1,
 			func(t *model.Turtle) {
 				t.Right(ws.m.RandomFloat(360))
@@ -228,23 +228,23 @@ func (ws *WolfSheep) EatSheep(t *model.Turtle) {
 	}
 	if prey != nil {
 		prey.Die()
-		t.SetOwn("energy", t.GetOwn("energy").(int)+ws.wolfGainFromFood)
+		t.SetProperty("energy", t.GetProperty("energy").(int)+ws.wolfGainFromFood)
 	}
 }
 
 func (ws *WolfSheep) Death(t *model.Turtle) {
-	if t.GetOwn("energy").(int) <= 0 {
+	if t.GetProperty("energy").(int) <= 0 {
 		t.Die()
 	}
 }
 
 func (ws *WolfSheep) growGrass(p *model.Patch) {
 	if p.PColor == model.Brown {
-		if p.GetOwnI("countdown") <= 0 {
+		if p.GetPropI("countdown") <= 0 {
 			p.PColor.SetColor(model.Green)
-			p.SetOwn("countdown", ws.grassRegrowthTime)
+			p.SetProperty("countdown", ws.grassRegrowthTime)
 		} else {
-			p.SetOwn("countdown", p.GetOwnI("countdown")-1)
+			p.SetProperty("countdown", p.GetPropI("countdown")-1)
 		}
 	}
 }

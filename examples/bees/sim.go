@@ -25,11 +25,11 @@ func NewBees() *Bees {
 
 func (b *Bees) Init() {
 	modelSettings := model.ModelSettings{
-		PatchesOwn: map[string]interface{}{
+		PatchProperties: map[string]interface{}{
 			"nectar": 0.0,
 		},
 		TurtleBreeds: []string{"scouts", "foragers"},
-		TurtlesOwn: map[string]interface{}{
+		TurtleProperties: map[string]interface{}{
 			"radius": 10.0,
 			"group":  0,
 		},
@@ -54,7 +54,7 @@ func (b *Bees) SetUp() error {
 	b.model.Patches.Ask(
 		func(p *model.Patch) {
 			if b.model.RandomInt(100) > 95 {
-				p.SetOwn("nectar", b.model.RandomFloat(100)+450)
+				p.SetProperty("nectar", b.model.RandomFloat(100)+450)
 			}
 		},
 	)
@@ -73,7 +73,7 @@ func (b *Bees) SetUp() error {
 
 	b.model.Patches.Ask(
 		func(p *model.Patch) {
-			nectar := p.GetOwnI("nectar")
+			nectar := p.GetPropI("nectar")
 			p.PColor.SetColorRGB(0, nectar, 0)
 		},
 	)
@@ -98,8 +98,8 @@ func (b *Bees) SetUp() error {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.Color.SetColor(model.Yellow)
 			t.SetSize(.9)
-			t.SetLabel(t.PatchHere().GetOwnI("nectar"))
-			t.SetOwn("group", t.Who())
+			t.SetLabel(t.PatchHere().GetPropI("nectar"))
+			t.SetProperty("group", t.Who())
 		},
 	)
 
@@ -115,12 +115,12 @@ func (b *Bees) Go() {
 	if b.step%numSteps == 0 {
 		b.model.Turtles("scouts").Ask(
 			func(scout *model.Turtle) {
-				searchRadius, _ := scout.GetOwnF("radius")
+				searchRadius, _ := scout.GetPropF("radius")
 				if searchRadius < 1 {
 					return
 				}
 
-				nectar := scout.PatchHere().GetOwnI("nectar")
+				nectar := scout.PatchHere().GetPropI("nectar")
 				numForagers := 2
 				if nectar > 30 {
 					numForagers = 4
@@ -137,7 +137,7 @@ func (b *Bees) Go() {
 								l.LabelColor = model.Red
 							},
 						)
-						forager.SetLabel(forager.PatchHere().GetOwnI("nectar"))
+						forager.SetLabel(forager.PatchHere().GetPropI("nectar"))
 					},
 				)
 			},
@@ -155,14 +155,14 @@ func (b *Bees) Go() {
 				}
 
 				foragers.SortDesc(func(f *model.Turtle) float64 {
-					return f.PatchHere().GetOwnF("nectar")
+					return f.PatchHere().GetPropF("nectar")
 				})
 				max, err := foragers.First()
 				if err != nil {
 					return
 				}
 
-				if max.PatchHere().GetOwnF("nectar") > t.PatchHere().GetOwnF("nectar") {
+				if max.PatchHere().GetPropF("nectar") > t.PatchHere().GetPropF("nectar") {
 					t.Die()
 					foragers.WhoAreNotTurtle(max).Ask(
 						func(f *model.Turtle) {
@@ -179,8 +179,8 @@ func (b *Bees) Go() {
 					)
 
 					//shrink the search radius
-					radius, _ := t.GetOwnF("radius")
-					t.SetOwn("radius", radius-.5)
+					radius, _ := t.GetPropF("radius")
+					t.SetProperty("radius", radius-.5)
 				}
 			},
 		)
@@ -206,9 +206,9 @@ func (b *Bees) Stats() map[string]interface{} {
 	stats := map[string]interface{}{}
 	b.model.Turtles("scouts").Ask(
 		func(t *model.Turtle) {
-			group := t.GetOwn("group")
-			nectar := t.PatchHere().GetOwnI("nectar")
-			radius := t.GetOwn("radius")
+			group := t.GetProperty("group")
+			nectar := t.PatchHere().GetPropI("nectar")
+			radius := t.GetProperty("radius")
 			stats[fmt.Sprintf("Group %v", group)] = fmt.Sprintf("Nectar at Scout: %v, Search Radius: %v", nectar, radius)
 		},
 	)
@@ -218,7 +218,7 @@ func (b *Bees) Stats() map[string]interface{} {
 
 func (b *Bees) Stop() bool {
 	return b.model.Turtles("scouts").All(func(t *model.Turtle) bool {
-		radius, _ := t.GetOwnF("radius")
+		radius, _ := t.GetPropF("radius")
 		return radius < 1
 	})
 }

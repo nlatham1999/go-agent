@@ -13,7 +13,7 @@ import (
 type Model struct {
 	Ticks int
 
-	patchesOwnTemplate map[string]interface{} //additional variables for each patch
+	patchPropertiesTemplate map[string]interface{} //additional variables for each patch
 
 	Patches              *PatchAgentSet          //all the patches
 	turtles              *TurtleAgentSet         //all the turtles
@@ -80,31 +80,31 @@ func NewModel(
 		settings.MinPyCor = -15
 	}
 
-	patchesOwn := make(map[string]interface{})
-	if settings.PatchesOwn != nil {
-		for key, value := range settings.PatchesOwn {
-			patchesOwn[key] = value
+	patchProperties := make(map[string]interface{})
+	if settings.PatchProperties != nil {
+		for key, value := range settings.PatchProperties {
+			patchProperties[key] = value
 		}
 	}
 
 	model := &Model{
-		maxPxCor:           settings.MaxPxCor,
-		maxPyCor:           settings.MaxPyCor,
-		minPxCor:           settings.MinPxCor,
-		minPyCor:           settings.MinPyCor,
-		maxXCor:            float64(settings.MaxPxCor) + .5,
-		maxYCor:            float64(settings.MaxPyCor) + .5,
-		minXCor:            float64(settings.MinPxCor) - .5,
-		minYCor:            float64(settings.MinPyCor) - .5,
-		worldWidth:         settings.MaxPxCor - settings.MinPxCor + 1,
-		worldHeight:        settings.MaxPyCor - settings.MinPyCor + 1,
-		patchesOwnTemplate: settings.PatchesOwn,
-		wrappingX:          settings.WrappingX,
-		wrappingY:          settings.WrappingY,
-		whoToTurtles:       make(map[int]*Turtle),
-		randomGenerator:    rand.New(rand.NewSource(settings.RandomSeed)),
-		modelStart:         time.Now(),
-		linkedTurtles:      make(map[*Turtle]*turtleLinks),
+		maxPxCor:                settings.MaxPxCor,
+		maxPyCor:                settings.MaxPyCor,
+		minPxCor:                settings.MinPxCor,
+		minPyCor:                settings.MinPyCor,
+		maxXCor:                 float64(settings.MaxPxCor) + .5,
+		maxYCor:                 float64(settings.MaxPyCor) + .5,
+		minXCor:                 float64(settings.MinPxCor) - .5,
+		minYCor:                 float64(settings.MinPyCor) - .5,
+		worldWidth:              settings.MaxPxCor - settings.MinPxCor + 1,
+		worldHeight:             settings.MaxPyCor - settings.MinPyCor + 1,
+		patchPropertiesTemplate: settings.PatchProperties,
+		wrappingX:               settings.WrappingX,
+		wrappingY:               settings.WrappingY,
+		whoToTurtles:            make(map[int]*Turtle),
+		randomGenerator:         rand.New(rand.NewSource(settings.RandomSeed)),
+		modelStart:              time.Now(),
+		linkedTurtles:           make(map[*Turtle]*turtleLinks),
 	}
 
 	//construct turtle breeds
@@ -116,14 +116,14 @@ func NewModel(
 			defaultShape: "",
 		}
 
-		//copy the turtles breeds own template
-		if settings.TurtleBreedsOwn != nil && settings.TurtleBreedsOwn[settings.TurtleBreeds[i]] != nil {
-			turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
-			for key, value := range settings.TurtleBreedsOwn[settings.TurtleBreeds[i]] {
-				turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate[key] = value
+		//copy the turtles breed properties template
+		if settings.TurtleBreedProperties != nil && settings.TurtleBreedProperties[settings.TurtleBreeds[i]] != nil {
+			turtleBreedsMap[settings.TurtleBreeds[i]].turtlePropertiesTemplate = make(map[string]interface{})
+			for key, value := range settings.TurtleBreedProperties[settings.TurtleBreeds[i]] {
+				turtleBreedsMap[settings.TurtleBreeds[i]].turtlePropertiesTemplate[key] = value
 			}
 		} else {
-			turtleBreedsMap[settings.TurtleBreeds[i]].turtlesOwnTemplate = make(map[string]interface{})
+			turtleBreedsMap[settings.TurtleBreeds[i]].turtlePropertiesTemplate = make(map[string]interface{})
 		}
 	}
 	model.breeds = turtleBreedsMap
@@ -159,17 +159,17 @@ func NewModel(
 
 	// create a breed with no name for the general population
 	model.breeds[""] = &turtleBreed{
-		turtles:            model.turtles,
-		name:               "",
-		defaultShape:       "",
-		turtlesOwnTemplate: make(map[string]interface{}),
+		turtles:                  model.turtles,
+		name:                     "",
+		defaultShape:             "",
+		turtlePropertiesTemplate: make(map[string]interface{}),
 	}
-	if settings.TurtlesOwn != nil {
-		for key, value := range settings.TurtlesOwn {
-			model.breeds[""].turtlesOwnTemplate[key] = value
+	if settings.TurtleProperties != nil {
+		for key, value := range settings.TurtleProperties {
+			model.breeds[""].turtlePropertiesTemplate[key] = value
 		}
 	} else {
-		model.breeds[""].turtlesOwnTemplate = make(map[string]interface{})
+		model.breeds[""].turtlePropertiesTemplate = make(map[string]interface{})
 	}
 
 	//construct general link set
@@ -189,7 +189,7 @@ func (m *Model) buildPatches() {
 		for j := m.minPxCor; j <= m.maxPxCor; j++ {
 			x := j
 			y := i
-			p := newPatch(m, m.patchesOwnTemplate, x, y)
+			p := newPatch(m, m.patchPropertiesTemplate, x, y)
 			m.Patches.Add(p)
 			index := y*m.worldHeight + x
 			m.posOfPatches[index] = p
@@ -268,7 +268,7 @@ func (m *Model) ClearTicks() {
 // clear all patches
 func (m *Model) ClearPatches() {
 	m.Patches.Ask(func(p *Patch) {
-		p.Reset(m.patchesOwnTemplate)
+		p.Reset(m.patchPropertiesTemplate)
 	})
 }
 
@@ -485,7 +485,7 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 
 	//go through each patch and calculate the diffusion amount
 	m.Patches.Ask(func(patch *Patch) {
-		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchProperties[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 8
 		diffusions[patch] = amountToGive
 	})
@@ -501,10 +501,10 @@ func (m *Model) Diffuse(patchVariable string, percent float64) error {
 			amountFromNeighbors += diffusions[n]
 		})
 
-		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchProperties[patchVariable].(float64)
 		amountToKeep := (patchAmount * (1 - percent)) + (float64(8-neighbors.Count()) * (patchAmount * percent / 8))
 
-		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+		patch.patchProperties[patchVariable] = amountToKeep + amountFromNeighbors
 	})
 
 	return nil
@@ -521,7 +521,7 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 
 	//go through each patch and calculate the diffusion amount
 	m.Patches.Ask(func(patch *Patch) {
-		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchProperties[patchVariable].(float64)
 		amountToGive := patchAmount * percent / 4
 		diffusions[patch] = amountToGive
 	})
@@ -537,10 +537,10 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 			amountFromNeighbors += diffusions[n]
 		})
 
-		patchAmount := patch.patchesOwn[patchVariable].(float64)
+		patchAmount := patch.patchProperties[patchVariable].(float64)
 		amountToKeep := (patchAmount * (1 - percent)) + (float64(4-neighbors.Count()) * (patchAmount * percent / 4))
 
-		patch.patchesOwn[patchVariable] = amountToKeep + amountFromNeighbors
+		patch.patchProperties[patchVariable] = amountToKeep + amountFromNeighbors
 	})
 
 	return nil

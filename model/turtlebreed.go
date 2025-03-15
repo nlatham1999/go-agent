@@ -7,6 +7,6 @@ type turtleBreed struct {
 
 	name string
 
-	defaultShape       string
-	turtlesOwnTemplate map[string]interface{}
+	defaultShape             string
+	turtlePropertiesTemplate map[string]interface{}
 }

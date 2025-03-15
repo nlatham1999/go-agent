@@ -27,7 +27,7 @@ func NewFlocking() *Flocking {
 
 func (f *Flocking) Init() {
 	modelSettings := model.ModelSettings{
-		TurtlesOwn: map[string]interface{}{
+		TurtleProperties: map[string]interface{}{
 			"flockmates":       nil,
 			"nearest-neighbor": nil,
 		},
@@ -55,7 +55,7 @@ func (f *Flocking) SetUp() error {
 		t.Color = f.model.RandomColor()
 		t.SetSize(.5)
 		t.SetXY(f.model.RandomXCor(), f.model.RandomYCor())
-		t.SetOwn("flockmates", nil)
+		t.SetProperty("flockmates", nil)
 		t.Shape = "triangle"
 	})
 	if err != nil {
@@ -83,9 +83,9 @@ func (f *Flocking) Go() {
 func (f *Flocking) flock(t *model.Turtle) {
 	f.findFlockmates(t)
 
-	if t.GetOwn("flockmates") != nil && t.GetOwn("flockmates").(*model.TurtleAgentSet).Count() > 0 {
-		if t.GetOwn("nearest-neighbor") != nil {
-			neighbor := t.GetOwn("nearest-neighbor").(*model.Turtle)
+	if t.GetProperty("flockmates") != nil && t.GetProperty("flockmates").(*model.TurtleAgentSet).Count() > 0 {
+		if t.GetProperty("nearest-neighbor") != nil {
+			neighbor := t.GetProperty("nearest-neighbor").(*model.Turtle)
 			if t.DistanceTurtle(neighbor) < f.minimumSeparation {
 				f.seperate(t)
 			} else {
@@ -101,7 +101,7 @@ func (f *Flocking) findFlockmates(t *model.Turtle) {
 
 	flockMates := model.NewTurtleAgentSet(nil)
 
-	t.SetOwn("nearest-neighbor", nil)
+	t.SetProperty("nearest-neighbor", nil)
 
 	minDistance := 1000000.0
 	f.model.Turtles("").Ask(
@@ -111,23 +111,23 @@ func (f *Flocking) findFlockmates(t *model.Turtle) {
 				flockMates.Add(t2)
 				if distance < minDistance {
 					minDistance = distance
-					t.SetOwn("nearest-neighbor", t2)
+					t.SetProperty("nearest-neighbor", t2)
 				}
 			}
 		},
 	)
 
-	t.SetOwn("flockmates", flockMates)
+	t.SetProperty("flockmates", flockMates)
 }
 
 func (f *Flocking) seperate(t *model.Turtle) {
 
-	if t.GetOwn("nearest-neighbor") == nil {
+	if t.GetProperty("nearest-neighbor") == nil {
 		fmt.Println("nearest-neighbor is nil")
 		return
 	}
 
-	nearestNeighbor := t.GetOwn("nearest-neighbor").(*model.Turtle)
+	nearestNeighbor := t.GetProperty("nearest-neighbor").(*model.Turtle)
 	f.turnAway(t, nearestNeighbor.GetHeading(), f.maxSeperateTurn)
 }
 
@@ -138,7 +138,7 @@ func (f *Flocking) align(t *model.Turtle) {
 func (f *Flocking) averageFlockmateHeading(t *model.Turtle) float64 {
 	xComponent := 0.0
 	yComponent := 0.0
-	flockmates := t.GetOwn("flockmates").(*model.TurtleAgentSet)
+	flockmates := t.GetProperty("flockmates").(*model.TurtleAgentSet)
 	flockmates.Ask(func(t2 *model.Turtle) {
 		headingRad := t2.GetHeading() * (math.Pi / 180.0)
 		xComponent += math.Cos(headingRad)
@@ -160,7 +160,7 @@ func (f *Flocking) cohere(t *model.Turtle) {
 func (f *Flocking) averageHeadingTowardsFlockmates(t *model.Turtle) float64 {
 	xComponent := 0.0
 	yComponent := 0.0
-	flockmates := t.GetOwn("flockmates").(*model.TurtleAgentSet)
+	flockmates := t.GetProperty("flockmates").(*model.TurtleAgentSet)
 
 	count := float64(flockmates.Count())
 	if count == 0 {
@@ -201,7 +201,7 @@ func (f *Flocking) turnTowards(t *model.Turtle, newHeading float64, maxTurn floa
 }
 
 func (f *Flocking) turnAway(t *model.Turtle, newHeading float64, maxTurn float64) {
-	turn := newHeading - t.GetHeading()
+	turn := t.GetHeading() - newHeading
 	if turn > 180 {
 		turn -= 360
 	} else if turn < -180 {
