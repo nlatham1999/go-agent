@@ -61,7 +61,7 @@ func (b *Boid) Init() {
 func (b *Boid) SetUp() error {
 	b.model.ClearAll()
 
-	b.model.CreateTurtles(b.numBirds, "",
+	b.model.CreateTurtles(b.numBirds,
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.SetSize(b.turtleSize)
@@ -74,7 +74,7 @@ func (b *Boid) SetUp() error {
 }
 
 func (b *Boid) Go() {
-	b.model.Turtles("").Ask(
+	b.model.Turtles().Ask(
 		func(t *model.Turtle) {
 			b.seperation(t)
 			b.alignment(t)
@@ -84,7 +84,7 @@ func (b *Boid) Go() {
 		},
 	)
 
-	b.model.Turtles("").Ask(
+	b.model.Turtles().Ask(
 		func(t *model.Turtle) {
 			b.updatePosition(t)
 		},
@@ -97,7 +97,7 @@ func (b *Boid) Go() {
 func (b *Boid) seperation(t *model.Turtle) {
 	closeDx := 0.0
 	closeDy := 0.0
-	b.model.Turtles("").Ask(
+	b.model.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				if t.DistanceTurtle(t2) < b.protectedRange {
@@ -118,7 +118,7 @@ func (b *Boid) alignment(t *model.Turtle) {
 	xvelAvg := 0.0
 	yvelAvg := 0.0
 	neighboringBoids := 0
-	b.model.Turtles("").Ask(
+	b.model.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				if t.DistanceTurtle(t2) < b.visibleRange {
@@ -144,7 +144,7 @@ func (b *Boid) cohesion(t *model.Turtle) {
 	xposAvg := 0.0
 	yposAvg := 0.0
 	neighboringBoids := 0
-	b.model.Turtles("").Ask(
+	b.model.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				if t.DistanceTurtle(t2) < b.visibleRange {

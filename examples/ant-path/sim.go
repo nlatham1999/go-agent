@@ -39,8 +39,11 @@ func (a *AntPath) Init() {
 
 	fmt.Println("Initializing model")
 
+	leaders := model.NewTurtleBreed("leader", "", nil)
+	followers := model.NewTurtleBreed("follower", "", nil)
+
 	settings := model.ModelSettings{
-		TurtleBreeds: []string{"leader", "follower"},
+		TurtleBreeds: []*model.TurtleBreed{leaders, followers},
 	}
 	a.m = model.NewModel(settings)
 
@@ -57,6 +60,9 @@ func (a *AntPath) SetUp() error {
 		a.m.ClearAll()
 	}
 
+	leaders := a.m.TurtleBreed("leaders")
+	followers := a.m.TurtleBreed("followers")
+
 	a.m.SetDefaultShapeTurtles("bug")
 
 	a.nestX = 10 + float64(a.m.MinPxCor())
@@ -64,30 +70,30 @@ func (a *AntPath) SetUp() error {
 	a.foodX = float64(a.m.MaxPxCor()) - 10
 	a.foodY = 0
 
-	a.m.CreateTurtles(1, "leader",
+	leaders.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Red)
 		},
 	)
 
-	a.m.CreateTurtles(a.numTurtles-1, "follower",
+	followers.CreateTurtles(a.numTurtles-1,
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)
 			t.SetHeading(0)
 		},
 	)
 
-	a.m.Turtles("").SortAsc(func(t *model.Turtle) float64 {
+	a.m.Turtles().SortAsc(func(t *model.Turtle) float64 {
 		return float64(t.Who())
 	})
-	t, err := a.m.Turtles("").First()
+	t, err := a.m.Turtles().First()
 	if err != nil {
 		return err
 	}
 
 	t.Color.SetColor(model.Blue)
 
-	a.m.Turtles("").Ask(
+	a.m.Turtles().Ask(
 		func(t *model.Turtle) {
 			t.SetXY(a.nestX, a.nestY)
 		},
@@ -99,7 +105,7 @@ func (a *AntPath) SetUp() error {
 }
 
 func (a *AntPath) Go() {
-	if a.m.Turtles("").All(func(t *model.Turtle) bool {
+	if a.m.Turtles().All(func(t *model.Turtle) bool {
 		return t.XCor() >= a.foodX
 	}) {
 		fmt.Println("All ants have reached the food")
@@ -109,7 +115,8 @@ func (a *AntPath) Go() {
 		return
 	}
 
-	a.m.Turtles("leader").Ask(
+	leaders := a.m.TurtleBreed("leaders")
+	leaders.Turtles().Ask(
 		func(t *model.Turtle) {
 			a.wiggle(t, 45)
 			correctPath(t)
@@ -122,9 +129,10 @@ func (a *AntPath) Go() {
 		},
 	)
 
-	a.m.Turtles("follower").Ask(
+	followers := a.m.TurtleBreed("followers")
+	followers.Turtles().Ask(
 		func(t *model.Turtle) {
-			t.FaceTurtle(a.m.Turtle("", t.Who()-1))
+			t.FaceTurtle(a.m.Turtle(t.Who() - 1))
 			if a.timeToStart(t) && t.XCor() < a.foodX {
 				if t.Who() == 1 {
 				}
@@ -155,7 +163,7 @@ func correctPath(t *model.Turtle) {
 }
 
 func (a *AntPath) timeToStart(t *model.Turtle) bool {
-	x := a.m.Turtle("", t.Who()-1).XCor()
+	x := a.m.Turtle(t.Who() - 1).XCor()
 	delay := a.nestX + float64(a.startDelay) + float64(a.m.RandomInt(a.startDelay))
 	if t.Who() == 1 {
 		// fmt.Println(x, delay)
@@ -165,8 +173,8 @@ func (a *AntPath) timeToStart(t *model.Turtle) bool {
 
 func (a *AntPath) Stats() map[string]interface{} {
 	return map[string]interface{}{
-		"num-turtles": a.m.Turtles("").Count(),
-		"num-at-food": a.m.Turtles("").With(func(t *model.Turtle) bool {
+		"num-turtles": a.m.Turtles().Count(),
+		"num-at-food": a.m.Turtles().With(func(t *model.Turtle) bool {
 			return t.XCor() >= a.foodX
 		}).Count(),
 	}
@@ -174,7 +182,7 @@ func (a *AntPath) Stats() map[string]interface{} {
 
 // stop the model when all the ants have reached the food
 func (a *AntPath) Stop() bool {
-	return a.m.Turtles("").All(func(t *model.Turtle) bool {
+	return a.m.Turtles().All(func(t *model.Turtle) bool {
 		return t.XCor() >= a.foodX
 	})
 }

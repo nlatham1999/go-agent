@@ -45,11 +45,11 @@ func (s *SimpleSim) SetUp() {
 
 	s.m.ClearAll()
 
-	fmt.Println(s.m.Turtles("").Count())
+	fmt.Println(s.m.Turtles().Count())
 
-	s.m.CreateTurtles(1, "", nil)
+	s.m.CreateTurtles(1, nil)
 
-	t1 := s.m.Turtle("", 0)
+	t1 := s.m.Turtle(0)
 	// t2 := s.m.Turtle("", 1)
 	// t3 := s.m.Turtle("", 2)
 	// t4 := s.m.Turtle("", 3)
@@ -63,6 +63,6 @@ func (s *SimpleSim) SetUp() {
 }
 
 func (s *SimpleSim) Go() {
-	t1 := s.m.Turtle("", 0)
+	t1 := s.m.Turtle(0)
 	t1.Forward(.2)
 }

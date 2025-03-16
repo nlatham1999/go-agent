@@ -16,8 +16,8 @@ func TestPatchDistanceToTurtle(t *testing.T) {
 	patch := m.Patch(-2, -2)
 
 	//create a turtle
-	m.CreateTurtles(1, "", nil)
-	turtle := m.Turtle("", 0)
+	m.CreateTurtles(1, nil)
+	turtle := m.Turtle(0)
 
 	//get the distance between the patch and the turtle
 	distance := patch.DistanceTurtle(turtle)
@@ -38,8 +38,8 @@ func TestPatchDistanceToTurtle(t *testing.T) {
 	patch = m.Patch(-15, -15)
 
 	//create a turtle
-	m.CreateTurtles(1, "", nil)
-	turtle = m.Turtle("", 0)
+	m.CreateTurtles(1, nil)
+	turtle = m.Turtle(0)
 
 	//move the turtle to the other side of the world
 	turtle.SetXY(14, 14)
@@ -426,7 +426,7 @@ func TestPatchSprout(t *testing.T) {
 	patch := m.Patch(0, 0)
 
 	//sprout a patch
-	patch.Sprout("", 5,
+	patch.Sprout(5,
 		func(t *model.Turtle) {
 			switch t.Who() {
 			case 0:
@@ -443,23 +443,23 @@ func TestPatchSprout(t *testing.T) {
 		},
 	)
 
-	if m.Turtle("", 0).Color != model.Red {
+	if m.Turtle(0).Color != model.Red {
 		t.Errorf("Expected red turtle")
 	}
 
-	if m.Turtle("", 1).Color != model.Blue {
+	if m.Turtle(1).Color != model.Blue {
 		t.Errorf("Expected blue turtle")
 	}
 
-	if m.Turtle("", 2).Color != model.Green {
+	if m.Turtle(2).Color != model.Green {
 		t.Errorf("Expected green turtle")
 	}
 
-	if m.Turtle("", 3).Color != model.Yellow {
+	if m.Turtle(3).Color != model.Yellow {
 		t.Errorf("Expected yellow turtle")
 	}
 
-	if m.Turtle("", 4).Color != model.Pink {
+	if m.Turtle(4).Color != model.Pink {
 		t.Errorf("Expected pink turtle")
 	}
 }

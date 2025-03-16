@@ -9,7 +9,7 @@ import (
 func convertModelToApiModel(model *model.Model) *Model {
 	apiModel := Model{
 		Patches:     convertPatchSetToApiPatchSet(model.Patches),
-		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles("")),
+		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles()),
 		Links:       convertLinkSetToApiLinkSet(model.Links()),
 		Ticks:       model.Ticks,
 		WorldWidth:  model.WorldWidth(),
