@@ -230,10 +230,13 @@ func TestTurtlesOwn(t *testing.T) {
 
 func TestTurtleCreateLinkToTurtle(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -244,10 +247,10 @@ func TestTurtleCreateLinkToTurtle(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	t1.CreateLinkToTurtle("parent-children", t2, nil)
+	t1.CreateLinkToTurtle(parentChildren, t2, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.LinkFrom("parent-children", t1)
+	l := t2.LinkFrom(parentChildren, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
@@ -256,10 +259,13 @@ func TestTurtleCreateLinkToTurtle(t *testing.T) {
 
 func TestTurtleCreateLinkToSet(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -272,24 +278,24 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
-	t1.CreateLinksToSet("parent-children", agentSet, nil)
+	t1.CreateLinksToSet(parentChildren, agentSet, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.LinkFrom("parent-children", t1)
+	l := t2.LinkFrom(parentChildren, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t1 to t3
-	l = t3.LinkFrom("parent-children", t1)
+	l = t3.LinkFrom(parentChildren, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t2 to t3
-	l = t3.LinkFrom("parent-children", t2)
+	l = t3.LinkFrom(parentChildren, t2)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -298,10 +304,13 @@ func TestTurtleCreateLinkToSet(t *testing.T) {
 
 func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -312,24 +321,24 @@ func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	t1.CreateLinkWithTurtle("coworkers", t2, nil)
+	t1.CreateLinkWithTurtle(coworkers, t2, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.LinkFrom("coworkers", t1)
+	l := t2.LinkFrom(coworkers, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t2 to t1
-	l = t1.LinkFrom("coworkers", t2)
+	l = t1.LinkFrom(coworkers, t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.LinkFrom("parent-children", t1)
+	l = t2.LinkFrom(parentChildren, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -338,10 +347,13 @@ func TestTurtleCreateLinkWithTurtle(t *testing.T) {
 
 func TestTurtleCreateLinkWithSet(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -354,38 +366,38 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
-	t1.CreateLinksWithSet("coworkers", agentSet, nil)
+	t1.CreateLinksWithSet(coworkers, agentSet, nil)
 
 	// make sure the link exists from t1 to t2
-	l := t2.LinkFrom("coworkers", t1)
+	l := t2.LinkFrom(coworkers, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t1 to t3
-	l = t3.LinkFrom("coworkers", t1)
+	l = t3.LinkFrom(coworkers, t1)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t2 to t1
-	l = t1.LinkFrom("coworkers", t2)
+	l = t1.LinkFrom(coworkers, t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t3 to t1
-	l = t1.LinkFrom("coworkers", t3)
+	l = t1.LinkFrom(coworkers, t3)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.LinkFrom("parent-children", t1)
+	l = t2.LinkFrom(parentChildren, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -394,10 +406,13 @@ func TestTurtleCreateLinkWithSet(t *testing.T) {
 
 func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -408,16 +423,16 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	t1.CreateLinkFromTurtle("parent-children", t2, nil)
+	t1.CreateLinkFromTurtle(parentChildren, t2, nil)
 
 	// make sure the link exists from t2 to t1
-	l := t1.LinkFrom("parent-children", t2)
+	l := t1.LinkFrom(parentChildren, t2)
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2
-	l = t2.LinkFrom("parent-children", t1)
+	l = t2.LinkFrom(parentChildren, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -426,10 +441,13 @@ func TestTurtleCreateLinkFromTurtle(t *testing.T) {
 
 func TestTurtleCreateLinkFromSet(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -442,38 +460,38 @@ func TestTurtleCreateLinkFromSet(t *testing.T) {
 
 	agentSet := model.NewTurtleAgentSet([]*model.Turtle{t2, t3})
 
-	t1.CreateLinksFromSet("parent-children", agentSet, nil)
+	t1.CreateLinksFromSet(parentChildren, agentSet, nil)
 
 	// make sure the link exists from t2 to t1
-	l := t1.LinkFrom("parent-children", t2)
+	l := t1.LinkFrom(parentChildren, t2)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link exists from t3 to t1
-	l = t1.LinkFrom("parent-children", t3)
+	l = t1.LinkFrom(parentChildren, t3)
 
 	if l == nil {
 		t.Errorf("Link should have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2
-	l = t2.LinkFrom("parent-children", t1)
+	l = t2.LinkFrom(parentChildren, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
 	}
 
 	// make sure the link does not exist from t1 to t3
-	l = t3.LinkFrom("parent-children", t1)
+	l = t3.LinkFrom(parentChildren, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
 	}
 
 	// make sure the link does not exist from t1 to t2 for parent-children
-	l = t2.LinkFrom("coworkers", t1)
+	l = t2.LinkFrom(coworkers, t1)
 
 	if l != nil {
 		t.Errorf("Link should not have been created")
@@ -690,10 +708,13 @@ func TestTurtleDistanceXY(t *testing.T) {
 
 func TestTurtleOtherEnd(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -704,7 +725,7 @@ func TestTurtleOtherEnd(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -947,10 +968,13 @@ func TestFaceXY(t *testing.T) {
 
 func TestTurtleInLinkNeighbor(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -967,63 +991,63 @@ func TestTurtleInLinkNeighbor(t *testing.T) {
 	t8 := m.Turtle(7)
 
 	// create a directed link between t1 and t2
-	t1.CreateLinkToTurtle("parent-children", t2, nil)
+	t1.CreateLinkToTurtle(parentChildren, t2, nil)
 
 	// create an undirected link between t3 and t4
-	t3.CreateLinkWithTurtle("coworkers", t4, nil)
+	t3.CreateLinkWithTurtle(coworkers, t4, nil)
 
 	// create a directed link between t5 and t6 that has no breed
-	t5.CreateLinkToTurtle("", t6, nil)
+	t5.CreateLinkToTurtle(nil, t6, nil)
 
 	// create an undirected link between t7 and t8 that has no breed
-	t7.CreateLinkWithTurtle("", t8, nil)
+	t7.CreateLinkWithTurtle(nil, t8, nil)
 
-	v := t1.LinkToTurtleExists("parent-children", t2)
+	v := t1.LinkToTurtleExists(parentChildren, t2)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t2.LinkToTurtleExists("parent-children", t1)
+	v = t2.LinkToTurtleExists(parentChildren, t1)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t3.LinkToTurtleExists("coworkers", t4)
+	v = t3.LinkToTurtleExists(coworkers, t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t4.LinkToTurtleExists("coworkers", t3)
+	v = t4.LinkToTurtleExists(coworkers, t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t5.LinkToTurtleExists("", t6)
+	v = t5.LinkToTurtleExists(nil, t6)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t6.LinkToTurtleExists("", t5)
+	v = t6.LinkToTurtleExists(nil, t5)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t7.LinkToTurtleExists("", t8)
+	v = t7.LinkToTurtleExists(nil, t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t8.LinkToTurtleExists("", t7)
+	v = t8.LinkToTurtleExists(nil, t7)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkToTurtleExists("", t2)
+	v = t1.LinkToTurtleExists(nil, t2)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor")
 	}
 
-	v = t2.LinkToTurtleExists("", t1)
+	v = t2.LinkToTurtleExists(nil, t1)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
@@ -1033,10 +1057,13 @@ func TestTurtleInLinkNeighbor(t *testing.T) {
 // tests the Turtle.InLinkNeighbors function which returns a list of turtles that either have a directed link to the turtle or an undirected link
 func TestTurtleInLinkNeighbors(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1054,22 +1081,22 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
-	t2.CreateLinkToTurtle("parent-children", t1, nil)
-	t3.CreateLinkToTurtle("parent-children", t1, nil)
+	t2.CreateLinkToTurtle(parentChildren, t1, nil)
+	t3.CreateLinkToTurtle(parentChildren, t1, nil)
 
 	// breeded undirected link to t1
-	t4.CreateLinkWithTurtle("coworkers", t1, nil)
-	t5.CreateLinkWithTurtle("coworkers", t1, nil)
+	t4.CreateLinkWithTurtle(coworkers, t1, nil)
+	t5.CreateLinkWithTurtle(coworkers, t1, nil)
 
 	// directed link to t1
-	t6.CreateLinkToTurtle("", t1, nil)
-	t7.CreateLinkToTurtle("", t1, nil)
+	t6.CreateLinkToTurtle(nil, t1, nil)
+	t7.CreateLinkToTurtle(nil, t1, nil)
 
 	// undirected link to t1
-	t8.CreateLinkWithTurtle("", t1, nil)
-	t9.CreateLinkWithTurtle("", t1, nil)
+	t8.CreateLinkWithTurtle(nil, t1, nil)
+	t9.CreateLinkWithTurtle(nil, t1, nil)
 
-	neighbors := t1.LinkedTurtlesToThis("parent-children")
+	neighbors := t1.LinkedTurtlesToThis(parentChildren)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -1077,7 +1104,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t2 and t3")
 	}
 
-	neighbors = t1.LinkedTurtlesToThis("coworkers")
+	neighbors = t1.LinkedTurtlesToThis(coworkers)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
@@ -1085,7 +1112,7 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 		t.Errorf("Expected neighbors to contain t4 and t5")
 	}
 
-	neighbors = t1.LinkedTurtlesToThis("")
+	neighbors = t1.LinkedTurtlesToThis(nil)
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 8 neighbors, got %d", neighbors.Count())
 	}
@@ -1096,10 +1123,13 @@ func TestTurtleInLinkNeighbors(t *testing.T) {
 // link can be directed or undirected
 func TestTurtleLinkNeighbor(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1117,57 +1147,52 @@ func TestTurtleLinkNeighbor(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
-	t2.CreateLinkToTurtle("parent-children", t1, nil)
-	t3.CreateLinkToTurtle("parent-children", t1, nil)
+	t2.CreateLinkToTurtle(parentChildren, t1, nil)
+	t3.CreateLinkToTurtle(parentChildren, t1, nil)
 
 	// breeded undirected link to t1
-	t4.CreateLinkWithTurtle("coworkers", t1, nil)
-	t5.CreateLinkWithTurtle("coworkers", t1, nil)
+	t4.CreateLinkWithTurtle(coworkers, t1, nil)
+	t5.CreateLinkWithTurtle(coworkers, t1, nil)
 
 	// directed link to t1
-	t6.CreateLinkToTurtle("", t1, nil)
-	t7.CreateLinkToTurtle("", t1, nil)
+	t6.CreateLinkToTurtle(nil, t1, nil)
+	t7.CreateLinkToTurtle(nil, t1, nil)
 
 	// undirected link to t1
-	t8.CreateLinkWithTurtle("", t1, nil)
-	t9.CreateLinkWithTurtle("", t1, nil)
+	t8.CreateLinkWithTurtle(nil, t1, nil)
+	t9.CreateLinkWithTurtle(nil, t1, nil)
 
-	v := t1.LinkExists("", t2)
+	v := t1.LinkExists(nil, t2)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkExists("parent-children", t3)
+	v = t1.LinkExists(parentChildren, t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkExists("", t4)
+	v = t1.LinkExists(nil, t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkExists("parent-childres", t5)
+	v = t1.LinkExists(nil, t6)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkExists(parentChildren, t7)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.LinkExists("", t6)
+	v = t1.LinkExists(nil, t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkExists("parent-children", t7)
-	if v {
-		t.Errorf("Expected turtle to not be a neighbor for that breed")
-	}
-
-	v = t1.LinkExists("", t8)
-	if !v {
-		t.Errorf("Expected turtle to be a neighbor")
-	}
-
-	v = t1.LinkExists("coworkers", t9)
+	v = t1.LinkExists(coworkers, t9)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
@@ -1177,10 +1202,13 @@ func TestTurtleLinkNeighbor(t *testing.T) {
 // can be directed or undirected, in either incoming or outgoing
 func TestTurtleLinkNeighbors(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1198,37 +1226,37 @@ func TestTurtleLinkNeighbors(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
-	t2.CreateLinkToTurtle("parent-children", t1, nil)
-	t3.CreateLinkToTurtle("parent-children", t1, nil)
+	t2.CreateLinkToTurtle(parentChildren, t1, nil)
+	t3.CreateLinkToTurtle(parentChildren, t1, nil)
 
 	// breeded undirected link to t1
-	t4.CreateLinkWithTurtle("coworkers", t1, nil)
-	t5.CreateLinkWithTurtle("coworkers", t1, nil)
+	t4.CreateLinkWithTurtle(coworkers, t1, nil)
+	t5.CreateLinkWithTurtle(coworkers, t1, nil)
 
 	// directed link to t1
-	t6.CreateLinkToTurtle("", t1, nil)
-	t7.CreateLinkToTurtle("", t1, nil)
+	t6.CreateLinkToTurtle(nil, t1, nil)
+	t7.CreateLinkToTurtle(nil, t1, nil)
 
 	// undirected link to t1
-	t8.CreateLinkWithTurtle("", t1, nil)
-	t9.CreateLinkWithTurtle("", t1, nil)
+	t8.CreateLinkWithTurtle(nil, t1, nil)
+	t9.CreateLinkWithTurtle(nil, t1, nil)
 
-	neighbors := t1.LinkedTurtles("")
+	neighbors := t1.LinkedTurtles(nil)
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkedTurtles("parent-children")
+	neighbors = t1.LinkedTurtles(parentChildren)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkedTurtles("coworkers")
+	neighbors = t1.LinkedTurtles(coworkers)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t2.LinkedTurtles("parent-children")
+	neighbors = t2.LinkedTurtles(parentChildren)
 	if neighbors.Count() != 1 {
 		t.Errorf("Expected 1 neighbor, got %d", neighbors.Count())
 	}
@@ -1242,10 +1270,13 @@ func TestTurtleLinkNeighbors(t *testing.T) {
 // but unlike LinkNeighbor, this function only checks for outgoing links
 func TestTurtleOutLinkNeighbor(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1263,62 +1294,57 @@ func TestTurtleOutLinkNeighbor(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
-	t1.CreateLinkToTurtle("parent-children", t2, nil)
-	t1.CreateLinkToTurtle("parent-children", t3, nil)
+	t1.CreateLinkToTurtle(parentChildren, t2, nil)
+	t1.CreateLinkToTurtle(parentChildren, t3, nil)
 
 	// breeded undirected link to t1
-	t1.CreateLinkWithTurtle("coworkers", t4, nil)
-	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+	t1.CreateLinkWithTurtle(coworkers, t4, nil)
+	t1.CreateLinkWithTurtle(coworkers, t5, nil)
 
 	// directed link to t1
-	t1.CreateLinkToTurtle("", t6, nil)
-	t1.CreateLinkToTurtle("", t7, nil)
+	t1.CreateLinkToTurtle(nil, t6, nil)
+	t1.CreateLinkToTurtle(nil, t7, nil)
 
 	// undirected link to t1
-	t1.CreateLinkWithTurtle("", t8, nil)
-	t1.CreateLinkWithTurtle("", t9, nil)
+	t1.CreateLinkWithTurtle(nil, t8, nil)
+	t1.CreateLinkWithTurtle(nil, t9, nil)
 
-	v := t1.LinkFromTurtleExists("", t2)
+	v := t1.LinkFromTurtleExists(nil, t2)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkFromTurtleExists("parent-children", t3)
+	v = t1.LinkFromTurtleExists(parentChildren, t3)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkFromTurtleExists("", t4)
+	v = t1.LinkFromTurtleExists(nil, t4)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkFromTurtleExists("parent-childres", t5)
+	v = t1.LinkFromTurtleExists(nil, t6)
+	if !v {
+		t.Errorf("Expected turtle to be a neighbor")
+	}
+
+	v = t1.LinkFromTurtleExists(parentChildren, t7)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.LinkFromTurtleExists("", t6)
+	v = t1.LinkFromTurtleExists(nil, t8)
 	if !v {
 		t.Errorf("Expected turtle to be a neighbor")
 	}
 
-	v = t1.LinkFromTurtleExists("parent-children", t7)
+	v = t1.LinkFromTurtleExists(coworkers, t9)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor for that breed")
 	}
 
-	v = t1.LinkFromTurtleExists("", t8)
-	if !v {
-		t.Errorf("Expected turtle to be a neighbor")
-	}
-
-	v = t1.LinkFromTurtleExists("coworkers", t9)
-	if v {
-		t.Errorf("Expected turtle to not be a neighbor for that breed")
-	}
-
-	v = t2.LinkFromTurtleExists("parent-children", t1)
+	v = t2.LinkFromTurtleExists(parentChildren, t1)
 	if v {
 		t.Errorf("Expected turtle to not be a neighbor since it is a directed link")
 	}
@@ -1328,10 +1354,13 @@ func TestTurtleOutLinkNeighbor(t *testing.T) {
 // like LinkNeighbors, but only checks for outgoing links
 func TestTurtleOutLinkNeighbors(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1349,37 +1378,37 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	/// breeded directed link to t1
-	t1.CreateLinkToTurtle("parent-children", t2, nil)
-	t1.CreateLinkToTurtle("parent-children", t3, nil)
+	t1.CreateLinkToTurtle(parentChildren, t2, nil)
+	t1.CreateLinkToTurtle(parentChildren, t3, nil)
 
 	// breeded undirected link to t1
-	t1.CreateLinkWithTurtle("coworkers", t4, nil)
-	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+	t1.CreateLinkWithTurtle(coworkers, t4, nil)
+	t1.CreateLinkWithTurtle(coworkers, t5, nil)
 
 	// directed link to t1
-	t1.CreateLinkToTurtle("", t6, nil)
-	t1.CreateLinkToTurtle("", t7, nil)
+	t1.CreateLinkToTurtle(nil, t6, nil)
+	t1.CreateLinkToTurtle(nil, t7, nil)
 
 	// undirected link to t1
-	t1.CreateLinkWithTurtle("", t8, nil)
-	t1.CreateLinkWithTurtle("", t9, nil)
+	t1.CreateLinkWithTurtle(nil, t8, nil)
+	t1.CreateLinkWithTurtle(nil, t9, nil)
 
-	neighbors := t1.LinkedTurtlesFromThis("")
+	neighbors := t1.LinkedTurtlesFromThis(nil)
 	if neighbors.Count() != 8 {
 		t.Errorf("Expected 4 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkedTurtlesFromThis("parent-children")
+	neighbors = t1.LinkedTurtlesFromThis(parentChildren)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t1.LinkedTurtlesFromThis("coworkers")
+	neighbors = t1.LinkedTurtlesFromThis(coworkers)
 	if neighbors.Count() != 2 {
 		t.Errorf("Expected 2 neighbors, got %d", neighbors.Count())
 	}
 
-	neighbors = t2.LinkedTurtlesFromThis("parent-children")
+	neighbors = t2.LinkedTurtlesFromThis(parentChildren)
 	if neighbors.Count() != 0 {
 		t.Errorf("Expected 0 neighbors, got %d", neighbors.Count())
 	}
@@ -1387,10 +1416,13 @@ func TestTurtleOutLinkNeighbors(t *testing.T) {
 
 func TestTurtleMyLinks(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a basic model with breeds for undirected and directed links
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -1408,39 +1440,39 @@ func TestTurtleMyLinks(t *testing.T) {
 	t9 := m.Turtle(8)
 
 	// directed unbreeded link from t1 to t2
-	t1.CreateLinkToTurtle("", t2, nil)
+	t1.CreateLinkToTurtle(nil, t2, nil)
 
 	// directed breeded link from t1 to t3
-	t1.CreateLinkToTurtle("parent-children", t3, nil)
+	t1.CreateLinkToTurtle(parentChildren, t3, nil)
 
 	// undirected unbreeded link from t1 to t4
-	t1.CreateLinkWithTurtle("", t4, nil)
+	t1.CreateLinkWithTurtle(nil, t4, nil)
 
 	// undirected breeded link from t1 to t5
-	t1.CreateLinkWithTurtle("coworkers", t5, nil)
+	t1.CreateLinkWithTurtle(coworkers, t5, nil)
 
 	// directed unbreeded link from t6 to t1
-	t1.CreateLinkFromTurtle("", t6, nil)
+	t1.CreateLinkFromTurtle(nil, t6, nil)
 
 	// directed breeded link from t7 to t1
-	t1.CreateLinkFromTurtle("parent-children", t7, nil)
+	t1.CreateLinkFromTurtle(parentChildren, t7, nil)
 
 	// undirected unbreeded link from t8 to t1
-	t1.CreateLinkWithTurtle("", t8, nil)
+	t1.CreateLinkWithTurtle(nil, t8, nil)
 
 	// undirected breeded link from t9 to t1
-	t1.CreateLinkWithTurtle("coworkers", t9, nil)
+	t1.CreateLinkWithTurtle(coworkers, t9, nil)
 
-	l1 := t1.LinkTo("", t2)
-	l2 := t1.LinkTo("parent-children", t3)
-	l3 := t1.LinkWith("", t4)
-	l4 := t1.LinkWith("coworkers", t5)
-	l5 := t1.LinkFrom("", t6)
-	l6 := t1.LinkFrom("parent-children", t7)
-	l7 := t1.LinkWith("", t8)
-	l8 := t1.LinkWith("coworkers", t9)
+	l1 := t1.LinkTo(nil, t2)
+	l2 := t1.LinkTo(parentChildren, t3)
+	l3 := t1.LinkWith(nil, t4)
+	l4 := t1.LinkWith(coworkers, t5)
+	l5 := t1.LinkFrom(nil, t6)
+	l6 := t1.LinkFrom(parentChildren, t7)
+	l7 := t1.LinkWith(nil, t8)
+	l8 := t1.LinkWith(coworkers, t9)
 
-	links := t1.Links("")
+	links := t1.Links(nil)
 	if links.Count() != 8 {
 		t.Errorf("Expected 8 links, got %d", links.Count())
 	}
@@ -1448,7 +1480,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.Links("parent-children")
+	links = t1.Links(parentChildren)
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1456,7 +1488,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l2 and l6")
 	}
 
-	links = t1.Links("coworkers")
+	links = t1.Links(coworkers)
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1464,7 +1496,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l4 and l8")
 	}
 
-	links = t1.InLinks("")
+	links = t1.InLinks(nil)
 	if links.Count() != 6 {
 		t.Errorf("Expected 6 links, got %d", links.Count())
 	}
@@ -1472,7 +1504,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.InLinks("parent-children")
+	links = t1.InLinks(parentChildren)
 	if links.Count() != 1 {
 		t.Errorf("Expected 1 link, got %d", links.Count())
 	}
@@ -1480,7 +1512,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l6")
 	}
 
-	links = t1.InLinks("coworkers")
+	links = t1.InLinks(coworkers)
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1488,7 +1520,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l4 and l8")
 	}
 
-	links = t1.OutLinks("")
+	links = t1.OutLinks(nil)
 	if links.Count() != 6 {
 		t.Errorf("Expected 6 links, got %d", links.Count())
 	}
@@ -1496,7 +1528,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain all links")
 	}
 
-	links = t1.OutLinks("parent-children")
+	links = t1.OutLinks(parentChildren)
 	if links.Count() != 1 {
 		t.Errorf("Expected 1 link, got %d", links.Count())
 	}
@@ -1504,7 +1536,7 @@ func TestTurtleMyLinks(t *testing.T) {
 		t.Errorf("Expected links to contain l2")
 	}
 
-	links = t1.OutLinks("coworkers")
+	links = t1.OutLinks(coworkers)
 	if links.Count() != 2 {
 		t.Errorf("Expected 2 links, got %d", links.Count())
 	}
@@ -1724,21 +1756,21 @@ func TestTurtlesLinksDying(t *testing.T) {
 	t5 := m.Turtle(4)
 	t6 := m.Turtle(5)
 
-	t1.CreateLinkWithTurtle("", t2, nil)
+	t1.CreateLinkWithTurtle(nil, t2, nil)
 	t1.Die()
-	if t2.LinkedTurtles("").Count() != 0 {
+	if t2.LinkedTurtles(nil).Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 
-	t3.CreateLinkToTurtle("", t4, nil)
+	t3.CreateLinkToTurtle(nil, t4, nil)
 	t3.Die()
-	if t4.LinkedTurtles("").Count() != 0 {
+	if t4.LinkedTurtles(nil).Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 
-	t5.CreateLinkFromTurtle("", t6, nil)
+	t5.CreateLinkFromTurtle(nil, t6, nil)
 	t5.Die()
-	if t6.LinkedTurtles("").Count() != 0 {
+	if t6.LinkedTurtles(nil).Count() != 0 {
 		t.Errorf("Expected turtle to have no neighbors")
 	}
 

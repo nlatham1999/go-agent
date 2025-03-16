@@ -13,7 +13,7 @@ type Link struct {
 	end2       *Turtle     // the two ends of the link
 	Hidden     bool        // whether the link is hidden or not
 	directed   bool        // whether the link is directed or not
-	breed      string      // Breed of the link
+	breed      *LinkBreed  // Breed of the link
 	Shape      string      // Shape of the link
 	Thickness  float64     // Thickness of the link
 	TieMode    TieMode     // Tie mode of the link
@@ -24,18 +24,7 @@ type Link struct {
 }
 
 // newLink creates a new link between two turtles
-func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
-
-	// make sure the breed exists
-	if directed {
-		if _, ok := model.directedLinkBreeds[breed]; !ok {
-			return nil, fmt.Errorf("directed link breed %s does not exist", breed)
-		}
-	} else {
-		if _, ok := model.undirectedLinkBreeds[breed]; !ok {
-			return nil, fmt.Errorf("undirected link breed %s does not exist", breed)
-		}
-	}
+func newLink(model *Model, breed *LinkBreed, end1 *Turtle, end2 *Turtle, directed bool) (*Link, error) {
 
 	// make sure the link doesn't already exist
 	if directed && model.linkedTurtles[end1].existsOutgoing(breed, end2) {
@@ -60,10 +49,10 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 	model.links.Add(l)
 
 	if directed {
-		model.directedLinkBreeds[breed].links.Add(l)
+		model.directedLinkBreeds[breed.name].links.Add(l)
 		model.directedLinkBreeds[BreedNone].links.Add(l)
 	} else {
-		model.undirectedLinkBreeds[breed].links.Add(l)
+		model.undirectedLinkBreeds[breed.name].links.Add(l)
 		model.undirectedLinkBreeds[BreedNone].links.Add(l)
 	}
 
@@ -81,7 +70,7 @@ func newLink(model *Model, breed string, end1 *Turtle, end2 *Turtle, directed bo
 
 // Returns the name of the breed of the link
 func (l *Link) BreedName() string {
-	return l.breed
+	return l.breed.name
 }
 
 // returns an agentset of the turtles at the ends of the link
@@ -108,50 +97,55 @@ func (l *Link) End2() *Turtle {
 }
 
 // sets the link to be a breed
-func (l *Link) SetBreed(name string) {
+func (l *Link) SetBreed(breed *LinkBreed) {
 
-	oldBreedName := l.breed
+	if l.breed == breed {
+		return
+	}
+
+	oldBreed := l.breed
 
 	// make sure the breed exists
+	// we can only change to a breed that is the same directedness
 	if l.directed {
-		if _, ok := l.parent.directedLinkBreeds[name]; !ok {
+		if _, ok := l.parent.directedLinkBreeds[breed.name]; !ok {
 			return
 		}
 	} else {
-		if _, ok := l.parent.undirectedLinkBreeds[name]; !ok {
+		if _, ok := l.parent.undirectedLinkBreeds[breed.name]; !ok {
 			return
 		}
 	}
 
 	// remove the link from the old breed if it exists
-	if l.breed != "" {
-		var breed *linkBreed
+	if l.breed.name != "" {
+		var breed *LinkBreed
 		if l.directed {
-			breed = l.parent.directedLinkBreeds[l.breed]
+			breed = l.parent.directedLinkBreeds[l.breed.name]
 		} else {
-			breed = l.parent.undirectedLinkBreeds[l.breed]
+			breed = l.parent.undirectedLinkBreeds[l.breed.name]
 		}
 
 		breed.links.links.Remove(l)
 	}
 
-	l.breed = name
+	l.breed = breed
 
-	if l.breed != "" {
+	if l.breed.name != BreedNone {
 		if l.directed {
-			l.parent.directedLinkBreeds[name].links.Add(l)
+			l.parent.directedLinkBreeds[l.breed.name].links.Add(l)
 		} else {
-			l.parent.undirectedLinkBreeds[name].links.Add(l)
+			l.parent.undirectedLinkBreeds[l.breed.name].links.Add(l)
 		}
 	}
 
 	//change the breed on the turtles
 	if l.directed {
-		l.parent.linkedTurtles[l.end1].changeDirectedOutBreed(oldBreedName, name, l.end2, l)
-		l.parent.linkedTurtles[l.end2].changeDirectedInBreed(oldBreedName, name, l.end1, l)
+		l.parent.linkedTurtles[l.end1].changeDirectedOutBreed(oldBreed, breed, l.end2, l)
+		l.parent.linkedTurtles[l.end2].changeDirectedInBreed(oldBreed, breed, l.end1, l)
 	} else {
-		l.parent.linkedTurtles[l.end1].changeUndirectedBreed(oldBreedName, name, l.end2, l)
-		l.parent.linkedTurtles[l.end2].changeUndirectedBreed(oldBreedName, name, l.end1, l)
+		l.parent.linkedTurtles[l.end1].changeUndirectedBreed(oldBreed, breed, l.end2, l)
+		l.parent.linkedTurtles[l.end2].changeUndirectedBreed(oldBreed, breed, l.end1, l)
 	}
 }
 

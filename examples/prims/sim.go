@@ -11,6 +11,11 @@ import (
 type Prims struct {
 	model *model.Model
 
+	placedTurtleBreed   *model.TurtleBreed
+	unplacedTurtleBreed *model.TurtleBreed
+	placedLinkBreed     *model.LinkBreed
+	unplacedLinkBreed   *model.LinkBreed
+
 	nodes int
 }
 
@@ -20,12 +25,15 @@ func NewPrims() *Prims {
 
 func (p *Prims) Init() {
 
-	placed := model.NewTurtleBreed("placed", "", nil)
-	unplaced := model.NewTurtleBreed("unplaced", "", nil)
+	p.placedTurtleBreed = model.NewTurtleBreed("placed", "", nil)
+	p.unplacedTurtleBreed = model.NewTurtleBreed("unplaced", "", nil)
+
+	p.placedLinkBreed = model.NewLinkBreed("unplaced")
+	p.unplacedLinkBreed = model.NewLinkBreed("placed")
 
 	modelSettings := model.ModelSettings{
-		TurtleBreeds:         []*model.TurtleBreed{placed, unplaced},
-		UndirectedLinkBreeds: []string{"unplaced", "placed"},
+		TurtleBreeds:         []*model.TurtleBreed{p.placedTurtleBreed, p.unplacedTurtleBreed},
+		UndirectedLinkBreeds: []*model.LinkBreed{p.placedLinkBreed, p.unplacedLinkBreed},
 		MinPxCor:             0,
 		MinPyCor:             0,
 		MaxPxCor:             100,
@@ -51,7 +59,7 @@ func (p *Prims) SetUp() error {
 		p.createInitialLinks,
 	)
 
-	p.model.UndirectedLinks("unplaced").SortAsc(func(l *model.Link) float64 {
+	p.unplacedLinkBreed.Links().SortAsc(func(l *model.Link) float64 {
 		return l.Length()
 	})
 
@@ -77,7 +85,7 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 	unplaced.Turtles().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 && t.DistanceTurtle(t2) < 10 {
-				t.CreateLinkWithTurtle("unplaced", t2,
+				t.CreateLinkWithTurtle(p.unplacedLinkBreed, t2,
 					func(l *model.Link) {
 						l.Color.SetColor(model.Gray)
 						l.Hide()
@@ -94,7 +102,7 @@ func (p *Prims) Go() {
 	// find the closest link to the cluster
 	var closestLink *model.Link
 	var closestTurtle *model.Turtle
-	links := p.model.UndirectedLinks("unplaced")
+	links := p.unplacedLinkBreed.Links()
 	done := false
 	links.Ask(func(l *model.Link) {
 		if done {
@@ -126,7 +134,7 @@ func (p *Prims) Go() {
 	placed := p.model.TurtleBreed("placed")
 
 	//add the link and turtle to the cluster
-	closestLink.SetBreed("placed")
+	closestLink.SetBreed(p.placedLinkBreed)
 	closestLink.Color.SetColor(model.Red)
 	closestLink.Hide()
 	closestTurtle.SetBreed(placed)
@@ -134,7 +142,7 @@ func (p *Prims) Go() {
 
 	// if all nodes are placed, kill all unplaced links
 	if placed.Turtles().Count() == p.nodes {
-		p.model.UndirectedLinks("unplaced").Ask(
+		p.unplacedLinkBreed.Links().Ask(
 			func(l *model.Link) {
 				l.Die()
 			},
@@ -159,12 +167,12 @@ func (p *Prims) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"Placed nodes":    placed.Turtles().Count(),
 		"Unplaced nodes":  unplaced.Turtles().Count(),
-		"potential links": p.model.UndirectedLinks("unplaced").Count(),
+		"potential links": p.unplacedLinkBreed.Links().Count(),
 	}
 }
 
 func (p *Prims) Stop() bool {
-	return p.model.UndirectedLinks("placed").Count() >= p.nodes-2
+	return p.placedLinkBreed.Links().Count() >= p.nodes-2
 }
 
 func (p *Prims) Widgets() []api.Widget {

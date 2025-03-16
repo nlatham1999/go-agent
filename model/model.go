@@ -19,8 +19,8 @@ type Model struct {
 	turtles              *TurtleAgentSet         //all the turtles
 	links                *LinkAgentSet           //all the links
 	breeds               map[string]*TurtleBreed //turtles split into breeds
-	directedLinkBreeds   map[string]*linkBreed   //directed link breeds
-	undirectedLinkBreeds map[string]*linkBreed   //undirected link breeds
+	directedLinkBreeds   map[string]*LinkBreed   //directed link breeds
+	undirectedLinkBreeds map[string]*LinkBreed   //undirected link breeds
 
 	posOfPatches map[int]*Patch  //map of patches by their index
 	whoToTurtles map[int]*Turtle //map of turtles by their who number
@@ -116,30 +116,22 @@ func NewModel(
 	model.breeds = turtleBreedsMap
 
 	//construct directed link breeds
-	directedLinkBreedsMap := make(map[string]*linkBreed)
-	settings.DirectedLinkBreeds = append(settings.DirectedLinkBreeds, "") // add the general population
-	for i := 0; i < len(settings.DirectedLinkBreeds); i++ {
-		directedLinkBreedsMap[settings.DirectedLinkBreeds[i]] = &linkBreed{
-			links:        NewLinkAgentSet([]*Link{}),
-			Directed:     true,
-			DefaultShape: "",
-			name:         settings.DirectedLinkBreeds[i],
-		}
+	model.directedLinkBreeds = make(map[string]*LinkBreed)
+	settings.DirectedLinkBreeds = append(settings.DirectedLinkBreeds, NewLinkBreed("")) // add the general population
+	for _, directedLink := range settings.DirectedLinkBreeds {
+		model.directedLinkBreeds[directedLink.name] = directedLink
+		directedLink.model = model
+		directedLink.directed = true
 	}
-	model.directedLinkBreeds = directedLinkBreedsMap
 
 	//construct undirected link breeds
-	undirectedLinkBreedsMap := make(map[string]*linkBreed)
-	settings.UndirectedLinkBreeds = append(settings.UndirectedLinkBreeds, "") // add the general population
-	for i := 0; i < len(settings.UndirectedLinkBreeds); i++ {
-		undirectedLinkBreedsMap[settings.UndirectedLinkBreeds[i]] = &linkBreed{
-			links:        NewLinkAgentSet([]*Link{}),
-			Directed:     false,
-			DefaultShape: "",
-			name:         settings.UndirectedLinkBreeds[i],
-		}
+	model.undirectedLinkBreeds = make(map[string]*LinkBreed)
+	settings.UndirectedLinkBreeds = append(settings.UndirectedLinkBreeds, NewLinkBreed("")) // add the general population
+	for _, undirectedLink := range settings.UndirectedLinkBreeds {
+		model.undirectedLinkBreeds[undirectedLink.name] = undirectedLink
+		undirectedLink.model = model
+		undirectedLink.directed = false
 	}
-	model.undirectedLinkBreeds = undirectedLinkBreedsMap
 
 	//construct general turtle set
 	model.turtles = NewTurtleAgentSet([]*Turtle{})
@@ -405,11 +397,11 @@ func (m *Model) KillLink(link *Link) {
 
 	m.links.links.Remove(link)
 
-	if link.breed != "" {
+	if link.breed.name != BreedNone {
 		if link.directed {
-			m.directedLinkBreeds[link.breed].links.links.Remove(link)
+			m.directedLinkBreeds[link.breed.name].links.links.Remove(link)
 		} else {
-			m.undirectedLinkBreeds[link.breed].links.links.Remove(link)
+			m.undirectedLinkBreeds[link.breed.name].links.links.Remove(link)
 		}
 	}
 
@@ -497,22 +489,16 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
-// returns the linkset containing the directed links for the specified breed
-// if the breed is empty then it will return the general population of directed links
-func (m *Model) DirectedLinks(breed string) *LinkAgentSet {
-	if breed, ok := m.directedLinkBreeds[breed]; ok {
-		return breed.links
-	}
-	return nil
+// returns the linkset containing the directed links
+// to get the links for a breed call <linkBreed>.Links()
+func (m *Model) DirectedLinks() *LinkAgentSet {
+	return m.directedLinkBreeds[BreedNone].links
 }
 
-// returns the linkset containing the undirected links for the specified breed
-// if the breed is empty then it will return the general population of undirected links
-func (m *Model) UndirectedLinks(breed string) *LinkAgentSet {
-	if breed, ok := m.undirectedLinkBreeds[breed]; ok {
-		return breed.links
-	}
-	return nil
+// returns the linkset containing the undirected links
+// to get the links for a breed call <linkBreed>.Links()
+func (m *Model) UndirectedLinks() *LinkAgentSet {
+	return m.directedLinkBreeds[BreedNone].links
 }
 
 // returns the link agentset containing all the links
@@ -561,8 +547,14 @@ func (m *Model) LayoutCircle(turtles []*Turtle, radius float64) {
 }
 
 // returns a link between two turtles that connects from turtle1 to turtle2
-// if the breed is empty then selects from the general population
-func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link {
+func (m *Model) Link(turtle1 int, turtle2 int) *Link {
+
+	generalBreed := m.directedLinkBreeds[BreedNone]
+
+	return m.linkBreeded(generalBreed, turtle1, turtle2)
+}
+
+func (m *Model) linkBreeded(breed *LinkBreed, turtle1 int, turtle2 int) *Link {
 	t1 := m.whoToTurtles[turtle1]
 	t2 := m.whoToTurtles[turtle2]
 
@@ -574,8 +566,14 @@ func (m *Model) Link(breed string, turtle1 int, turtle2 int) *Link {
 }
 
 // returns a link that is directed that connects from turtle1 to turtle2
-// if the breed is empty then selects from the general population
-func (m *Model) LinkDirected(breed string, turtle1 int, turtle2 int) *Link {
+func (m *Model) LinkDirected(turtle1 int, turtle2 int) *Link {
+
+	generalBreed := m.directedLinkBreeds[BreedNone]
+
+	return m.linkDirectedBreed(generalBreed, turtle1, turtle2)
+}
+
+func (m *Model) linkDirectedBreed(breed *LinkBreed, turtle1 int, turtle2 int) *Link {
 	t1 := m.whoToTurtles[turtle1]
 	t2 := m.whoToTurtles[turtle2]
 
@@ -1004,11 +1002,6 @@ func (m *Model) SetDefaultShapeLinks(shape string) {
 // sets the default shape for turtles
 func (m *Model) SetDefaultShapeTurtles(shape string) {
 	m.DefaultShapeTurtles = shape
-}
-
-// sets the default shape for a directed link breed
-func (m *Model) SetDefaultShapeLinkBreed(breed string, shape string) {
-	m.directedLinkBreeds[breed].DefaultShape = shape
 }
 
 // increments the tick counter by one

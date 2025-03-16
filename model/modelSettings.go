@@ -5,8 +5,8 @@ type ModelSettings struct {
 	PatchProperties      map[string]interface{}
 	TurtleProperties     map[string]interface{}
 	TurtleBreeds         []*TurtleBreed
-	DirectedLinkBreeds   []string
-	UndirectedLinkBreeds []string
+	DirectedLinkBreeds   []*LinkBreed
+	UndirectedLinkBreeds []*LinkBreed
 	WrappingX            bool
 	WrappingY            bool
 	MinPxCor             int

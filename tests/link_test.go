@@ -9,10 +9,13 @@ import (
 
 func TestLinkCreation(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -22,19 +25,8 @@ func TestLinkCreation(t *testing.T) {
 	t1 := m.Turtle(0)
 	t2 := m.Turtle(1)
 
-	// create a new link that will fail
-
-	l, err := t1.CreateLinkToTurtle("parent-children3", t2, nil)
-	if err == nil {
-		t.Errorf("Error should not be nil")
-	}
-
-	if l != nil {
-		t.Errorf("Link should not have been created")
-	}
-
 	// create a new link that will pass
-	l, err = t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -49,22 +41,25 @@ func TestLinkCreation(t *testing.T) {
 	}
 
 	// make sure it exist in the general directed link list
-	if !m.DirectedLinks("").Contains(l) {
+	if !m.DirectedLinks().Contains(l) {
 		t.Errorf("Link should have been added to the general directed link list")
 	}
 
 	// make sure it exist in the directed link list for the breed
-	if !m.DirectedLinks("parent-children").Contains(l) {
+	if !parentChildren.Links().Contains(l) {
 		t.Errorf("Link should have been added to the directed link list for the breed")
 	}
 }
 
 func TestLinkBreedName(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -75,7 +70,7 @@ func TestLinkBreedName(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -87,10 +82,13 @@ func TestLinkBreedName(t *testing.T) {
 
 func TestLinkBreed(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -101,7 +99,7 @@ func TestLinkBreed(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -113,10 +111,14 @@ func TestLinkBreed(t *testing.T) {
 
 func TestLinkSetBreed(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	personPet := model.NewLinkBreed("person-pet")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren, personPet},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -127,20 +129,20 @@ func TestLinkSetBreed(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// set the breed to coworkers
-	l.SetBreed("coworkers")
+	l.SetBreed(coworkers)
 
 	// breed should not be changed since it is not a valid breed for direced links
 	if l.BreedName() != "parent-children" {
 		t.Errorf("Breed name should be parent-children")
 	}
 
-	l.SetBreed("person-pet")
+	l.SetBreed(personPet)
 
 	// breed should be changed since it is a valid breed for directed links
 	if l.BreedName() != "person-pet" {
@@ -148,22 +150,25 @@ func TestLinkSetBreed(t *testing.T) {
 	}
 
 	// make sure it no longer exists for parent-children
-	if m.DirectedLinks("parent-children").Contains(l) {
+	if parentChildren.Links().Contains(l) {
 		t.Errorf("Link should have been removed from parent-children")
 	}
 
 	// make sure it exists for person-pet
-	if !m.DirectedLinks("person-pet").Contains(l) {
+	if !personPet.Links().Contains(l) {
 		t.Errorf("Link should have been added to person-pet")
 	}
 }
 
 func TestLinkBothEnds(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -174,7 +179,7 @@ func TestLinkBothEnds(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -194,10 +199,13 @@ func TestLinkBothEnds(t *testing.T) {
 
 func TestLinkHeading(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -208,7 +216,7 @@ func TestLinkHeading(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -253,10 +261,13 @@ func TestLinkHeading(t *testing.T) {
 
 func TestLinkOtherEnd(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -267,7 +278,7 @@ func TestLinkOtherEnd(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -283,10 +294,14 @@ func TestLinkOtherEnd(t *testing.T) {
 
 func TestRotatingTiedTurtles(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	personPet := model.NewLinkBreed("person-pet")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren, personPet},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -311,19 +326,19 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t3.SetXY(5, 1)
 
 	// create a new link
-	l1, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l1, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 	l1.TieMode = model.TieModeAllTied
 
-	l2, err := t2.CreateLinkToTurtle("parent-children", t3, nil)
+	l2, err := t2.CreateLinkToTurtle(parentChildren, t3, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 	l2.TieMode = model.TieModeAllTied
 
-	l3, err := t3.CreateLinkToTurtle("parent-children", t1, nil)
+	l3, err := t3.CreateLinkToTurtle(parentChildren, t1, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -396,7 +411,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t5 := m.Turtle(4)
 	t4.SetXY(0, 0)
 	t5.SetXY(14, 14)
-	l4, err := t4.CreateLinkToTurtle("parent-children", t5, nil)
+	l4, err := t4.CreateLinkToTurtle(parentChildren, t5, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -431,7 +446,7 @@ func TestRotatingTiedTurtles(t *testing.T) {
 	t6.SetXY(0, 0)
 	t7.SetXY(-14, 14)
 
-	l5, err := t6.CreateLinkToTurtle("parent-children", t7, nil)
+	l5, err := t6.CreateLinkToTurtle(parentChildren, t7, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -448,10 +463,14 @@ func TestRotatingTiedTurtles(t *testing.T) {
 // test that when a turtle is tied to another turtle, it moves with it, when the turtle moves forward, back or setxy
 func TestMovingTiedTurtles(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	personPet := model.NewLinkBreed("person-pet")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren, personPet},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -469,7 +488,7 @@ func TestMovingTiedTurtles(t *testing.T) {
 	t2.SetXY(3, 4)
 
 	// create a new link
-	l, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	l, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
@@ -516,10 +535,14 @@ func TestMovingTiedTurtles(t *testing.T) {
 // make sure that when a links is created that is a duplicate, that it returns an error
 func TestLinkCreationNoDuplicates(t *testing.T) {
 
+	parentChildren := model.NewLinkBreed("parent-children")
+	personPet := model.NewLinkBreed("person-pet")
+	coworkers := model.NewLinkBreed("coworkers")
+
 	// create a new model
 	settings := model.ModelSettings{
-		DirectedLinkBreeds:   []string{"parent-children", "person-pet"},
-		UndirectedLinkBreeds: []string{"coworkers"},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildren, personPet},
+		UndirectedLinkBreeds: []*model.LinkBreed{coworkers},
 	}
 	m := model.NewModel(settings)
 
@@ -530,25 +553,25 @@ func TestLinkCreationNoDuplicates(t *testing.T) {
 	t2 := m.Turtle(1)
 
 	// create a new link
-	_, err := t1.CreateLinkToTurtle("parent-children", t2, nil)
+	_, err := t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create a new link
-	_, err = t1.CreateLinkToTurtle("parent-children", t2, nil)
+	_, err = t1.CreateLinkToTurtle(parentChildren, t2, nil)
 	if err == nil {
 		t.Errorf("Error should not be nil")
 	}
 
 	// do the same for undirected links
-	_, err = t1.CreateLinkWithTurtle("coworkers", t2, nil)
+	_, err = t1.CreateLinkWithTurtle(coworkers, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
 	// create a new link
-	_, err = t1.CreateLinkWithTurtle("coworkers", t2, nil)
+	_, err = t1.CreateLinkWithTurtle(coworkers, t2, nil)
 	if err == nil {
 		t.Errorf("Error should not be nil")
 	}
@@ -557,9 +580,14 @@ func TestLinkCreationNoDuplicates(t *testing.T) {
 func TestLinkBreedSetting(t *testing.T) {
 	//create breeded link betwen turtles switch breed and make sure link under the old breed does not exist any more for either turtle
 
+	a := model.NewLinkBreed("a")
+	b := model.NewLinkBreed("b")
+	c := model.NewLinkBreed("c")
+	d := model.NewLinkBreed("d")
+
 	modelSettings := model.ModelSettings{
-		UndirectedLinkBreeds: []string{"a", "b"},
-		DirectedLinkBreeds:   []string{"c", "d"},
+		UndirectedLinkBreeds: []*model.LinkBreed{a, b},
+		DirectedLinkBreeds:   []*model.LinkBreed{c, d},
 	}
 
 	m := model.NewModel(modelSettings)
@@ -569,84 +597,84 @@ func TestLinkBreedSetting(t *testing.T) {
 	t1 := m.Turtle(0)
 	t2 := m.Turtle(1)
 
-	l, err := t1.CreateLinkWithTurtle("a", t2, nil)
+	l, err := t1.CreateLinkWithTurtle(a, t2, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
-	if t1.Links("a").Count() != 1 {
+	if t1.Links(a).Count() != 1 {
 		t.Errorf("Turtle 1 should have 1 link of breed a")
 	}
 
-	if t2.Links("a").Count() != 1 {
+	if t2.Links(a).Count() != 1 {
 		t.Errorf("Turtle 2 should have 1 link of breed a")
 	}
 
-	l.SetBreed("b")
+	l.SetBreed(b)
 
-	if m.UndirectedLinks("a").Count() != 0 {
+	if a.Links().Count() != 0 {
 		t.Errorf("Link should not exist under breed a")
 	}
 
-	if m.UndirectedLinks("b").Count() != 1 {
+	if b.Links().Count() != 1 {
 		t.Errorf("Link should exist under breed b")
 	}
 
-	if t1.Links("a").Count() != 0 {
+	if t1.Links(a).Count() != 0 {
 		t.Errorf("Turtle 1 should have 0 links of breed a")
 	}
 
-	if t2.Links("a").Count() != 0 {
+	if t2.Links(a).Count() != 0 {
 		t.Errorf("Turtle 2 should have 0 links of breed a")
 	}
 
-	if t1.Links("b").Count() != 1 {
+	if t1.Links(b).Count() != 1 {
 		t.Errorf("Turtle 1 should have 1 link of breed b")
 	}
 
-	if t2.Links("b").Count() != 1 {
+	if t2.Links(b).Count() != 1 {
 		t.Errorf("Turtle 2 should have 1 link of breed b")
 	}
 
 	t3 := m.Turtle(2)
 	t4 := m.Turtle(3)
 
-	l, err = t3.CreateLinkToTurtle("c", t4, nil)
+	l, err = t3.CreateLinkToTurtle(c, t4, nil)
 	if err != nil {
 		t.Errorf("Error should be nil")
 	}
 
-	if t3.OutLinks("c").Count() != 1 {
+	if t3.OutLinks(c).Count() != 1 {
 		t.Errorf("Turtle 3 should have 1 out link of breed c")
 	}
 
-	if t4.InLinks("c").Count() != 1 {
+	if t4.InLinks(c).Count() != 1 {
 		t.Errorf("Turtle 4 should have 1 in link of breed c")
 	}
 
-	l.SetBreed("d")
+	l.SetBreed(d)
 
-	if m.DirectedLinks("c").Count() != 0 {
+	if c.Links().Count() != 0 {
 		t.Errorf("Link should not exist under breed c")
 	}
 
-	if m.DirectedLinks("d").Count() != 1 {
+	if d.Links().Count() != 1 {
 		t.Errorf("Link should exist under breed d")
 	}
 
-	if t3.OutLinks("c").Count() != 0 {
+	if t3.OutLinks(c).Count() != 0 {
 		t.Errorf("Turtle 3 should have 0 out links of breed c")
 	}
 
-	if t4.InLinks("c").Count() != 0 {
+	if t4.InLinks(c).Count() != 0 {
 		t.Errorf("Turtle 4 should have 0 in links of breed c")
 	}
 
-	if t3.OutLinks("d").Count() != 1 {
+	if t3.OutLinks(d).Count() != 1 {
 		t.Errorf("Turtle 3 should have 1 out link of breed d")
 	}
 
-	if t4.InLinks("d").Count() != 1 {
+	if t4.InLinks(d).Count() != 1 {
 		t.Errorf("Turtle 4 should have 1 in link of breed d")
 	}
 }
@@ -654,9 +682,14 @@ func TestLinkBreedSetting(t *testing.T) {
 func TestLinkDying(t *testing.T) {
 	//create a link and kill it, make sure it is removed from the model and the turtles
 
+	a := model.NewLinkBreed("a")
+	b := model.NewLinkBreed("b")
+	c := model.NewLinkBreed("c")
+	d := model.NewLinkBreed("d")
+
 	modelSettings := model.ModelSettings{
-		UndirectedLinkBreeds: []string{"a", "b"},
-		DirectedLinkBreeds:   []string{"c", "d"},
+		UndirectedLinkBreeds: []*model.LinkBreed{a, b},
+		DirectedLinkBreeds:   []*model.LinkBreed{c, d},
 	}
 
 	m := model.NewModel(modelSettings)
@@ -669,26 +702,26 @@ func TestLinkDying(t *testing.T) {
 	t4 := m.Turtle(3)
 	t5 := m.Turtle(4)
 
-	t1.CreateLinkWithTurtle("a", t2, nil)
-	t1.CreateLinkWithTurtle("a", t3, nil)
-	t1.CreateLinkWithTurtle("a", t4, nil)
-	t1.CreateLinkWithTurtle("a", t5, nil)
-	t2.CreateLinkWithTurtle("a", t3, nil)
-	t2.CreateLinkWithTurtle("a", t4, nil)
-	t2.CreateLinkWithTurtle("a", t5, nil)
-	t3.CreateLinkWithTurtle("a", t4, nil)
-	t3.CreateLinkWithTurtle("a", t5, nil)
-	t4.CreateLinkWithTurtle("a", t5, nil)
+	t1.CreateLinkWithTurtle(a, t2, nil)
+	t1.CreateLinkWithTurtle(a, t3, nil)
+	t1.CreateLinkWithTurtle(a, t4, nil)
+	t1.CreateLinkWithTurtle(a, t5, nil)
+	t2.CreateLinkWithTurtle(a, t3, nil)
+	t2.CreateLinkWithTurtle(a, t4, nil)
+	t2.CreateLinkWithTurtle(a, t5, nil)
+	t3.CreateLinkWithTurtle(a, t4, nil)
+	t3.CreateLinkWithTurtle(a, t5, nil)
+	t4.CreateLinkWithTurtle(a, t5, nil)
 
 	if m.Links().Count() != 10 {
 		t.Errorf("Model should have 4 links")
 	}
 
-	if m.UndirectedLinks("a").Count() != 10 {
+	if a.Links().Count() != 10 {
 		t.Errorf("Model should have 4 links of breed a")
 	}
 
-	for i, link := range m.UndirectedLinks("a").List() {
+	for i, link := range a.Links().List() {
 		if i == 0 {
 			link.Die()
 		}

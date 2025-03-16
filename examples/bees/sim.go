@@ -90,7 +90,7 @@ func (b *Bees) SetUp() error {
 	b.model.CreateTurtles(1,
 		func(t *model.Turtle) {
 			t.SetXY(1, 0)
-			t.CreateLinkWithTurtle("", b.model.Turtle(0), nil)
+			t.CreateLinkWithTurtle(nil, b.model.Turtle(0), nil)
 		},
 	)
 
@@ -137,7 +137,7 @@ func (b *Bees) Go() {
 					forager.Color.SetColor(model.Red)
 					forager.SetHeading(b.model.RandomFloat(360))
 					forager.Forward(b.model.RandomFloat(searchRadius))
-					scout.CreateLinkWithTurtle("", forager, nil)
+					scout.CreateLinkWithTurtle(nil, forager, nil)
 					forager.SetLabel(forager.PatchHere().GetPropI("nectar"))
 					forager.SetXY(scout.XCor(), scout.YCor())
 				})
@@ -150,7 +150,7 @@ func (b *Bees) Go() {
 	if b.step%numSteps == 1 {
 		scouts.Turtles().Ask(
 			func(t *model.Turtle) {
-				foragers := t.LinkedTurtles("")
+				foragers := t.LinkedTurtles(nil)
 
 				if foragers.Count() == 0 {
 					return
