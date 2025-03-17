@@ -3,7 +3,7 @@
 # model
 
 ```go
-import "github.com/nlatham1999/go-agent/model"
+import "github.com/nlatham1999/go-agent/pkg/model"
 ```
 
 breeds are groups of turtles

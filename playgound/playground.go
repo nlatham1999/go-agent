@@ -1,11 +1,13 @@
+// playground for quick testing
+
 package playgound
 
 import (
 	"fmt"
 	"math"
 
-	"github.com/nlatham1999/go-agent/api"
-	"github.com/nlatham1999/go-agent/model"
+	"github.com/nlatham1999/go-agent/pkg/api"
+	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
 // Init()        // runs at the very beginning

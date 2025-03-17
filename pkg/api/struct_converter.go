@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/nlatham1999/go-agent/model"
+	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
 func convertModelToApiModel(model *model.Model) *Model {

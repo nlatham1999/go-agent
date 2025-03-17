@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/nlatham1999/go-agent/model"
+	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
 func TestCreateTurtles(t *testing.T) {

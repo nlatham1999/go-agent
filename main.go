@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/nlatham1999/go-agent/api"
 	"github.com/nlatham1999/go-agent/examples/boid"
 	"github.com/nlatham1999/go-agent/examples/gol"
 	"github.com/nlatham1999/go-agent/examples/schelling"
+	"github.com/nlatham1999/go-agent/pkg/api"
 )
 
 func main() {

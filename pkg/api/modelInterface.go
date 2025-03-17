@@ -1,6 +1,6 @@
 package api
 
-import "github.com/nlatham1999/go-agent/model"
+import "github.com/nlatham1999/go-agent/pkg/model"
 
 type ModelInterface interface {
 	Init()        // runs at the very beginning

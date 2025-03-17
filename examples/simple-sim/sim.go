@@ -3,7 +3,7 @@ package simplesim
 import (
 	"fmt"
 
-	"github.com/nlatham1999/go-agent/model"
+	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
 type SimpleSim struct {
