@@ -22,12 +22,12 @@ func TestCreateTurtles(t *testing.T) {
 	}
 
 	// creating turtles with a breed should add them to that breed and the default breed
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 	if environment.Turtles().Count() != 10 {
 		t.Errorf("Expected 10 turtles, got %d", environment.Turtles().Count())
 	}
-	if ants.Turtles().Count() != 5 {
-		t.Errorf("Expected 5 ants, got %d", ants.Turtles().Count())
+	if ants.Agents().Count() != 5 {
+		t.Errorf("Expected 5 ants, got %d", ants.Agents().Count())
 	}
 
 }
@@ -43,7 +43,7 @@ func TestTurtle(t *testing.T) {
 
 	// create 5 general turtle and five ants
 	environment.CreateTurtles(5, nil)
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
 	// get turtle from general pop
 	turtle := environment.Turtle(0)
@@ -52,13 +52,13 @@ func TestTurtle(t *testing.T) {
 	}
 
 	// get turtle from ants pop when it should not exist
-	turtle = ants.Turtle(0)
+	turtle = ants.Agent(0)
 	if turtle != nil {
 		t.Errorf("Expected nil, got turtle")
 	}
 
 	// get turtle from ants pop when it should exist
-	turtle = ants.Turtle(5)
+	turtle = ants.Agent(5)
 	if turtle == nil {
 		t.Errorf("Expected turtle, got nil")
 	}
@@ -86,7 +86,7 @@ func TestClearTurtles(t *testing.T) {
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, nil)
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
 	ref := m.Turtle(0)
 	ref.SetXY(1, 1)
@@ -136,7 +136,7 @@ func TestKillTurtle(t *testing.T) {
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, nil)
 	// m.CreateTurtles(5, "ants", nil)
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
 	ref := m.Turtle(0)
 	ref.SetXY(1, 1)
@@ -146,9 +146,9 @@ func TestKillTurtle(t *testing.T) {
 	}
 
 	t1 := m.Turtle(0)
-	t2 := ants.Turtle(5)
-	t3 := ants.Turtle(6)
-	t4 := ants.Turtle(7)
+	t2 := ants.Agent(5)
+	t3 := ants.Agent(6)
+	t4 := ants.Agent(7)
 
 	_, err := t1.CreateLinkToTurtle(nil, t2, nil)
 	if err != nil {
@@ -202,12 +202,12 @@ func TestModelLink(t *testing.T) {
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, nil)
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
 	t1 := m.Turtle(0)
-	t2 := ants.Turtle(5)
-	t3 := ants.Turtle(6)
-	t4 := ants.Turtle(7)
+	t2 := ants.Agent(5)
+	t3 := ants.Agent(6)
+	t4 := ants.Agent(7)
 
 	// create a directed link
 	l1, err := t1.CreateLinkToTurtle(nil, t2, nil)
@@ -288,12 +288,12 @@ func TestModelLinkDirected(t *testing.T) {
 
 	// create 5 general turtle and five ants
 	m.CreateTurtles(5, nil)
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
 	t1 := m.Turtle(0)
-	t2 := ants.Turtle(5)
-	t3 := ants.Turtle(6)
-	t4 := ants.Turtle(7)
+	t2 := ants.Agent(5)
+	t3 := ants.Agent(6)
+	t4 := ants.Agent(7)
 
 	// create a directed link
 	l1, err := t1.CreateLinkToTurtle(nil, t2, nil)
@@ -717,7 +717,7 @@ func TestModelSize(t *testing.T) {
 
 	sheepGainFromFood := 2
 
-	sheep.CreateTurtles(initialNumberSheep,
+	sheep.CreateAgents(initialNumberSheep,
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -733,7 +733,7 @@ func TestModelSize(t *testing.T) {
 
 	wolfGainFromFood := 2
 
-	wolves.CreateTurtles(initialNumberWolves,
+	wolves.CreateAgents(initialNumberWolves,
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)

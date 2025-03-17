@@ -6,8 +6,6 @@
 import "github.com/nlatham1999/go-agent/pkg/model"
 ```
 
-breeds are groups of turtles
-
 ## Index
 
 - [Variables](<#variables>)
@@ -265,15 +263,15 @@ breeds are groups of turtles
 - [type TurtleBoolOperation](<#TurtleBoolOperation>)
 - [type TurtleBreed](<#TurtleBreed>)
   - [func NewTurtleBreed\(name string, defaultShape string, turtleProperties map\[string\]interface\{\}\) \*TurtleBreed](<#NewTurtleBreed>)
-  - [func \(tb \*TurtleBreed\) CreateTurtles\(amount int, operation TurtleOperation\) \(\*TurtleAgentSet, error\)](<#TurtleBreed.CreateTurtles>)
+  - [func \(tb \*TurtleBreed\) Agent\(who int\) \*Turtle](<#TurtleBreed.Agent>)
+  - [func \(tb \*TurtleBreed\) Agents\(\) \*TurtleAgentSet](<#TurtleBreed.Agents>)
+  - [func \(tb \*TurtleBreed\) AgentsAtCoords\(pxcor float64, pycor float64\) \*TurtleAgentSet](<#TurtleBreed.AgentsAtCoords>)
+  - [func \(tb \*TurtleBreed\) AgentsOnPatch\(patch \*Patch\) \*TurtleAgentSet](<#TurtleBreed.AgentsOnPatch>)
+  - [func \(tb \*TurtleBreed\) AgentsOnPatches\(patches \*PatchAgentSet\) \*TurtleAgentSet](<#TurtleBreed.AgentsOnPatches>)
+  - [func \(tb \*TurtleBreed\) AgentsWithAgent\(turtle \*Turtle\) \*TurtleAgentSet](<#TurtleBreed.AgentsWithAgent>)
+  - [func \(tb \*TurtleBreed\) AgentsWithAgents\(turtles \*TurtleAgentSet\) \*TurtleAgentSet](<#TurtleBreed.AgentsWithAgents>)
+  - [func \(tb \*TurtleBreed\) CreateAgents\(amount int, operation TurtleOperation\) \(\*TurtleAgentSet, error\)](<#TurtleBreed.CreateAgents>)
   - [func \(tb \*TurtleBreed\) SetDefaultShape\(shape string\)](<#TurtleBreed.SetDefaultShape>)
-  - [func \(tb \*TurtleBreed\) Turtle\(who int\) \*Turtle](<#TurtleBreed.Turtle>)
-  - [func \(tb \*TurtleBreed\) Turtles\(\) \*TurtleAgentSet](<#TurtleBreed.Turtles>)
-  - [func \(tb \*TurtleBreed\) TurtlesAtCoords\(pxcor float64, pycor float64\) \*TurtleAgentSet](<#TurtleBreed.TurtlesAtCoords>)
-  - [func \(tb \*TurtleBreed\) TurtlesOnPatch\(patch \*Patch\) \*TurtleAgentSet](<#TurtleBreed.TurtlesOnPatch>)
-  - [func \(tb \*TurtleBreed\) TurtlesOnPatches\(patches \*PatchAgentSet\) \*TurtleAgentSet](<#TurtleBreed.TurtlesOnPatches>)
-  - [func \(tb \*TurtleBreed\) TurtlesWithTurtle\(turtle \*Turtle\) \*TurtleAgentSet](<#TurtleBreed.TurtlesWithTurtle>)
-  - [func \(tb \*TurtleBreed\) TurtlesWithTurtles\(turtles \*TurtleAgentSet\) \*TurtleAgentSet](<#TurtleBreed.TurtlesWithTurtles>)
 - [type TurtleFloatOperation](<#TurtleFloatOperation>)
 - [type TurtleOperation](<#TurtleOperation>)
 
@@ -2707,7 +2705,7 @@ type TurtleBoolOperation func(t *Turtle) bool
 ```
 
 <a name="TurtleBreed"></a>
-## type [TurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L5-L15>)
+## type [TurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L4-L14>)
 
 TurtleBreed holds the agentset of the turtles belonging to the breed with the name, shape, turtles own variables
 
@@ -2718,7 +2716,7 @@ type TurtleBreed struct {
 ```
 
 <a name="NewTurtleBreed"></a>
-### func [NewTurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L19>)
+### func [NewTurtleBreed](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L18>)
 
 ```go
 func NewTurtleBreed(name string, defaultShape string, turtleProperties map[string]interface{}) *TurtleBreed
@@ -2726,86 +2724,86 @@ func NewTurtleBreed(name string, defaultShape string, turtleProperties map[strin
 
 creates a new turtle breed after creating, pass it in the model settings
 
-<a name="TurtleBreed.CreateTurtles"></a>
-### func \(\*TurtleBreed\) [CreateTurtles](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L29>)
+<a name="TurtleBreed.Agent"></a>
+### func \(\*TurtleBreed\) [Agent](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L38>)
 
 ```go
-func (tb *TurtleBreed) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAgentSet, error)
+func (tb *TurtleBreed) Agent(who int) *Turtle
+```
+
+returns a turtle given the who number if it is in the breed
+
+<a name="TurtleBreed.Agents"></a>
+### func \(\*TurtleBreed\) [Agents](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L52>)
+
+```go
+func (tb *TurtleBreed) Agents() *TurtleAgentSet
+```
+
+returns the turtles in the breed
+
+<a name="TurtleBreed.AgentsAtCoords"></a>
+### func \(\*TurtleBreed\) [AgentsAtCoords](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L58>)
+
+```go
+func (tb *TurtleBreed) AgentsAtCoords(pxcor float64, pycor float64) *TurtleAgentSet
+```
+
+returns the turtle agentset that is on patch of the proviced x y coordinates that belong to the breed same as TurtlesOnPatch\(breed, Patch\(x, y\)\)
+
+<a name="TurtleBreed.AgentsOnPatch"></a>
+### func \(\*TurtleBreed\) [AgentsOnPatch](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L63>)
+
+```go
+func (tb *TurtleBreed) AgentsOnPatch(patch *Patch) *TurtleAgentSet
+```
+
+returns the turtle agentset that is on the provided patch
+
+<a name="TurtleBreed.AgentsOnPatches"></a>
+### func \(\*TurtleBreed\) [AgentsOnPatches](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L68>)
+
+```go
+func (tb *TurtleBreed) AgentsOnPatches(patches *PatchAgentSet) *TurtleAgentSet
+```
+
+Returns the turtles on the provided patches
+
+<a name="TurtleBreed.AgentsWithAgent"></a>
+### func \(\*TurtleBreed\) [AgentsWithAgent](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L73>)
+
+```go
+func (tb *TurtleBreed) AgentsWithAgent(turtle *Turtle) *TurtleAgentSet
+```
+
+Returns the turtles on the same patch as the provided turtle
+
+<a name="TurtleBreed.AgentsWithAgents"></a>
+### func \(\*TurtleBreed\) [AgentsWithAgents](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L78>)
+
+```go
+func (tb *TurtleBreed) AgentsWithAgents(turtles *TurtleAgentSet) *TurtleAgentSet
+```
+
+Returns the turtles on the same patch as the provided turtle
+
+<a name="TurtleBreed.CreateAgents"></a>
+### func \(\*TurtleBreed\) [CreateAgents](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L28>)
+
+```go
+func (tb *TurtleBreed) CreateAgents(amount int, operation TurtleOperation) (*TurtleAgentSet, error)
 ```
 
 create the specified amount of turtles with the specified operation
 
 <a name="TurtleBreed.SetDefaultShape"></a>
-### func \(\*TurtleBreed\) [SetDefaultShape](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L34>)
+### func \(\*TurtleBreed\) [SetDefaultShape](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L33>)
 
 ```go
 func (tb *TurtleBreed) SetDefaultShape(shape string)
 ```
 
 sets the default shape for a turtle breed
-
-<a name="TurtleBreed.Turtle"></a>
-### func \(\*TurtleBreed\) [Turtle](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L39>)
-
-```go
-func (tb *TurtleBreed) Turtle(who int) *Turtle
-```
-
-returns a turtle given the who number if it is in the breed
-
-<a name="TurtleBreed.Turtles"></a>
-### func \(\*TurtleBreed\) [Turtles](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L53>)
-
-```go
-func (tb *TurtleBreed) Turtles() *TurtleAgentSet
-```
-
-returns the turtles in the breed
-
-<a name="TurtleBreed.TurtlesAtCoords"></a>
-### func \(\*TurtleBreed\) [TurtlesAtCoords](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L59>)
-
-```go
-func (tb *TurtleBreed) TurtlesAtCoords(pxcor float64, pycor float64) *TurtleAgentSet
-```
-
-returns the turtle agentset that is on patch of the proviced x y coordinates that belong to the breed same as TurtlesOnPatch\(breed, Patch\(x, y\)\)
-
-<a name="TurtleBreed.TurtlesOnPatch"></a>
-### func \(\*TurtleBreed\) [TurtlesOnPatch](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L64>)
-
-```go
-func (tb *TurtleBreed) TurtlesOnPatch(patch *Patch) *TurtleAgentSet
-```
-
-returns the turtle agentset that is on the provided patch
-
-<a name="TurtleBreed.TurtlesOnPatches"></a>
-### func \(\*TurtleBreed\) [TurtlesOnPatches](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L69>)
-
-```go
-func (tb *TurtleBreed) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet
-```
-
-Returns the turtles on the provided patches
-
-<a name="TurtleBreed.TurtlesWithTurtle"></a>
-### func \(\*TurtleBreed\) [TurtlesWithTurtle](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L74>)
-
-```go
-func (tb *TurtleBreed) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet
-```
-
-Returns the turtles on the same patch as the provided turtle
-
-<a name="TurtleBreed.TurtlesWithTurtles"></a>
-### func \(\*TurtleBreed\) [TurtlesWithTurtles](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/turtlebreed.go#L79>)
-
-```go
-func (tb *TurtleBreed) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet
-```
-
-Returns the turtles on the same patch as the provided turtle
 
 <a name="TurtleFloatOperation"></a>
 ## type [TurtleFloatOperation](<https://github.com/nlatham1999/go-agent/blob/main/pkg/model/types.go#L39>)

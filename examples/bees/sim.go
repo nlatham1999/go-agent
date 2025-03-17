@@ -98,7 +98,7 @@ func (b *Bees) SetUp() error {
 	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
 
 	scouts := b.model.TurtleBreed("scouts")
-	scouts.CreateTurtles(b.scouts,
+	scouts.CreateAgents(b.scouts,
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.Color.SetColor(model.Yellow)
@@ -120,7 +120,7 @@ func (b *Bees) Go() {
 	scouts := b.model.TurtleBreed("scouts")
 	foragers := b.model.TurtleBreed("foragers")
 	if b.step%numSteps == 0 {
-		scouts.Turtles().Ask(
+		scouts.Agents().Ask(
 			func(scout *model.Turtle) {
 				searchRadius, _ := scout.GetPropF("radius")
 				if searchRadius < 1 {
@@ -132,7 +132,7 @@ func (b *Bees) Go() {
 				if nectar > 30 {
 					numForagers = 4
 				}
-				foragers.CreateTurtles(numForagers, func(forager *model.Turtle) {
+				foragers.CreateAgents(numForagers, func(forager *model.Turtle) {
 					forager.SetSize(.8)
 					forager.Color.SetColor(model.Red)
 					forager.SetHeading(b.model.RandomFloat(360))
@@ -148,7 +148,7 @@ func (b *Bees) Go() {
 
 	// determine new scout
 	if b.step%numSteps == 1 {
-		scouts.Turtles().Ask(
+		scouts.Agents().Ask(
 			func(t *model.Turtle) {
 				foragers := t.LinkedTurtles(nil)
 
@@ -207,7 +207,7 @@ func (b *Bees) Stats() map[string]interface{} {
 
 	scouts := b.model.TurtleBreed("scouts")
 	stats := map[string]interface{}{}
-	scouts.Turtles().Ask(
+	scouts.Agents().Ask(
 		func(t *model.Turtle) {
 			group := t.GetProperty("group")
 			nectar := t.PatchHere().GetPropI("nectar")
@@ -221,7 +221,7 @@ func (b *Bees) Stats() map[string]interface{} {
 
 func (b *Bees) Stop() bool {
 	scouts := b.model.TurtleBreed("scouts")
-	return scouts.Turtles().All(func(t *model.Turtle) bool {
+	return scouts.Agents().All(func(t *model.Turtle) bool {
 		radius, _ := t.GetPropF("radius")
 		return radius < 1
 	})

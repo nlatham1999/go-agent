@@ -1,4 +1,3 @@
-// breeds are groups of turtles
 package model
 
 // TurtleBreed holds the agentset of the turtles belonging to the breed with the name, shape, turtles own variables
@@ -26,7 +25,7 @@ func NewTurtleBreed(name string, defaultShape string, turtleProperties map[strin
 }
 
 // create the specified amount of turtles with the specified operation
-func (tb *TurtleBreed) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAgentSet, error) {
+func (tb *TurtleBreed) CreateAgents(amount int, operation TurtleOperation) (*TurtleAgentSet, error) {
 	return tb.model.createTurtlesBreeded(amount, tb, operation)
 }
 
@@ -36,7 +35,7 @@ func (tb *TurtleBreed) SetDefaultShape(shape string) {
 }
 
 // returns a turtle given the who number if it is in the breed
-func (tb *TurtleBreed) Turtle(who int) *Turtle {
+func (tb *TurtleBreed) Agent(who int) *Turtle {
 	t := tb.model.whoToTurtles[who]
 	if t == nil {
 		return nil //turtle not found
@@ -50,32 +49,32 @@ func (tb *TurtleBreed) Turtle(who int) *Turtle {
 }
 
 // returns the turtles in the breed
-func (tb *TurtleBreed) Turtles() *TurtleAgentSet {
+func (tb *TurtleBreed) Agents() *TurtleAgentSet {
 	return tb.turtles
 }
 
 // returns the turtle agentset that is on patch of the proviced x y coordinates that belong to the breed
 // same as TurtlesOnPatch(breed, Patch(x, y))
-func (tb *TurtleBreed) TurtlesAtCoords(pxcor float64, pycor float64) *TurtleAgentSet {
+func (tb *TurtleBreed) AgentsAtCoords(pxcor float64, pycor float64) *TurtleAgentSet {
 	return tb.model.turtlesAtCoordsBreeded(tb, pxcor, pycor)
 }
 
 // returns the turtle agentset that is on the provided patch
-func (tb *TurtleBreed) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
+func (tb *TurtleBreed) AgentsOnPatch(patch *Patch) *TurtleAgentSet {
 	return tb.model.turtlesOnPatchBreeded(tb, patch)
 }
 
 // Returns the turtles on the provided patches
-func (tb *TurtleBreed) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
+func (tb *TurtleBreed) AgentsOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
 	return tb.model.turtlesOnPatchesBreeded(tb, patches)
 }
 
 // Returns the turtles on the same patch as the provided turtle
-func (tb *TurtleBreed) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
+func (tb *TurtleBreed) AgentsWithAgent(turtle *Turtle) *TurtleAgentSet {
 	return tb.model.turtlesWithTurtleBreeded(tb, turtle)
 }
 
 // Returns the turtles on the same patch as the provided turtle
-func (tb *TurtleBreed) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
+func (tb *TurtleBreed) AgentsWithAgents(turtles *TurtleAgentSet) *TurtleAgentSet {
 	return tb.model.turtlesWithTurtlesBreeded(tb, turtles)
 }

@@ -34,16 +34,31 @@ func (s *Sim) Model() *model.Model {
 }
 
 func (s *Sim) Init() {
+
+	dogs := model.NewTurtleBreed("dogs", "", map[string]interface{}{
+		"earshape": "round",
+	})
+	cats := model.NewTurtleBreed("cats", "", map[string]interface{}{
+		"earshape": "pointy",
+	})
+
+	parentChildrenLinks := model.NewLinkBreed("parent-children")
+	siblingLinks := model.NewLinkBreed("siblings")
+
 	settings := model.ModelSettings{
-		WrappingX: false,
-		WrappingY: false,
-		MinPxCor:  -10,
-		MaxPxCor:  10,
-		MinPyCor:  -10,
-		MaxPyCor:  10,
+		TurtleBreeds:         []*model.TurtleBreed{dogs, cats},
+		DirectedLinkBreeds:   []*model.LinkBreed{parentChildrenLinks}, //parent chilred are directed
+		UndirectedLinkBreeds: []*model.LinkBreed{siblingLinks},        //siblings are undirected
+		WrappingX:            false,                                   // wrapping x off
+		WrappingY:            false,                                   // wrapping y off
+		MinPxCor:             -10,                                     // min x patch coordinate
+		MaxPxCor:             10,                                      // max x patch coordinate
+		MinPyCor:             -10,                                     // min y patch coordinate
+		MaxPyCor:             10,                                      // max y patch coordinate
+		RandomSeed:           10,                                      // random seed
 	}
 
-	s.model = model.NewModel(settings)
+	s.model = model.NewModel(settings) // create a new model with the settings
 }
 
 func (s *Sim) SetUp() error {

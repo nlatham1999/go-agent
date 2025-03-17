@@ -70,13 +70,13 @@ func (a *AntPath) SetUp() error {
 	a.foodX = float64(a.m.MaxPxCor()) - 10
 	a.foodY = 0
 
-	leaders.CreateTurtles(1,
+	leaders.CreateAgents(1,
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Red)
 		},
 	)
 
-	followers.CreateTurtles(a.numTurtles-1,
+	followers.CreateAgents(a.numTurtles-1,
 		func(t *model.Turtle) {
 			t.Color.SetColor(model.Yellow)
 			t.SetHeading(0)
@@ -116,7 +116,7 @@ func (a *AntPath) Go() {
 	}
 
 	leaders := a.m.TurtleBreed("leaders")
-	leaders.Turtles().Ask(
+	leaders.Agents().Ask(
 		func(t *model.Turtle) {
 			a.wiggle(t, 45)
 			correctPath(t)
@@ -130,7 +130,7 @@ func (a *AntPath) Go() {
 	)
 
 	followers := a.m.TurtleBreed("followers")
-	followers.Turtles().Ask(
+	followers.Agents().Ask(
 		func(t *model.Turtle) {
 			t.FaceTurtle(a.m.Turtle(t.Who() - 1))
 			if a.timeToStart(t) && t.XCor() < a.foodX {

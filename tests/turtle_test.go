@@ -46,9 +46,9 @@ func TestTurtleBreedName(t *testing.T) {
 	_ = model.NewModel(settings)
 
 	//create a turtle
-	ants.CreateTurtles(1, nil)
+	ants.CreateAgents(1, nil)
 
-	turtle := ants.Turtle(0)
+	turtle := ants.Agent(0)
 	//assert that the turtle's breed is "ants"
 	if turtle.BreedName() != "ants" {
 		t.Errorf("Expected turtle to have breed 'ants'")
@@ -66,9 +66,9 @@ func TestTurtleBreed(t *testing.T) {
 	_ = model.NewModel(settings)
 
 	//create a turtle
-	ants.CreateTurtles(1, nil)
+	ants.CreateAgents(1, nil)
 
-	turtle := ants.Turtle(0)
+	turtle := ants.Agent(0)
 
 	if turtle.BreedName() == "" {
 		t.Errorf("Expected turtle to have a breed")
@@ -91,9 +91,9 @@ func TestTurtleSetBreed(t *testing.T) {
 	m := model.NewModel(settings)
 
 	//create a turtle
-	ants.CreateTurtles(5, nil)
+	ants.CreateAgents(5, nil)
 
-	turtle := ants.Turtle(0)
+	turtle := ants.Agent(0)
 
 	turtle.SetBreed(beetles)
 
@@ -101,13 +101,13 @@ func TestTurtleSetBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have breed 'beetles'")
 	}
 
-	turtle = ants.Turtle(0)
+	turtle = ants.Agent(0)
 
 	if turtle != nil {
 		t.Errorf("Expected turtle to not exist in breed 'ants'")
 	}
 
-	turtle = beetles.Turtle(0)
+	turtle = beetles.Agent(0)
 
 	if turtle == nil {
 		t.Errorf("Expected turtle to exist in breed 'beetles'")
@@ -127,7 +127,7 @@ func TestTurtleSetBreed(t *testing.T) {
 		t.Errorf("Expected turtle to have breed 'ants'")
 	}
 
-	turtle = ants.Turtle(5)
+	turtle = ants.Agent(5)
 
 	if turtle == nil {
 		t.Errorf("Expected turtle to exist in breed 'ants'")
@@ -171,9 +171,9 @@ func TestTurtlesOwn(t *testing.T) {
 	_ = model.NewModel(settings)
 
 	// create a turtle
-	ants.CreateTurtles(1, nil)
+	ants.CreateAgents(1, nil)
 
-	turtle = ants.Turtle(0)
+	turtle = ants.Agent(0)
 
 	// get the turtle's own
 	mood = turtle.GetProperty("mood")
@@ -203,9 +203,9 @@ func TestTurtlesOwn(t *testing.T) {
 	_ = model.NewModel(settings)
 
 	// create a turtle
-	beetles.CreateTurtles(1, nil)
+	beetles.CreateAgents(1, nil)
 
-	turtle = beetles.Turtle(0)
+	turtle = beetles.Agent(0)
 
 	//change the breed
 	turtle.SetBreed(ants)
@@ -1557,13 +1557,13 @@ func TestTurtleTurtlesHere(t *testing.T) {
 
 	// create some turtles
 	m.CreateTurtles(2, nil)
-	ants.CreateTurtles(2, nil)
+	ants.CreateAgents(2, nil)
 
 	t1 := m.Turtle(0)
 	t2 := m.Turtle(1)
 
-	t3 := ants.Turtle(2)
-	t4 := ants.Turtle(3)
+	t3 := ants.Agent(2)
+	t4 := ants.Agent(3)
 
 	t1.SetXY(1, 1)
 	t2.SetXY(2, 2)
@@ -1578,7 +1578,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t1")
 	}
 
-	turtles = ants.TurtlesOnPatch(t1.PatchHere())
+	turtles = ants.AgentsOnPatch(t1.PatchHere())
 	// turtles = t1.TurtlesHere("ants")
 	if turtles.Count() != 0 {
 		t.Errorf("Expected 0 turtles, got %d", turtles.Count())
@@ -1592,7 +1592,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t2 and t3")
 	}
 
-	turtles = ants.TurtlesWithTurtle(t2)
+	turtles = ants.AgentsWithAgent(t2)
 	// turtles = ants.TurtlesOnPatch(t2.PatchHere())
 	// turtles = t2.TurtlesHere("ants")
 	if turtles.Count() != 1 {
@@ -1602,7 +1602,7 @@ func TestTurtleTurtlesHere(t *testing.T) {
 		t.Errorf("Expected turtles to contain t3")
 	}
 
-	turtles = ants.TurtlesOnPatch(t3.PatchHere())
+	turtles = ants.AgentsOnPatch(t3.PatchHere())
 	// turtles = t3.TurtlesHere("ants")
 	if turtles.Count() != 1 {
 		t.Errorf("Expected 1 turtle, got %d", turtles.Count())
@@ -1788,18 +1788,18 @@ func TestTurtleSetBreedPatchHere(t *testing.T) {
 	_ = model.NewModel(settings)
 
 	// m.CreateTurtles(1, "scouts", nil)
-	scouts.CreateTurtles(1, nil)
+	scouts.CreateAgents(1, nil)
 
 	// t1 := m.Turtle("scouts", 0)
-	t1 := scouts.Turtle(0)
+	t1 := scouts.Agent(0)
 
-	if scouts.TurtlesOnPatch(t1.PatchHere()).Count() != 1 {
+	if scouts.AgentsOnPatch(t1.PatchHere()).Count() != 1 {
 		t.Errorf("Expected turtle to be on patch")
 	}
 
 	t1.SetBreed(foragers)
 
-	if foragers.TurtlesOnPatch(t1.PatchHere()).Count() != 1 {
+	if foragers.AgentsOnPatch(t1.PatchHere()).Count() != 1 {
 		t.Errorf("Expected turtle to be on patch")
 	}
 

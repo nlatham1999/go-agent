@@ -50,12 +50,12 @@ func (p *Prims) SetUp() error {
 	p.model.ClearAll()
 
 	unplaced := p.model.TurtleBreed("unplaced")
-	unplaced.CreateTurtles(p.nodes,
+	unplaced.CreateAgents(p.nodes,
 		p.placeInitialNodes,
 	)
 
 	//for each turtle create a link with every other turtle
-	unplaced.Turtles().Ask(
+	unplaced.Agents().Ask(
 		p.createInitialLinks,
 	)
 
@@ -82,7 +82,7 @@ func (p *Prims) placeInitialNodes(t *model.Turtle) {
 
 func (p *Prims) createInitialLinks(t *model.Turtle) {
 	unplaced := p.model.TurtleBreed("unplaced")
-	unplaced.Turtles().Ask(
+	unplaced.Agents().Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 && t.DistanceTurtle(t2) < 10 {
 				t.CreateLinkWithTurtle(p.unplacedLinkBreed, t2,
@@ -141,7 +141,7 @@ func (p *Prims) Go() {
 	closestTurtle.Color.SetColor(model.Red)
 
 	// if all nodes are placed, kill all unplaced links
-	if placed.Turtles().Count() == p.nodes {
+	if placed.Agents().Count() == p.nodes {
 		p.unplacedLinkBreed.Links().Ask(
 			func(l *model.Link) {
 				l.Die()
@@ -165,8 +165,8 @@ func (p *Prims) Stats() map[string]interface{} {
 	unplaced := p.model.TurtleBreed("unplaced")
 
 	return map[string]interface{}{
-		"Placed nodes":    placed.Turtles().Count(),
-		"Unplaced nodes":  unplaced.Turtles().Count(),
+		"Placed nodes":    placed.Agents().Count(),
+		"Unplaced nodes":  unplaced.Agents().Count(),
 		"potential links": p.unplacedLinkBreed.Links().Count(),
 	}
 }

@@ -31,34 +31,56 @@ func (ws *WolfSheep) Model() *model.Model {
 
 func (ws *WolfSheep) Init() {
 
-	sheep := model.NewTurtleBreed("sheep", "", nil)
-	wolves := model.NewTurtleBreed("wolves", "", nil)
+	sheep := model.NewTurtleBreed("sheep", "", map[string]interface{}{
+		"health": 0,
+	})
+	wolves := model.NewTurtleBreed("wolves", "", map[string]interface{}{
+		"hunger": 0,
+	})
 
 	modelSettings := model.ModelSettings{
-		TurtleBreeds: []*model.TurtleBreed{sheep, wolves},
-		TurtleProperties: map[string]interface{}{
+		TurtleBreeds: []*model.TurtleBreed{sheep, wolves}, // add the turtle breeds
+		TurtleProperties: map[string]interface{}{ // add the turtle properties
 			"energy": 0,
 		},
-		PatchProperties: map[string]interface{}{
-			"countdown": int(0),
+		PatchProperties: map[string]interface{}{ // add the patch properties
+			"grassOrDirt": "grass",
 		},
-		MinPxCor: -15,
-		MaxPxCor: 15,
-		MinPyCor: -15,
-		MaxPyCor: 15,
+		MinPxCor:   -15,
+		MaxPxCor:   15,
+		MinPyCor:   -15,
+		MaxPyCor:   15,
+		RandomSeed: 10,
 	}
 
-	ws.m = model.NewModel(modelSettings)
+	// create the model
+	m := model.NewModel(modelSettings)
 
-	ws.showEnergy = false
-	ws.maxSheep = 300
-	ws.grassRegrowthTime = 30
-	ws.initialNumberSheep = 20
-	ws.initialNumberWolves = 4
-	ws.wolfGainFromFood = 2
-	ws.sheepGainFromFood = 2
-	ws.sheepReproduceRate = 50.0
-	ws.wolfReproduceRate = 40.0
+	// get the agentset of sheep
+	sheepAgentSet := sheep.Agents()
+
+	// for each sheep attempt to eat grass
+	sheepAgentSet.Ask(
+		func(t *model.Turtle) {
+			energy := t.GetProperty("energy").(int)
+			patch := t.PatchHere()
+			if patch.GetProperty("grassOrDirt").(string) == "grass" {
+				energy += 2
+				patch.SetProperty("grassOrDirt", "dirt")
+			} else {
+				energy--
+			}
+			t.SetProperty("energy", energy)
+		},
+	)
+
+	sheepAgentSet.Ask(
+		func(t *model.Turtle) {
+			t.SetHeading(m.RandomFloat(360))
+			t.Forward(1)
+		},
+	)
+
 }
 
 func (ws *WolfSheep) SetUp() error {
@@ -80,7 +102,7 @@ func (ws *WolfSheep) SetUp() error {
 	sheep := ws.m.TurtleBreed("sheep")
 	wolves := ws.m.TurtleBreed("wolves")
 
-	sheep.CreateTurtles(ws.initialNumberSheep,
+	sheep.CreateAgents(ws.initialNumberSheep,
 		func(t *model.Turtle) {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
@@ -92,7 +114,7 @@ func (ws *WolfSheep) SetUp() error {
 		},
 	)
 
-	wolves.CreateTurtles(ws.initialNumberWolves,
+	wolves.CreateAgents(ws.initialNumberWolves,
 		func(t *model.Turtle) {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
@@ -126,12 +148,12 @@ func (ws *WolfSheep) Go() {
 	wolves := ws.m.TurtleBreed("wolves")
 	sheep := ws.m.TurtleBreed("sheep")
 
-	if wolves.Turtles().Count() == 0 && sheep.Turtles().Count() > ws.maxSheep {
+	if wolves.Agents().Count() == 0 && sheep.Agents().Count() > ws.maxSheep {
 		fmt.Println("The sheep have inherited the earth")
 		return
 	}
 
-	sheep.Turtles().Ask(
+	sheep.Agents().Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
 			energy, err := t.GetPropI("energy")
@@ -146,10 +168,10 @@ func (ws *WolfSheep) Go() {
 		},
 	)
 
-	wolves.Turtles().Ask(
+	wolves.Agents().Ask(
 		ws.move,
 	)
-	wolves.Turtles().Ask(
+	wolves.Agents().Ask(
 		func(t *model.Turtle) {
 			ws.move(t)
 			t.SetProperty("energy", t.GetProperty("energy").(int)-1)
@@ -163,7 +185,7 @@ func (ws *WolfSheep) Go() {
 		ws.growGrass,
 	)
 
-	wolves.Turtles().Ask(
+	wolves.Agents().Ask(
 		func(t *model.Turtle) {
 			if ws.showEnergy {
 				t.SetLabel(fmt.Sprintf("%v", t.GetProperty("energy")))
@@ -234,7 +256,7 @@ func (ws *WolfSheep) EatSheep(t *model.Turtle) {
 
 	sheep := ws.m.TurtleBreed("sheep")
 
-	prey, err := sheep.TurtlesWithTurtle(t).First()
+	prey, err := sheep.AgentsWithAgent(t).First()
 	if err != nil {
 		return
 	}
@@ -280,7 +302,7 @@ func (ws *WolfSheep) Stop() bool {
 	wolves := ws.m.TurtleBreed("wolves")
 	sheep := ws.m.TurtleBreed("sheep")
 
-	if wolves.Turtles().Count() == 0 && sheep.Turtles().Count() > ws.maxSheep {
+	if wolves.Agents().Count() == 0 && sheep.Agents().Count() > ws.maxSheep {
 		fmt.Println("The sheep have inherited the earth")
 		return true
 	}
