@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +37,7 @@ func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 	a.stepData = map[int]*Model{}
 	a.oldestValue = 0
 
-	err := a.Model.SetUp()
+	err := a.currentModel.SetUp()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -59,7 +61,7 @@ func (a *Api) goHandler(w http.ResponseWriter, r *http.Request) {
 
 	a.tickValue = -1
 
-	a.Model.Go()
+	a.currentModel.Go()
 	a.storeStepData()
 	w.WriteHeader(http.StatusOK)
 
@@ -96,7 +98,7 @@ func (a *Api) goRepeatHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) storeStepData() {
 	if a.settings.StoreSteps {
 		// Store the model
-		model := convertModelToApiModel(a.Model.Model())
+		model := convertModelToApiModel(a.currentModel.Model())
 		a.stepData[model.Ticks] = model
 
 		// Remove the oldest step if we have reached the maximum number of steps
@@ -123,12 +125,12 @@ func (a *Api) loop() {
 			a.funcMutext.Unlock()
 			return
 		default:
-			if a.Model.Stop() {
+			if a.currentModel.Stop() {
 				a.goRepeatRunning = false
 				a.funcMutext.Unlock()
 				return
 			}
-			a.Model.Go()
+			a.currentModel.Go()
 			a.storeStepData()
 			time.Sleep(a.simulationSpeed) // Simulate some work
 		}
@@ -137,22 +139,52 @@ func (a *Api) loop() {
 }
 
 func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	a.currentModel = nil
 
-	tmpl, err := template.New("content").Parse(indexHTML)
+	htmlTmpl, err := template.New("content").Parse(homePageHtml)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data := map[string]interface{}{
+		"ModelList": a.buildModelList(),
+	}
+	htmlTmpl.Execute(w, data)
+
+	styleTmpl, err := template.New("content").Parse(homePageStyle)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	styleTmpl.Execute(w, nil)
+}
+
+func (a *Api) ModelPageHandler(w http.ResponseWriter, r *http.Request) {
+
+	// get the model name from the url
+	vars := mux.Vars(r)
+	modelName := vars["model"]
+
+	a.currentModel = a.models[modelName]
+	if a.currentModel == nil {
+		http.Error(w, "Model not found", http.StatusNotFound)
+		return
+	}
+
+	tmpl, err := template.New("content").Parse(modelPageHtml)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	data := map[string]interface{}{
-		"Title":   a.settings.Title,
 		"Widgets": a.buildWidgets(),
 	}
 
 	tmpl.Execute(w, data)
 
 	// load the threejs html as a string
-	jsTml, err := template.New("content").Parse(threejsHTML)
+	jsTml, err := template.New("content").Parse(modelPageThreeJS)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -160,7 +192,7 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	jsTml.Execute(w, nil)
 
 	// load the scripts
-	scriptsTmpl, err := template.New("content").Parse(scriptsHTML)
+	scriptsTmpl, err := template.New("content").Parse(modelPageScripts)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -168,7 +200,7 @@ func (a *Api) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	scriptsTmpl.Execute(w, nil)
 
 	// load the style
-	styleTmpl, err := template.New("content").Parse(styleHTML)
+	styleTmpl, err := template.New("content").Parse(modelPageStyle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -181,15 +213,20 @@ func (a *Api) loadStatsHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
+
 	// get the stats
-	stats := a.Model.Stats()
+	stats := a.currentModel.Stats()
 
 	if stats == nil {
 		stats = map[string]interface{}{}
 	}
 
 	// add in the tick
-	stats["ticks"] = a.Model.Model().Ticks
+	stats["ticks"] = a.currentModel.Model().Ticks
 
 	//return the stats as json
 	w.Header().Set("Content-Type", "application/json")
@@ -219,7 +256,12 @@ func (a *Api) modelHandler(w http.ResponseWriter, r *http.Request) {
 	a.funcMutext.Lock()
 	defer a.funcMutext.Unlock()
 
-	model := convertModelToApiModel(a.Model.Model())
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
+
+	model := convertModelToApiModel(a.currentModel.Model())
 
 	//return the model as json
 	w.Header().Set("Content-Type", "application/json")
@@ -228,6 +270,11 @@ func (a *Api) modelHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) modelAtHandler(w http.ResponseWriter, r *http.Request) {
+
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
 
 	queryParams := r.URL.Query()
 	step := queryParams.Get("step")
@@ -266,7 +313,7 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 		}
 
 		// go through widgets and update the dynamic variable
-		for _, widget := range a.Model.Widgets() {
+		for _, widget := range a.currentModel.Widgets() {
 			if widget.TargetVariable == name {
 
 				// If the widget is a button, just call the target function

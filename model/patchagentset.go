@@ -155,6 +155,24 @@ func (p *PatchAgentSet) Last() (*Patch, error) {
 	return patch.(*Patch), nil
 }
 
+// returns a random patch in the agent set that satisfies the operation
+// @TODO - this is not using the rand value so it's not deterministic
+func (p *PatchAgentSet) RandomWhere(operation PatchBoolOperation) *Patch {
+	if operation == nil {
+		return nil
+	}
+
+	patch := p.patches.RandomValueWhere(func(a interface{}) bool {
+		return operation(a.(*Patch))
+	})
+
+	if patch == nil {
+		return nil
+	}
+
+	return patch.(*Patch)
+}
+
 // func (p *PatchAgentSet) Next() (*Patch, error) {
 // 	patch, err := p.patches.Next()
 // 	if err != nil {

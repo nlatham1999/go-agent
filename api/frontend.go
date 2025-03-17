@@ -7,17 +7,23 @@ import (
 	"strings"
 )
 
-//go:embed html/index.html
-var indexHTML string
+//go:embed modelpage/index.html
+var modelPageHtml string
 
-//go:embed html/threejs.html
-var threejsHTML string
+//go:embed modelpage/threejs.html
+var modelPageThreeJS string
 
-//go:embed html/scripts.html
-var scriptsHTML string
+//go:embed modelpage/scripts.html
+var modelPageScripts string
 
-//go:embed html/style.html
-var styleHTML string
+//go:embed modelpage/style.html
+var modelPageStyle string
+
+//go:embed homepage/index.html
+var homePageHtml string
+
+//go:embed homepage/style.html
+var homePageStyle string
 
 var (
 	statsKeys = []string{}
@@ -25,14 +31,14 @@ var (
 
 func (a *Api) renderStatsAsWidgets() (string, int) {
 	html := ""
-	stats := a.Model.Stats()
+	stats := a.currentModel.Stats()
 
 	//tick stat
 	html += fmt.Sprintf(`
 		<div class="widget widget-stats">
 			<div id="stats-ticks">Ticks : %d</div>
 		</div>
-	`, a.Model.Model().Ticks)
+	`, a.currentModel.Model().Ticks)
 
 	count := 2
 	for key, value := range stats {
@@ -43,7 +49,7 @@ func (a *Api) renderStatsAsWidgets() (string, int) {
 		<div class="widget widget-stats" style="top: %dpx;">
 			<div id="stats-%s">%s : %v</div>
 		</div>
-		`, count*20, key, key, value)
+		`, count*40, key, key, value)
 		count++
 	}
 	return html, len(stats) + 1
@@ -115,10 +121,46 @@ func (a *Api) buildWidgets() string {
 
 	// Add widgets here
 	count++
-	for _, widget := range a.Model.Widgets() {
+	for _, widget := range a.currentModel.Widgets() {
 		html += widget.Render(count)
 		count++
 	}
 
+	return html
+}
+
+// <li>
+// <a href="/run/gameoflife">
+// 	<button>🟢 <strong>Game of Life</strong> – A classic cellular automaton</button>
+// </a>
+// </li>
+// <li>
+// <a href="/run/boids">
+// 	<button>🏃 <strong>Boid Flocking</strong> – Simulating flocking birds</button>
+// </a>
+// </li>
+// <li>
+// <a href="/run/schelling">
+// 	<button>🌍 <strong>Schelling’s Segregation Model</strong> – A simple social dynamics model</button>
+// </a>
+// </li>
+
+func (a *Api) buildModelList() string {
+	html := ""
+	for name, _ := range a.models {
+		modelUrl := name
+		buttonTitle := a.settings.ButtonTitles[name]
+		buttonDescription := a.settings.ButtonDescriptions[name]
+		if buttonTitle == "" {
+			buttonTitle = name
+		}
+		html += fmt.Sprintf(`
+		<li>
+			<a href="/run/%s">
+				<button><strong>%s</strong> - %s</button>
+			</a>
+		</li>
+		`, modelUrl, buttonTitle, buttonDescription)
+	}
 	return html
 }

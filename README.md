@@ -7,9 +7,8 @@ consists of three parts.
 - api to interface with models
 
 ## TODO
-
-- [ ] Make it so that the Api html generation isn't the ugliest code to ever exist  
-- [ ] switch the breedname string params to be the turtlebreed and linkbreed types  
+  
+- [x] switch the breedname string params to be the turtlebreed and linkbreed types  
 -  [ ]  add a function for turtlesinradius at the model level - for speed purposes, should first get all patches, and then turtles on the patch  
     - this should instead be a seperate package on top
     - collision detection layer they can add on
@@ -22,3 +21,5 @@ consists of three parts.
 -  [ ] add slider to change render speed on frontend   
 -  [ ] documentation   
 -  [ ] move folder structure so packages are in pkg folder
+-  [x] have main screen and then model running on second
+-  [ ] make link types in threejs render properly
