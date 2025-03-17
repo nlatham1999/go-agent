@@ -11,7 +11,9 @@ import (
 )
 
 type Api struct {
-	Model ModelInterface
+	models map[string]ModelInterface
+
+	currentModel ModelInterface
 
 	funcMutext      sync.Mutex // Mutex for when we are running a model function
 	simulationSpeed time.Duration
@@ -29,44 +31,44 @@ type Api struct {
 }
 
 type ApiSettings struct {
-	Title      string
-	StoreSteps bool // Whether to store steps
-	MaxSteps   int  // Maximum number of steps to store. Default is 1000
+	ButtonTitles       map[string]string
+	ButtonDescriptions map[string]string
+	StoreSteps         bool // Whether to store steps
+	MaxSteps           int  // Maximum number of steps to store. Default is 1000
 }
 
-func NewApi(model ModelInterface, settings ApiSettings) *Api {
+func NewApi(models map[string]ModelInterface, settings ApiSettings) (*Api, error) {
+
+	// make sure there isn't a model with empty string key
+	if _, ok := models[""]; ok {
+		return nil, fmt.Errorf("Model with empty string key")
+	}
 
 	if settings.StoreSteps && settings.MaxSteps == 0 {
 		settings.MaxSteps = 1000 // Default value
 	}
 
-	if settings.Title == "" {
-		settings.Title = "Go Agent"
-	}
-
 	return &Api{
-		Model:           model,
+		models:          models,
 		simulationSpeed: 100 * time.Millisecond,
 		settings:        settings,
 		stepData:        map[int]*Model{},
-	}
+	}, nil
 }
 
 func (a *Api) Serve() {
 
-	if a.Model.Model() == nil {
-		fmt.Println("Model is nil")
-	}
-
-	a.Model.Init()
-
-	if a.Model.Model() == nil {
-		fmt.Println("Model is nil")
+	// init all the models
+	for _, model := range a.models {
+		model.Init()
 	}
 
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", a.HomeHandler)
+
+	//handler by name in the url
+	r.HandleFunc("/run/{model}", a.ModelPageHandler)
 	r.HandleFunc("/health", a.healthCheckHandler)
 	r.HandleFunc("/setup", a.setUpHandler).Methods("POST")
 	r.HandleFunc("/go", a.goHandler).Methods("POST")

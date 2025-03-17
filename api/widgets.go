@@ -17,6 +17,20 @@ type Widget struct {
 	ValuePointerString *string  `json:"valuePointerString"`
 }
 
+func NewFloatSliderWidget(prettyName, targetVariable, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
+	return Widget{
+		PrettyName:        prettyName,
+		TargetVariable:    targetVariable,
+		WidgetType:        "slider",
+		WidgetValueType:   "float",
+		MinValue:          minValue,
+		MaxValue:          maxValue,
+		DefaultValue:      defaultValue,
+		StepAmount:        stepAmount,
+		ValuePointerFloat: valuePointer,
+	}
+}
+
 func (w *Widget) Render(offset int) string {
 
 	id := w.TargetVariable + "-widget"
