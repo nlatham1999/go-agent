@@ -31,7 +31,7 @@ func NewFloatSliderWidget(prettyName, targetVariable, minValue, maxValue, defaul
 	}
 }
 
-func (w *Widget) Render(offset int) string {
+func (w *Widget) render(offset int) string {
 
 	id := w.TargetVariable + "-widget"
 

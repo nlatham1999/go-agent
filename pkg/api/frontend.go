@@ -122,7 +122,7 @@ func (a *Api) buildWidgets() string {
 	// Add widgets here
 	count++
 	for _, widget := range a.currentModel.Widgets() {
-		html += widget.Render(count)
+		html += widget.render(count)
 		count++
 	}
 
