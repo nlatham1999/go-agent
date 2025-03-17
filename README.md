@@ -8,6 +8,8 @@ consists of three parts.
 - library to run models
 - api complete with frontend to interface with models
 
+For a demo run `go run main.go`
+
 ## Model
 
 This is the library that is used to create and interact with a model. For an exhaustive list of all the functions look here: https://github.com/nlatham1999/go-agent/blob/main/pkg/model/doc.md

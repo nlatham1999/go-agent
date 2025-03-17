@@ -31,56 +31,34 @@ func (ws *WolfSheep) Model() *model.Model {
 
 func (ws *WolfSheep) Init() {
 
-	sheep := model.NewTurtleBreed("sheep", "", map[string]interface{}{
-		"health": 0,
-	})
-	wolves := model.NewTurtleBreed("wolves", "", map[string]interface{}{
-		"hunger": 0,
-	})
+	sheep := model.NewTurtleBreed("sheep", "", nil)
+	wolves := model.NewTurtleBreed("wolves", "", nil)
 
 	modelSettings := model.ModelSettings{
-		TurtleBreeds: []*model.TurtleBreed{sheep, wolves}, // add the turtle breeds
-		TurtleProperties: map[string]interface{}{ // add the turtle properties
+		TurtleBreeds: []*model.TurtleBreed{sheep, wolves},
+		TurtleProperties: map[string]interface{}{
 			"energy": 0,
 		},
-		PatchProperties: map[string]interface{}{ // add the patch properties
-			"grassOrDirt": "grass",
+		PatchProperties: map[string]interface{}{
+			"countdown": int(0),
 		},
-		MinPxCor:   -15,
-		MaxPxCor:   15,
-		MinPyCor:   -15,
-		MaxPyCor:   15,
-		RandomSeed: 10,
+		MinPxCor: -15,
+		MaxPxCor: 15,
+		MinPyCor: -15,
+		MaxPyCor: 15,
 	}
 
-	// create the model
-	m := model.NewModel(modelSettings)
+	ws.m = model.NewModel(modelSettings)
 
-	// get the agentset of sheep
-	sheepAgentSet := sheep.Agents()
-
-	// for each sheep attempt to eat grass
-	sheepAgentSet.Ask(
-		func(t *model.Turtle) {
-			energy := t.GetProperty("energy").(int)
-			patch := t.PatchHere()
-			if patch.GetProperty("grassOrDirt").(string) == "grass" {
-				energy += 2
-				patch.SetProperty("grassOrDirt", "dirt")
-			} else {
-				energy--
-			}
-			t.SetProperty("energy", energy)
-		},
-	)
-
-	sheepAgentSet.Ask(
-		func(t *model.Turtle) {
-			t.SetHeading(m.RandomFloat(360))
-			t.Forward(1)
-		},
-	)
-
+	ws.showEnergy = false
+	ws.maxSheep = 300
+	ws.grassRegrowthTime = 30
+	ws.initialNumberSheep = 20
+	ws.initialNumberWolves = 4
+	ws.wolfGainFromFood = 2
+	ws.sheepGainFromFood = 2
+	ws.sheepReproduceRate = 50.0
+	ws.wolfReproduceRate = 40.0
 }
 
 func (ws *WolfSheep) SetUp() error {
@@ -256,7 +234,7 @@ func (ws *WolfSheep) EatSheep(t *model.Turtle) {
 
 	sheep := ws.m.TurtleBreed("sheep")
 
-	prey, err := sheep.AgentsWithAgent(t).First()
+	prey, err := sheep.Agents().First()
 	if err != nil {
 		return
 	}
