@@ -1,5 +1,8 @@
 # go-agent
 
+[![forthebadge](https://forthebadge.com/images/featured/featured-built-with-love.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/featured/featured-made-with-crayons.svg)](https://forthebadge.com)
+
 Go Agent is a really cool agent based modelling library for go
 
 based off of netlogo
