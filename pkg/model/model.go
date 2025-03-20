@@ -813,44 +813,10 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	n := sortedset.NewSortedSet()
 
-	topLeft := p.neighborsPatchMap["topLeft"]
-	if topLeft != nil {
-		n.Add(topLeft)
-	}
-
-	left := p.neighborsPatchMap["left"]
-	if left != nil {
-		n.Add(left)
-	}
-
-	bottomLeft := p.neighborsPatchMap["bottomLeft"]
-	if bottomLeft != nil {
-		n.Add(bottomLeft)
-	}
-
-	top := p.neighborsPatchMap["top"]
-	if top != nil {
-		n.Add(top)
-	}
-
-	topRight := p.neighborsPatchMap["topRight"]
-	if topRight != nil {
-		n.Add(topRight)
-	}
-
-	right := p.neighborsPatchMap["right"]
-	if right != nil {
-		n.Add(right)
-	}
-
-	bottomRight := p.neighborsPatchMap["bottomRight"]
-	if bottomRight != nil {
-		n.Add(bottomRight)
-	}
-
-	bottom := p.neighborsPatchMap["bottom"]
-	if bottom != nil {
-		n.Add(bottom)
+	for _, neighbor := range p.neighborsPatchMap {
+		if neighbor != nil {
+			n.Add(neighbor)
+		}
 	}
 
 	return &PatchAgentSet{
@@ -1055,6 +1021,92 @@ func (m *Model) turtlesAtCoordsBreeded(breed *TurtleBreed, pxcor float64, pycor 
 	}
 
 	return patch.turtlesHereBreeded(breed)
+}
+
+func (m *Model) TurtlesInRadius(xCor float64, yCor float64, radius float64) *TurtleAgentSet {
+	// xMin, xMax := int(math.Floor(cx-r)), int(math.Ceil(cx+r))
+	// yMin, yMax := int(math.Floor(cy-r)), int(math.Ceil(cy+r))
+
+	xMin := int(math.Floor(xCor - radius))
+	xMax := int(math.Ceil(xCor + radius))
+	yMin := int(math.Floor(yCor - radius))
+	yMax := int(math.Ceil(yCor + radius))
+
+	//are we going to be looping through more patches than there are turtles?
+	//if so, just loop through all the turtles
+	if (xMax-xMin+1)*(yMax-yMin+1) > m.turtles.Count() {
+		return m.Turtles().With(func(t *Turtle) bool {
+			return m.DistanceBetweenPoints(xCor, yCor, t.XCor(), t.YCor()) <= radius
+		})
+	}
+
+	patchesFullyInsideRadius := make([]*Patch, 0)
+	patchesPartiallyInsideRadius := make([]*Patch, 0)
+
+	for x := xMin; x <= xMax; x++ {
+		for y := yMin; y <= yMax; y++ {
+
+			// get the patch, this will handle wrapping
+			// if it is nil, then that probably means the world is not wrapping and the x y is out of bounds
+			patch := m.Patch(float64(x), float64(y))
+			if patch == nil {
+				continue
+			}
+
+			// if there are no turtles on the patch then we can skip it
+			if patch.TurtlesHere().Count() == 0 {
+				continue
+			}
+
+			// get the center of the patch from the patch
+			// this makes sure that this is actually the center of the patch, just in case the coords shifted due to world wrapping
+			px := float64(patch.PXCor())
+			py := float64(patch.PYCor())
+
+			// patch corners
+			corners := [4][2]float64{
+				{px - 0.5, py - 0.5}, // bottom-left
+				{px + 0.5, py - 0.5}, // bottom-right
+				{px - 0.5, py + 0.5}, // top-left
+				{px + 0.5, py + 0.5}, // top-right
+			}
+
+			// check how many corners are inside the circle
+			insideCount := 0
+			for _, corner := range corners {
+				if m.DistanceBetweenPoints(xCor, yCor, corner[0], corner[1]) <= radius {
+					insideCount++
+				}
+			}
+
+			// classify
+			if insideCount == 4 {
+				patchesFullyInsideRadius = append(patchesFullyInsideRadius, patch)
+			} else if insideCount > 0 {
+				patchesPartiallyInsideRadius = append(patchesPartiallyInsideRadius, patch)
+			}
+		}
+	}
+
+	turtles := NewTurtleAgentSet(nil)
+
+	// add turtles from patches that are fully inside the radius
+	for _, patch := range patchesFullyInsideRadius {
+		patch.TurtlesHere().Ask(func(t *Turtle) {
+			turtles.Add(t)
+		})
+	}
+
+	// add turtles from patches that are partially inside the radius provided they are within the radius
+	for _, patch := range patchesPartiallyInsideRadius {
+		patch.TurtlesHere().Ask(func(t *Turtle) {
+			if m.DistanceBetweenPoints(xCor, yCor, t.XCor(), t.YCor()) <= radius {
+				turtles.Add(t)
+			}
+		})
+	}
+
+	return turtles
 }
 
 // returns the turtle agentset that is on the provided patch

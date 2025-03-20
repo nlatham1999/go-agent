@@ -758,3 +758,233 @@ func TestModelSize(t *testing.T) {
 
 	m.ResetTicks()
 }
+
+func TestTurtlesInRadiusWrappingOff(t *testing.T) {
+
+	// create a basic model
+	settings := model.ModelSettings{
+		MinPxCor:  -15,
+		MinPyCor:  -15,
+		MaxPxCor:  15,
+		MaxPyCor:  15,
+		WrappingX: false,
+		WrappingY: false,
+	}
+	m := model.NewModel(settings)
+
+	// create 100 turtles
+	turtles, err := m.CreateTurtles(100, nil)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	// set them to random positions
+	turtles.Ask(
+		func(t *model.Turtle) {
+			t.SetXY(float64(m.RandomXCor()), float64(m.RandomYCor()))
+		},
+	)
+
+	xCor := -9.2
+	yCor := 9.2
+	radius := 2.4
+
+	turtlesInRadiusBruteForce := turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc := m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = 3.2
+	yCor = 1.2
+	radius = 2.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = 3.2
+	yCor = -1.2
+	radius = 2.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = -3.2
+	yCor = -1.2
+	radius = 2.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+}
+
+func TestTurtlesInRadiusWrappingOn(t *testing.T) {
+
+	// create a basic model
+	settings := model.ModelSettings{
+		MinPxCor:  -15,
+		MinPyCor:  -15,
+		MaxPxCor:  15,
+		MaxPyCor:  15,
+		WrappingX: true,
+		WrappingY: true,
+	}
+	m := model.NewModel(settings)
+
+	// create 100 turtles
+	turtles, err := m.CreateTurtles(300, nil)
+	if err != nil {
+		t.Errorf("Error should be nil")
+	}
+
+	// set them to random positions
+	turtles.Ask(
+		func(t *model.Turtle) {
+			t.SetXY(float64(m.RandomXCor()), float64(m.RandomYCor()))
+		},
+	)
+
+	xCor := -14.2
+	yCor := 13.2
+	radius := 3.4
+
+	turtlesInRadiusBruteForce := turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc := m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = 14.2
+	yCor = 13.2
+	radius = 3.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = 14.2
+	yCor = -13.2
+	radius = 3.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+
+	xCor = -14.2
+	yCor = -13.2
+	radius = 3.4
+
+	turtlesInRadiusBruteForce = turtles.With(func(t *model.Turtle) bool {
+		return t.DistanceXY(xCor, yCor) <= radius
+	})
+
+	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+
+	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
+		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
+	}
+
+	turtlesInRadiusBruteForce.Ask(
+		func(turtle *model.Turtle) {
+			if !turtlesInRadiusFunc.Contains(turtle) {
+				t.Errorf("Expected turtlesInRadiusFunc to contain turtle")
+			}
+		},
+	)
+}

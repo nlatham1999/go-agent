@@ -97,13 +97,11 @@ func (b *Boid) Go() {
 func (b *Boid) seperation(t *model.Turtle) {
 	closeDx := 0.0
 	closeDy := 0.0
-	b.model.Turtles().Ask(
+	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.protectedRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				if t.DistanceTurtle(t2) < b.protectedRange {
-					closeDx += t.XCor() - t2.XCor()
-					closeDy += t.YCor() - t2.YCor()
-				}
+				closeDx += t.XCor() - t2.XCor()
+				closeDy += t.YCor() - t2.YCor()
 			}
 		},
 	)
@@ -118,14 +116,12 @@ func (b *Boid) alignment(t *model.Turtle) {
 	xvelAvg := 0.0
 	yvelAvg := 0.0
 	neighboringBoids := 0
-	b.model.Turtles().Ask(
+	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				if t.DistanceTurtle(t2) < b.visibleRange {
-					xvelAvg += t2.GetProperty("vx").(float64)
-					yvelAvg += t2.GetProperty("vy").(float64)
-					neighboringBoids++
-				}
+				xvelAvg += t2.GetProperty("vx").(float64)
+				yvelAvg += t2.GetProperty("vy").(float64)
+				neighboringBoids++
 			}
 		},
 	)
@@ -144,14 +140,12 @@ func (b *Boid) cohesion(t *model.Turtle) {
 	xposAvg := 0.0
 	yposAvg := 0.0
 	neighboringBoids := 0
-	b.model.Turtles().Ask(
+	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				if t.DistanceTurtle(t2) < b.visibleRange {
-					xposAvg += t2.XCor()
-					yposAvg += t2.YCor()
-					neighboringBoids++
-				}
+				xposAvg += t2.XCor()
+				yposAvg += t2.YCor()
+				neighboringBoids++
 			}
 		},
 	)
