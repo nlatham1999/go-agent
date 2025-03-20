@@ -63,6 +63,8 @@ func (p *Prims) SetUp() error {
 		return l.Length()
 	})
 
+	fmt.Println("Initial links: ", p.unplacedLinkBreed.Links().Count())
+
 	t0 := p.model.Turtle(0)
 	t0.Color.SetColor(model.Red)
 
@@ -84,7 +86,7 @@ func (p *Prims) createInitialLinks(t *model.Turtle) {
 	unplaced := p.model.TurtleBreed("unplaced")
 	unplaced.Agents().Ask(
 		func(t2 *model.Turtle) {
-			if t != t2 && t.DistanceTurtle(t2) < 10 {
+			if t != t2 { // && t.DistanceTurtle(t2) < 10 {
 				t.CreateLinkWithTurtle(p.unplacedLinkBreed, t2,
 					func(l *model.Link) {
 						l.Color.SetColor(model.Gray)
@@ -136,7 +138,7 @@ func (p *Prims) Go() {
 	//add the link and turtle to the cluster
 	closestLink.SetBreed(p.placedLinkBreed)
 	closestLink.Color.SetColor(model.Red)
-	closestLink.Hide()
+	closestLink.Show()
 	closestTurtle.SetBreed(placed)
 	closestTurtle.Color.SetColor(model.Red)
 
@@ -185,6 +187,7 @@ func (p *Prims) Widgets() []api.Widget {
 			MinValue:        "2",
 			MaxValue:        "4000",
 			DefaultValue:    "5",
+			ValuePointerInt: &p.nodes,
 		},
 	}
 }

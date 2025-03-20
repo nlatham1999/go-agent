@@ -44,7 +44,9 @@
         camera.lookAt(0, 0, 0);
 
         // Renderer
-        renderer = new THREE.WebGLRenderer();
+        // renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+
         renderer.setSize(viewWidth, viewHeight);
         renderer.domElement.style.position = "absolute";
         renderer.domElement.style.left = "50vw";
@@ -187,14 +189,20 @@
 
         // Create Links (lines)
         model.links.forEach(link => {
+
             if (!link.hidden) {
                 const material = new THREE.LineBasicMaterial({ 
                     color: new THREE.Color(link.color.r / 255, link.color.g / 255, link.color.b / 255) 
                 });
 
+                let relativeX1 = link.end1X;
+                let relativeX2 = link.end2X;
+                let relativeY1 = link.end1Y;
+                let relativeY2 = link.end2Y;
+
                 const points = [
-                    new THREE.Vector3((link.end1X - model.width / 2) * patchSize, (link.end1Y - model.height / 2) * patchSize, 0.05),
-                    new THREE.Vector3((link.end2X - model.width / 2) * patchSize, (link.end2Y - model.height / 2) * patchSize, 0.05)
+                    new THREE.Vector3((relativeX1-offsetX) * patchSize, (relativeY1-offsetY) * patchSize, 0.05),
+                    new THREE.Vector3((relativeX2-offsetX) * patchSize, (relativeY2-offsetY) * patchSize, 0.05)
                 ];
 
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
