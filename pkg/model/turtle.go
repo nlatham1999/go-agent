@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"math"
+	"sync"
 )
 
 // Turtle is an agent that can move around the world
@@ -24,6 +25,7 @@ type Turtle struct {
 	label      interface{}
 	labelColor Color
 
+	propertiesMutex         sync.RWMutex
 	turtlePropertiesGeneral map[string]interface{} // turtles own variables
 	turtlePropertiesBreed   map[string]interface{} // turtle properties variables
 
@@ -594,6 +596,20 @@ func (t *Turtle) GetProperty(key string) interface{} {
 	return nil
 }
 
+// returns the property value safely for concurrent access
+func (t *Turtle) GetPropertySafe(key string) interface{} {
+	t.propertiesMutex.RLock()
+	defer t.propertiesMutex.RUnlock()
+
+	if val, found := t.turtlePropertiesBreed[key]; found {
+		return val
+	}
+	if val, found := t.turtlePropertiesGeneral[key]; found {
+		return val
+	}
+	return nil
+}
+
 // returns the turtle property variable as an int
 func (t *Turtle) GetPropI(key string) (int, error) {
 	v := t.GetProperty(key)
@@ -642,6 +658,22 @@ func (t *Turtle) GetPropS(key string) (string, error) {
 
 // sets the turtle property variable
 func (t *Turtle) SetProperty(key string, value interface{}) {
+	if _, found := t.turtlePropertiesBreed[key]; found {
+		t.turtlePropertiesBreed[key] = value
+		return
+	} else {
+		if _, found := t.turtlePropertiesGeneral[key]; found {
+			t.turtlePropertiesGeneral[key] = value
+		}
+	}
+}
+
+// sets the turtle property variable safely for concurrent access
+func (t *Turtle) SetPropertySafe(key string, value interface{}) {
+
+	t.propertiesMutex.Lock()
+	defer t.propertiesMutex.Unlock()
+
 	if _, found := t.turtlePropertiesBreed[key]; found {
 		t.turtlePropertiesBreed[key] = value
 		return

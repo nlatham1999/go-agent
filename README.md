@@ -89,9 +89,15 @@ below is a sample of a wolf and sheep model where patches are grass or dirt and 
 	)
 
     // wolf movements
-
+	...
 ```
 
+### Concurrency
+Concurrency is currently supported only for turtles via AskConcurrent, SetPropertySafe and GetPropertySafe  
+
+Suggested use is to leverage concurrency to read turtle attributes and store values in the turtle properties, and then to go through each turtle on a single thread and use the set attributes to move the turtle.  
+
+This is because any actions moving the turtle can affect other pieces  
 
 ## TODO
   

@@ -1,4 +1,4 @@
-package boid
+package boidconcurrent
 
 import (
 	"fmt"
@@ -26,17 +26,23 @@ type Boid struct {
 	minSpeed        float64
 	maxSpeed        float64
 	turtleSize      float64
+
+	properties map[*model.Turtle]map[string]interface{}
 }
 
 func NewBoid() *Boid {
-	return &Boid{}
+	return &Boid{
+		properties: make(map[*model.Turtle]map[string]interface{}),
+	}
 }
 
 func (b *Boid) Init() {
 	modelSettings := model.ModelSettings{
 		TurtleProperties: map[string]interface{}{
-			"vx": .01,
-			"vy": .01,
+			"vx":     .01,
+			"vy":     .01,
+			"vx-new": .01,
+			"vy-new": .01,
 		},
 		MinPxCor: -5,
 		MinPyCor: -5,
@@ -79,14 +85,24 @@ func (b *Boid) Go() {
 
 	timeNow := time.Now()
 
-	b.model.Turtles().Ask(
+	// apply the first two steps
+	b.model.Turtles().AskConcurrent(
 		func(t *model.Turtle) {
 			b.seperation(t)
-			b.alignment(t)
+			b.getAlignment(t)
+		},
+		100,
+	)
+
+	// since alignment is using the vx and vy it needs to be slit into two steps
+	b.model.Turtles().AskConcurrent(
+		func(t *model.Turtle) {
+			b.setAlignment(t)
 			b.cohesion(t)
 			b.turnAwayFromEdges(t)
 			b.limitSpeeds(t)
 		},
+		100,
 	)
 
 	b.model.Turtles().Ask(
@@ -109,6 +125,7 @@ func (b *Boid) seperation(t *model.Turtle) {
 			if t != t2 {
 				closeDx += t.XCor() - t2.XCor()
 				closeDy += t.YCor() - t2.YCor()
+
 			}
 		},
 	)
@@ -119,28 +136,45 @@ func (b *Boid) seperation(t *model.Turtle) {
 	t.SetProperty("vy", vy+(closeDy*avoidFactor))
 }
 
-func (b *Boid) alignment(t *model.Turtle) {
+func (b *Boid) getAlignment(t *model.Turtle) {
+
 	xvelAvg := 0.0
 	yvelAvg := 0.0
 	neighboringBoids := 0
 	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				xvelAvg += t2.GetProperty("vx").(float64)
-				yvelAvg += t2.GetProperty("vy").(float64)
+				xvelAvg += t2.GetPropertySafe("vx").(float64)
+				yvelAvg += t2.GetPropertySafe("vy").(float64)
 				neighboringBoids++
+
 			}
 		},
 	)
 	if neighboringBoids > 0 {
 		xvelAvg /= float64(neighboringBoids)
 		yvelAvg /= float64(neighboringBoids)
-		vx := t.GetProperty("vx").(float64)
-		vy := t.GetProperty("vy").(float64)
+		vx := t.GetPropertySafe("vx").(float64)
+		vy := t.GetPropertySafe("vy").(float64)
 		matchingFactor := b.matchingFactor
-		t.SetProperty("vx", vx+(xvelAvg-vx)*matchingFactor)
-		t.SetProperty("vy", vy+(yvelAvg-vy)*matchingFactor)
+		t.SetPropertySafe("vx-new", vx+(xvelAvg-vx)*matchingFactor)
+		t.SetPropertySafe("vy-new", vy+(yvelAvg-vy)*matchingFactor)
+	} else {
+		vx := t.GetPropertySafe("vx").(float64)
+		vy := t.GetPropertySafe("vy").(float64)
+		t.SetPropertySafe("vx-new", vx)
+		t.SetPropertySafe("vy-new", vy)
 	}
+}
+
+func (b *Boid) setAlignment(t *model.Turtle) {
+	vx := t.GetProperty("vx-new").(float64)
+	vy := t.GetProperty("vy-new").(float64)
+	// vx := b.properties[t]["vx-new"].(float64)
+	// vy := b.properties[t]["vy-new"].(float64)
+
+	t.SetProperty("vx", vx)
+	t.SetProperty("vy", vy)
 }
 
 func (b *Boid) cohesion(t *model.Turtle) {
@@ -153,6 +187,7 @@ func (b *Boid) cohesion(t *model.Turtle) {
 				xposAvg += t2.XCor()
 				yposAvg += t2.YCor()
 				neighboringBoids++
+
 			}
 		},
 	)
