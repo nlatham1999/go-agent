@@ -101,8 +101,8 @@ This is because any actions moving the turtle can affect other pieces
 
 ## TODO
   
-- [x] switch the breedname string params to be the turtlebreed and linkbreed types  
--  [ ]  add a function for turtlesinradius at the model level - for speed purposes, should first get all patches, and then turtles on the patch  
+-  [x] switch the breedname string params to be the turtlebreed and linkbreed types  
+-  [x]  add a function for turtlesinradius at the model level - for speed purposes, should first get all patches, and then turtles on the patch  
     - this should instead be a seperate package on top
     - collision detection layer they can add on
 -  [x]  patches, turtles "own" should be renamed to "properties"  
@@ -112,7 +112,20 @@ This is because any actions moving the turtle can affect other pieces
 -  [ ] implement dx and dy  
 -  [ ] make sure that distance works with wrap around on the horizontal  
 -  [ ] add slider to change render speed on frontend   
--  [ ] documentation   
+-  [x] documentation   
 -  [ ] move folder structure so packages are in pkg folder
 -  [x] have main screen and then model running on second
--  [ ] make link types in threejs render properly
+-  [x] make link types in threejs render properly
+-  [ ] concurrency on patches and links
+-  [ ] 3D
+-  [x] collision detection
+-  [ ] labels on turtles and links
+-  [ ] setting the color should be a setcolor function
+-  [x] make moving on world wrapping on left and down work 🤦‍♂️
+-  [ ] make setxy able to be called concurrently
+-  [ ] remove tie modes
+-  [ ] make change patch ownership able to be called concurrently
+-  [ ] have descendents public
+-  [ ] button widgets
+-  [ ] enable setting x,y, height(?) and width on widgets
+-  [ ] update readme on concurrency

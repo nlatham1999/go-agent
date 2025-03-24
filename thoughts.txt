@@ -41,3 +41,9 @@ why have linkedTurtles and linkedTurtlesConnectedFrom?
 
 why have seperate endpoints for stats and model? 
  - so that the user has the option to only grab the bare necessities
+
+
+ Concurrency should not be baked in and should only be a option
+    - Concurrency reduces determinism
+    - To complicated given the variety of actions the user can undergo
+    - conccurency should only be for read, not for write

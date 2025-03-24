@@ -1862,3 +1862,130 @@ func TestTurtle_Jump(t *testing.T) {
 		t.Errorf("Expected turtle to jump to (-5, 0), got (%v, %v)", turtle.XCor(), turtle.YCor())
 	}
 }
+
+func TestTurtleMoveForwardDown(t *testing.T) {
+	settings := model.ModelSettings{
+		WrappingX:  true,
+		WrappingY:  true,
+		MinPxCor:   -10, // min x patch coordinate
+		MaxPxCor:   10,  // max x patch coordinate
+		MinPyCor:   -10, // min y patch coordinate
+		MaxPyCor:   10,  // max y patch coordinate
+		RandomSeed: 10,  // random seed
+	}
+
+	m := model.NewModel(settings) // create a new model with the settings
+
+	m.ClearAll()
+
+	m.CreateTurtles(1, func(t *model.Turtle) {
+		t.SetHeading(270)
+		t.SetSize(.5)
+		t.SetXY(5.0, -10.4)
+		t.Shape = "circle"
+		t.Color = model.Green
+	})
+
+	t0 := m.Turtle(0)
+	t0.Forward(1.0)
+
+	if m.Turtle(0).XCor() != 5.0 || m.Turtle(0).YCor() != 9.6 {
+		t.Errorf("Expected turtle to move to (5.0, 9.6), got (%v, %v)", m.Turtle(0).XCor(), m.Turtle(0).YCor())
+	}
+}
+
+func TestTurtleMoveForwardUp(t *testing.T) {
+
+	settings := model.ModelSettings{
+		WrappingX:  true,
+		WrappingY:  true,
+		MinPxCor:   -10, // min x patch coordinate
+		MaxPxCor:   10,  // max x patch coordinate
+		MinPyCor:   -10, // min y patch coordinate
+		MaxPyCor:   10,  // max y patch coordinate
+		RandomSeed: 10,  // random seed
+	}
+
+	m := model.NewModel(settings) // create a new model with the settings
+
+	m.ClearAll()
+
+	m.CreateTurtles(1, func(t *model.Turtle) {
+		t.SetHeading(90)
+		t.SetSize(.5)
+		t.SetXY(5.0, 10.4)
+		t.Shape = "circle"
+		t.Color = model.Green
+	})
+
+	t0 := m.Turtle(0)
+	t0.Forward(1.0)
+
+	if m.Turtle(0).XCor() != 5.0 || (m.Turtle(0).YCor()+9.6) > .001 {
+		t.Errorf("Expected turtle to move to (5.0, -9.6), got (%v, %v)", m.Turtle(0).XCor(), m.Turtle(0).YCor())
+	}
+}
+
+func TestTurtleMoveForwardLeft(t *testing.T) {
+
+	settings := model.ModelSettings{
+		WrappingX:  true,
+		WrappingY:  true,
+		MinPxCor:   -10, // min x patch coordinate
+		MaxPxCor:   10,  // max x patch coordinate
+		MinPyCor:   -10, // min y patch coordinate
+		MaxPyCor:   10,  // max y patch coordinate
+		RandomSeed: 10,  // random seed
+	}
+
+	m := model.NewModel(settings) // create a new model with the settings
+
+	m.ClearAll()
+
+	m.CreateTurtles(1, func(t *model.Turtle) {
+		t.SetHeading(180)
+		t.SetSize(.5)
+		t.SetXY(-10.4, 5.0)
+		t.Shape = "circle"
+		t.Color = model.Green
+	})
+
+	t0 := m.Turtle(0)
+	t0.Forward(1.0)
+
+	if m.Turtle(0).XCor() != 9.6 || m.Turtle(0).YCor() != 5.0 {
+		t.Errorf("Expected turtle to move to (-9.6, 5.0), got (%v, %v)", m.Turtle(0).XCor(), m.Turtle(0).YCor())
+	}
+}
+
+func TestTurtleMoveForwardRight(t *testing.T) {
+
+	settings := model.ModelSettings{
+		WrappingX:  true,
+		WrappingY:  true,
+		MinPxCor:   -10, // min x patch coordinate
+		MaxPxCor:   10,  // max x patch coordinate
+		MinPyCor:   -10, // min y patch coordinate
+		MaxPyCor:   10,  // max y patch coordinate
+		RandomSeed: 10,  // random seed
+	}
+
+	m := model.NewModel(settings) // create a new model with the settings
+
+	m.ClearAll()
+
+	m.CreateTurtles(1, func(t *model.Turtle) {
+		t.SetHeading(0)
+		t.SetSize(.5)
+		t.SetXY(10.4, 5.0)
+		t.Shape = "circle"
+		t.Color = model.Green
+	})
+
+	t0 := m.Turtle(0)
+	t0.Forward(1.0)
+
+	if m.Turtle(0).XCor()+9.6 > (.001) || m.Turtle(0).YCor() != 5.0 {
+		t.Errorf("Expected turtle to move to (9.6, 5.0), got (%v, %v)", m.Turtle(0).XCor(), m.Turtle(0).YCor())
+	}
+}

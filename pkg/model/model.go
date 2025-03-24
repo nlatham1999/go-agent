@@ -322,7 +322,7 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 
 	if x < m.minXCor {
 		if m.wrappingX {
-			x = m.maxXCor - math.Mod(m.minXCor-x, float64(m.worldWidth)) + 1
+			x = m.maxXCor - math.Mod(m.minXCor-x, float64(m.worldWidth))
 		} else {
 			return x, y, false
 		}
@@ -338,7 +338,8 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 
 	if y < m.minYCor {
 		if m.wrappingY {
-			y = m.maxYCor - math.Mod(m.minYCor-y, float64(m.worldHeight)) + 1
+			modu := math.Mod(m.minYCor-y, float64(m.worldHeight))
+			y = m.maxYCor - modu
 		} else {
 			return x, y, false
 		}
@@ -507,7 +508,9 @@ func (m *Model) Links() *LinkAgentSet {
 }
 
 // returns the distance between two points
+// convertXYToInBounds should be called before this function
 func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
+
 	deltaX := x1 - x2
 	deltaY := y1 - y2
 
@@ -996,9 +999,76 @@ func (m *Model) Turtle(who int) *Turtle {
 	return t
 }
 
+func (m *Model) TurtleWillCollide(turtle *Turtle, distance float64, biggestSize float64) bool {
+
+	dx := distance * math.Cos(turtle.heading)
+	dy := distance * math.Sin(turtle.heading)
+
+	// radius of the given turtle
+	radius := turtle.GetSize() / 2
+
+	tX := turtle.XCor() + dx
+	tY := turtle.YCor() + dy
+
+	tX, tY, inBounds := m.convertXYToInBounds(tX, tY)
+	if !inBounds {
+		return false
+	}
+
+	// get the turtles that are in the radius of the turtle and who might be given the biggest possible size
+	potentialTurtles := m.TurtlesInRadius(tX, tY, radius+(biggestSize/2))
+
+	// remove the turtle from the potential turtles
+	potentialTurtles.Remove(turtle)
+
+	// if there are no turtles in the radius then there is no collision
+	if potentialTurtles.Count() == 0 {
+		return false
+	}
+	// check if any of the potential turtles actually do collide with the given turtle
+	if potentialTurtles.Any(func(t *Turtle) bool {
+		return m.TurtlesCollide(turtle, t, distance, 0, 0)
+	}) {
+		return true
+	}
+
+	return false
+}
+
 // returns the turtle agentset
 func (m *Model) Turtles() *TurtleAgentSet {
 	return m.turtles
+}
+
+// returns true if the two turtles are within the provided distanc
+func (m *Model) TurtlesCollide(t1 *Turtle, t2 *Turtle, t1dist float64, t2dist float64, difference float64) bool {
+
+	t1dx := t1dist * math.Cos(t1.heading)
+	t1dy := t1dist * math.Sin(t1.heading)
+
+	t2dx := t2dist * math.Cos(t2.heading)
+	t2dy := t2dist * math.Sin(t2.heading)
+
+	t1X := t1.XCor() + t1dx
+	t1Y := t1.YCor() + t1dy
+
+	t2X := t2.XCor() + t2dx
+	t2Y := t2.YCor() + t2dy
+
+	t1X, t1Y, inBounds1 := m.convertXYToInBounds(t1X, t1Y)
+	t2X, t2Y, inBounds2 := m.convertXYToInBounds(t2X, t2Y)
+
+	if !inBounds1 || !inBounds2 {
+		return false
+	}
+
+	distance := m.DistanceBetweenPoints(t1X, t1Y, t2X, t2Y)
+
+	radius1 := t1.GetSize() / 2
+
+	radius2 := t2.GetSize() / 2
+
+	return distance <= radius1+radius2+difference
 }
 
 // returns the turtle agentset that is on patch of the proviced x y coordinates
