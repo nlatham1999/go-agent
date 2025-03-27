@@ -123,7 +123,7 @@ This is because any actions moving the turtle can affect other pieces
 -  [ ] setting the color should be a setcolor function
 -  [x] make moving on world wrapping on left and down work 🤦‍♂️
 -  [ ] make setxy able to be called concurrently
--  [ ] remove tie modes
+-  [x] remove tie modes
 -  [ ] make change patch ownership able to be called concurrently
 -  [ ] have descendents public
 -  [ ] button widgets
@@ -131,5 +131,6 @@ This is because any actions moving the turtle can affect other pieces
 -  [ ] update readme on concurrency
 -  [ ] remove collision detection and make a seperate package
 -  [ ] speed improvements on rendering
--  [ ] on sliders, if the value is set, than use that value when loading
+-  [x] on sliders, if the value is set, than use that value when loading
 -  [ ] agentset copy funcs
+-  [ ] stats should just be widgets

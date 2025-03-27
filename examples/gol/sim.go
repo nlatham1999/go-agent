@@ -129,7 +129,7 @@ func (g *Gol) Widgets() []api.Widget {
 	return []api.Widget{
 		{
 			PrettyName:      "Min Neighbors To Live",
-			TargetVariable:  "min-neighbors-to-live",
+			Id:              "min-neighbors-to-live",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -139,7 +139,7 @@ func (g *Gol) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Max Neighbors To Live",
-			TargetVariable:  "max-neighbors-to-live",
+			Id:              "max-neighbors-to-live",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -149,7 +149,7 @@ func (g *Gol) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Min Neighbors To Reproduce",
-			TargetVariable:  "min-neighbors-to-reproduce",
+			Id:              "min-neighbors-to-reproduce",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -159,7 +159,7 @@ func (g *Gol) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Max Neighbors To Reproduce",
-			TargetVariable:  "max-neighbors-to-reproduce",
+			Id:              "max-neighbors-to-reproduce",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -169,7 +169,7 @@ func (g *Gol) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:        "Initial Alive",
-			TargetVariable:    "initial-alive",
+			Id:                "initial-alive",
 			WidgetType:        "slider",
 			WidgetValueType:   "float",
 			MinValue:          "0",

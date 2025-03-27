@@ -181,7 +181,7 @@ func (p *Prims) Widgets() []api.Widget {
 	return []api.Widget{
 		{
 			PrettyName:      "Nodes",
-			TargetVariable:  "nodes",
+			Id:              "nodes",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "2",

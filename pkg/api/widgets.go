@@ -4,7 +4,7 @@ import "fmt"
 
 type Widget struct {
 	PrettyName         string   `json:"prettyName"`
-	TargetVariable     string   `json:"targetVariable"`
+	Id                 string   `json:"targetVariable"`
 	WidgetType         string   `json:"widgetType"`
 	WidgetValueType    string   `json:"widgetValueType"`
 	MinValue           string   `json:"minValue"`
@@ -17,10 +17,10 @@ type Widget struct {
 	ValuePointerString *string  `json:"valuePointerString"`
 }
 
-func NewFloatSliderWidget(prettyName, targetVariable, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
+func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
 	return Widget{
 		PrettyName:        prettyName,
-		TargetVariable:    targetVariable,
+		Id:                id,
 		WidgetType:        "slider",
 		WidgetValueType:   "float",
 		MinValue:          minValue,
@@ -31,25 +31,47 @@ func NewFloatSliderWidget(prettyName, targetVariable, minValue, maxValue, defaul
 	}
 }
 
+func NewButtonWidget(prettyName, id string, target func()) Widget {
+	return Widget{
+		PrettyName: prettyName,
+		Id:         id,
+		WidgetType: "button",
+		Target:     target,
+	}
+}
+
 func (w *Widget) render(offset int) string {
 
-	id := w.TargetVariable + "-widget"
+	id := w.Id + "-widget"
 
 	html := "<div class='widget' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
 	//label for id
 	if w.WidgetType == "text" {
 		html += `<label for="` + id + `">` + w.PrettyName + `</label>`
 		//input type text with id and dynamic name (TargetVariable as the name)
-		html += `<input type="text" id="` + id + `" name="` + w.TargetVariable + `" hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `">`
+		html += `<input type="text" id="` + id + `" name="` + w.Id + `" hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `">`
 	}
 	if w.WidgetType == "slider" {
+
+		initialValue := w.DefaultValue
+		if w.ValuePointerInt != nil {
+			initialValue = fmt.Sprintf("%d", *w.ValuePointerInt)
+		}
+		if w.ValuePointerFloat != nil {
+			initialValue = fmt.Sprintf("%f", *w.ValuePointerFloat)
+			// remove trailing zeros
+			for initialValue[len(initialValue)-1] == '0' {
+				initialValue = initialValue[:len(initialValue)-1]
+			}
+		}
+
 		labelId := id + "-label"
 		html += `<div>`
-		html += `<label for="` + id + `">` + w.PrettyName + `: <span id="` + labelId + `">` + w.DefaultValue + `</span></label>`
+		html += `<label for="` + id + `">` + w.PrettyName + `: <span id="` + labelId + `">` + initialValue + `</span></label>`
 		html += `</div>`
 		//input type range with id and dynamic name (TargetVariable as the name)
-		html += `<input type="range" id="` + id + `" name="` + w.TargetVariable + `" 
-		min="` + w.MinValue + `" max="` + w.MaxValue + `" value="` + w.DefaultValue + `"`
+		html += `<input type="range" id="` + id + `" name="` + w.Id + `" 
+		min="` + w.MinValue + `" max="` + w.MaxValue + `" value="` + initialValue + `"`
 		if w.StepAmount != "" {
 			html += `step="` + w.StepAmount + `"`
 		}
@@ -57,7 +79,7 @@ func (w *Widget) render(offset int) string {
 		oninput="document.getElementById('` + labelId + `').innerText = this.value;">`
 	}
 	if w.WidgetType == "button" {
-		html += `<button id="` + id + `" hx-swap="none" hx-get="/updatedynamic" hx-trigger="click" hx-vals='{"` + w.TargetVariable + `": "test"}'>` + w.PrettyName + `</button>`
+		html += `<button id="` + id + `" hx-swap="none" hx-get="/updatedynamic" hx-trigger="click" hx-vals='{"` + w.Id + `": "test"}'>` + w.PrettyName + `</button>`
 	}
 
 	html += "</div>"

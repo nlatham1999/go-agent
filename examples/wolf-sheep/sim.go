@@ -292,7 +292,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 	return []api.Widget{
 		{
 			PrettyName:      "Max Sheep",
-			TargetVariable:  "max-sheep",
+			Id:              "max-sheep",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "200",
@@ -301,7 +301,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Initial Number Of Sheep",
-			TargetVariable:  "initial-number-sheep",
+			Id:              "initial-number-sheep",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -310,7 +310,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Initial Number Of Wolves",
-			TargetVariable:  "initial-number-wolves",
+			Id:              "initial-number-wolves",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -319,7 +319,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Grass Regrowth Time",
-			TargetVariable:  "grass-regrowth-time",
+			Id:              "grass-regrowth-time",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -328,7 +328,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Wolf Gain From Food",
-			TargetVariable:  "wolf-gain-from-food",
+			Id:              "wolf-gain-from-food",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -337,7 +337,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Sheep Gain From Food",
-			TargetVariable:  "sheep-gain-from-food",
+			Id:              "sheep-gain-from-food",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
@@ -346,7 +346,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Sheep Reproduce Rate",
-			TargetVariable:  "sheep-reproduce-rate",
+			Id:              "sheep-reproduce-rate",
 			WidgetType:      "slider",
 			WidgetValueType: "float",
 			MinValue:        "1",
@@ -355,7 +355,7 @@ func (ws *WolfSheep) Widgets() []api.Widget {
 		},
 		{
 			PrettyName:      "Wolf Reproduce Rate",
-			TargetVariable:  "wolf-reproduce-rate",
+			Id:              "wolf-reproduce-rate",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",

@@ -314,7 +314,7 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 
 		// go through widgets and update the dynamic variable
 		for _, widget := range a.currentModel.Widgets() {
-			if widget.TargetVariable == name {
+			if widget.Id == name {
 
 				// If the widget is a button, just call the target function
 				if widget.WidgetType == "button" {

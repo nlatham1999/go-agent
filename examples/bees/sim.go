@@ -231,7 +231,7 @@ func (b *Bees) Widgets() []api.Widget {
 	return []api.Widget{
 		{
 			PrettyName:      "Scouts",
-			TargetVariable:  "scouts",
+			Id:              "scouts",
 			WidgetType:      "slider",
 			WidgetValueType: "int",
 			MinValue:        "1",
