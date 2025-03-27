@@ -129,3 +129,7 @@ This is because any actions moving the turtle can affect other pieces
 -  [ ] button widgets
 -  [ ] enable setting x,y, height(?) and width on widgets
 -  [ ] update readme on concurrency
+-  [ ] remove collision detection and make a seperate package
+-  [ ] speed improvements on rendering
+-  [ ] on sliders, if the value is set, than use that value when loading
+-  [ ] agentset copy funcs

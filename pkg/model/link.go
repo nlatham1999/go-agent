@@ -16,7 +16,6 @@ type Link struct {
 	breed      *LinkBreed  // Breed of the link
 	Shape      string      // Shape of the link
 	Thickness  float64     // Thickness of the link
-	TieMode    TieMode     // Tie mode of the link
 	parent     *Model      // the parent model
 	Size       int         // Size of the link
 	Label      interface{} // Label of the link
@@ -191,18 +190,4 @@ func (l *Link) OtherEnd(t *Turtle) *Turtle {
 // sets the link to be visible
 func (l *Link) Show() {
 	l.Hidden = false
-}
-
-// sets the tie mode to be closely tied
-func (l *Link) Tie() {
-	l.TieMode.MoveTiedTurtle = true
-	l.TieMode.SwivelTiedTurtle = true
-	l.TieMode.RotateTiedTurtle = true
-}
-
-// sets the tie mode to completely free
-func (l *Link) Untie() {
-	l.TieMode.MoveTiedTurtle = false
-	l.TieMode.SwivelTiedTurtle = false
-	l.TieMode.RotateTiedTurtle = false
 }

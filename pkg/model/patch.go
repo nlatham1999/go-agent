@@ -211,6 +211,7 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 
 // returns the turtles that are on this patch regardless of breed
 // if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (p *Patch) TurtlesHere() *TurtleAgentSet {
 
 	generalBreed := p.parent.breeds[BreedNone]
@@ -230,12 +231,7 @@ func (p *Patch) turtlesHereBreeded(breed *TurtleBreed) *TurtleAgentSet {
 		return NewTurtleAgentSet([]*Turtle{})
 	}
 
-	agentSet := NewTurtleAgentSet(nil)
-	turtles.Ask(func(turtle *Turtle) {
-		agentSet.Add(turtle)
-	})
-
-	return agentSet
+	return turtles
 }
 
 func (p *Patch) GetProperty(key string) interface{} {

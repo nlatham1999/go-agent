@@ -83,23 +83,16 @@ func (p *PatchAgentSet) Contains(patch *Patch) bool {
 	return p.patches.Contains(patch)
 }
 
+// returns a copy of the agent set
+func (p *PatchAgentSet) Copy() *PatchAgentSet {
+	return &PatchAgentSet{
+		// patches: p.patches.Copy(),
+	}
+}
+
 // returns the number of patches in the agent set
 func (p *PatchAgentSet) Count() int {
 	return p.patches.Len()
-}
-
-// returns a subset of patches that are in the radius of the given patch
-func (p PatchAgentSet) InRadiusPatch(radius float64, patch *Patch) *PatchAgentSet {
-	return p.With(func(p *Patch) bool {
-		return p.DistancePatch(patch) <= radius
-	})
-}
-
-// returns a subset of patches that are in the radius of the given turtle
-func (p PatchAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *PatchAgentSet {
-	return p.With(func(p *Patch) bool {
-		return p.DistanceTurtle(turtle) <= radius
-	})
 }
 
 // returns the agent set as a list

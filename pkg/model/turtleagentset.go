@@ -123,20 +123,14 @@ func (t *TurtleAgentSet) Contains(turtle *Turtle) bool {
 	return t.turtles.Contains(turtle)
 }
 
+func (t *TurtleAgentSet) Copy() *TurtleAgentSet {
+	return &TurtleAgentSet{
+		// 	turtles: t.turtles.Copy(),
+	}
+}
+
 func (t *TurtleAgentSet) Count() int {
 	return t.turtles.Len()
-}
-
-func (t *TurtleAgentSet) InRadiusPatch(radius float64, patch *Patch) *TurtleAgentSet {
-	return t.With(func(t *Turtle) bool {
-		return t.DistancePatch(patch) <= radius
-	})
-}
-
-func (t *TurtleAgentSet) InRadiusTurtle(radius float64, turtle *Turtle) *TurtleAgentSet {
-	return t.With(func(t *Turtle) bool {
-		return t.DistanceTurtle(turtle) <= radius
-	})
 }
 
 func (t *TurtleAgentSet) List() []*Turtle {

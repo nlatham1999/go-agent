@@ -67,6 +67,13 @@ func (l *LinkAgentSet) Contains(link *Link) bool {
 	return l.links.Contains(link)
 }
 
+// returns a copy of the agent set
+func (l *LinkAgentSet) Copy() *LinkAgentSet {
+	return &LinkAgentSet{
+		// links: l.links.Copy(),
+	}
+}
+
 // returns the length of the agent set
 func (l *LinkAgentSet) Count() int {
 	return l.links.Len()

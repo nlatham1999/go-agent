@@ -443,51 +443,7 @@ func (t *Turtle) SetHeading(heading float64) {
 }
 
 func (t *Turtle) setHeadingRadians(heading float64) {
-
-	headingDifference := heading - t.heading
-
 	t.heading = heading
-
-	if t.parent.linkedTurtles[t].count() == 0 {
-		return
-	}
-
-	swivellDescendents := t.descendents(false, false, true)
-	rotateDescendents := t.descendents(true, false, false)
-
-	// rotate the heading for all descendents where the tiemode is at least free
-	swivellDescendents.Ask(func(turtle *Turtle) {
-		t.rotateTiedTurtle(turtle, headingDifference)
-	})
-
-	// rotate the heading for all descendents where the tiemode is fixed
-	rotateDescendents.Ask(func(turtle *Turtle) {
-		turtle.heading += headingDifference
-	})
-}
-
-// swivvels the turtle to the left or right by the amount passed in
-// the turtle passed in will maintain the same distance from the current turtle
-func (t *Turtle) rotateTiedTurtle(turtle *Turtle, amount float64) {
-	if t == turtle {
-		return
-	}
-
-	// get the distance between the two turtles
-	distanceX := turtle.xcor - t.xcor
-	distanceY := turtle.ycor - t.ycor
-
-	// get the new x and y coordinates
-	newX := t.xcor + distanceX*math.Cos(-amount) - distanceY*math.Sin(-amount)
-	newY := t.ycor + distanceX*math.Sin(-amount) + distanceY*math.Cos(-amount)
-
-	newX, newY, allowed := t.parent.convertXYToInBounds(newX, newY)
-	if !allowed {
-		return
-	}
-
-	turtle.xcor = newX
-	turtle.ycor = newY
 }
 
 // Hide the turtle
@@ -742,9 +698,6 @@ func (t *Turtle) Right(number float64) {
 
 func (t *Turtle) SetXY(x float64, y float64) {
 
-	dx := x - t.xcor
-	dy := y - t.ycor
-
 	x, y, allowed := t.parent.convertXYToInBounds(x, y)
 	if !allowed {
 		return
@@ -754,17 +707,6 @@ func (t *Turtle) SetXY(x float64, y float64) {
 	t.ycor = y
 
 	t.transferPatchOwnership()
-
-	if t.parent.linkedTurtles[t].count() == 0 {
-		return
-	}
-
-	moveDescendents := t.descendents(false, true, false)
-
-	// move the linked turtles
-	moveDescendents.Ask(func(turtle *Turtle) {
-		t.moveTiedTurtle(turtle, dx, dy)
-	})
 }
 
 func (t *Turtle) transferPatchOwnership() {
@@ -775,26 +717,6 @@ func (t *Turtle) transferPatchOwnership() {
 		oldPatch.removeTurtle(t)
 		t.patch.addTurtle(t)
 	}
-}
-
-func (t *Turtle) moveTiedTurtle(turtle *Turtle, dx float64, dy float64) {
-	if t == turtle {
-		return
-	}
-
-	newX := turtle.xcor + dx
-	newY := turtle.ycor + dy
-
-	newX, newY, allowed := t.parent.convertXYToInBounds(newX, newY)
-	if !allowed {
-		return
-	}
-
-	turtle.xcor = newX
-	turtle.ycor = newY
-
-	t.transferPatchOwnership()
-
 }
 
 func (t *Turtle) Show() {

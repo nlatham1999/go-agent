@@ -1073,6 +1073,7 @@ func (m *Model) TurtlesCollide(t1 *Turtle, t2 *Turtle, t1dist float64, t2dist fl
 
 // returns the turtle agentset that is on patch of the proviced x y coordinates
 // same as TurtlesOnPatch(breed, Patch(x, y))
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (m *Model) TurtlesAtCoords(pxcor float64, pycor float64) *TurtleAgentSet {
 
 	generalBreed := m.breeds[BreedNone]
@@ -1093,6 +1094,7 @@ func (m *Model) turtlesAtCoordsBreeded(breed *TurtleBreed, pxcor float64, pycor 
 	return patch.turtlesHereBreeded(breed)
 }
 
+// returns an agentset of turtles that are within the provided radius of the provided x y coordinates
 func (m *Model) TurtlesInRadius(xCor float64, yCor float64, radius float64) *TurtleAgentSet {
 	// xMin, xMax := int(math.Floor(cx-r)), int(math.Ceil(cx+r))
 	// yMin, yMax := int(math.Floor(cy-r)), int(math.Ceil(cy+r))
@@ -1180,6 +1182,7 @@ func (m *Model) TurtlesInRadius(xCor float64, yCor float64, radius float64) *Tur
 }
 
 // returns the turtle agentset that is on the provided patch
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (m *Model) TurtlesOnPatch(patch *Patch) *TurtleAgentSet {
 
 	generalBreed := m.breeds[BreedNone]
@@ -1192,6 +1195,7 @@ func (m *Model) turtlesOnPatchBreeded(breed *TurtleBreed, patch *Patch) *TurtleA
 }
 
 // Returns the turtles on the provided patches
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (m *Model) TurtlesOnPatches(patches *PatchAgentSet) *TurtleAgentSet {
 
 	generalBreed := m.breeds[BreedNone]
@@ -1213,6 +1217,7 @@ func (m *Model) turtlesOnPatchesBreeded(breed *TurtleBreed, patches *PatchAgentS
 }
 
 // Returns the turtles on the same patch as the provided turtle
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (m *Model) TurtlesWithTurtle(turtle *Turtle) *TurtleAgentSet {
 
 	generalBreed := m.breeds[BreedNone]
@@ -1230,6 +1235,7 @@ func (m *Model) turtlesWithTurtleBreeded(breed *TurtleBreed, turtle *Turtle) *Tu
 }
 
 // Returns the turtles on the same patch as the provided turtle
+// the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (m *Model) TurtlesWithTurtles(turtles *TurtleAgentSet) *TurtleAgentSet {
 
 	generalBreed := m.breeds[BreedNone]

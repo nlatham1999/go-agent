@@ -74,7 +74,7 @@ func (f *Flocking) Go() {
 
 	f.model.Turtles().Ask(
 		func(t *model.Turtle) {
-			t.Forward(1)
+			t.Forward(.1)
 		},
 	)
 	f.model.Tick()

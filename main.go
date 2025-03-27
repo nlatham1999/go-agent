@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/nlatham1999/go-agent/examples/boid"
 	"github.com/nlatham1999/go-agent/examples/boidconcurrent"
+	"github.com/nlatham1999/go-agent/examples/flocking"
 	"github.com/nlatham1999/go-agent/examples/gol"
 	"github.com/nlatham1999/go-agent/examples/prims"
 	"github.com/nlatham1999/go-agent/pkg/api"
@@ -16,6 +17,7 @@ func main() {
 	boidConurrent := boidconcurrent.NewBoid()
 	gol := gol.NewGol()
 	playground := playground.NewSim()
+	flocking := flocking.NewFlocking()
 
 	agentApi, err := api.NewApi(
 		map[string]api.ModelInterface{
@@ -24,6 +26,7 @@ func main() {
 			"boid":           boid,
 			"boidconcurrent": boidConurrent,
 			"playground":     playground,
+			"flocking":       flocking,
 		},
 		api.ApiSettings{
 			StoreSteps: false,
@@ -33,6 +36,7 @@ func main() {
 				"boid":           "🐦 Boid Movement",
 				"boidconcurrent": "🐦 Boid Movement Concurrent",
 				"playground":     "🎮 Playground",
+				"flocking":       "🐦 Flocking",
 			},
 			ButtonDescriptions: map[string]string{
 				"gameoflife":     "Conway's Game of Life",
@@ -40,6 +44,7 @@ func main() {
 				"boid":           "Simulating flocking birds",
 				"boidconcurrent": "Simulating flocking birds concurrently",
 				"playground":     "Playground for quick testing",
+				"flocking":       "Flocking simulation",
 			},
 		},
 	)

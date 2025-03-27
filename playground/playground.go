@@ -34,13 +34,13 @@ func (s *Sim) Model() *model.Model {
 
 func (s *Sim) Init() {
 	settings := model.ModelSettings{
-		WrappingX:  true,
-		WrappingY:  true,
-		MinPxCor:   1,  // min x patch coordinate
-		MaxPxCor:   20, // max x patch coordinate
-		MinPyCor:   1,  // min y patch coordinate
-		MaxPyCor:   20, // max y patch coordinate
-		RandomSeed: 10, // random seed
+		WrappingX:  false,
+		WrappingY:  false,
+		MinPxCor:   -100, // min x patch coordinate
+		MaxPxCor:   100,  // max x patch coordinate
+		MinPyCor:   -100, // min y patch coordinate
+		MaxPyCor:   100,  // max y patch coordinate
+		RandomSeed: 10,   // random seed
 		TurtleProperties: map[string]interface{}{
 			"newHeading": nil,
 		},
@@ -53,76 +53,44 @@ func (s *Sim) SetUp() error {
 
 	s.model.ClearAll()
 
-	s.model.CreateTurtles(100, func(t *model.Turtle) {
-		t.SetHeading(s.model.RandomFloat(360))
-		t.SetSize(.5)
-		t.SetXY(s.model.RandomXCor(), s.model.RandomYCor())
-		t.Shape = "circle"
-		t.Color = s.model.RandomColor()
+	s.model.Patches.Ask(func(p *model.Patch) {
+		p.PColor.SetColor(model.Green)
 	})
+
+	s.model.Patch(float64(s.model.MaxPxCor())-2, float64(s.model.MaxPyCor())-2).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor())-2, float64(s.model.MaxPyCor())-1).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor())-2, float64(s.model.MaxPyCor())).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor())-1, float64(s.model.MaxPyCor())-2).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor())-1, float64(s.model.MaxPyCor())-1).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor())-1, float64(s.model.MaxPyCor())).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor()), float64(s.model.MaxPyCor())-2).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor()), float64(s.model.MaxPyCor())-1).PColor.SetColor(model.White)
+	s.model.Patch(float64(s.model.MaxPxCor()), float64(s.model.MaxPyCor())).PColor.SetColor(model.White)
+
 	return nil
 }
 
 func (s *Sim) Go() {
 
-	s.model.Turtles().Ask(func(t *model.Turtle) {
+	s.model.Patches.Ask(func(p *model.Patch) {
 
-		var turtleFound *model.Turtle
-
-		if t.GetProperty("newHeading") != nil {
+		if p.PColor == model.White {
+			p.PColor.SetColor(model.Black)
 			return
 		}
 
-		s.model.Turtles().Ask(func(t2 *model.Turtle) {
+		neighborsTotal := p.Neighbors()
 
-			if turtleFound != nil {
-				return
-			}
-
-			if t == t2 {
-				return
-			}
-
-			if t2.GetProperty("newHeading") != nil {
-				return
-			}
-
-			distance := .1
-
-			if s.model.TurtlesCollide(t, t2, distance, distance, 0) {
-				turtleFound = t2
-			}
-
+		neighborsColored := neighborsTotal.With(func(p *model.Patch) bool {
+			return p.PColor == model.White || p.PColor == model.Black
 		})
 
-		if turtleFound != nil {
-			// fmt.Println("calling elastic collision with", t.XCor(), t.YCor(), turtleFound.XCor(), turtleFound.YCor(), t.GetHeading(), turtleFound.GetHeading())
-			newH1, newH2 := elasticCollisionHeadings(t.XCor(), t.YCor(), turtleFound.XCor(), turtleFound.YCor(), t.GetHeading(), turtleFound.GetHeading())
-
-			newH1Deg := newH1 * 180 / math.Pi
-			newH2Deg := newH2 * 180 / math.Pi
-
-			// fmt.Println("New Headings", newH1Deg, newH2Deg, "Old Headings", t.GetHeading(), turtleFound.GetHeading())
-			t.SetProperty("newHeading", newH1Deg)
-			turtleFound.SetProperty("newHeading", newH2Deg)
-		}
-
-	})
-
-	s.model.Turtles().Ask(func(t *model.Turtle) {
-		if t.GetProperty("newHeading") != nil {
-			t.SetHeading(t.GetProperty("newHeading").(float64))
-			t.SetProperty("newHeading", nil)
-			if !s.model.TurtleWillCollide(t, .1, .5) {
-				t.Forward(.1)
-			}
+		if s.model.RandomFloat(1) < float64(neighborsColored.Count())/float64(neighborsTotal.Count()) {
+			p.PColor.SetColor(model.White)
 		} else {
-			t.Forward(.1)
+			p.PColor.SetColor(model.Green)
 		}
 	})
-
-	s.model.Tick()
-
 }
 
 func (s *Sim) Stats() map[string]interface{} {
