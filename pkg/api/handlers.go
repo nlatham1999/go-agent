@@ -171,6 +171,11 @@ func (a *Api) ModelPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	a.currentModelWidgets = map[string]Widget{}
+	for _, widget := range a.currentModel.Widgets() {
+		a.currentModelWidgets[widget.Id] = widget
+	}
+
 	tmpl, err := template.New("content").Parse(modelPageHtml)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -312,46 +317,57 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 			value = values[0]
 		}
 
-		// go through widgets and update the dynamic variable
-		for _, widget := range a.currentModel.Widgets() {
-			if widget.Id == name {
+		widget, found := a.currentModelWidgets[name]
+		if !found {
+			fmt.Println("Widget not found", name)
+			continue
+		}
 
-				// If the widget is a button, just call the target function
-				if widget.WidgetType == "button" {
-					widget.Target()
-					continue
-				}
+		// If the widget is a button, just call the target function
+		if widget.WidgetType == "button" {
+			widget.Target()
+			continue
+		}
 
-				// Update the dynamic variable
-				if widget.WidgetValueType == "int" {
-					intValue, err := strconv.Atoi(value)
-					if err != nil {
-						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
-					}
-					if widget.ValuePointerInt == nil {
-						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
-						continue
-					}
-					*widget.ValuePointerInt = intValue
-				} else if widget.WidgetValueType == "float" {
-					floatValue, err := strconv.ParseFloat(value, 64)
-					if err != nil {
-						http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
-						continue
-					}
-					if widget.ValuePointerFloat == nil {
-						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
-						continue
-					}
-					*widget.ValuePointerFloat = floatValue
-				} else {
-					if widget.ValuePointerString == nil {
-						http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
-						continue
-					}
-					*widget.ValuePointerString = value
-				}
+		// Update the dynamic variable
+		if widget.WidgetValueType == "int" {
+			intValue, err := strconv.Atoi(value)
+			if err != nil {
+				http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
 			}
+			if widget.ValuePointerInt == nil {
+				http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			*widget.ValuePointerInt = intValue
+		} else if widget.WidgetValueType == "float" {
+			floatValue, err := strconv.ParseFloat(value, 64)
+			if err != nil {
+				http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			if widget.ValuePointerFloat == nil {
+				http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			*widget.ValuePointerFloat = floatValue
+		} else if widget.WidgetValueType == "bool" {
+			boolValue, err := strconv.ParseBool(value)
+			if err != nil {
+				http.Error(w, "Invalid value for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			if widget.ValuePointerBool == nil {
+				http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			*widget.ValuePointerBool = boolValue
+		} else {
+			if widget.ValuePointerString == nil {
+				http.Error(w, "Invalid value pointer for dynamic variable", http.StatusBadRequest)
+				continue
+			}
+			*widget.ValuePointerString = value
 		}
 
 		// Here you can process the variable name and value dynamically, e.g., store them, respond, etc.

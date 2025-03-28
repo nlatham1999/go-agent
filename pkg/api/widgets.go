@@ -15,6 +15,7 @@ type Widget struct {
 	ValuePointerInt    *int     `json:"valuePointerInt"`
 	ValuePointerFloat  *float64 `json:"valuePointerFloat"`
 	ValuePointerString *string  `json:"valuePointerString"`
+	ValuePointerBool   *bool    `json:"valuePointerBool"`
 }
 
 func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
@@ -40,11 +41,65 @@ func NewButtonWidget(prettyName, id string, target func()) Widget {
 	}
 }
 
+func NewMouseXClickedHook(valuePointer *float64) Widget {
+	return Widget{
+		WidgetType:        "background",
+		Id:                "mouse-x-clicked",
+		WidgetValueType:   "float",
+		ValuePointerFloat: valuePointer,
+	}
+}
+
+func NewMouseYClickedHook(valuePointer *float64) Widget {
+	return Widget{
+		WidgetType:        "background",
+		Id:                "mouse-y-clicked",
+		WidgetValueType:   "float",
+		ValuePointerFloat: valuePointer,
+	}
+}
+
+func NewMouseClickedHook(valuePointer *bool) Widget {
+	return Widget{
+		WidgetType:       "background",
+		Id:               "mouse-clicked",
+		WidgetValueType:  "bool",
+		ValuePointerBool: valuePointer,
+	}
+}
+
+func NewMouseXMovedHook(valuePointer *float64) Widget {
+	return Widget{
+		WidgetType:        "background",
+		Id:                "mouse-x-moved",
+		WidgetValueType:   "float",
+		ValuePointerFloat: valuePointer,
+	}
+}
+
+func NewMouseYMovedHook(valuePointer *float64) Widget {
+	return Widget{
+		WidgetType:        "background",
+		Id:                "mouse-y-moved",
+		WidgetValueType:   "float",
+		ValuePointerFloat: valuePointer,
+	}
+}
+
+func NewMouseMovedHook(valuePointer *bool) Widget {
+	return Widget{
+		WidgetType:       "background",
+		Id:               "mouse-moved",
+		WidgetValueType:  "bool",
+		ValuePointerBool: valuePointer,
+	}
+}
+
 func (w *Widget) render(offset int) string {
 
 	id := w.Id + "-widget"
 
-	html := "<div class='widget' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
+	html := "<div class='widget widget-" + w.WidgetType + "' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
 	//label for id
 	if w.WidgetType == "text" {
 		html += `<label for="` + id + `">` + w.PrettyName + `</label>`

@@ -35,7 +35,7 @@ func (a *Api) renderStatsAsWidgets() (string, int) {
 
 	//tick stat
 	html += fmt.Sprintf(`
-		<div class="widget widget-stats">
+		<div class="widget widget-stat">
 			<div id="stats-ticks">Ticks : %d</div>
 		</div>
 	`, a.currentModel.Model().Ticks)
@@ -46,7 +46,7 @@ func (a *Api) renderStatsAsWidgets() (string, int) {
 			value = "null"
 		}
 		html += fmt.Sprintf(`
-		<div class="widget widget-stats" style="top: %dpx;">
+		<div class="widget widget-stat" style="top: %dpx;">
 			<div id="stats-%s">%s : %v</div>
 		</div>
 		`, count*40, key, key, value)

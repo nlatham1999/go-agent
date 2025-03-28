@@ -1,5 +1,4 @@
-// playground for quick testing
-package playground
+package mouseinteractions
 
 import (
 	"fmt"

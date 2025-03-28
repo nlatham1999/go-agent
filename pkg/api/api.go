@@ -13,7 +13,8 @@ import (
 type Api struct {
 	models map[string]ModelInterface
 
-	currentModel ModelInterface
+	currentModel        ModelInterface
+	currentModelWidgets map[string]Widget
 
 	funcMutext      sync.Mutex // Mutex for when we are running a model function
 	simulationSpeed time.Duration
