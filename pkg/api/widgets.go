@@ -97,6 +97,10 @@ func NewMouseMovedHook(valuePointer *bool) Widget {
 
 func (w *Widget) render(offset int) string {
 
+	if w.WidgetType == "background" {
+		return ""
+	}
+
 	id := w.Id + "-widget"
 
 	html := "<div class='widget widget-" + w.WidgetType + "' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"

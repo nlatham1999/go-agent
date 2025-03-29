@@ -53,6 +53,7 @@
         renderer.domElement.style.position = "absolute";
         renderer.domElement.style.left = "50vw";
         renderer.domElement.style.top = "1vh";
+        renderer.domElement.style.border = "1px solid white";
         renderer.domElement.addEventListener("webglcontextlost", (event) => {
             event.preventDefault();
             console.warn("WebGL context lost! Restarting...");

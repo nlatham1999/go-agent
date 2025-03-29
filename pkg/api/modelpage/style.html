@@ -1,28 +1,78 @@
 <style>
 
-
-    :root {
-        --background-color: #1A1A1A; 
-        --background-color-two: #1A1A1A;
-        --primary-color: #4CAF50; 
-        --secondary-color: #333333;
-        --text-color: #F5F5F5;
-        --button-text-color: #F5F5F5;
-    }
-
     /* :root {
-        --background-color: #2a5298; 
-        --background-color-two: #1e3c72;
-        --primary-color: #00c6ff; 
-        --secondary-color: #00c6ff;
-        --text-color: #00c6ff;
-        --button-text-color: #2a5298;
+        --background-color: #000000; 
+        --widget-background-color: #000000;
+        --button-hover-background-color: #000000;
+        --button-group-background-color: #000000;
+        --button-background-color: #6fd0ff;
+        --input-background-color: #000000;
+
+        --border-color: #6fd0ff;
+        --button-group-border-color: #ffa000;
+        --label-and-input-border-color: #ff00ff;
+
+        --scrollbar-color: #6fd0ff; 
+        --slider-color: #6fd0ff;
+
+        --text-color: #6fd0ff;
+        --button-hover-text-color: #6fd0ff;
+        --button-text-color: #000000;
+        --label-and-input-text-color: #ffffff;
+
+        --border-radius: 2px;
+        --border-radius-large: 2px;
     } */
 
+    /*dark mode green*/
+    /* :root {
+        --background-color: #1A1A1A; 
+        --widget-background-color: #1A1A1A;
+        --button-group-background-color: #1A1A1A;
+        --scrollbar-color: #4CAF50; 
+        --slider-color: #F5F5F5;
+        --text-color: #F5F5F5;
+        --border-color: #4CAF50;
+        --button-group-border-color: #4CAF50;
+        --label-and-input-border-color: #4CAF50;
+        --button-text-color: #f5f5f5c6;
+        --label-and-input-text-color: #f5f5f5c6;
+        --button-background-color: #4CAF50;
+        --input-background-color: #333333;
+        --button-hover-background-color: #F5F5F5;
+        --button-hover-text-color: #4CAF50;
+
+        --border-radius: 5px;
+        --border-radius-large: 10px;
+    } */
+
+    /*white and black*/
+    :root {
+        --background-color: #1e3c72; 
+        --widget-background-color: #1e3c72;
+        --button-group-background-color: #1e3c72;
+        --scrollbar-color: #1e3c72; 
+        --slider-color: #F5F5F5;
+        --text-color: #F5F5F5;
+        --border-color: #F5F5F5;
+        --button-group-border-color: #F5F5F5;
+        --label-and-input-border-color: #F5F5F5;
+        --button-text-color: #1e3c72;
+        --label-and-input-text-color: #F5F5F5;
+        --button-background-color: #F5F5F5;
+        --input-background-color: #1e3c72;
+
+        --button-hover-background-color: #1e3c72;
+        --button-hover-text-color: #F5F5F5;
+
+        --border-radius: 3px;
+        --border-radius-large: 3px;
+    }
+
     .nunito-font {
-        font-family: "Manrope", sans-serif;
+        font-family: "Space Mono", monospace;
         font-optical-sizing: auto;
-        font-weight: 300;
+        font-weight: 400;
         font-style: normal;
     }
 
@@ -36,26 +86,37 @@
         margin: 10px;
     }
     body {
-        font-family: nunito-light, sans-serif;
+        /* font-family: nunito-light, sans-serif; */
         margin: 0;
         padding: 0;
         background-color: var(--background-color);
         /* background: linear-gradient(to right, #1e3c72, #2a5298); */
+        /* background-image: url('https://anniversaryreminder.netlify.app/purple-blue.f38dd5210fc58111.jpg'); */
         color: var(--text-color);
     }
     button {
-        background-color: var(--primary-color);
+        background-color: var(--button-background-color);
         color: var(--button-text-color);
 
         
-        border-radius: 5px;
-        border: 4px solid var(--primary-color);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
         box-shadow: none;
         margin: 3px;
         padding: 2px;
+        padding-left: 6px;
+        padding-right: 6px;
         font-size: medium;
         /* border-style: none; */
+
+        /* font-family: nunito-light, sans-serif; */
+        font-family: "Manrope", sans-serif;
     }
+    button:hover {
+        background-color: var(--button-hover-background-color);
+        color: var(--button-hover-text-color);
+    }
+
     #modelControls {
         display: flex;
         align-items: flex-start;
@@ -70,24 +131,48 @@
         display: flex;
         gap: 5px; /* space between buttons */
         padding: 5px;
-        border: 2px solid var(--primary-color); /* optional: adds a border around the group */
-        border-radius: 10px; /* makes the grouping look smoother */
-        padding-bottom: 9px;
-        padding-top: 9px;
-        background-color: var(--background-color-two);
+        border: 1px solid var(--button-group-border-color); /* optional: adds a border around the group */
+        border-radius: var(--border-radius); /* makes the grouping look smoother */
+        padding-bottom: 1.2vh;
+        padding-top: 1.2vh;
+        background-color: var(--button-group-background-color);
+    }
+    .buttonGroupButton {
+        border: 1px solid var(--button-group-border-color);
+        background-color: var(--button-group-border-color);
+        color: var(--button-group-background-color) !important;
+    }
+    .buttonGroupButton:hover {
+        background-color: var(--button-group-background-color);
+        color: var(--button-group-border-color) !important;
     }
     .labelAndInput {
+        background-color: var(--background-color);
         padding: 5px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 5px;
         font-size: medium; 
-        border: 2px solid var(--primary-color); /* optional: adds a border around the group */
-        border-radius: 10px; /* makes the grouping look smoother */
+        border: 1px solid var(--label-and-input-border-color); /* optional: adds a border around the group */
+        border-radius: var(--border-radius); /* makes the grouping look smoother */
+    }
+    .labelAndInputLabel {
+        color: var(--label-and-input-text-color);
     }
     #speedControl {
         padding-bottom: 14px;
+    }
+    #speedSlider {
+        background: var(--label-and-input-border-color) ;
+    }
+
+    #speedSlider::-webkit-slider-thumb {
+        background: var(--label-and-input-border-color) ; /* different color for speedSlider */
+    }
+    #replayTick {
+        color: var(--label-and-input-text-color) !important;
+        border: 1px solid var(--label-and-input-border-color);
     }
     #widgetContainer {
         position: absolute;
@@ -98,15 +183,15 @@
         background-color: var(--background-color);
 
 
-        border: 2px solid var(--primary-color); 
-        border-radius: 10px; 
+        border: 1px solid var(--border-color); 
+        border-radius: var(--border-radius-large); 
 
         padding: 1vw;
         overflow: scroll;
         scroll-behavior: smooth;
         /* add a scrollbar */
         scrollbar-width: thin;
-        scrollbar-color: var(--primary-color) var(--background-color);
+        scrollbar-color: var(--scrollbar-color) var(--background-color);
 
     }
 
@@ -114,32 +199,34 @@
     .widget {
 
         cursor: move;
-        background-color: var(--background-color-two);
+        background-color: var(--widget-background-color);
 
         position: absolute;
         /* resize: horizontal; */
         overflow: auto;
+        border: 1px solid var(--border-color); 
+
     }
 
     .widget-text {
-        border: 2px solid var(--primary-color); 
-        border-radius: 10px; 
+        border-radius: var(--border-radius-large); 
 
         padding: 5px;
         padding-right: 10px;
     }
 
     .widget-slider {
-        border: 2px solid var(--primary-color); 
-        border-radius: 10px; 
+        border-radius: var(--border-radius-large); 
 
-        padding: 5px;
-        padding-right: 10px;
+        padding: 7px;
+
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
     }
 
     .widget-button {
-        border: 2px solid var(--primary-color); 
-        border-radius: 10px; 
+        border-radius: var(--border-radius-large); 
 
         padding: 5px;
         padding-right: 5px;
@@ -147,8 +234,7 @@
     }
 
     .widget-stat {
-        border: 2px solid var(--primary-color); 
-        border-radius: 10px; 
+        border-radius: var(--border-radius-large); 
 
         padding: 5px;
         padding-right: 5px;
@@ -157,20 +243,20 @@
     /* make inputs on click have a border */
     input[type="number"]:focus,
     input[type="text"]:focus {
-        border: 2px solid var(--primary-color); /* green border on focus */
+        border: 2px solid var(--border-color); /* green border on focus */
         outline: none; /* removes default blue outline */
-        border-radius: 4px; /* optional: smooth edges */
         transition: border 0.2s ease-in-out; /* smooth effect */
     }
 
     input[type="number"],
     input[type="text"] {
-        background-color: var(--secondary-color);
+        background-color: var(--input-background-color);
         color: #E0E0E0;
         box-shadow: none;
-        border-style: none;
         font-size: medium;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
     }
 
 
@@ -180,17 +266,15 @@
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 8px;
-            background: var(--secondary-color);
-            border-radius: 4px;
+            height: 2px;
+            background: var(--slider-color);
             outline: none;
         }
         
         input[type='range']::-webkit-slider-runnable-track {     
-            height: 8px;
-            border-radius: 4px;
+            height: 2px;
             -webkit-appearance: none;
-            color: var(--primary-color);
+            color: var(--slider-color);
             /* background-size: 100% 100%;
             background-repeat: no-repeat; */
         }
@@ -198,29 +282,29 @@
         input[type='range']::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background: var(--primary-color);
-            /* box-shadow: -80px 0 0 80px #00A878; */
+            background: var(--slider-color);
             cursor: pointer;
-            margin-top: -4px; /* centers it */
+            margin-top: -5px; /* centers it */
         }
+
 
     }
     /** FF*/
     input[type="range"]::-moz-range-progress {
-        background-color: var(--primary-color); 
+        background-color: var(--slider-color); 
     }
     input[type="range"]::-moz-range-track {  
-        background-color: var(--secondary-color);
+        background-color: var(--slider-color);
     }
     /* IE*/
     input[type="range"]::-ms-fill-lower {
-        background-color: var(--primary-color); 
+        background-color: var(--slider-color); 
     }
     input[type="range"]::-ms-fill-upper {  
-        background-color: var(--secondary-color);
+        background-color: var(--slider-color);
     }
 
 

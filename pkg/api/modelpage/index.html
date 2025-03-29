@@ -7,16 +7,17 @@
     <script src="https://unpkg.com/htmx.org@1.8.0"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     
 </head>
 <body class="nunito-font">
 
     <div id="modelControls">
         <div class="buttonGroup">
-            <button id="setup" hx-post="/setup" hx-swap="none">Setup</button>
-            <button id="goOnce" hx-post="/go" hx-swap="none">Go</button>
+            <button class="buttonGroupButton" id="setup" hx-post="/setup" hx-swap="none">Setup</button>
+            <button class="buttonGroupButton" id="goOnce" hx-post="/go" hx-swap="none">Go</button>
             <button 
+                class="buttonGroupButton"
                 id="goRepeat"
                 hx-post="/gorepeat" hx-swap="none"
             >
@@ -25,7 +26,7 @@
         </div>
 
         <div class="labelAndInput" id="speedControl">
-            <label for="speedSlider">Speed: <span id="sliderValue">50</span></label>
+            <label class="labelAndInputLabel" for="speedSlider">Speed: <span id="sliderValue">50</span></label>
             <input type="range" id="speedSlider" name="speed" min="1" max="100" value="50" 
                 hx-get="/updatespeed" hx-trigger="input" hx-swap="none" hx-include="#speedSlider" 
                 oninput="document.getElementById('sliderValue').innerText = this.value;">
@@ -33,7 +34,7 @@
 
         
         <div class="labelAndInput">
-            <label for="replayTick">Replay For Tick:</label>
+            <label class="labelAndInputLabel" for="replayTick">Replay For Tick:</label>
             <input id="replayTick" type="number" name="tick"
                     hx-get="/settick"
                     hx-trigger="change" 
