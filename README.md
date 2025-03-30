@@ -106,14 +106,14 @@ This is because any actions moving the turtle can affect other pieces
     - this should instead be a seperate package on top
     - collision detection layer they can add on
 -  [x]  patches, turtles "own" should be renamed to "properties"  
--  [ ] there should be a way to pass in the mouse x and y, maybe as a dynamic variable?  
+-  [x] there should be a way to pass in the mouse x and y, maybe as a dynamic variable?  
 -  [ ] build widgets in js  
 -  [ ] implement subtract-headings  
 -  [ ] implement dx and dy  
--  [ ] make sure that distance works with wrap around on the horizontal  
+-  [x] make sure that distance works with wrap around on the horizontal  
 -  [ ] add slider to change render speed on frontend   
 -  [x] documentation   
--  [ ] move folder structure so packages are in pkg folder
+-  [x] move folder structure so packages are in pkg folder
 -  [x] have main screen and then model running on second
 -  [x] make link types in threejs render properly
 -  [ ] concurrency on patches and links
@@ -134,3 +134,8 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] on sliders, if the value is set, than use that value when loading
 -  [ ] agentset copy funcs
 -  [ ] stats should just be widgets
+-  [x] loading unloading model type to enable storing into json
+-  [ ] threejs should not be setting the css values
+-  [ ] Should be a createLink func at the model level
+-  [ ] rename pcolor to color
+-  [ ] labelColor on turtles should be public, same with label

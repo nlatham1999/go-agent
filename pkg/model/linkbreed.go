@@ -32,3 +32,16 @@ func (lb *LinkBreed) Links() *LinkAgentSet {
 func (lb *LinkBreed) SetDefaultShape(shape string) {
 	lb.defaultShape = shape
 }
+
+// gets the default shape
+func (lb *LinkBreed) GetDefaultShape() string {
+	return lb.defaultShape
+}
+
+func (lb *LinkBreed) Name() string {
+	return lb.name
+}
+
+func (lb *LinkBreed) Directed() bool {
+	return lb.directed
+}

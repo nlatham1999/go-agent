@@ -3,7 +3,7 @@ package model
 import (
 	"errors"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
 	"github.com/nlatham1999/sortedset"
@@ -13,7 +13,7 @@ import (
 type Model struct {
 	Ticks int
 
-	patchPropertiesTemplate map[string]interface{} //additional variables for each patch
+	DefaultPatchProperties map[string]interface{} //additional variables for each patch
 
 	Patches              *PatchAgentSet          //all the patches
 	turtles              *TurtleAgentSet         //all the turtles
@@ -44,6 +44,9 @@ type Model struct {
 	turtlesWhoNumber int //who number of the next turtle to be created
 
 	randomGenerator *rand.Rand
+	seedValue       uint64
+	seedValue2      uint64
+	randomSrc       *rand.PCG
 
 	modelStart time.Time
 
@@ -88,24 +91,28 @@ func NewModel(
 	}
 
 	model := &Model{
-		maxPxCor:                settings.MaxPxCor,
-		maxPyCor:                settings.MaxPyCor,
-		minPxCor:                settings.MinPxCor,
-		minPyCor:                settings.MinPyCor,
-		maxXCor:                 float64(settings.MaxPxCor) + .5,
-		maxYCor:                 float64(settings.MaxPyCor) + .5,
-		minXCor:                 float64(settings.MinPxCor) - .5,
-		minYCor:                 float64(settings.MinPyCor) - .5,
-		worldWidth:              settings.MaxPxCor - settings.MinPxCor + 1,
-		worldHeight:             settings.MaxPyCor - settings.MinPyCor + 1,
-		patchPropertiesTemplate: settings.PatchProperties,
-		wrappingX:               settings.WrappingX,
-		wrappingY:               settings.WrappingY,
-		whoToTurtles:            make(map[int]*Turtle),
-		randomGenerator:         rand.New(rand.NewSource(settings.RandomSeed)),
-		modelStart:              time.Now(),
-		linkedTurtles:           make(map[*Turtle]*turtleLinks),
+		maxPxCor:               settings.MaxPxCor,
+		maxPyCor:               settings.MaxPyCor,
+		minPxCor:               settings.MinPxCor,
+		minPyCor:               settings.MinPyCor,
+		maxXCor:                float64(settings.MaxPxCor) + .5,
+		maxYCor:                float64(settings.MaxPyCor) + .5,
+		minXCor:                float64(settings.MinPxCor) - .5,
+		minYCor:                float64(settings.MinPyCor) - .5,
+		worldWidth:             settings.MaxPxCor - settings.MinPxCor + 1,
+		worldHeight:            settings.MaxPyCor - settings.MinPyCor + 1,
+		DefaultPatchProperties: settings.PatchProperties,
+		wrappingX:              settings.WrappingX,
+		wrappingY:              settings.WrappingY,
+		whoToTurtles:           make(map[int]*Turtle),
+		seedValue:              settings.RandomSeed,
+		seedValue2:             settings.RandomSeed2,
+		modelStart:             time.Now(),
+		linkedTurtles:          make(map[*Turtle]*turtleLinks),
 	}
+
+	model.randomSrc = rand.NewPCG(model.seedValue, model.seedValue2)
+	model.randomGenerator = rand.New(model.randomSrc)
 
 	//construct turtle breeds
 	turtleBreedsMap := make(map[string]*TurtleBreed)
@@ -142,10 +149,10 @@ func NewModel(
 
 	if settings.TurtleProperties != nil {
 		for key, value := range settings.TurtleProperties {
-			model.breeds[BreedNone].turtlePropertiesTemplate[key] = value
+			model.breeds[BreedNone].defaultProperties[key] = value
 		}
 	} else {
-		model.breeds[BreedNone].turtlePropertiesTemplate = make(map[string]interface{})
+		model.breeds[BreedNone].defaultProperties = make(map[string]interface{})
 	}
 
 	//construct general link set
@@ -165,7 +172,7 @@ func (m *Model) buildPatches() {
 		for j := m.minPxCor; j <= m.maxPxCor; j++ {
 			x := j
 			y := i
-			p := newPatch(m, m.patchPropertiesTemplate, x, y)
+			p := newPatch(m, m.DefaultPatchProperties, x, y)
 			m.Patches.Add(p)
 			index := y*m.worldHeight + x
 			m.posOfPatches[index] = p
@@ -219,6 +226,15 @@ func (m *Model) TurtleBreed(breedName string) *TurtleBreed {
 	return m.breeds[breedName]
 }
 
+// returns a list of the turtle breeds
+func (m *Model) TurtleBreeds() []*TurtleBreed {
+	breeds := make([]*TurtleBreed, 0, len(m.breeds))
+	for _, breed := range m.breeds {
+		breeds = append(breeds, breed)
+	}
+	return breeds
+}
+
 // clear all patches and turtles and set the ticks to zero
 func (m *Model) ClearAll() {
 	m.ClearTicks()
@@ -248,7 +264,7 @@ func (m *Model) ClearTicks() {
 // clear all patches
 func (m *Model) ClearPatches() {
 	m.Patches.Ask(func(p *Patch) {
-		p.Reset(m.patchPropertiesTemplate)
+		p.Reset(m.DefaultPatchProperties)
 	})
 }
 
@@ -303,7 +319,7 @@ func (m *Model) createTurtlesBreeded(amount int, breed *TurtleBreed, operation T
 		newTurtle.setHeadingRadians(m.randomGenerator.Float64() * 2 * math.Pi)
 
 		// get a random color from the base colors and set it
-		newTurtle.Color.SetColor(baseColorsList[m.randomGenerator.Intn(len(baseColorsList))])
+		newTurtle.Color.SetColor(baseColorsList[m.randomGenerator.IntN(len(baseColorsList))])
 
 		turtles.Add(newTurtle)
 
@@ -490,6 +506,38 @@ func (m *Model) Diffuse4(patchVariable string, percent float64) error {
 	return nil
 }
 
+// returns the directed link breed associated with the name
+func (m *Model) DirectedLinkBreed(name string) *LinkBreed {
+	return m.directedLinkBreeds[name]
+}
+
+// returns all the directed link breeds
+func (m *Model) DirectedLinkBreeds() []*LinkBreed {
+	arr := []*LinkBreed{}
+
+	for _, val := range m.directedLinkBreeds {
+		arr = append(arr, val)
+	}
+
+	return arr
+}
+
+// returns the undirected link breed associated with the name
+func (m *Model) UndirectedLinkBreed(name string) *LinkBreed {
+	return m.undirectedLinkBreeds[name]
+}
+
+// returns all the undirected link breeds
+func (m *Model) UndirectedLinkBreeds() []*LinkBreed {
+	arr := []*LinkBreed{}
+
+	for _, val := range m.undirectedLinkBreeds {
+		arr = append(arr, val)
+	}
+
+	return arr
+}
+
 // returns the linkset containing the directed links
 // to get the links for a breed call <linkBreed>.Links()
 func (m *Model) DirectedLinks() *LinkAgentSet {
@@ -641,12 +689,12 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 
 // returns a random int n the provided list
 func (m *Model) OneOfInt(arr []int) interface{} {
-	return arr[m.randomGenerator.Intn(len(arr))-1]
+	return arr[m.randomGenerator.IntN(len(arr))-1]
 }
 
 // returns a random int from (0, n]
 func (m *Model) RandomAmount(n int) int {
-	return m.randomGenerator.Intn(n)
+	return m.randomGenerator.IntN(n)
 }
 
 func (m *Model) topLeftNeighbor(p *Patch) *Patch {
@@ -916,7 +964,7 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 }
 
 func (m *Model) RandomColor() Color {
-	return baseColorsList[m.randomGenerator.Intn(len(baseColorsList))]
+	return baseColorsList[m.randomGenerator.IntN(len(baseColorsList))]
 }
 
 // If number is positive, reports a random floating point number greater than or equal to 0 but strictly less than number.
@@ -940,7 +988,7 @@ func (m *Model) RandomInt(number int) int {
 		number = number * -1
 	}
 
-	return m.randomGenerator.Intn(number) * sign
+	return m.randomGenerator.IntN(number) * sign
 }
 
 // returns a random x cor that is within the world bounds
@@ -961,6 +1009,30 @@ func (m *Model) ResetTicks() {
 // resets the timer
 func (m *Model) ResetTimer() {
 	m.modelStart = time.Now()
+}
+
+func (m *Model) GetRandomState() (uint64, uint64, []byte) {
+
+	bin, err := m.randomSrc.MarshalBinary()
+	if err != nil {
+		return 0, 0, nil
+	}
+
+	return m.seedValue, m.seedValue2, bin
+}
+
+func (m *Model) SetRandomState(seed1 uint64, seed2 uint64, state []byte) error {
+	m.seedValue = seed1
+	m.seedValue2 = seed2
+
+	err := m.randomSrc.UnmarshalBinary(state)
+	if err != nil {
+		return err
+	}
+
+	m.randomGenerator = rand.New(m.randomSrc)
+
+	return nil
 }
 
 // sets the default shape for links
@@ -1266,19 +1338,29 @@ func (m *Model) WorldWidth() int {
 	return m.worldWidth
 }
 
+// returns if wrapping x is on
+func (m *Model) WrappingX() bool {
+	return m.wrappingX
+}
+
 // sets the x coordinate to wrap
 func (m *Model) WrappingXOn() {
 	m.wrappingX = true
 }
 
-// sets the y coordinate to wrap
-func (m *Model) WrappingYOn() {
-	m.wrappingY = true
-}
-
 // sets the x coordinate to not wrap
 func (m *Model) WrappingXOff() {
 	m.wrappingX = false
+}
+
+// returns if wrapping y is on
+func (m *Model) WrappingY() bool {
+	return m.wrappingY
+}
+
+// sets the y coordinate to wrap
+func (m *Model) WrappingYOn() {
+	m.wrappingY = true
 }
 
 // sets the y coordinate to not wrap

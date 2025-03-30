@@ -13,5 +13,6 @@ type ModelSettings struct {
 	MaxPxCor             int
 	MinPyCor             int
 	MaxPyCor             int
-	RandomSeed           int64
+	RandomSeed           uint64
+	RandomSeed2          uint64
 }

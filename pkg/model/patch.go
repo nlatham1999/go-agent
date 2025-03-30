@@ -177,7 +177,7 @@ func (p *Patch) sproutBreeded(breed *TurtleBreed, number int, operation TurtleOp
 		p.parent.turtlesWhoNumber++
 
 		//set the heading to be between 0 and 360
-		heading := p.parent.randomGenerator.Intn(360)
+		heading := p.parent.randomGenerator.IntN(360)
 
 		//convert to radians
 		t.SetHeading(float64(heading))

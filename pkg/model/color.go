@@ -3,8 +3,8 @@ package model
 // holds RGBA values
 type Color struct {
 	Red   int
-	Blue  int
 	Green int
+	Blue  int
 	Alpha int
 }
 

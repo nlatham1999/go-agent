@@ -10,17 +10,17 @@ type TurtleBreed struct {
 
 	defaultShape string
 
-	turtlePropertiesTemplate map[string]interface{}
+	defaultProperties map[string]interface{}
 }
 
 // creates a new turtle breed
 // after creating, pass it in the model settings
 func NewTurtleBreed(name string, defaultShape string, turtleProperties map[string]interface{}) *TurtleBreed {
 	return &TurtleBreed{
-		name:                     name,
-		model:                    nil,
-		turtles:                  NewTurtleAgentSet(nil),
-		turtlePropertiesTemplate: turtleProperties,
+		name:              name,
+		model:             nil,
+		turtles:           NewTurtleAgentSet(nil),
+		defaultProperties: turtleProperties,
 	}
 }
 
@@ -32,6 +32,11 @@ func (tb *TurtleBreed) CreateAgents(amount int, operation TurtleOperation) (*Tur
 // sets the default shape for a turtle breed
 func (tb *TurtleBreed) SetDefaultShape(shape string) {
 	tb.defaultShape = shape
+}
+
+// returns the default shape
+func (tb *TurtleBreed) GetDefaultShape() string {
+	return tb.defaultShape
 }
 
 // returns a turtle given the who number if it is in the breed
@@ -77,4 +82,14 @@ func (tb *TurtleBreed) AgentsWithAgent(turtle *Turtle) *TurtleAgentSet {
 // Returns the turtles on the same patch as the provided turtle
 func (tb *TurtleBreed) AgentsWithAgents(turtles *TurtleAgentSet) *TurtleAgentSet {
 	return tb.model.turtlesWithTurtlesBreeded(tb, turtles)
+}
+
+// returns the default properties of the breed
+func (tb *TurtleBreed) DefaultProperties() map[string]interface{} {
+	return tb.defaultProperties
+}
+
+// returns the name of the breed
+func (tb *TurtleBreed) Name() string {
+	return tb.name
 }

@@ -68,12 +68,12 @@ func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Tur
 	//breed specific variables can override general variables
 	t.turtlePropertiesGeneral = make(map[string]interface{})
 	t.turtlePropertiesBreed = make(map[string]interface{})
-	generalTemplate := m.breeds[BreedNone].turtlePropertiesTemplate
+	generalTemplate := m.breeds[BreedNone].defaultProperties
 	for key, value := range generalTemplate {
 		t.turtlePropertiesGeneral[key] = value
 	}
 	if breed != nil {
-		breedTemplate := breed.turtlePropertiesTemplate
+		breedTemplate := breed.defaultProperties
 		for key, value := range breedTemplate {
 			t.turtlePropertiesBreed[key] = value
 		}
@@ -120,7 +120,7 @@ func (t *Turtle) SetBreed(breed *TurtleBreed) {
 	// switch the turtles properties variables to the new breed
 	t.turtlePropertiesBreed = make(map[string]interface{})
 	if t.breed != nil {
-		breedTemplate := t.parent.breeds[t.breed.name].turtlePropertiesTemplate
+		breedTemplate := t.parent.breeds[t.breed.name].defaultProperties
 		for key, value := range breedTemplate {
 			t.turtlePropertiesBreed[key] = value
 		}
@@ -188,7 +188,7 @@ func (t *Turtle) Downhill(patchVariable string) {
 	p := t.PatchHere()
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.DefaultPatchProperties[patchVariable].(float64); !ok {
 		return
 	}
 
@@ -262,7 +262,7 @@ func (t *Turtle) Downhill4(patchVariable string) {
 	}
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.DefaultPatchProperties[patchVariable].(float64); !ok {
 		return
 	}
 
@@ -760,7 +760,7 @@ func (t *Turtle) Uphill(patchVariable string) {
 	p := t.PatchHere()
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.DefaultPatchProperties[patchVariable].(float64); !ok {
 		return
 	}
 
@@ -832,7 +832,7 @@ func (t *Turtle) Uphill4(patchVariable string) {
 	}
 
 	// if the patch variable is not a number then return
-	if _, ok := t.parent.patchPropertiesTemplate[patchVariable].(float64); !ok {
+	if _, ok := t.parent.DefaultPatchProperties[patchVariable].(float64); !ok {
 		return
 	}
 
