@@ -2,6 +2,7 @@ package model
 
 import (
 	"math"
+	"sync"
 )
 
 // Patches are agents that resemble the physical space
@@ -24,12 +25,14 @@ type Patch struct {
 	Color Color
 
 	//instead it might be faster having a PatchesOwn for each data type to reduce type assertions
+	propertiesMutex sync.RWMutex // allows for concurrent access to properties
 	patchProperties map[string]interface{}
 
 	Label       interface{}
 	PlabelColor Color
 
-	turtles map[*TurtleBreed]*TurtleAgentSet // sets of turtles keyed by breed
+	turtlesMutex sync.RWMutex                     // allows for concurrent access to turtles
+	turtles      map[*TurtleBreed]*TurtleAgentSet // sets of turtles keyed by breed
 
 	// patch to string and string to patch for the neighbors
 	patchNeighborsMap map[*Patch]string
@@ -60,6 +63,9 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
+	p.turtlesMutex.Lock()
+	defer p.turtlesMutex.Unlock()
+
 	if _, ok := p.turtles[t.breed]; !ok {
 		p.turtles[t.breed] = NewTurtleAgentSet([]*Turtle{})
 	}
@@ -77,6 +83,9 @@ func (p *Patch) addTurtle(t *Turtle) {
 
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
+	p.turtlesMutex.Lock()
+	defer p.turtlesMutex.Unlock()
+
 	if _, ok := p.turtles[t.breed]; ok {
 		p.turtles[t.breed].Remove(t)
 	}
@@ -213,6 +222,8 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 // if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
 // the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (p *Patch) TurtlesHere() *TurtleAgentSet {
+	p.turtlesMutex.RLock()
+	defer p.turtlesMutex.RUnlock()
 
 	generalBreed := p.parent.breeds[BreedNone]
 
@@ -236,6 +247,13 @@ func (p *Patch) turtlesHereBreeded(breed *TurtleBreed) *TurtleAgentSet {
 
 func (p *Patch) GetProperty(key string) interface{} {
 	return p.patchProperties[key]
+}
+
+func (p *Patch) GetPropertySafe(key string) interface{} {
+	p.propertiesMutex.RLock()
+	defer p.propertiesMutex.RUnlock()
+
+	return p.GetProperty(key)
 }
 
 func (t *Patch) GetPropI(key string) int {
@@ -304,4 +322,11 @@ func (p *Patch) SetProperty(key string, value interface{}) {
 		return
 	}
 	p.patchProperties[key] = value
+}
+
+func (p *Patch) SetPropertySafe(key string, value interface{}) {
+	p.propertiesMutex.Lock()
+	defer p.propertiesMutex.Unlock()
+
+	p.SetProperty(key, value)
 }

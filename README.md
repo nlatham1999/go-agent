@@ -116,15 +116,15 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] move folder structure so packages are in pkg folder
 -  [x] have main screen and then model running on second
 -  [x] make link types in threejs render properly
--  [ ] concurrency on patches and links
+-  [x] concurrency on patches and links
 -  [ ] 3D
 -  [x] collision detection
 -  [ ] labels on turtles and links
 -  [ ] setting the color should be a setcolor function
 -  [x] make moving on world wrapping on left and down work 🤦‍♂️
--  [ ] make setxy able to be called concurrently
+-  [x] make setxy able to be called concurrently
 -  [x] remove tie modes
--  [ ] make change patch ownership able to be called concurrently
+-  [x] make change patch ownership able to be called concurrently
 -  [ ] have descendents public
 -  [x] button widgets
 -  [ ] enable setting x,y, height(?) and width on widgets
@@ -139,3 +139,4 @@ This is because any actions moving the turtle can affect other pieces
 -  [ ] Should be a createLink func at the model level
 -  [x] rename pcolor to color
 -  [x] labelColor on turtles should be public, same with label
+-  [x] seperate concurrency package

@@ -2,6 +2,7 @@ package gol
 
 import (
 	"github.com/nlatham1999/go-agent/pkg/api"
+	"github.com/nlatham1999/go-agent/pkg/concurrency"
 	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
@@ -15,6 +16,8 @@ type Gol struct {
 	minNeighborsToReproduce int
 	maxNeighborsToReproduce int
 	initialAlive            float64
+
+	patches []*model.Patch
 }
 
 func NewGol() *Gol {
@@ -32,9 +35,9 @@ func (g *Gol) Init() {
 			"alive-next": true,
 		},
 		MinPxCor: 0,
-		MaxPxCor: 20,
+		MaxPxCor: 200,
 		MinPyCor: 0,
-		MaxPyCor: 20,
+		MaxPyCor: 200,
 	}
 
 	g.model = model.NewModel(settings)
@@ -52,23 +55,26 @@ func (g *Gol) SetUp() error {
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.initialAlive {
-				p.SetProperty("alive", true)
-				p.SetProperty("alive-next", true)
+				p.SetPropertySafe("alive", true)
+				p.SetPropertySafe("alive-next", true)
 				p.Color.SetColor(model.Green)
 			} else {
-				p.SetProperty("alive", false)
-				p.SetProperty("alive-next", false)
+				p.SetPropertySafe("alive", false)
+				p.SetPropertySafe("alive-next", false)
 				p.Color.SetColor(model.Black)
 			}
 		},
 	)
+
+	g.patches = g.model.Patches.List()
 
 	return nil
 }
 
 func (g *Gol) Go() {
 
-	g.model.Patches.Ask(
+	// g.model.Patches.Ask(
+	concurrency.AskPatches(g.patches,
 		func(p *model.Patch) {
 
 			//get neighboring patches
@@ -76,36 +82,39 @@ func (g *Gol) Go() {
 
 			//count the number of alive neighbors
 			aliveNeighbors := neighbors.With(func(p *model.Patch) bool {
-				alive := p.GetPropB("alive")
+				alive := p.GetPropertySafe("alive").(bool)
 				return alive
 			}).Count()
 
-			alive := p.GetPropB("alive")
+			alive := p.GetPropertySafe("alive").(bool)
 			if alive {
 				if aliveNeighbors < g.minNeighborsToLive {
-					p.SetProperty("alive-next", false)
+					p.SetPropertySafe("alive-next", false)
 				}
 
 				if aliveNeighbors > g.maxNeighborsToLive {
-					p.SetProperty("alive-next", false)
+					p.SetPropertySafe("alive-next", false)
 				}
 			} else {
 				if aliveNeighbors >= g.minNeighborsToReproduce && aliveNeighbors <= g.maxNeighborsToReproduce {
-					p.SetProperty("alive-next", true)
+					p.SetPropertySafe("alive-next", true)
 				}
 			}
 		},
+		10,
 	)
 
-	g.model.Patches.Ask(
+	// g.model.Patches.Ask(
+	concurrency.AskPatches(g.patches,
 		func(p *model.Patch) {
-			p.SetProperty("alive", p.GetPropB("alive-next"))
-			if p.GetPropB("alive") {
+			p.SetPropertySafe("alive", p.GetPropertySafe("alive-next").(bool))
+			if p.GetPropertySafe("alive").(bool) {
 				p.Color.SetColor(model.Green)
 			} else {
 				p.Color.SetColor(model.Black)
 			}
 		},
+		10,
 	)
 
 	g.model.Tick()
@@ -114,14 +123,14 @@ func (g *Gol) Go() {
 func (g *Gol) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
-			return p.GetPropB("alive")
+			return p.GetPropertySafe("alive").(bool)
 		}).Count(),
 	}
 }
 
 func (g *Gol) Stop() bool {
 	return g.model.Patches.All(func(p *model.Patch) bool {
-		return !p.GetPropB("alive")
+		return !p.GetPropertySafe("alive").(bool)
 	})
 }
 
