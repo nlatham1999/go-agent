@@ -23,7 +23,7 @@ type Turtle struct {
 	parent *Model //model the turtle belongs too
 
 	label      interface{}
-	labelColor Color
+	LabelColor Color
 
 	propertiesMutex         sync.RWMutex
 	turtlePropertiesGeneral map[string]interface{} // turtles own variables
@@ -46,7 +46,7 @@ func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Tur
 		breed:      breed,
 		size:       .8,
 		label:      "",
-		labelColor: Black,
+		LabelColor: Black,
 		Shape:      "circle",
 	}
 
@@ -400,7 +400,7 @@ func (t *Turtle) Hatch(amount int, operation TurtleOperation) {
 		turtles[i].Shape = t.Shape
 		turtles[i].size = t.size
 		turtles[i].label = t.label
-		turtles[i].labelColor = t.labelColor
+		turtles[i].LabelColor = t.LabelColor
 
 		// copy the property variables
 		for key, value := range t.turtlePropertiesGeneral {
@@ -474,14 +474,6 @@ func (t *Turtle) SetLabel(label interface{}) {
 
 func (t *Turtle) GetLabel() interface{} {
 	return t.label
-}
-
-func (t *Turtle) SetLabelColor(color Color) {
-	t.labelColor = color
-}
-
-func (t *Turtle) GetLabelColor() Color {
-	return t.labelColor
 }
 
 func (t *Turtle) Left(number float64) {

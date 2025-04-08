@@ -21,7 +21,7 @@ type Patch struct {
 	xFloat64 float64
 	yFloat64 float64
 
-	PColor Color
+	Color Color
 
 	//instead it might be faster having a PatchesOwn for each data type to reduce type assertions
 	patchProperties map[string]interface{}
@@ -43,12 +43,12 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 		y:        y,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
-		PColor:   Color{},
+		Color:    Color{},
 		turtles:  make(map[*TurtleBreed]*TurtleAgentSet),
 		parent:   m,
 	}
 
-	patch.PColor.SetColor(Black)
+	patch.Color.SetColor(Black)
 
 	patch.patchProperties = map[string]interface{}{}
 	for key, value := range patchProperties {
@@ -153,7 +153,7 @@ func (p *Patch) PYCor() int {
 
 // resest the patch to the default values
 func (p *Patch) Reset(patchProperties map[string]interface{}) {
-	p.PColor.SetColor(Black)
+	p.Color.SetColor(Black)
 
 	for key, value := range patchProperties {
 		p.patchProperties[key] = value

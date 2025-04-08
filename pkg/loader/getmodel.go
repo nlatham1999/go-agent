@@ -42,7 +42,7 @@ func convertPatchSet(patches *model.PatchAgentSet) []Patch {
 		apiPatch := Patch{
 			X:     patch.PXCor(),
 			Y:     patch.PYCor(),
-			Color: convertColor(patch.PColor),
+			Color: convertColor(patch.Color),
 		}
 		apiPatches = append(apiPatches, apiPatch)
 	})
@@ -71,7 +71,7 @@ func convertTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 			Shape:      turtle.Shape,
 			Heading:    turtle.GetHeading(),
 			Label:      turtle.GetLabel(),
-			LabelColor: convertColor(turtle.GetLabelColor()),
+			LabelColor: convertColor(turtle.LabelColor),
 			Breed:      turtle.BreedName(),
 		}
 		apiTurtles = append(apiTurtles, apiTurtle)

@@ -173,7 +173,7 @@ func TestPatchNeighbors(t *testing.T) {
 
 	neighbors.Ask(
 		func(p *model.Patch) {
-			p.PColor.SetColor(model.Red)
+			p.Color.SetColor(model.Red)
 		},
 	)
 
@@ -189,7 +189,7 @@ func TestPatchNeighbors(t *testing.T) {
 	patchSet := model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor == model.Red
+		return p.Color == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -252,14 +252,14 @@ func TestPatchNeighbors(t *testing.T) {
 
 	neighbors.Ask(
 		func(p *model.Patch) {
-			p.PColor.SetColor(model.Red)
+			p.Color.SetColor(model.Red)
 		},
 	)
 
 	patchSet = model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4, p5, p6, p7, p8})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor == model.Red
+		return p.Color == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -284,7 +284,7 @@ func TestPatchNeighbors4(t *testing.T) {
 
 	neighbors.Ask(
 		func(p *model.Patch) {
-			p.PColor.SetColor(model.Red)
+			p.Color.SetColor(model.Red)
 		},
 	)
 
@@ -296,7 +296,7 @@ func TestPatchNeighbors4(t *testing.T) {
 	patchSet := model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor == model.Red
+		return p.Color == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}
@@ -347,14 +347,14 @@ func TestPatchNeighbors4(t *testing.T) {
 
 	neighbors.Ask(
 		func(p *model.Patch) {
-			p.PColor.SetColor(model.Red)
+			p.Color.SetColor(model.Red)
 		},
 	)
 
 	patchSet = model.NewPatchAgentSet([]*model.Patch{p1, p2, p3, p4})
 
 	if !patchSet.All(func(p *model.Patch) bool {
-		return p.PColor == model.Red
+		return p.Color == model.Red
 	}) {
 		t.Errorf("Expected all neighbors to be red")
 	}

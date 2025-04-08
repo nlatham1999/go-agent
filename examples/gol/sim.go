@@ -54,11 +54,11 @@ func (g *Gol) SetUp() error {
 			if v := g.model.RandomFloat(1); v < g.initialAlive {
 				p.SetProperty("alive", true)
 				p.SetProperty("alive-next", true)
-				p.PColor.SetColor(model.Green)
+				p.Color.SetColor(model.Green)
 			} else {
 				p.SetProperty("alive", false)
 				p.SetProperty("alive-next", false)
-				p.PColor.SetColor(model.Black)
+				p.Color.SetColor(model.Black)
 			}
 		},
 	)
@@ -101,9 +101,9 @@ func (g *Gol) Go() {
 		func(p *model.Patch) {
 			p.SetProperty("alive", p.GetPropB("alive-next"))
 			if p.GetPropB("alive") {
-				p.PColor.SetColor(model.Green)
+				p.Color.SetColor(model.Green)
 			} else {
-				p.PColor.SetColor(model.Black)
+				p.Color.SetColor(model.Black)
 			}
 		},
 	)

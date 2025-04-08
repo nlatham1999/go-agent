@@ -126,7 +126,7 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] remove tie modes
 -  [ ] make change patch ownership able to be called concurrently
 -  [ ] have descendents public
--  [ ] button widgets
+-  [x] button widgets
 -  [ ] enable setting x,y, height(?) and width on widgets
 -  [ ] update readme on concurrency
 -  [ ] remove collision detection and make a seperate package
@@ -137,5 +137,5 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] loading unloading model type to enable storing into json
 -  [ ] threejs should not be setting the css values
 -  [ ] Should be a createLink func at the model level
--  [ ] rename pcolor to color
--  [ ] labelColor on turtles should be public, same with label
+-  [x] rename pcolor to color
+-  [x] labelColor on turtles should be public, same with label

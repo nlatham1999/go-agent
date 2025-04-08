@@ -51,7 +51,7 @@ func SetModel(modelJson *Model) *model.Model {
 	// set all the patches
 	for _, patch := range modelJson.Patches {
 		p := builtModel.Patch(float64(patch.X), float64(patch.Y))
-		p.PColor.SetColorRGBA(patch.Color.Red, patch.Color.Green, patch.Color.Blue, patch.Color.Alpha)
+		p.Color.SetColorRGBA(patch.Color.Red, patch.Color.Green, patch.Color.Blue, patch.Color.Alpha)
 		for key, val := range patch.Properties {
 			p.SetProperty(key, val)
 		}
@@ -69,12 +69,12 @@ func SetModel(modelJson *Model) *model.Model {
 		t.Shape = turtle.Shape
 		t.SetHeading(turtle.Heading)
 		t.SetLabel(turtle.Label)
-		t.SetLabelColor(model.Color{
+		t.LabelColor = model.Color{
 			Red:   turtle.LabelColor.Red,
 			Green: turtle.LabelColor.Green,
 			Blue:  turtle.LabelColor.Blue,
 			Alpha: turtle.LabelColor.Alpha,
-		})
+		}
 		for key, val := range turtle.Properties {
 			t.SetProperty(key, val)
 		}

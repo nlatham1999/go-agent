@@ -42,13 +42,13 @@ func TestAskPatches(t *testing.T) {
 	// ask to change all colors to red
 	agentset.Ask(
 		func(patch *model.Patch) {
-			patch.PColor.SetColor(model.Red)
+			patch.Color.SetColor(model.Red)
 		},
 	)
 
 	//make sure that all colors are red
 	if !agentset.All(func(p *model.Patch) bool {
-		return p.PColor == model.Red
+		return p.Color == model.Red
 	}) {
 		t.Errorf("Expected patchset to have all patches with color 'red'")
 	}

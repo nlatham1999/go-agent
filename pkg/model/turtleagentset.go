@@ -181,13 +181,13 @@ func (t *TurtleAgentSet) Last() (*Turtle, error) {
 	return turtle.(*Turtle), nil
 }
 
-// func (t *TurtleAgentSet) Next() (*Turtle, error) {
-// 	turtle, _ := t.turtles.Next()
-// 	if turtle == nil {
-// 		return nil, ErrNoTurtlesInAgentSet
-// 	}
-// 	return turtle.(*Turtle), nil
-// }
+func (t *TurtleAgentSet) Next() (*Turtle, error) {
+	turtle, _ := t.turtles.Next()
+	if turtle == nil {
+		return nil, ErrNoTurtlesInAgentSet
+	}
+	return turtle.(*Turtle), nil
+}
 
 func (t *TurtleAgentSet) Remove(turtle *Turtle) {
 	t.turtles.Remove(turtle)

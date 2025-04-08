@@ -68,7 +68,7 @@ func (s *Sim) Go() {
 		if p == nil {
 			return
 		}
-		p.PColor.SetColor(model.White)
+		p.Color.SetColor(model.White)
 	}
 
 	if s.MouseMoved {
@@ -89,12 +89,12 @@ func (s *Sim) Stop() bool {
 
 func (s *Sim) TurnPatchWhite() {
 	p := s.model.Patch(-10, -10)
-	p.PColor.SetColor(model.White)
+	p.Color.SetColor(model.White)
 }
 
 func (s *Sim) TurnPatchGreen() {
 	p := s.model.Patch(-10, -10)
-	p.PColor.SetColor(model.Green)
+	p.Color.SetColor(model.Green)
 }
 
 func (s *Sim) Widgets() []api.Widget {
