@@ -392,28 +392,59 @@ func (a *Api) widgetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	widgets := a.currentModel.Widgets()
+	stats := a.currentModel.Stats()
 
 	// Create JSON-serializable widget data
 	widgetData := make([]map[string]interface{}, 0)
 
-	for i, widget := range widgets {
+	// Add tick stat as first widget
+	tickData := map[string]interface{}{
+		"prettyName":      "Ticks",
+		"id":              "stats-ticks",
+		"widgetType":      "stat",
+		"widgetValueType": "int",
+		"currentValue":    fmt.Sprintf("%d", a.currentModel.Model().Ticks),
+		"index":           0,
+	}
+	widgetData = append(widgetData, tickData)
+
+	// Add other stats
+	index := 1
+	for key, value := range stats {
+		if value == nil {
+			value = "null"
+		}
+		statData := map[string]interface{}{
+			"prettyName":   key,
+			"id":           fmt.Sprintf("stats-%s", key),
+			"widgetType":   "stat",
+			"currentValue": fmt.Sprintf("%v", value),
+			"index":        index,
+		}
+		widgetData = append(widgetData, statData)
+		index++
+	}
+
+	// Add model widgets
+	for _, widget := range widgets {
 		if widget.WidgetType == "background" {
 			continue
 		}
 
 		data := map[string]interface{}{
-			"prettyName":     widget.PrettyName,
-			"id":             widget.Id,
-			"widgetType":     widget.WidgetType,
+			"prettyName":      widget.PrettyName,
+			"id":              widget.Id,
+			"widgetType":      widget.WidgetType,
 			"widgetValueType": widget.WidgetValueType,
-			"minValue":       widget.MinValue,
-			"maxValue":       widget.MaxValue,
-			"defaultValue":   widget.DefaultValue,
-			"stepAmount":     widget.StepAmount,
-			"currentValue":   widget.getCurrentValue(),
-			"index":          i,
+			"minValue":        widget.MinValue,
+			"maxValue":        widget.MaxValue,
+			"defaultValue":    widget.DefaultValue,
+			"stepAmount":      widget.StepAmount,
+			"currentValue":    widget.getCurrentValue(),
+			"index":           index,
 		}
 		widgetData = append(widgetData, data)
+		index++
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -1,5 +1,13 @@
 <script>
 
+    // Track widget structure to detect changes
+    let currentWidgetStructure = null;
+
+    function getWidgetStructureHash(widgets) {
+        // Create a hash of widget IDs and types to detect structural changes
+        return widgets.map(w => `${w.id}:${w.widgetType}`).join('|');
+    }
+
     // Widget rendering functions
     function renderWidget(widget) {
         const widgetDiv = document.createElement('div');
@@ -65,6 +73,11 @@
             button.setAttribute('hx-trigger', 'click');
             button.setAttribute('hx-vals', `{"${widget.id}": "test"}`);
             widgetDiv.appendChild(button);
+        } else if (widget.widgetType === 'stat') {
+            const statDiv = document.createElement('div');
+            statDiv.id = widget.id;
+            statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
+            widgetDiv.appendChild(statDiv);
         }
 
         return widgetDiv;
@@ -74,6 +87,9 @@
         fetch('/widgets')
             .then(response => response.json())
             .then(widgets => {
+                // Initialize structure tracking
+                currentWidgetStructure = getWidgetStructureHash(widgets);
+
                 const container = document.getElementById('widgetContainer');
                 container.innerHTML = '';
 
@@ -271,11 +287,47 @@
             fetch('/widgets')
                 .then(response => response.json())
                 .then(widgets => {
+                    const newStructure = getWidgetStructureHash(widgets);
+
+                    // Check if widget structure has changed (widgets added/removed/changed type)
+                    if (currentWidgetStructure !== newStructure) {
+                        console.log('Widget structure changed, reloading widgets...');
+                        currentWidgetStructure = newStructure;
+
+                        // Full reload of widgets
+                        const container = document.getElementById('widgetContainer');
+                        container.innerHTML = '';
+
+                        widgets.forEach(widget => {
+                            const widgetElement = renderWidget(widget);
+                            container.appendChild(widgetElement);
+                        });
+
+                        // Re-initialize HTMX for new elements
+                        if (window.htmx) {
+                            htmx.process(container);
+                        }
+
+                        // Apply widget positions and dragging
+                        initWidgetDragging();
+                        applyWidgetPositions();
+                        return;
+                    }
+
+                    // Structure hasn't changed, just update values
                     widgets.forEach(widget => {
                         const widgetElement = document.querySelector(`[data-widget-id="${widget.id}"]`);
                         if (!widgetElement) return;
 
                         const widgetId = `${widget.id}-widget`;
+
+                        // Update stat values
+                        if (widget.widgetType === 'stat') {
+                            const statDiv = document.getElementById(widget.id);
+                            if (statDiv) {
+                                statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
+                            }
+                        }
 
                         // Update slider/input values if they've changed server-side
                         if (widget.widgetType === 'slider' || widget.widgetType === 'text') {
@@ -300,23 +352,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         startWidgetSync();
     });
-
-    // function to /loadstats that will load the stats every .5 seconds
-    function updateStats() {
-        fetch('/loadstats')
-            .then(response => response.json())
-            .then(data => {
-                Object.entries(data).forEach(([key, value]) => {
-                    let statDiv = document.getElementById(`stats-${key}`);
-                    if (statDiv) {
-                        statDiv.textContent = `${key}: ${value}`;
-                    }
-                });
-            })
-            .catch(error => console.error('Error loading stats:', error));
-    }
-
-    setInterval(updateStats, 500);
 
     // if goOnce is clicked, set replayTick to empty string
     goOnceButton.addEventListener('click', function() {

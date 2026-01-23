@@ -1,5 +1,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
+
 <script>
     let scene, camera, renderer;
     let patchGroup, turtleGroup, linkGroup;
@@ -7,6 +7,22 @@
     let patchSize = 1;
     let minPxCor = 0, minPyCor = 0, maxPxCor = 0, maxPyCor = 0;
     let animateTimeout = 16;
+
+    // Shared geometries and materials for reuse (major performance improvement)
+    let sharedGeometries = {
+        plane: null,
+        circle: null,
+        triangle: null
+    };
+
+    // Object pools to reuse meshes instead of recreating
+    let patchPool = [];
+    let turtlePool = [];
+    let linkPool = [];
+    let spritePool = [];
+
+    // Track current model state
+    let lastModelData = null;
 
     function init() {
         if (renderer) {
@@ -123,29 +139,111 @@
         } 
     }
 
-    function updateScene(model) {
+    // Helper function to get or create a mesh from pool
+    function getOrCreatePatch(index) {
+        if (patchPool[index]) {
+            patchPool[index].visible = true;
+            return patchPool[index];
+        }
 
-        
+        // Create shared geometry if needed
+        if (!sharedGeometries.plane) {
+            sharedGeometries.plane = new THREE.PlaneGeometry(1, 1);
+        }
+
+        const material = new THREE.MeshBasicMaterial();
+        const mesh = new THREE.Mesh(sharedGeometries.plane, material);
+        patchGroup.add(mesh);
+        patchPool[index] = mesh;
+        return mesh;
+    }
+
+    function getOrCreateTurtle(index, shape) {
+        if (turtlePool[index] && turtlePool[index].userData.shape === shape) {
+            turtlePool[index].visible = true;
+            return turtlePool[index];
+        }
+
+        // Remove old turtle if shape changed
+        if (turtlePool[index]) {
+            turtleGroup.remove(turtlePool[index]);
+            turtlePool[index].geometry.dispose();
+            turtlePool[index].material.dispose();
+        }
+
+        let geometry, material, mesh;
+
+        if (shape === 'circle') {
+            if (!sharedGeometries.circle) {
+                sharedGeometries.circle = new THREE.CircleGeometry(0.5, 32);
+            }
+            geometry = sharedGeometries.circle;
+            material = new THREE.MeshBasicMaterial();
+            mesh = new THREE.Mesh(geometry, material);
+        } else if (shape === 'triangle') {
+            geometry = new THREE.BufferGeometry();
+            const vertices = new Float32Array([
+                0.5, 0, 0,
+                -0.5, -0.289, 0,
+                -0.5, 0.289, 0
+            ]);
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            mesh = new THREE.Mesh(geometry, material);
+        }
+
+        mesh.userData.shape = shape;
+        turtleGroup.add(mesh);
+        turtlePool[index] = mesh;
+        return mesh;
+    }
+
+    function getOrCreateLink(index) {
+        if (linkPool[index]) {
+            linkPool[index].visible = true;
+            return linkPool[index];
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(6); // 2 points * 3 coords
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.LineBasicMaterial();
+        const line = new THREE.Line(geometry, material);
+        linkGroup.add(line);
+        linkPool[index] = line;
+        return line;
+    }
+
+    function getOrCreateSprite(index) {
+        if (spritePool[index]) {
+            spritePool[index].visible = true;
+            return spritePool[index];
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const texture = new THREE.CanvasTexture(canvas);
+        const material = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+        const sprite = new THREE.Sprite(material);
+        sprite.userData.canvas = canvas;
+        sprite.userData.texture = texture;
+        turtleGroup.add(sprite);
+        spritePool[index] = sprite;
+        return sprite;
+    }
+
+    function updateScene(model) {
         if (!patchGroup || !turtleGroup || !linkGroup) {
             console.error("Scene groups not initialized!");
             return;
         }
 
-        patchGroup.children.forEach(obj => {
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        });
-        turtleGroup.children.forEach(obj => {
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        });
-        linkGroup.children.forEach(obj => {
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        });
-        patchGroup.clear();
-        turtleGroup.clear();
-        linkGroup.clear();
+        // Hide all objects first (will show the ones we need)
+        patchPool.forEach(p => p && (p.visible = false));
+        turtlePool.forEach(t => t && (t.visible = false));
+        linkPool.forEach(l => l && (l.visible = false));
+        spritePool.forEach(s => s && (s.visible = false));
 
 
         // get the screen dimensions
@@ -192,124 +290,84 @@
         maxPyCor = model.maxPyCor;
         
 
-        // Create Patches (squares)
-        model.patches.forEach(patch => {
-            const geometry = new THREE.PlaneGeometry(patchSize, patchSize);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: new THREE.Color(patch.color.r / 255, patch.color.g / 255, patch.color.b / 255) 
-            });
-            const square = new THREE.Mesh(geometry, material);
+        // Update Patches - reuse existing meshes
+        model.patches.forEach((patch, index) => {
+            const mesh = getOrCreatePatch(index);
+
+            // Update color
+            mesh.material.color.setRGB(patch.color.r / 255, patch.color.g / 255, patch.color.b / 255);
+
+            // Update position and scale
             const relativeX = patch.x;
             const relativeY = patch.y;
-            square.position.set((relativeX-offsetX) * patchSize, (relativeY-offsetY) * patchSize, 0);
-            patchGroup.add(square);
+            mesh.position.set((relativeX - offsetX) * patchSize, (relativeY - offsetY) * patchSize, 0);
+            mesh.scale.set(patchSize, patchSize, 1);
         });
 
-        // Create Turtles (circles)
-        model.turtles.forEach(turtle => {
-            if (turtle.shape == "circle") {
-                buildCircleTurtle(turtle, patchSize, offsetX, offsetY);
-            } else if (turtle.shape == "triangle") {
-                buildTriangleTurtle(turtle, patchSize, offsetX, offsetY);
+        // Update Turtles - reuse existing meshes
+        let spriteIndex = 0;
+        model.turtles.forEach((turtle, index) => {
+            const mesh = getOrCreateTurtle(index, turtle.shape);
+
+            // Update color
+            mesh.material.color.setRGB(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255);
+
+            // Update position
+            const relativeX = turtle.x;
+            const relativeY = turtle.y;
+            const posX = (relativeX - offsetX) * patchSize;
+            const posY = (relativeY - offsetY) * patchSize;
+            mesh.position.set(posX, posY, 0.1);
+
+            // Update scale based on size
+            const size = turtle.size * patchSize;
+            mesh.scale.set(size, size, 1);
+
+            // Update rotation for triangles
+            if (turtle.shape === 'triangle') {
+                mesh.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
+            }
+
+            // Handle labels
+            if (turtle.label && turtle.label !== "") {
+                const sprite = getOrCreateSprite(spriteIndex++);
+                const canvas = sprite.userData.canvas;
+                const ctx = canvas.getContext('2d');
+
+                // Clear and redraw label
+                ctx.clearRect(0, 0, 256, 256);
+                ctx.font = '48px Arial';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(turtle.label, 128, 128);
+
+                sprite.userData.texture.needsUpdate = true;
+                sprite.scale.set(patchSize * 1.5, patchSize * 1.5, 1);
+                sprite.position.set(posX, posY, 0.2);
             }
         });
 
-        // Create Links (lines)
-        model.links.forEach(link => {
-
+        // Update Links - reuse existing lines
+        let linkIndex = 0;
+        model.links.forEach((link) => {
             if (!link.hidden) {
-                const material = new THREE.LineBasicMaterial({ 
-                    color: new THREE.Color(link.color.r / 255, link.color.g / 255, link.color.b / 255) 
-                });
+                const line = getOrCreateLink(linkIndex++);
 
-                let relativeX1 = link.end1X;
-                let relativeX2 = link.end2X;
-                let relativeY1 = link.end1Y;
-                let relativeY2 = link.end2Y;
+                // Update color
+                line.material.color.setRGB(link.color.r / 255, link.color.g / 255, link.color.b / 255);
 
-                const points = [
-                    new THREE.Vector3((relativeX1-offsetX) * patchSize, (relativeY1-offsetY) * patchSize, 0.05),
-                    new THREE.Vector3((relativeX2-offsetX) * patchSize, (relativeY2-offsetY) * patchSize, 0.05)
-                ];
-
-                const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                const line = new THREE.Line(geometry, material);
-                linkGroup.add(line);
+                // Update positions
+                const positions = line.geometry.attributes.position.array;
+                positions[0] = (link.end1X - offsetX) * patchSize;
+                positions[1] = (link.end1Y - offsetY) * patchSize;
+                positions[2] = 0.05;
+                positions[3] = (link.end2X - offsetX) * patchSize;
+                positions[4] = (link.end2Y - offsetY) * patchSize;
+                positions[5] = 0.05;
+                line.geometry.attributes.position.needsUpdate = true;
             }
         });
-    }
-
-    function buildCircleTurtle(turtle, patchSize, offsetX, offsetY) {
-        const geometry = new THREE.CircleGeometry(turtle.size * patchSize * 0.5, 32);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255) 
-        });
-        const circle = new THREE.Mesh(geometry, material);
-        const relativeX = turtle.x;
-        const relativeY = turtle.y;
-        const turtleOffset = 0;
-        let posX = (relativeX - offsetX) * patchSize - turtleOffset;
-        let posY = (relativeY - offsetY) * patchSize - turtleOffset;
-        circle.position.set(posX, posY, 0.1);
-
-
-        turtleGroup.add(circle);
-
-        if (turtle.label !== "") {
-            const canvas = document.createElement('canvas');
-            const size = 256;
-            canvas.width = size;
-            canvas.height = size;
-            const context = canvas.getContext('2d');
-            context.font = '48px Arial';
-            context.fillStyle = 'white';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(turtle.label, size / 2, size / 2);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
-            const sprite = new THREE.Sprite(spriteMaterial);
-
-            // Size and position
-            sprite.scale.set(patchSize * 1.5, patchSize * 1.5, 1);
-            sprite.position.set(posX, posY, 0.2); // A little above the circle
-
-            turtleGroup.add(sprite);
-        }
-    }
-
-    function buildTriangleTurtle(turtle, patchSize, offsetX, offsetY) {
-        const geometry = new THREE.BufferGeometry();
-
-        const size = turtle.size * patchSize * 0.5;
-        const height = Math.sqrt(3) * size; // equilateral triangle height
-
-        // define vertices with the triangle pointing along +X (so 0 degrees = right)
-        const vertices = new Float32Array([
-            height / 2, 0, 0,    // tip of the triangle (facing default direction)
-            -height / 2, -size, 0, // bottom left
-            -height / 2, size, 0  // bottom right
-        ]);
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-        const material = new THREE.MeshBasicMaterial({ 
-            color: new THREE.Color(turtle.color.r / 255, turtle.color.g / 255, turtle.color.b / 255),
-            side: THREE.DoubleSide
-        });
-
-        const triangle = new THREE.Mesh(geometry, material);
-
-        // Positioning
-        const relativeX = turtle.x;
-        const relativeY = turtle.y;
-        triangle.position.set((relativeX - offsetX) * patchSize, (relativeY - offsetY) * patchSize, 0.1);
-
-        // Correct rotation: default points right (+X), so apply `heading` directly
-        triangle.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
-
-        turtleGroup.add(triangle);
     }
 
     function UpdateMouseClicked(x, y) {

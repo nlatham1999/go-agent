@@ -21,7 +21,7 @@ func main() {
 
 func RunServer() {
 
-	schelling := prims.NewPrims()
+	prims := prims.NewPrims()
 	boid := boid.NewBoid()
 	boidConurrent := boidconcurrent.NewBoid()
 	gol := gol.NewGol()
@@ -32,7 +32,7 @@ func RunServer() {
 	agentApi, err := api.NewApi(
 		map[string]api.ModelInterface{
 			"gameoflife":        gol,
-			"schelling":         schelling,
+			"prims":             prims,
 			"boid":              boid,
 			"boidconcurrent":    boidConurrent,
 			"playground":        playground,
@@ -43,7 +43,7 @@ func RunServer() {
 			StoreSteps: false,
 			ButtonTitles: map[string]string{
 				"gameoflife":        "🟩 Game of Life",
-				"schelling":         "🏃‍♂️ Schelling's Segregation Model",
+				"prims":             "🧱 Prim's Maze Generation",
 				"boid":              "🐦 Boid Movement",
 				"boidconcurrent":    "🐦 Boid Movement Concurrent",
 				"playground":        "🎮 Playground",
@@ -52,7 +52,7 @@ func RunServer() {
 			},
 			ButtonDescriptions: map[string]string{
 				"gameoflife":        "Conway's Game of Life",
-				"schelling":         "A simple social dynamics model",
+				"prims":             "Generating mazes using Prim's algorithm",
 				"boid":              "Simulating flocking birds",
 				"boidconcurrent":    "Simulating flocking birds concurrently",
 				"playground":        "Playground for quick testing",
