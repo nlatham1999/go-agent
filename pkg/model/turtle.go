@@ -484,7 +484,10 @@ func (t *Turtle) Left(number float64) {
 	heading := math.Mod((t.heading + number), 2*math.Pi)
 
 	t.setHeadingRadians(heading)
+}
 
+func (t *Turtle) Model() *Model {
+	return t.parent
 }
 
 // moves the turtle to the patch passed in

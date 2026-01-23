@@ -16,9 +16,6 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("Setting up model")
-
 	if a.goRepeatRunning {
 		a.stopRepeating <- struct{}{}
 		a.goRepeatRunning = false

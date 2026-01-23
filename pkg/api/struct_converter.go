@@ -26,8 +26,8 @@ func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
 	apiPatches := make([]Patch, 0, patches.Count())
 	patches.Ask(func(patch *model.Patch) {
 		apiPatch := Patch{
-			X:     patch.PXCor(),
-			Y:     patch.PYCor(),
+			X:     patch.XCor(),
+			Y:     patch.YCor(),
 			Color: convertColorToApiColor(patch.Color),
 		}
 		apiPatches = append(apiPatches, apiPatch)

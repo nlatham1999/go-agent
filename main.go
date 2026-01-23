@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/nlatham1999/go-agent/examples/boid"
 	"github.com/nlatham1999/go-agent/examples/boidconcurrent"
 	"github.com/nlatham1999/go-agent/examples/flocking"
@@ -12,6 +14,12 @@ import (
 )
 
 func main() {
+	RunServer()
+
+	// RunSingleModel(geneticalgorithm.NewGeneticAlgorithm())
+}
+
+func RunServer() {
 
 	schelling := prims.NewPrims()
 	boid := boid.NewBoid()
@@ -59,5 +67,29 @@ func main() {
 	}
 
 	agentApi.Serve()
+}
 
+func RunSingleModel(model api.ModelInterface) {
+
+	model.Init()
+
+	model.SetUp()
+
+	fmt.Println("generation, high score, average_score, highest amount picked")
+
+	for !model.Stop() {
+		model.Go()
+
+		// PrintStats(model)
+		stats := model.Stats()
+
+		fmt.Println(fmt.Sprintf("%d,%d,%d,%d", stats["generation"], stats["high score"], stats["average score"], stats["highest amount picked"]))
+	}
+}
+
+func PrintStats(model api.ModelInterface) {
+	stats := model.Stats()
+	for key, val := range stats {
+		fmt.Println(key, val)
+	}
 }

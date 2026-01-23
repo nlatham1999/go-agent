@@ -17,6 +17,8 @@ type Gol struct {
 	maxNeighborsToReproduce int
 	initialAlive            float64
 
+	worldSize int
+
 	patches []*model.Patch
 }
 
@@ -29,28 +31,31 @@ func (g *Gol) Model() *model.Model {
 }
 
 func (g *Gol) Init() {
-	settings := model.ModelSettings{
-		PatchProperties: map[string]interface{}{
-			"alive":      true,
-			"alive-next": true,
-		},
-		MinPxCor: 0,
-		MaxPxCor: 200,
-		MinPyCor: 0,
-		MaxPyCor: 200,
-	}
-
-	g.model = model.NewModel(settings)
 
 	g.minNeighborsToLive = 2
 	g.maxNeighborsToLive = 3
 	g.minNeighborsToReproduce = 3
 	g.maxNeighborsToReproduce = 3
 	g.initialAlive = 0.5
+	g.worldSize = 12
+
+	_ = g.SetUp()
 }
 
 func (g *Gol) SetUp() error {
-	g.model.ClearAll()
+
+	settings := model.ModelSettings{
+		PatchProperties: map[string]interface{}{
+			"alive":      true,
+			"alive-next": true,
+		},
+		MinPxCor: 0,
+		MaxPxCor: g.worldSize,
+		MinPyCor: 0,
+		MaxPyCor: g.worldSize,
+	}
+
+	g.model = model.NewModel(settings)
 
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
@@ -187,5 +192,6 @@ func (g *Gol) Widgets() []api.Widget {
 			StepAmount:        "0.01",
 			ValuePointerFloat: &g.initialAlive,
 		},
+		api.NewIntSliderWidget("World Size", "world-size", "10", "100", "12", "1", &g.worldSize),
 	}
 }

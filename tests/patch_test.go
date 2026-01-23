@@ -373,8 +373,8 @@ func TestPatchPatchAt(t *testing.T) {
 	patchAt := patch.PatchAt(1, 1)
 
 	//make sure the patch is correct
-	if patchAt.PXCor() != 1 || patchAt.PYCor() != 1 {
-		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	if patchAt.XCor() != 1 || patchAt.YCor() != 1 {
+		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.XCor(), patchAt.YCor())
 	}
 
 	// get patch outside of world
@@ -398,21 +398,21 @@ func TestPatchPatchAt(t *testing.T) {
 	patchAt = patch.PatchAt(-1, -1)
 
 	//make sure the patch is correct
-	if patchAt.PXCor() != 15 || patchAt.PYCor() != 15 {
-		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	if patchAt.XCor() != 15 || patchAt.YCor() != 15 {
+		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.XCor(), patchAt.YCor())
 	}
 
 	// get patch outside of world
 	patchAt = patch.PatchAt(16, 16)
 
-	if patchAt.PXCor() != 1 || patchAt.PYCor() != 1 {
-		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	if patchAt.XCor() != 1 || patchAt.YCor() != 1 {
+		t.Errorf("Expected patch at 1, 1, got %v, %v", patchAt.XCor(), patchAt.YCor())
 	}
 
 	patchAt = patch.PatchAt(-32, -32)
 
-	if patchAt.PXCor() != 15 || patchAt.PYCor() != 15 {
-		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.PXCor(), patchAt.PYCor())
+	if patchAt.XCor() != 15 || patchAt.YCor() != 15 {
+		t.Errorf("Expected patch at 15, 15, got %v, %v", patchAt.XCor(), patchAt.YCor())
 	}
 }
 

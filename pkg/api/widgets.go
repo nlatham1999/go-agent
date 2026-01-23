@@ -32,6 +32,20 @@ func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, step
 	}
 }
 
+func NewIntSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *int) Widget {
+	return Widget{
+		PrettyName:      prettyName,
+		Id:              id,
+		WidgetType:      "slider",
+		WidgetValueType: "int",
+		MinValue:        minValue,
+		MaxValue:        maxValue,
+		DefaultValue:    defaultValue,
+		StepAmount:      stepAmount,
+		ValuePointerInt: valuePointer,
+	}
+}
+
 func NewButtonWidget(prettyName, id string, target func()) Widget {
 	return Widget{
 		PrettyName: prettyName,

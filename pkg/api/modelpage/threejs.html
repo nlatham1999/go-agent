@@ -246,8 +246,35 @@
         const relativeX = turtle.x;
         const relativeY = turtle.y;
         const turtleOffset = 0;
-        circle.position.set((relativeX - offsetX) * patchSize - turtleOffset, (relativeY - offsetY) * patchSize - turtleOffset, 0.1);
+        let posX = (relativeX - offsetX) * patchSize - turtleOffset;
+        let posY = (relativeY - offsetY) * patchSize - turtleOffset;
+        circle.position.set(posX, posY, 0.1);
+
+
         turtleGroup.add(circle);
+
+        if (turtle.label !== "") {
+            const canvas = document.createElement('canvas');
+            const size = 256;
+            canvas.width = size;
+            canvas.height = size;
+            const context = canvas.getContext('2d');
+            context.font = '48px Arial';
+            context.fillStyle = 'white';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(turtle.label, size / 2, size / 2);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+            const sprite = new THREE.Sprite(spriteMaterial);
+
+            // Size and position
+            sprite.scale.set(patchSize * 1.5, patchSize * 1.5, 1);
+            sprite.position.set(posX, posY, 0.2); // A little above the circle
+
+            turtleGroup.add(sprite);
+        }
     }
 
     function buildTriangleTurtle(turtle, patchSize, offsetX, offsetY) {

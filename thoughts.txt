@@ -37,13 +37,14 @@ why have linkedTurtles and linkedTurtlesConnectedFrom?
  - so that means we need to store the directed links that are conecting back to the current turtle
 
 
- patches own should not contain ints, only floats, this is for diffusing
+patches own should not contain ints, only floats, this is for diffusing
 
 why have seperate endpoints for stats and model? 
  - so that the user has the option to only grab the bare necessities
 
 
- Concurrency should not be baked in and should only be a option
-    - Concurrency reduces determinism
-    - To complicated given the variety of actions the user can undergo
-    - conccurency should only be for read, not for write
+Concurrency
+- should be made available but not baked in
+- Concurrency reduces determinism
+- To complicated given the variety of actions the user can undergo
+- conccurency should only be for read, not for write

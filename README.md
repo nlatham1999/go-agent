@@ -95,9 +95,7 @@ below is a sample of a wolf and sheep model where patches are grass or dirt and 
 ### Concurrency
 Concurrency is currently supported only for turtles via AskConcurrent, SetPropertySafe and GetPropertySafe  
 
-Suggested use is to leverage concurrency to read turtle attributes and store values in the turtle properties, and then to go through each turtle on a single thread and use the set attributes to move the turtle.  
-
-This is because any actions moving the turtle can affect other pieces  
+For simulation forward type models concurrency will not ruin determinism, two sets of conccurent actions can be created, a read group and a write group that happens after all the reads are done. For continuous models however, concurrency ruins determinism.
 
 ## TODO
   
@@ -125,11 +123,11 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] make setxy able to be called concurrently
 -  [x] remove tie modes
 -  [x] make change patch ownership able to be called concurrently
--  [ ] have descendents public
 -  [x] button widgets
 -  [ ] enable setting x,y, height(?) and width on widgets
--  [ ] update readme on concurrency
--  [ ] remove collision detection and make a seperate package
+-  [x] update readme on concurrency
+-  [x] remove collision detection
+-  [ ] make a seperate package for collision detection
 -  [ ] speed improvements on rendering
 -  [x] on sliders, if the value is set, than use that value when loading
 -  [ ] agentset copy funcs

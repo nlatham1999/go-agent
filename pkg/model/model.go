@@ -1204,8 +1204,8 @@ func (m *Model) TurtlesInRadius(xCor float64, yCor float64, radius float64) *Tur
 
 			// get the center of the patch from the patch
 			// this makes sure that this is actually the center of the patch, just in case the coords shifted due to world wrapping
-			px := float64(patch.PXCor())
-			py := float64(patch.PYCor())
+			px := float64(patch.XCor())
+			py := float64(patch.YCor())
 
 			// patch corners
 			corners := [4][2]float64{

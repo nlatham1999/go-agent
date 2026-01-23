@@ -151,12 +151,12 @@ func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Pa
 }
 
 // returns the x coordinate of this patch
-func (p *Patch) PXCor() int {
+func (p *Patch) XCor() int {
 	return p.x
 }
 
 // returns the y coordinate of this patch
-func (p *Patch) PYCor() int {
+func (p *Patch) YCor() int {
 	return p.y
 }
 
