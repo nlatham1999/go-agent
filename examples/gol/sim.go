@@ -1,6 +1,9 @@
 package gol
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/nlatham1999/go-agent/pkg/api"
 	"github.com/nlatham1999/go-agent/pkg/concurrency"
 	"github.com/nlatham1999/go-agent/pkg/model"
@@ -77,6 +80,11 @@ func (g *Gol) SetUp() error {
 }
 
 func (g *Gol) Go() {
+
+	currentTime := time.Now()
+	defer func(startTime time.Time) {
+		fmt.Println("Time per tick (ms):", time.Since(currentTime).Milliseconds())
+	}(currentTime)
 
 	// g.model.Patches.Ask(
 	concurrency.AskPatches(g.patches,

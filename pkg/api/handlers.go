@@ -179,11 +179,7 @@ func (a *Api) ModelPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := map[string]interface{}{
-		"Widgets": a.buildWidgets(),
-	}
-
-	tmpl.Execute(w, data)
+	tmpl.Execute(w, nil)
 
 	// load the threejs html as a string
 	jsTml, err := template.New("content").Parse(modelPageThreeJS)
@@ -384,4 +380,43 @@ func (a *Api) setTickValueHandler(w http.ResponseWriter, r *http.Request) {
 
 	a.tickValue = tick
 	w.WriteHeader(http.StatusOK)
+}
+
+func (a *Api) widgetsHandler(w http.ResponseWriter, r *http.Request) {
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
+
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
+
+	widgets := a.currentModel.Widgets()
+
+	// Create JSON-serializable widget data
+	widgetData := make([]map[string]interface{}, 0)
+
+	for i, widget := range widgets {
+		if widget.WidgetType == "background" {
+			continue
+		}
+
+		data := map[string]interface{}{
+			"prettyName":     widget.PrettyName,
+			"id":             widget.Id,
+			"widgetType":     widget.WidgetType,
+			"widgetValueType": widget.WidgetValueType,
+			"minValue":       widget.MinValue,
+			"maxValue":       widget.MaxValue,
+			"defaultValue":   widget.DefaultValue,
+			"stepAmount":     widget.StepAmount,
+			"currentValue":   widget.getCurrentValue(),
+			"index":          i,
+		}
+		widgetData = append(widgetData, data)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(widgetData)
 }

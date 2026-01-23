@@ -1,5 +1,99 @@
 <script>
 
+    // Widget rendering functions
+    function renderWidget(widget) {
+        const widgetDiv = document.createElement('div');
+        widgetDiv.className = `widget widget-${widget.widgetType}`;
+        widgetDiv.setAttribute('data-widget-index', widget.index);
+        widgetDiv.setAttribute('data-widget-id', widget.id);
+
+        const widgetId = `${widget.id}-widget`;
+
+        if (widget.widgetType === 'text') {
+            const label = document.createElement('label');
+            label.setAttribute('for', widgetId);
+            label.textContent = widget.prettyName;
+            widgetDiv.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = widgetId;
+            input.name = widget.id;
+            input.setAttribute('hx-get', '/updatedynamic');
+            input.setAttribute('hx-trigger', 'change');
+            input.setAttribute('hx-include', `#${widgetId}`);
+            input.value = widget.currentValue || widget.defaultValue || '';
+            widgetDiv.appendChild(input);
+        } else if (widget.widgetType === 'slider') {
+            const labelDiv = document.createElement('div');
+            const label = document.createElement('label');
+            label.setAttribute('for', widgetId);
+
+            const labelId = `${widgetId}-label`;
+            const valueSpan = document.createElement('span');
+            valueSpan.id = labelId;
+            valueSpan.textContent = widget.currentValue || widget.defaultValue;
+
+            label.textContent = `${widget.prettyName}: `;
+            label.appendChild(valueSpan);
+            labelDiv.appendChild(label);
+            widgetDiv.appendChild(labelDiv);
+
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.id = widgetId;
+            input.name = widget.id;
+            input.min = widget.minValue;
+            input.max = widget.maxValue;
+            input.value = widget.currentValue || widget.defaultValue;
+            if (widget.stepAmount) {
+                input.step = widget.stepAmount;
+            }
+            input.setAttribute('hx-get', '/updatedynamic');
+            input.setAttribute('hx-trigger', 'change');
+            input.setAttribute('hx-include', `#${widgetId}`);
+            input.oninput = function() {
+                document.getElementById(labelId).textContent = this.value;
+            };
+            widgetDiv.appendChild(input);
+        } else if (widget.widgetType === 'button') {
+            const button = document.createElement('button');
+            button.id = widgetId;
+            button.textContent = widget.prettyName;
+            button.setAttribute('hx-swap', 'none');
+            button.setAttribute('hx-get', '/updatedynamic');
+            button.setAttribute('hx-trigger', 'click');
+            button.setAttribute('hx-vals', `{"${widget.id}": "test"}`);
+            widgetDiv.appendChild(button);
+        }
+
+        return widgetDiv;
+    }
+
+    function loadWidgets() {
+        fetch('/widgets')
+            .then(response => response.json())
+            .then(widgets => {
+                const container = document.getElementById('widgetContainer');
+                container.innerHTML = '';
+
+                widgets.forEach(widget => {
+                    const widgetElement = renderWidget(widget);
+                    container.appendChild(widgetElement);
+                });
+
+                // Re-initialize HTMX for new elements
+                if (window.htmx) {
+                    htmx.process(container);
+                }
+
+                // Apply widget positions and dragging
+                initWidgetDragging();
+                applyWidgetPositions();
+            })
+            .catch(error => console.error('Error loading widgets:', error));
+    }
+
     const goRepeatText = document.getElementById('goRepeat').innerText;
 
     const goOnceButton = document.getElementById('goOnce');
@@ -64,31 +158,147 @@
     //     console.log('Restored scroll position:', savedScrollPosition);
     // });
 
-    // make the widget draggable
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".widget").forEach(widget => {
-            let isDragging = false;
-            let offsetX, offsetY;
+    // Widget dragging with position persistence
+    let dragState = {
+        isDragging: false,
+        currentWidget: null,
+        offsetX: 0,
+        offsetY: 0
+    };
 
-            widget.addEventListener("mousedown", (e) => {
-                if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return; // prevent dragging inside inputs
-                isDragging = true;
-                offsetX = e.clientX - widget.offsetLeft;
-                offsetY = e.clientY - widget.offsetTop;
-                widget.style.cursor = "grabbing";
-            });
+    // Load saved widget positions from localStorage
+    function loadWidgetPositions() {
+        const saved = localStorage.getItem('widgetPositions');
+        return saved ? JSON.parse(saved) : {};
+    }
 
-            document.addEventListener("mousemove", (e) => {
-                if (!isDragging) return;
-                widget.style.left = e.clientX - offsetX + "px";
-                widget.style.top = e.clientY - offsetY + "px";
-            });
+    // Save widget positions to localStorage
+    function saveWidgetPosition(widgetId, left, top) {
+        const positions = loadWidgetPositions();
+        positions[widgetId] = { left, top };
+        localStorage.setItem('widgetPositions', JSON.stringify(positions));
+    }
 
-            document.addEventListener("mouseup", () => {
-                isDragging = false;
-                widget.style.cursor = "grab";
+    // Apply saved positions to widgets or set default positions
+    function applyWidgetPositions() {
+        const positions = loadWidgetPositions();
+        document.querySelectorAll('.widget').forEach(widget => {
+            const widgetId = getWidgetId(widget);
+            if (positions[widgetId]) {
+                // Apply saved position
+                widget.style.left = positions[widgetId].left + 'px';
+                widget.style.top = positions[widgetId].top + 'px';
+            } else {
+                // Set default position based on widget index
+                const index = parseInt(widget.getAttribute('data-widget-index') || 0);
+                widget.style.left = '0px';
+                widget.style.top = (index * 65) + 'px';
+            }
+        });
+    }
+
+    // Get unique widget ID
+    function getWidgetId(widget) {
+        // Use the input/button ID inside the widget as unique identifier
+        const input = widget.querySelector('input, button');
+        return input ? input.id : widget.className;
+    }
+
+    // Initialize dragging for all widgets
+    function initWidgetDragging() {
+        document.querySelectorAll('.widget').forEach(widget => {
+            // Remove old listeners if any
+            widget.onmousedown = null;
+
+            widget.addEventListener('mousedown', (e) => {
+                // Prevent dragging when interacting with inputs, buttons, or sliders
+                if (e.target.tagName === 'TEXTAREA' ||
+                    e.target.tagName === 'INPUT' ||
+                    e.target.tagName === 'BUTTON') {
+                    return;
+                }
+
+                dragState.isDragging = true;
+                dragState.currentWidget = widget;
+                dragState.offsetX = e.clientX - widget.offsetLeft;
+                dragState.offsetY = e.clientY - widget.offsetTop;
+                widget.style.cursor = 'grabbing';
+                widget.style.zIndex = '1000';
+                widget.style.transition = 'none'; // Disable transition during drag
+                e.preventDefault();
             });
         });
+    }
+
+    // Global mouse move handler for instant dragging
+    document.addEventListener('mousemove', (e) => {
+        if (!dragState.isDragging || !dragState.currentWidget) return;
+
+        const newLeft = e.clientX - dragState.offsetX;
+        const newTop = e.clientY - dragState.offsetY;
+        dragState.currentWidget.style.left = newLeft + 'px';
+        dragState.currentWidget.style.top = newTop + 'px';
+    });
+
+    // Global mouse up handler
+    document.addEventListener('mouseup', () => {
+        if (dragState.isDragging && dragState.currentWidget) {
+            dragState.currentWidget.style.cursor = 'move';
+            dragState.currentWidget.style.zIndex = '';
+            dragState.currentWidget.style.transition = ''; // Re-enable transition
+
+            // Save position
+            const widgetId = getWidgetId(dragState.currentWidget);
+            saveWidgetPosition(
+                widgetId,
+                parseInt(dragState.currentWidget.style.left),
+                parseInt(dragState.currentWidget.style.top)
+            );
+
+            dragState.isDragging = false;
+            dragState.currentWidget = null;
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadWidgets();
+    });
+
+    // Periodically reload widgets to get updated values from server
+    function startWidgetSync() {
+        setInterval(() => {
+            fetch('/widgets')
+                .then(response => response.json())
+                .then(widgets => {
+                    widgets.forEach(widget => {
+                        const widgetElement = document.querySelector(`[data-widget-id="${widget.id}"]`);
+                        if (!widgetElement) return;
+
+                        const widgetId = `${widget.id}-widget`;
+
+                        // Update slider/input values if they've changed server-side
+                        if (widget.widgetType === 'slider' || widget.widgetType === 'text') {
+                            const input = document.getElementById(widgetId);
+                            const label = document.getElementById(`${widgetId}-label`);
+
+                            // Only update if user isn't actively changing it
+                            if (input && document.activeElement !== input) {
+                                input.value = widget.currentValue || widget.defaultValue;
+                                if (label) {
+                                    label.textContent = widget.currentValue || widget.defaultValue;
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error syncing widgets:', error));
+        }, 500); // Sync every 500ms
+    }
+
+    // Start syncing after initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        startWidgetSync();
     });
 
     // function to /loadstats that will load the stats every .5 seconds

@@ -46,27 +46,33 @@
         --border-radius-large: 10px;
     } */
 
-    /*white and black*/
+    /*modern dark theme with gradients*/
     :root {
-        --background-color: #1e3c72; 
-        --widget-background-color: #1e3c72;
-        --button-group-background-color: #1e3c72;
-        --scrollbar-color: #1e3c72; 
-        --slider-color: #F5F5F5;
-        --text-color: #F5F5F5;
-        --border-color: #F5F5F5;
-        --button-group-border-color: #F5F5F5;
-        --label-and-input-border-color: #F5F5F5;
-        --button-text-color: #1e3c72;
-        --label-and-input-text-color: #F5F5F5;
-        --button-background-color: #F5F5F5;
-        --input-background-color: #1e3c72;
+        --background-color: #0f172a;
+        --background-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        --widget-background-color: rgba(30, 41, 59, 0.8);
+        --button-group-background-color: rgba(15, 23, 42, 0.6);
+        --scrollbar-color: #3b82f6;
+        --slider-color: #3b82f6;
+        --text-color: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: rgba(59, 130, 246, 0.3);
+        --button-group-border-color: rgba(59, 130, 246, 0.5);
+        --label-and-input-border-color: rgba(59, 130, 246, 0.4);
+        --button-text-color: #0f172a;
+        --label-and-input-text-color: #f1f5f9;
+        --button-background-color: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        --button-hover-background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        --input-background-color: rgba(15, 23, 42, 0.8);
+        --button-hover-text-color: #ffffff;
+        --accent-glow: rgba(59, 130, 246, 0.4);
 
-        --button-hover-background-color: #1e3c72;
-        --button-hover-text-color: #F5F5F5;
-
-        --border-radius: 3px;
-        --border-radius-large: 3px;
+        --border-radius: 8px;
+        --border-radius-large: 12px;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+        --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
     }
 
     .nunito-font {
@@ -86,35 +92,54 @@
         margin: 10px;
     }
     body {
-        /* font-family: nunito-light, sans-serif; */
         margin: 0;
         padding: 0;
-        background-color: var(--background-color);
-        /* background: linear-gradient(to right, #1e3c72, #2a5298); */
-        /* background-image: url('https://anniversaryreminder.netlify.app/purple-blue.f38dd5210fc58111.jpg'); */
+        background: var(--background-gradient);
         color: var(--text-color);
+        min-height: 100vh;
     }
     button {
-        background-color: var(--button-background-color);
+        background: var(--button-background-color);
         color: var(--button-text-color);
-
-        
         border-radius: var(--border-radius);
-        border: 1px solid var(--border-color);
-        box-shadow: none;
+        border: none;
+        box-shadow: var(--shadow-md);
         margin: 3px;
-        padding: 2px;
-        padding-left: 6px;
-        padding-right: 6px;
-        font-size: medium;
-        /* border-style: none; */
-
-        /* font-family: nunito-light, sans-serif; */
-        font-family: "Manrope", sans-serif;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-family: "Space Mono", monospace;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
+
+    button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    button:hover::before {
+        left: 100%;
+    }
+
     button:hover {
-        background-color: var(--button-hover-background-color);
+        background: var(--button-hover-background);
         color: var(--button-hover-text-color);
+        box-shadow: var(--shadow-lg), var(--shadow-glow);
+        transform: translateY(-2px);
+    }
+
+    button:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-sm);
     }
 
     #modelControls {
@@ -129,37 +154,53 @@
     }
     .buttonGroup {
         display: flex;
-        gap: 5px; /* space between buttons */
-        padding: 5px;
-        border: 1px solid var(--button-group-border-color); /* optional: adds a border around the group */
-        border-radius: var(--border-radius); /* makes the grouping look smoother */
-        padding-bottom: 1.2vh;
-        padding-top: 1.2vh;
-        background-color: var(--button-group-background-color);
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--button-group-border-color);
+        border-radius: var(--border-radius-large);
+        background: var(--button-group-background-color);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-md);
     }
+
     .buttonGroupButton {
         border: 1px solid var(--button-group-border-color);
-        background-color: var(--button-group-border-color);
-        color: var(--button-group-background-color) !important;
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--text-color) !important;
+        backdrop-filter: blur(5px);
     }
+
     .buttonGroupButton:hover {
-        background-color: var(--button-group-background-color);
-        color: var(--button-group-border-color) !important;
+        background: rgba(59, 130, 246, 0.4);
+        color: var(--text-color) !important;
+        border-color: #3b82f6;
     }
     .labelAndInput {
-        background-color: var(--background-color);
-        padding: 5px;
+        background: var(--button-group-background-color);
+        backdrop-filter: blur(10px);
+        padding: 12px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 5px;
-        font-size: medium; 
-        border: 1px solid var(--label-and-input-border-color); /* optional: adds a border around the group */
-        border-radius: var(--border-radius); /* makes the grouping look smoother */
+        gap: 8px;
+        font-size: 14px;
+        border: 1px solid var(--label-and-input-border-color);
+        border-radius: var(--border-radius-large);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
     }
+
+    .labelAndInput:hover {
+        border-color: #3b82f6;
+        box-shadow: var(--shadow-lg), 0 0 15px rgba(59, 130, 246, 0.2);
+    }
+
     .labelAndInputLabel {
         color: var(--label-and-input-text-color);
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
+
     #speedControl {
         padding-bottom: 14px;
     }
@@ -180,83 +221,99 @@
         top: 15vh;
         height: 78vh;
         width: 45vw;
-        background-color: var(--background-color);
-
-
-        border: 1px solid var(--border-color); 
-        border-radius: var(--border-radius-large); 
-
-        padding: 1vw;
-        overflow: scroll;
+        background: var(--widget-background-color);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-large);
+        padding: 1.5vw;
+        overflow: auto;
         scroll-behavior: smooth;
-        /* add a scrollbar */
         scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar-color) var(--background-color);
+        scrollbar-color: var(--scrollbar-color) transparent;
+        box-shadow: var(--shadow-lg);
+    }
 
+    #widgetContainer::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #widgetContainer::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #widgetContainer::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-color);
+        border-radius: 4px;
+    }
+
+    #widgetContainer::-webkit-scrollbar-thumb:hover {
+        background: #60a5fa;
     }
 
     /* make widget class have borders and be draggable*/
     .widget {
-
         cursor: move;
-        background-color: var(--widget-background-color);
-
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(8px);
         position: absolute;
-        /* resize: horizontal; */
         overflow: auto;
-        border: 1px solid var(--border-color); 
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
 
+    .widget:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
 
     .widget-text {
-        border-radius: var(--border-radius-large); 
-
-        padding: 5px;
-        padding-right: 10px;
+        border-radius: var(--border-radius-large);
+        padding: 10px 15px;
     }
 
     .widget-slider {
-        border-radius: var(--border-radius-large); 
-
-        padding: 7px;
-
+        border-radius: var(--border-radius-large);
+        padding: 12px;
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: 8px;
     }
 
     .widget-button {
-        border-radius: var(--border-radius-large); 
-
-        padding: 5px;
-        padding-right: 5px;
-
+        border-radius: var(--border-radius-large);
+        padding: 10px;
     }
 
     .widget-stat {
-        border-radius: var(--border-radius-large); 
-
-        padding: 5px;
-        padding-right: 5px;
+        border-radius: var(--border-radius-large);
+        padding: 10px 12px;
     }
 
     /* make inputs on click have a border */
     input[type="number"]:focus,
     input[type="text"]:focus {
-        border: 2px solid var(--border-color); /* green border on focus */
-        outline: none; /* removes default blue outline */
-        transition: border 0.2s ease-in-out; /* smooth effect */
+        border: 2px solid #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
 
     input[type="number"],
     input[type="text"] {
-        background-color: var(--input-background-color);
-        color: #E0E0E0;
-        box-shadow: none;
-        font-size: medium;
+        background: var(--input-background-color);
+        backdrop-filter: blur(5px);
+        color: var(--text-color);
+        box-shadow: var(--shadow-sm);
+        font-size: 14px;
         border-radius: var(--border-radius);
         border: 1px solid var(--border-color);
-        color: var(--text-color);
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+        font-family: "Space Mono", monospace;
+    }
+
+    input[type="number"]:hover,
+    input[type="text"]:hover {
+        border-color: #3b82f6;
     }
 
 
@@ -266,45 +323,89 @@
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 2px;
-            background: var(--slider-color);
+            height: 6px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 3px;
             outline: none;
+            transition: all 0.3s ease;
         }
-        
-        input[type='range']::-webkit-slider-runnable-track {     
-            height: 2px;
+
+        input[type='range']:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        input[type='range']::-webkit-slider-runnable-track {
+            height: 6px;
             -webkit-appearance: none;
-            color: var(--slider-color);
-            /* background-size: 100% 100%;
-            background-repeat: no-repeat; */
+            border-radius: 3px;
         }
-        
+
         input[type='range']::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 12px;
-            height: 12px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: var(--slider-color);
             cursor: pointer;
-            margin-top: -5px; /* centers it */
+            margin-top: -6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
-
+        input[type='range']::-webkit-slider-thumb:hover {
+            background: #60a5fa;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+            transform: scale(1.1);
+        }
     }
+
     /** FF*/
     input[type="range"]::-moz-range-progress {
-        background-color: var(--slider-color); 
-    }
-    input[type="range"]::-moz-range-track {  
         background-color: var(--slider-color);
+        border-radius: 3px;
     }
+
+    input[type="range"]::-moz-range-track {
+        background-color: rgba(59, 130, 246, 0.2);
+        border-radius: 3px;
+        height: 6px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--slider-color);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+        background: #60a5fa;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+    }
+
     /* IE*/
     input[type="range"]::-ms-fill-lower {
-        background-color: var(--slider-color); 
-    }
-    input[type="range"]::-ms-fill-upper {  
         background-color: var(--slider-color);
+        border-radius: 3px;
+    }
+
+    input[type="range"]::-ms-fill-upper {
+        background-color: rgba(59, 130, 246, 0.2);
+        border-radius: 3px;
+    }
+
+    input[type="range"]::-ms-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--slider-color);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
 

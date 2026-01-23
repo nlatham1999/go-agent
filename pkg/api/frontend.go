@@ -29,32 +29,6 @@ var (
 	statsKeys = []string{}
 )
 
-func (a *Api) renderStatsAsWidgets() (string, int) {
-	html := ""
-	stats := a.currentModel.Stats()
-
-	//tick stat
-	html += fmt.Sprintf(`
-		<div class="widget widget-stat">
-			<div id="stats-ticks">Ticks : %d</div>
-		</div>
-	`, a.currentModel.Model().Ticks)
-
-	count := 2
-	for key, value := range stats {
-		if value == nil {
-			value = "null"
-		}
-		html += fmt.Sprintf(`
-		<div class="widget widget-stat" style="top: %dpx;">
-			<div id="stats-%s">%s : %v</div>
-		</div>
-		`, count*40, key, key, value)
-		count++
-	}
-	return html, len(stats) + 1
-}
-
 func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSize int, screenHeight float64) {
 
 	if link.Hidden {
@@ -114,21 +88,6 @@ func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSi
 
 }
 
-func (a *Api) buildWidgets() string {
-
-	// Add stats widget
-	html, count := a.renderStatsAsWidgets()
-
-	// Add widgets here
-	count++
-	for _, widget := range a.currentModel.Widgets() {
-		html += widget.render(count)
-		count++
-	}
-
-	return html
-}
-
 // <li>
 // <a href="/run/gameoflife">
 // 	<button>🟢 <strong>Game of Life</strong> – A classic cellular automaton</button>
@@ -154,12 +113,17 @@ func (a *Api) buildModelList() string {
 		if buttonTitle == "" {
 			buttonTitle = name
 		}
+		if buttonDescription == "" {
+			buttonDescription = "Explore this simulation model"
+		}
 		html += fmt.Sprintf(`
-		<li>
-			<a href="/run/%s">
-				<button><strong>%s</strong> - %s</button>
-			</a>
-		</li>
+		<a href="/run/%s" class="model-card">
+			<div class="model-card-content">
+				<h3 class="model-title">%s</h3>
+				<p class="model-description">%s</p>
+				<span class="model-arrow">→</span>
+			</div>
+		</a>
 		`, modelUrl, buttonTitle, buttonDescription)
 	}
 	return html
