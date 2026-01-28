@@ -3,6 +3,9 @@
     // Track widget structure to detect changes
     let currentWidgetStructure = null;
 
+    // Store chart instances for updates
+    let chartInstances = {};
+
     function getWidgetStructureHash(widgets) {
         // Create a hash of widget IDs and types to detect structural changes
         return widgets.map(w => `${w.id}:${w.widgetType}`).join('|');
@@ -78,15 +81,189 @@
             statDiv.id = widget.id;
             statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
             widgetDiv.appendChild(statDiv);
+        } else if (widget.widgetType === 'graph') {
+            // Parse graph data from JSON
+            let graphData;
+            try {
+                graphData = JSON.parse(widget.currentValue);
+                console.log('Parsed graph data:', graphData);
+            } catch (e) {
+                console.error('Failed to parse graph data:', e, 'Raw value:', widget.currentValue);
+                const errorDiv = document.createElement('div');
+                errorDiv.textContent = `Error parsing graph: ${widget.prettyName}`;
+                errorDiv.style.color = '#ef4444';
+                widgetDiv.appendChild(errorDiv);
+                return widgetDiv;
+            }
+
+            // Create container for the graph
+            const graphContainer = document.createElement('div');
+            graphContainer.style.width = '100%';
+            graphContainer.style.height = '300px';
+            graphContainer.style.position = 'relative';
+
+            // Create canvas for chart
+            const canvas = document.createElement('canvas');
+            canvas.id = `${widget.id}-canvas`;
+            canvas.style.display = 'block';
+
+            graphContainer.appendChild(canvas);
+            widgetDiv.appendChild(graphContainer);
+
+            // Store graph data for later chart creation
+            widgetDiv.dataset.graphData = JSON.stringify(graphData);
         }
 
         return widgetDiv;
+    }
+
+    function createOrUpdateChart(widgetId, graphData) {
+        console.log('createOrUpdateChart called for', widgetId, 'with data:', graphData);
+
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+
+        const canvasId = `${widgetId}-canvas`;
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error('Canvas not found for', canvasId, 'Available canvases:',
+                Array.from(document.querySelectorAll('canvas')).map(c => c.id));
+            return;
+        }
+
+        console.log('Canvas found:', canvas, 'Size:', canvas.width, 'x', canvas.height);
+
+        // Convert string arrays to numbers for Y values
+        const yValues = graphData.yValues.map(v => parseFloat(v));
+        console.log('Y values:', yValues);
+
+        // If chart already exists, update it
+        if (chartInstances[widgetId]) {
+            console.log('Updating existing chart for', widgetId);
+            const chart = chartInstances[widgetId];
+            chart.data.labels = graphData.xValues;
+            chart.data.datasets[0].data = yValues;
+            chart.options.plugins.title.text = graphData.title;
+            chart.update('none'); // Update without animation for performance
+            return;
+        }
+
+        console.log('Creating new chart for', widgetId);
+
+        // Create new chart
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: graphData.xValues || [],
+                datasets: [{
+                    label: graphData.yLabel || 'Value',
+                    data: yValues,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Disable animation for performance
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#cbd5e1',
+                            font: {
+                                family: '"Space Mono", monospace',
+                                size: 11
+                            }
+                        }
+                    },
+                    title: {
+                        display: !!graphData.title,
+                        text: graphData.title || '',
+                        color: '#f1f5f9',
+                        font: {
+                            size: 16,
+                            weight: 'bold',
+                            family: '"Space Mono", monospace'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 15
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: !!graphData.xLabel,
+                            text: graphData.xLabel || '',
+                            color: '#cbd5e1',
+                            font: {
+                                size: 12,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            maxTicksLimit: 10,
+                            font: {
+                                size: 10,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(203, 213, 225, 0.1)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: !!graphData.yLabel,
+                            text: graphData.yLabel || '',
+                            color: '#cbd5e1',
+                            font: {
+                                size: 12,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 10,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(203, 213, 225, 0.1)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        chartInstances[widgetId] = chart;
+        console.log('Chart created successfully for', widgetId, 'Chart instance:', chart);
     }
 
     function loadWidgets() {
         fetch('/widgets')
             .then(response => response.json())
             .then(widgets => {
+                console.log('Loaded widgets:', widgets);
+
+                // Find graph widgets
+                const graphWidgets = widgets.filter(w => w.widgetType === 'graph');
+                console.log('Graph widgets:', graphWidgets);
+
                 // Initialize structure tracking
                 currentWidgetStructure = getWidgetStructureHash(widgets);
 
@@ -106,6 +283,30 @@
                 // Apply widget positions and dragging
                 initWidgetDragging();
                 applyWidgetPositions();
+
+                // Create charts for all graph widgets after DOM is ready
+                setTimeout(() => {
+                    console.log('Creating charts after timeout...');
+                    const graphDivs = document.querySelectorAll('.widget-graph');
+                    console.log('Found graph divs:', graphDivs.length);
+
+                    graphDivs.forEach(widgetDiv => {
+                        const widgetId = widgetDiv.getAttribute('data-widget-id');
+                        const graphDataStr = widgetDiv.dataset.graphData;
+                        console.log('Processing graph widget:', widgetId, 'Data:', graphDataStr);
+
+                        if (graphDataStr) {
+                            try {
+                                const graphData = JSON.parse(graphDataStr);
+                                createOrUpdateChart(widgetId, graphData);
+                            } catch (e) {
+                                console.error('Failed to create chart for', widgetId, e);
+                            }
+                        } else {
+                            console.error('No graph data found for', widgetId);
+                        }
+                    });
+                }, 100);
             })
             .catch(error => console.error('Error loading widgets:', error));
     }
@@ -278,6 +479,10 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded. Chart.js available:', typeof Chart !== 'undefined');
+        if (typeof Chart !== 'undefined') {
+            console.log('Chart.js version:', Chart.version);
+        }
         loadWidgets();
     });
 
@@ -293,6 +498,12 @@
                     if (currentWidgetStructure !== newStructure) {
                         console.log('Widget structure changed, reloading widgets...');
                         currentWidgetStructure = newStructure;
+
+                        // Destroy old chart instances to prevent memory leaks
+                        Object.values(chartInstances).forEach(chart => {
+                            if (chart) chart.destroy();
+                        });
+                        chartInstances = {};
 
                         // Full reload of widgets
                         const container = document.getElementById('widgetContainer');
@@ -311,6 +522,23 @@
                         // Apply widget positions and dragging
                         initWidgetDragging();
                         applyWidgetPositions();
+
+                        // Create charts for all graph widgets after DOM is ready
+                        setTimeout(() => {
+                            document.querySelectorAll('.widget-graph').forEach(widgetDiv => {
+                                const widgetId = widgetDiv.getAttribute('data-widget-id');
+                                const graphDataStr = widgetDiv.dataset.graphData;
+                                if (graphDataStr) {
+                                    try {
+                                        const graphData = JSON.parse(graphDataStr);
+                                        createOrUpdateChart(widgetId, graphData);
+                                    } catch (e) {
+                                        console.error('Failed to create chart for', widgetId, e);
+                                    }
+                                }
+                            });
+                        }, 100);
+
                         return;
                     }
 
@@ -326,6 +554,16 @@
                             const statDiv = document.getElementById(widget.id);
                             if (statDiv) {
                                 statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
+                            }
+                        }
+
+                        // Update graph values
+                        if (widget.widgetType === 'graph') {
+                            try {
+                                const graphData = JSON.parse(widget.currentValue);
+                                createOrUpdateChart(widget.id, graphData);
+                            } catch (e) {
+                                console.error('Failed to parse graph data during sync:', e);
                             }
                         }
 

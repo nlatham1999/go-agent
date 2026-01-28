@@ -19,8 +19,8 @@ type Gol struct {
 	minNeighborsToReproduce int
 	maxNeighborsToReproduce int
 	initialAlive            float64
-
-	worldSize int
+	worldSize               int
+	numAliveGraph           api.GraphWidget
 
 	patches []*model.Patch
 }
@@ -41,6 +41,7 @@ func (g *Gol) Init() {
 	g.maxNeighborsToReproduce = 3
 	g.initialAlive = 0.5
 	g.worldSize = 12
+	g.numAliveGraph = api.NewGraphWidget("Number Alive", "num-alive-graph", "ticks", "count", []string{}, []string{})
 
 	_ = g.SetUp()
 }
@@ -73,6 +74,9 @@ func (g *Gol) SetUp() error {
 			}
 		},
 	)
+
+	g.numAliveGraph.XValues = []string{}
+	g.numAliveGraph.YValues = []string{}
 
 	g.patches = g.model.Patches.List()
 
@@ -130,6 +134,11 @@ func (g *Gol) Go() {
 		10,
 	)
 
+	g.numAliveGraph.XValues = append(g.numAliveGraph.XValues, fmt.Sprintf("%d", g.model.Ticks))
+	g.numAliveGraph.YValues = append(g.numAliveGraph.YValues, fmt.Sprintf("%d", g.model.Patches.With(func(p *model.Patch) bool {
+		return p.GetPropertySafe("alive").(bool)
+	}).Count()))
+
 	g.model.Tick()
 }
 
@@ -138,6 +147,7 @@ func (g *Gol) Stats() map[string]interface{} {
 		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
 			return p.GetPropertySafe("alive").(bool)
 		}).Count(),
+		"num-alive-graph": g.numAliveGraph,
 	}
 }
 

@@ -3,20 +3,29 @@ package api
 import "fmt"
 
 type Widget struct {
-	PrettyName         string   `json:"prettyName"`
-	Id                 string   `json:"id"`
-	WidgetType         string   `json:"widgetType"`
-	WidgetValueType    string   `json:"widgetValueType"`
-	MinValue           string   `json:"minValue"`
-	MaxValue           string   `json:"maxValue"`
-	DefaultValue       string   `json:"defaultValue"`
-	StepAmount         string   `json:"stepAmount"`
-	CurrentValue       string   `json:"currentValue"`
-	Target             func()   `json:"-"` // this is a function that will be called when the widget is interacted with if the type is a button
-	ValuePointerInt    *int     `json:"-"`
-	ValuePointerFloat  *float64 `json:"-"`
-	ValuePointerString *string  `json:"-"`
-	ValuePointerBool   *bool    `json:"-"`
+	PrettyName         string       `json:"prettyName"`
+	Id                 string       `json:"id"`
+	WidgetType         string       `json:"widgetType"`
+	WidgetValueType    string       `json:"widgetValueType"`
+	MinValue           string       `json:"minValue"`
+	MaxValue           string       `json:"maxValue"`
+	DefaultValue       string       `json:"defaultValue"`
+	StepAmount         string       `json:"stepAmount"`
+	CurrentValue       string       `json:"currentValue"`
+	Target             func()       `json:"-"` // this is a function that will be called when the widget is interacted with if the type is a button
+	ValuePointerInt    *int         `json:"-"`
+	ValuePointerFloat  *float64     `json:"-"`
+	ValuePointerString *string      `json:"-"`
+	ValuePointerBool   *bool        `json:"-"`
+	ValuePointerGraph  *GraphWidget `json:"-"`
+}
+
+type GraphWidget struct {
+	XLabel  string   `json:"xLabel"`
+	YLabel  string   `json:"yLabel"`
+	Title   string   `json:"title"`
+	XValues []string `json:"xValues"`
+	YValues []string `json:"yValues"`
 }
 
 func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
@@ -54,6 +63,17 @@ func NewButtonWidget(prettyName, id string, target func()) Widget {
 		WidgetType: "button",
 		Target:     target,
 	}
+}
+
+func NewGraphWidget(title string, id string, xLabel string, yLabel string, xValues []string, yValues []string) GraphWidget {
+	return GraphWidget{
+		XLabel:  xLabel,
+		YLabel:  yLabel,
+		Title:   title,
+		XValues: xValues,
+		YValues: yValues,
+	}
+
 }
 
 func NewMouseXClickedHook(valuePointer *float64) Widget {

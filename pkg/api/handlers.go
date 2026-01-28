@@ -414,11 +414,39 @@ func (a *Api) widgetsHandler(w http.ResponseWriter, r *http.Request) {
 		if value == nil {
 			value = "null"
 		}
+
+		// if value is type GraphWidget, marshal it differently
+		valueStr := ""
+		widgetType := "stat"
+
+		// Check for both GraphWidget value and *GraphWidget pointer
+		var graphWidget *GraphWidget
+		if gw, ok := value.(GraphWidget); ok {
+			fmt.Printf("Found GraphWidget (value) for key %s\n", key)
+			graphWidget = &gw
+		} else if gw, ok := value.(*GraphWidget); ok {
+			fmt.Printf("Found GraphWidget (pointer) for key %s\n", key)
+			graphWidget = gw
+		}
+
+		if graphWidget != nil {
+			valueBytes, err := json.Marshal(graphWidget)
+			if err != nil {
+				http.Error(w, "error marshaling graph widget", http.StatusInternalServerError)
+				return
+			}
+			valueStr = string(valueBytes)
+			widgetType = "graph"
+			fmt.Printf("Marshaled graph widget for %s: %s\n", key, valueStr)
+		} else {
+			valueStr = fmt.Sprintf("%v", value)
+		}
+
 		statData := map[string]interface{}{
 			"prettyName":   key,
 			"id":           fmt.Sprintf("stats-%s", key),
-			"widgetType":   "stat",
-			"currentValue": fmt.Sprintf("%v", value),
+			"widgetType":   widgetType,
+			"currentValue": valueStr,
 			"index":        index,
 		}
 		widgetData = append(widgetData, statData)
