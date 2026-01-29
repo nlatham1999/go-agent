@@ -132,16 +132,32 @@
 
             // Create container for the graph
             const graphContainer = document.createElement('div');
-            graphContainer.style.width = '100%';
+            graphContainer.className = 'graph-container';
+            graphContainer.style.width = '400px';
             graphContainer.style.height = '300px';
             graphContainer.style.position = 'relative';
+            graphContainer.style.minWidth = '200px';
+            graphContainer.style.minHeight = '150px';
 
             // Create canvas for chart
             const canvas = document.createElement('canvas');
             canvas.id = `${widget.id}-canvas`;
             canvas.style.display = 'block';
 
+            // Create resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'graph-resize-handle';
+            resizeHandle.style.position = 'absolute';
+            resizeHandle.style.bottom = '0';
+            resizeHandle.style.right = '0';
+            resizeHandle.style.width = '15px';
+            resizeHandle.style.height = '15px';
+            resizeHandle.style.cursor = 'nwse-resize';
+            resizeHandle.style.background = 'rgba(59, 130, 246, 0.5)';
+            resizeHandle.style.borderRadius = '0 0 4px 0';
+
             graphContainer.appendChild(canvas);
+            graphContainer.appendChild(resizeHandle);
             widgetDiv.appendChild(graphContainer);
 
             // Store graph data for later chart creation
@@ -194,7 +210,7 @@
             data: {
                 labels: graphData.xValues || [],
                 datasets: [{
-                    label: graphData.yLabel || 'Value',
+                    label: '',
                     data: yValues,
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -211,7 +227,7 @@
                 animation: false, // Disable animation for performance
                 plugins: {
                     legend: {
-                        display: true,
+                        display: false,
                         labels: {
                             color: '#cbd5e1',
                             font: {
@@ -260,7 +276,7 @@
                     },
                     y: {
                         title: {
-                            display: !!graphData.yLabel,
+                            display: false,
                             text: graphData.yLabel || '',
                             color: '#cbd5e1',
                             font: {
@@ -316,6 +332,7 @@
 
                 // Apply widget positions and dragging
                 initWidgetDragging();
+                initGraphResizing();
                 applyWidgetPositions();
 
                 // Create charts for all graph widgets after DOM is ready
@@ -436,9 +453,24 @@
         localStorage.setItem('widgetPositions', JSON.stringify(positions));
     }
 
+    // Load saved graph dimensions from localStorage
+    function loadGraphDimensions() {
+        const saved = localStorage.getItem('graphDimensions');
+        return saved ? JSON.parse(saved) : {};
+    }
+
+    // Save graph dimensions to localStorage
+    function saveGraphDimension(widgetId, width, height) {
+        const dimensions = loadGraphDimensions();
+        dimensions[widgetId] = { width, height };
+        localStorage.setItem('graphDimensions', JSON.stringify(dimensions));
+    }
+
     // Apply saved positions to widgets or set default positions
     function applyWidgetPositions() {
         const positions = loadWidgetPositions();
+        const dimensions = loadGraphDimensions();
+
         document.querySelectorAll('.widget').forEach(widget => {
             const widgetId = getWidgetId(widget);
             if (positions[widgetId]) {
@@ -450,6 +482,19 @@
                 const index = parseInt(widget.getAttribute('data-widget-index') || 0);
                 widget.style.left = '0px';
                 widget.style.top = (index * 65) + 'px';
+            }
+
+            // Apply saved graph dimensions if this is a graph widget
+            const graphContainer = widget.querySelector('.graph-container');
+            if (graphContainer && dimensions[widgetId]) {
+                graphContainer.style.width = dimensions[widgetId].width + 'px';
+                graphContainer.style.height = dimensions[widgetId].height + 'px';
+
+                // Trigger chart resize
+                const chart = chartInstances[widgetId];
+                if (chart) {
+                    chart.resize();
+                }
             }
         });
     }
@@ -467,10 +512,11 @@
             widget.onmousedown = null;
 
             widget.addEventListener('mousedown', (e) => {
-                // Prevent dragging when interacting with inputs, buttons, or sliders
+                // Prevent dragging when interacting with inputs, buttons, sliders, or resize handles
                 if (e.target.tagName === 'TEXTAREA' ||
                     e.target.tagName === 'INPUT' ||
-                    e.target.tagName === 'BUTTON') {
+                    e.target.tagName === 'BUTTON' ||
+                    e.target.classList.contains('graph-resize-handle')) {
                     return;
                 }
 
@@ -485,6 +531,76 @@
             });
         });
     }
+
+    // Resize state for graphs
+    let resizeState = {
+        isResizing: false,
+        currentWidget: null,
+        currentContainer: null,
+        startX: 0,
+        startY: 0,
+        startWidth: 0,
+        startHeight: 0
+    };
+
+    // Initialize resizing for graph widgets
+    function initGraphResizing() {
+        document.querySelectorAll('.graph-resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // Prevent widget dragging
+                const widget = handle.closest('.widget');
+                const graphContainer = handle.closest('.graph-container');
+
+                resizeState.isResizing = true;
+                resizeState.currentWidget = widget;
+                resizeState.currentContainer = graphContainer;
+                resizeState.startX = e.clientX;
+                resizeState.startY = e.clientY;
+                resizeState.startWidth = graphContainer.offsetWidth;
+                resizeState.startHeight = graphContainer.offsetHeight;
+
+                e.preventDefault();
+            });
+        });
+    }
+
+    // Global mouse move handler for graph resizing
+    document.addEventListener('mousemove', (e) => {
+        if (resizeState.isResizing && resizeState.currentContainer) {
+            const deltaX = e.clientX - resizeState.startX;
+            const deltaY = e.clientY - resizeState.startY;
+
+            const newWidth = Math.max(200, resizeState.startWidth + deltaX);
+            const newHeight = Math.max(150, resizeState.startHeight + deltaY);
+
+            resizeState.currentContainer.style.width = newWidth + 'px';
+            resizeState.currentContainer.style.height = newHeight + 'px';
+
+            // Update chart
+            const widgetId = getWidgetId(resizeState.currentWidget);
+            const chart = chartInstances[widgetId];
+            if (chart) {
+                chart.resize();
+            }
+        }
+    });
+
+    // Global mouse up handler for graph resizing
+    document.addEventListener('mouseup', () => {
+        if (resizeState.isResizing && resizeState.currentWidget && resizeState.currentContainer) {
+            // Save dimensions
+            const widgetId = getWidgetId(resizeState.currentWidget);
+            saveGraphDimension(
+                widgetId,
+                resizeState.currentContainer.offsetWidth,
+                resizeState.currentContainer.offsetHeight
+            );
+
+            resizeState.isResizing = false;
+            resizeState.currentWidget = null;
+            resizeState.currentContainer = null;
+        }
+    });
 
     // Global mouse move handler for instant dragging
     document.addEventListener('mousemove', (e) => {

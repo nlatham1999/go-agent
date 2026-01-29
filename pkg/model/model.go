@@ -420,6 +420,7 @@ func (m *Model) KillTurtle(turtle *Turtle) {
 func (m *Model) KillLink(link *Link) {
 
 	m.links.links.Remove(link)
+	m.ShownLinks.Remove(link)
 
 	if link.breed.name != BreedNone {
 		if link.directed {
@@ -569,7 +570,7 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	deltaX := x1 - x2
 	deltaY := y1 - y2
 
-	distance := math.Abs(math.Sqrt(deltaX*deltaX + deltaY*deltaY))
+	distance := math.Sqrt(deltaX*deltaX + deltaY*deltaY)
 
 	if !m.wrappingX && !m.wrappingY {
 		return distance
@@ -579,15 +580,15 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	deltaYInverse := float64(m.worldHeight) - math.Abs(deltaY)
 
 	if m.wrappingX {
-		distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY)))
+		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY))
 	}
 
 	if m.wrappingY {
-		distance = math.Min(distance, math.Abs(math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse)))
+		distance = math.Min(distance, math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse))
 	}
 
 	if m.wrappingX && m.wrappingY {
-		distance = math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse))
 	}
 
 	return distance

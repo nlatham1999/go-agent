@@ -332,13 +332,13 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 		dySign = -1.0
 	}
 
-	distance := math.Abs(math.Sqrt(dx*dx + dy*dy))
+	distance := math.Sqrt(dx*dx + dy*dy)
 
 	deltaXInverse := float64(t.parent.worldWidth) - math.Abs(dx)
 	deltaYInverse := float64(t.parent.worldHeight) - math.Abs(dy)
 
 	if t.parent.wrappingX {
-		d := math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+dy*dy)))
+		d := math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+dy*dy))
 		if d < distance {
 			distance = d
 			newDx = deltaXInverse * dxSign * -1
@@ -346,7 +346,7 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 	}
 
 	if t.parent.wrappingY {
-		d := math.Min(distance, math.Abs(math.Sqrt(dx*dx+deltaYInverse*deltaYInverse)))
+		d := math.Min(distance, math.Sqrt(dx*dx+deltaYInverse*deltaYInverse))
 		if d < distance {
 			distance = d
 			newDy = deltaYInverse * dySign * -1
@@ -354,7 +354,7 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 	}
 
 	if t.parent.wrappingX && t.parent.wrappingY {
-		d := math.Min(distance, math.Abs(math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse)))
+		d := math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse))
 		if d < distance {
 			newDx = deltaXInverse * dxSign * -1
 			newDy = deltaYInverse * dySign * -1

@@ -26,6 +26,7 @@ type Boid struct {
 	minSpeed        float64
 	maxSpeed        float64
 	turtleSize      float64
+	avgSpeedGraph   api.GraphWidget
 }
 
 func NewBoid() *Boid {
@@ -57,6 +58,7 @@ func (b *Boid) Init() {
 	b.minSpeed = 0.03
 	b.maxSpeed = 0.06
 	b.turtleSize = 0.16
+	b.avgSpeedGraph = api.NewGraphWidget("Average Speed", "avg-speed-graph", "ticks", "speed", []string{}, []string{})
 
 }
 
@@ -71,6 +73,9 @@ func (b *Boid) SetUp() error {
 		},
 	)
 
+	b.avgSpeedGraph.XValues = []string{}
+	b.avgSpeedGraph.YValues = []string{}
+
 	b.model.ResetTicks()
 	return nil
 }
@@ -78,6 +83,12 @@ func (b *Boid) SetUp() error {
 func (b *Boid) Go() {
 
 	timeNow := time.Now()
+
+	// remove all links - collect them first to avoid modifying during iteration
+	links := b.model.Links().List()
+	for _, l := range links {
+		b.model.KillLink(l)
+	}
 
 	b.model.Turtles().Ask(
 		func(t *model.Turtle) {
@@ -94,6 +105,21 @@ func (b *Boid) Go() {
 			b.updatePosition(t)
 		},
 	)
+
+	// Calculate average speed for graph
+	totalSpeed := 0.0
+	b.model.Turtles().Ask(
+		func(t *model.Turtle) {
+			vx := t.GetProperty("vx").(float64)
+			vy := t.GetProperty("vy").(float64)
+			speed := math.Sqrt(vx*vx + vy*vy)
+			totalSpeed += speed
+		},
+	)
+	avgSpeed := totalSpeed / float64(b.model.Turtles().Count())
+
+	b.avgSpeedGraph.XValues = append(b.avgSpeedGraph.XValues, fmt.Sprintf("%d", b.model.Ticks))
+	b.avgSpeedGraph.YValues = append(b.avgSpeedGraph.YValues, fmt.Sprintf("%.4f", avgSpeed))
 
 	b.model.Tick()
 
@@ -129,6 +155,12 @@ func (b *Boid) alignment(t *model.Turtle) {
 				xvelAvg += t2.GetProperty("vx").(float64)
 				yvelAvg += t2.GetProperty("vy").(float64)
 				neighboringBoids++
+
+				// Create link to visualize connections
+				t.CreateLinkWithTurtle(nil, t2, func(l *model.Link) {
+					l.Color = b.model.RandomColor()
+					l.Show()
+				})
 			}
 		},
 	)
@@ -211,6 +243,11 @@ func (b *Boid) updatePosition(t *model.Turtle) {
 	vx := t.GetProperty("vx").(float64)
 	vy := t.GetProperty("vy").(float64)
 	t.SetXY(t.XCor()+vx, t.YCor()+vy)
+
+	// Update heading to point in direction of movement
+	// atan2 returns radians, convert to degrees
+	heading := math.Atan2(vy, vx) * (180.0 / math.Pi)
+	t.SetHeading(heading)
 }
 
 func (b *Boid) Model() *model.Model {
@@ -218,7 +255,9 @@ func (b *Boid) Model() *model.Model {
 }
 
 func (b *Boid) Stats() map[string]interface{} {
-	return nil
+	return map[string]interface{}{
+		"avg-speed-graph": b.avgSpeedGraph,
+	}
 }
 
 func (b *Boid) Stop() bool {
@@ -290,7 +329,7 @@ func (b *Boid) Widgets() []api.Widget {
 			MinValue:          "0.01",
 			MaxValue:          "1",
 			StepAmount:        "0.01",
-			DefaultValue:      "0.05",
+			DefaultValue:      "0.1",
 			ValuePointerFloat: &b.avoidFactor,
 		},
 		{
@@ -301,7 +340,7 @@ func (b *Boid) Widgets() []api.Widget {
 			MinValue:          "0.01",
 			MaxValue:          "1",
 			StepAmount:        "0.01",
-			DefaultValue:      "0.05",
+			DefaultValue:      "0.1",
 			ValuePointerFloat: &b.matchingFactor,
 		},
 		{
@@ -312,7 +351,7 @@ func (b *Boid) Widgets() []api.Widget {
 			MinValue:          "0.0001",
 			MaxValue:          "0.01",
 			StepAmount:        "0.0001",
-			DefaultValue:      "0.0005",
+			DefaultValue:      "0.005",
 			ValuePointerFloat: &b.centeringFactor,
 		},
 		{
@@ -323,7 +362,7 @@ func (b *Boid) Widgets() []api.Widget {
 			MinValue:          "0.01",
 			MaxValue:          ".2",
 			StepAmount:        "0.01",
-			DefaultValue:      ".01",
+			DefaultValue:      "0.2",
 			ValuePointerFloat: &b.margin,
 		},
 		{

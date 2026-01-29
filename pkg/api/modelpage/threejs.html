@@ -404,7 +404,7 @@
     let isFetching = false;
     async function fetchAndRender() {
         const now = performance.now();
-        if (!isFetching && now - lastUpdateTime >= 50) {  
+        if (!isFetching && now - lastUpdateTime >= 50) {
             isFetching = true;
             fetchDataAndUpdateScene();  // wait for fetch to finish
             lastUpdateTime = performance.now();
