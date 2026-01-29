@@ -153,7 +153,7 @@ func (p *Prims) Go() {
 
 	p.model.Tick()
 
-	fmt.Println("Time taken: ", time.Since(start))
+	fmt.Println("Time taken: ", time.Since(start).Seconds())
 
 }
 

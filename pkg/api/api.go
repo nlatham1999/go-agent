@@ -13,6 +13,7 @@ import (
 type Api struct {
 	models map[string]ModelInterface
 
+	settings            ApiSettings
 	currentModel        ModelInterface
 	currentModelWidgets map[string]Widget
 
@@ -22,7 +23,6 @@ type Api struct {
 	goRepeatRunning bool
 	stopRepeating   chan struct{}
 	goRepeatMutex   sync.Mutex // Mutex for the goRepeatHandler
-	settings        ApiSettings
 	concurrentCall  bool
 
 	stepData    map[int]*Model
@@ -80,6 +80,7 @@ func (a *Api) Serve() {
 	//frontend handlers
 	r.HandleFunc("/loadstats", a.loadStatsHandler)
 	r.HandleFunc("/widgets", a.widgetsHandler)
+	r.HandleFunc("/widget-values", a.widgetValuesHandler)
 	r.HandleFunc("/updatespeed", a.updateSpeedHandler)
 	r.HandleFunc("/updatedynamic", a.updateDynamicVariableHandler)
 	r.HandleFunc("/settick", a.setTickValueHandler)

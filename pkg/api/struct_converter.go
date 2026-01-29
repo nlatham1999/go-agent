@@ -10,7 +10,7 @@ func convertModelToApiModel(model *model.Model) *Model {
 	apiModel := Model{
 		Patches:     convertPatchSetToApiPatchSet(model.Patches),
 		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles()),
-		Links:       convertLinkSetToApiLinkSet(model.Links()),
+		Links:       convertLinkSetToApiLinkSet(model.ShownLinks),
 		Ticks:       model.Ticks,
 		WorldWidth:  model.WorldWidth(),
 		WorldHeight: model.WorldHeight(),
@@ -67,6 +67,11 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
 	links.Ask(func(link *model.Link) {
+
+		if link.IsHidden() {
+			return
+		}
+
 		if link.End1() == nil || link.End2() == nil {
 			fmt.Println("Link has nil ends")
 			return
@@ -85,7 +90,7 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Label:      link.Label,
 			LabelColor: convertColorToApiColor(link.LabelColor),
 			Size:       link.Size,
-			Hidden:     link.Hidden,
+			Hidden:     link.IsHidden(),
 		}
 		apiLinks = append(apiLinks, apiLink)
 	})

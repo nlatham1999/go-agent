@@ -98,7 +98,7 @@ func convertLinkSet(links *model.LinkAgentSet) []Link {
 			Label:      link.Label,
 			LabelColor: convertColor(link.LabelColor),
 			Size:       link.Size,
-			Hidden:     link.Hidden,
+			Hidden:     link.IsHidden(),
 			Breed:      link.BreedName(),
 		}
 		apiLinks = append(apiLinks, apiLink)

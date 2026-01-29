@@ -96,7 +96,11 @@ func SetModel(modelJson *Model) *model.Model {
 				l.Label = link.Label
 				l.LabelColor.SetColorRGBA(link.LabelColor.Red, link.LabelColor.Green, link.LabelColor.Blue, link.LabelColor.Alpha)
 				l.Size = link.Size
-				l.Hidden = link.Hidden
+				if link.Hidden {
+					l.Hide()
+				} else {
+					l.Show()
+				}
 			})
 		} else {
 			breed := builtModel.UndirectedLinkBreed(link.Breed)
@@ -105,7 +109,11 @@ func SetModel(modelJson *Model) *model.Model {
 				l.Label = link.Label
 				l.LabelColor.SetColorRGBA(link.LabelColor.Red, link.LabelColor.Green, link.LabelColor.Blue, link.LabelColor.Alpha)
 				l.Size = link.Size
-				l.Hidden = link.Hidden
+				if link.Hidden {
+					l.Hide()
+				} else {
+					l.Show()
+				}
 			})
 		}
 	}

@@ -52,6 +52,10 @@ type Model struct {
 
 	// turtles the current turtle is linked to/by/with
 	linkedTurtles map[*Turtle]*turtleLinks
+
+	// set of shown links
+	// used for efficient rendering
+	ShownLinks *LinkAgentSet
 }
 
 // Create a new model
@@ -157,6 +161,9 @@ func NewModel(
 
 	//construct general link set
 	model.links = NewLinkAgentSet([]*Link{})
+
+	// create shown link sets
+	model.ShownLinks = NewLinkAgentSet([]*Link{})
 
 	// build patches
 	model.buildPatches()

@@ -63,6 +63,40 @@
             input.setAttribute('hx-get', '/updatedynamic');
             input.setAttribute('hx-trigger', 'change');
             input.setAttribute('hx-include', `#${widgetId}`);
+
+            // Track slider interaction to prevent sync conflicts
+            input.addEventListener('mousedown', () => {
+                activeSliders.add(widgetId);
+            });
+            input.addEventListener('touchstart', () => {
+                activeSliders.add(widgetId);
+            });
+
+            // Keep in active set during dragging
+            input.addEventListener('input', () => {
+                activeSliders.add(widgetId);
+            });
+
+            // Remove from active set after user releases
+            input.addEventListener('mouseup', () => {
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+            input.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+
+            // Also handle when mouse leaves while dragging
+            input.addEventListener('mouseleave', () => {
+                // Only remove if not currently being dragged (no mouse button pressed)
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+
             input.oninput = function() {
                 document.getElementById(labelId).textContent = this.value;
             };
@@ -383,6 +417,12 @@
         offsetY: 0
     };
 
+    // Track which sliders are being actively used to prevent sync conflicts
+    let activeSliders = new Set();
+
+    // Track last graph data to prevent unnecessary updates
+    let lastGraphData = {};
+
     // Load saved widget positions from localStorage
     function loadWidgetPositions() {
         const saved = localStorage.getItem('widgetPositions');
@@ -416,9 +456,8 @@
 
     // Get unique widget ID
     function getWidgetId(widget) {
-        // Use the input/button ID inside the widget as unique identifier
-        const input = widget.querySelector('input, button');
-        return input ? input.id : widget.className;
+        // Use the data-widget-id attribute which is unique for each widget
+        return widget.getAttribute('data-widget-id');
     }
 
     // Initialize dragging for all widgets
@@ -486,63 +525,13 @@
         loadWidgets();
     });
 
-    // Periodically reload widgets to get updated values from server
+    // Periodically reload widget values from server (lightweight sync)
     function startWidgetSync() {
         setInterval(() => {
-            fetch('/widgets')
+            fetch('/widget-values')
                 .then(response => response.json())
                 .then(widgets => {
-                    const newStructure = getWidgetStructureHash(widgets);
-
-                    // Check if widget structure has changed (widgets added/removed/changed type)
-                    if (currentWidgetStructure !== newStructure) {
-                        console.log('Widget structure changed, reloading widgets...');
-                        currentWidgetStructure = newStructure;
-
-                        // Destroy old chart instances to prevent memory leaks
-                        Object.values(chartInstances).forEach(chart => {
-                            if (chart) chart.destroy();
-                        });
-                        chartInstances = {};
-
-                        // Full reload of widgets
-                        const container = document.getElementById('widgetContainer');
-                        container.innerHTML = '';
-
-                        widgets.forEach(widget => {
-                            const widgetElement = renderWidget(widget);
-                            container.appendChild(widgetElement);
-                        });
-
-                        // Re-initialize HTMX for new elements
-                        if (window.htmx) {
-                            htmx.process(container);
-                        }
-
-                        // Apply widget positions and dragging
-                        initWidgetDragging();
-                        applyWidgetPositions();
-
-                        // Create charts for all graph widgets after DOM is ready
-                        setTimeout(() => {
-                            document.querySelectorAll('.widget-graph').forEach(widgetDiv => {
-                                const widgetId = widgetDiv.getAttribute('data-widget-id');
-                                const graphDataStr = widgetDiv.dataset.graphData;
-                                if (graphDataStr) {
-                                    try {
-                                        const graphData = JSON.parse(graphDataStr);
-                                        createOrUpdateChart(widgetId, graphData);
-                                    } catch (e) {
-                                        console.error('Failed to create chart for', widgetId, e);
-                                    }
-                                }
-                            });
-                        }, 100);
-
-                        return;
-                    }
-
-                    // Structure hasn't changed, just update values
+                    // Just update values - no structure checking or reconfiguration
                     widgets.forEach(widget => {
                         const widgetElement = document.querySelector(`[data-widget-id="${widget.id}"]`);
                         if (!widgetElement) return;
@@ -553,7 +542,11 @@
                         if (widget.widgetType === 'stat') {
                             const statDiv = document.getElementById(widget.id);
                             if (statDiv) {
-                                statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
+                                // Extract the label from existing text (everything before the colon)
+                                const currentText = statDiv.textContent;
+                                const colonIndex = currentText.indexOf(':');
+                                const label = colonIndex !== -1 ? currentText.substring(0, colonIndex + 1) : widget.id + ':';
+                                statDiv.textContent = `${label} ${widget.currentValue}`;
                             }
                         }
 
@@ -561,23 +554,45 @@
                         if (widget.widgetType === 'graph') {
                             try {
                                 const graphData = JSON.parse(widget.currentValue);
-                                createOrUpdateChart(widget.id, graphData);
+
+                                // Only update if data has actually changed (check array lengths and last values)
+                                const lastData = lastGraphData[widget.id];
+                                const dataChanged = !lastData ||
+                                    lastData.xLength !== graphData.xValues.length ||
+                                    lastData.yLength !== graphData.yValues.length ||
+                                    (graphData.yValues.length > 0 && lastData.lastY !== graphData.yValues[graphData.yValues.length - 1]);
+
+                                if (dataChanged) {
+                                    lastGraphData[widget.id] = {
+                                        xLength: graphData.xValues.length,
+                                        yLength: graphData.yValues.length,
+                                        lastY: graphData.yValues.length > 0 ? graphData.yValues[graphData.yValues.length - 1] : null
+                                    };
+                                    createOrUpdateChart(widget.id, graphData);
+                                }
                             } catch (e) {
                                 console.error('Failed to parse graph data during sync:', e);
                             }
                         }
 
-                        // Update slider/input values if they've changed server-side
-                        if (widget.widgetType === 'slider' || widget.widgetType === 'text') {
+                        // Update slider values if they've changed server-side
+                        if (widget.widgetType === 'slider') {
                             const input = document.getElementById(widgetId);
                             const label = document.getElementById(`${widgetId}-label`);
 
+                            // Only update if user isn't actively changing it and it's not in the active set
+                            if (input && document.activeElement !== input && !activeSliders.has(widgetId)) {
+                                input.value = widget.currentValue;
+                                if (label) {
+                                    label.textContent = widget.currentValue;
+                                }
+                            }
+                        } else if (widget.widgetType === 'text') {
+                            const input = document.getElementById(widgetId);
+
                             // Only update if user isn't actively changing it
                             if (input && document.activeElement !== input) {
-                                input.value = widget.currentValue || widget.defaultValue;
-                                if (label) {
-                                    label.textContent = widget.currentValue || widget.defaultValue;
-                                }
+                                input.value = widget.currentValue;
                             }
                         }
                     });
