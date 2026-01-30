@@ -64,12 +64,12 @@ func (g *Gol) SetUp() error {
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.initialAlive {
-				p.SetPropertySafe("alive", true)
-				p.SetPropertySafe("alive-next", true)
+				p.SetProperty("alive", true)
+				p.SetProperty("alive-next", true)
 				p.Color.SetColor(model.Green)
 			} else {
-				p.SetPropertySafe("alive", false)
-				p.SetPropertySafe("alive-next", false)
+				p.SetProperty("alive", false)
+				p.SetProperty("alive-next", false)
 				p.Color.SetColor(model.Black)
 			}
 		},
@@ -99,22 +99,22 @@ func (g *Gol) Go() {
 
 			//count the number of alive neighbors
 			aliveNeighbors := neighbors.With(func(p *model.Patch) bool {
-				alive := p.GetPropertySafe("alive").(bool)
+				alive := p.GetProperty("alive").(bool)
 				return alive
 			}).Count()
 
-			alive := p.GetPropertySafe("alive").(bool)
+			alive := p.GetProperty("alive").(bool)
 			if alive {
 				if aliveNeighbors < g.minNeighborsToLive {
-					p.SetPropertySafe("alive-next", false)
+					p.SetProperty("alive-next", false)
 				}
 
 				if aliveNeighbors > g.maxNeighborsToLive {
-					p.SetPropertySafe("alive-next", false)
+					p.SetProperty("alive-next", false)
 				}
 			} else {
 				if aliveNeighbors >= g.minNeighborsToReproduce && aliveNeighbors <= g.maxNeighborsToReproduce {
-					p.SetPropertySafe("alive-next", true)
+					p.SetProperty("alive-next", true)
 				}
 			}
 		},
@@ -124,8 +124,8 @@ func (g *Gol) Go() {
 	// g.model.Patches.Ask(
 	concurrency.AskPatches(g.patches,
 		func(p *model.Patch) {
-			p.SetPropertySafe("alive", p.GetPropertySafe("alive-next").(bool))
-			if p.GetPropertySafe("alive").(bool) {
+			p.SetProperty("alive", p.GetProperty("alive-next").(bool))
+			if p.GetProperty("alive").(bool) {
 				p.Color.SetColor(model.Green)
 			} else {
 				p.Color.SetColor(model.Black)
@@ -136,7 +136,7 @@ func (g *Gol) Go() {
 
 	g.numAliveGraph.XValues = append(g.numAliveGraph.XValues, fmt.Sprintf("%d", g.model.Ticks))
 	g.numAliveGraph.YValues = append(g.numAliveGraph.YValues, fmt.Sprintf("%d", g.model.Patches.With(func(p *model.Patch) bool {
-		return p.GetPropertySafe("alive").(bool)
+		return p.GetProperty("alive").(bool)
 	}).Count()))
 
 	g.model.Tick()
@@ -145,7 +145,7 @@ func (g *Gol) Go() {
 func (g *Gol) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
-			return p.GetPropertySafe("alive").(bool)
+			return p.GetProperty("alive").(bool)
 		}).Count(),
 		"num-alive-graph": g.numAliveGraph,
 	}
@@ -153,7 +153,7 @@ func (g *Gol) Stats() map[string]interface{} {
 
 func (g *Gol) Stop() bool {
 	return g.model.Patches.All(func(p *model.Patch) bool {
-		return !p.GetPropertySafe("alive").(bool)
+		return !p.GetProperty("alive").(bool)
 	})
 }
 

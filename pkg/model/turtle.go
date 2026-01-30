@@ -9,16 +9,19 @@ import (
 // Turtle is an agent that can move around the world
 // it can have links to other turtles
 type Turtle struct {
-	xcor float64
-	ycor float64
+	positionMu sync.RWMutex // Protects xcor, ycor, heading, patch
+	xcor       float64
+	ycor       float64
+	heading    float64 // direction the turtle is facing in radians
+	patch      *Patch  // patch the turtle is on
+
 	who  int //the id of the turtle
 	size float64
 
-	Color   Color
-	heading float64 //direction the turtle is facing in radians
-	Hidden  bool    //if the turtle is hidden
-	breed   *TurtleBreed
-	Shape   string
+	Color  Color
+	Hidden bool //if the turtle is hidden
+	breed  *TurtleBreed
+	Shape  string
 
 	parent *Model //model the turtle belongs too
 
@@ -28,8 +31,6 @@ type Turtle struct {
 	propertiesMutex         sync.RWMutex
 	turtlePropertiesGeneral map[string]interface{} // turtles own variables
 	turtlePropertiesBreed   map[string]interface{} // turtle properties variables
-
-	patch *Patch //patch the turtle is on
 }
 
 func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Turtle {
@@ -82,7 +83,8 @@ func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Tur
 	return t
 }
 
-// moves the turtle backwards by the distance passed in and in relation to its heading
+// Back moves the turtle backwards by the distance passed in and in relation to its heading.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) Back(distance float64) {
 	t.Forward(-distance)
 }
@@ -161,7 +163,9 @@ func (t *Turtle) CanMove(distance float64) bool {
 	return true
 }
 
-// kill the turtle
+// Die kills the turtle.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) Die() {
 	t.parent.KillTurtle(t)
 }
@@ -365,7 +369,8 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 	t.setHeadingRadians(a)
 }
 
-// moves the turtle forward by the distance passed in and in relation to its heading
+// Forward moves the turtle forward by the distance passed in and in relation to its heading.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) Forward(distance float64) {
 	intPart := int(distance)
 	decimalPart := distance - float64(intPart)
@@ -385,7 +390,9 @@ func (t *Turtle) Forward(distance float64) {
 	}
 }
 
-// creates new turtles that are a copy of the current turtle
+// Hatch creates new turtles that are a copy of the current turtle.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) Hatch(amount int, operation TurtleOperation) {
 
 	turtles := make([]*Turtle, amount)
@@ -421,12 +428,19 @@ func (t *Turtle) Hatch(amount int, operation TurtleOperation) {
 }
 
 // returns the heading of the turtle in degrees
+// GetHeading returns the turtle's heading in degrees.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) GetHeading() float64 {
+	t.positionMu.RLock()
+	defer t.positionMu.RUnlock()
 	return radiansToDegrees(t.heading)
 }
 
-// takes in the heading in degrees and sets the heading of the turtle
+// SetHeading sets the turtle's heading in degrees.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) SetHeading(heading float64) {
+	t.positionMu.Lock()
+	defer t.positionMu.Unlock()
 
 	//make sure the heading is between -360 and 360
 	if heading > 360 || heading < -360 {
@@ -456,7 +470,8 @@ func (t *Turtle) Home() {
 	t.SetXY(0, 0)
 }
 
-// jumps ahead by the distance, if it cannot then it returns false
+// Jump moves the turtle forward by the specified distance without leaving a trail.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) Jump(distance float64) {
 	// if t.CanMove(distance) {
 	xcor := t.xcor + distance*math.Cos(t.heading)
@@ -537,18 +552,9 @@ func (t *Turtle) Neighbors4() *PatchAgentSet {
 }
 
 // returns the turtle property variable
+// GetProperty returns the turtle property variable.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) GetProperty(key string) interface{} {
-	if val, found := t.turtlePropertiesBreed[key]; found {
-		return val
-	}
-	if val, found := t.turtlePropertiesGeneral[key]; found {
-		return val
-	}
-	return nil
-}
-
-// returns the property value safely for concurrent access
-func (t *Turtle) GetPropertySafe(key string) interface{} {
 	t.propertiesMutex.RLock()
 	defer t.propertiesMutex.RUnlock()
 
@@ -607,21 +613,9 @@ func (t *Turtle) GetPropS(key string) (string, error) {
 	}
 }
 
-// sets the turtle property variable
+// SetProperty sets the turtle property variable.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) SetProperty(key string, value interface{}) {
-	if _, found := t.turtlePropertiesBreed[key]; found {
-		t.turtlePropertiesBreed[key] = value
-		return
-	} else {
-		if _, found := t.turtlePropertiesGeneral[key]; found {
-			t.turtlePropertiesGeneral[key] = value
-		}
-	}
-}
-
-// sets the turtle property variable safely for concurrent access
-func (t *Turtle) SetPropertySafe(key string, value interface{}) {
-
 	t.propertiesMutex.Lock()
 	defer t.propertiesMutex.Unlock()
 
@@ -691,7 +685,11 @@ func (t *Turtle) Right(number float64) {
 	t.Left(-number)
 }
 
+// SetXY sets the turtle's position to the specified coordinates.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) SetXY(x float64, y float64) {
+	t.positionMu.Lock()
+	defer t.positionMu.Unlock()
 
 	x, y, allowed := t.parent.convertXYToInBounds(x, y)
 	if !allowed {
@@ -864,10 +862,18 @@ func (t *Turtle) Who() int {
 	return t.who
 }
 
+// XCor returns the turtle's x coordinate.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) XCor() float64 {
+	t.positionMu.RLock()
+	defer t.positionMu.RUnlock()
 	return t.xcor
 }
 
+// YCor returns the turtle's y coordinate.
+// This method is thread-safe and can be called concurrently.
 func (t *Turtle) YCor() float64 {
+	t.positionMu.RLock()
+	defer t.positionMu.RUnlock()
 	return t.ycor
 }

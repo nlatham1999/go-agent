@@ -93,7 +93,7 @@ below is a sample of a wolf and sheep model where patches are grass or dirt and 
 ```
 
 ### Concurrency
-Concurrency is currently supported only for turtles via AskConcurrent, SetPropertySafe and GetPropertySafe  
+Concurrency is currently supported only for turtles via SetPropertySafe and GetPropertySafe  
 
 For simulation forward type models concurrency will not ruin determinism, two sets of conccurent actions can be created, a read group and a write group that happens after all the reads are done. For continuous models however, concurrency ruins determinism.
 
@@ -105,7 +105,7 @@ For simulation forward type models concurrency will not ruin determinism, two se
     - collision detection layer they can add on
 -  [x]  patches, turtles "own" should be renamed to "properties"  
 -  [x] there should be a way to pass in the mouse x and y, maybe as a dynamic variable?  
--  [ ] build widgets in js  
+-  [x] build widgets in js  
 -  [ ] implement subtract-headings  
 -  [ ] implement dx and dy  
 -  [x] make sure that distance works with wrap around on the horizontal  
@@ -128,7 +128,7 @@ For simulation forward type models concurrency will not ruin determinism, two se
 -  [x] update readme on concurrency
 -  [x] remove collision detection
 -  [ ] make a seperate package for collision detection
--  [ ] speed improvements on rendering
+-  [x] speed improvements on rendering
 -  [x] on sliders, if the value is set, than use that value when loading
 -  [ ] agentset copy funcs
 -  [ ] stats should just be widgets

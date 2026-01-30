@@ -306,7 +306,9 @@ func (m *Model) ClearTurtles() {
 	m.turtlesWhoNumber = 0
 }
 
-// create the specified amount of turtles with the specified operation
+// CreateTurtles creates the specified amount of turtles with the specified operation.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (m *Model) CreateTurtles(amount int, operation TurtleOperation) (*TurtleAgentSet, error) {
 
 	generalBreed := m.breeds[BreedNone]
@@ -692,7 +694,7 @@ func (m *Model) getPatchAtCoords(x int, y int) *Patch {
 
 	pos := y*m.worldHeight + x
 
-	return m.posOfPatches[pos]
+	return m.getPatchAtPos(pos)
 }
 
 // returns a random int n the provided list

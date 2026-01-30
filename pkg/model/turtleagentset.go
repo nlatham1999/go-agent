@@ -1,8 +1,6 @@
 package model
 
 import (
-	"sync"
-
 	"github.com/nlatham1999/sortedset"
 )
 
@@ -52,56 +50,6 @@ func (t *TurtleAgentSet) Ask(operation TurtleOperation) {
 	t.turtles.Ask(func(a interface{}) {
 		operation(a.(*Turtle))
 	})
-}
-
-// AskConcurrent will run the given operation concurrently on all turtles in the agentset with the given concurrency
-// Not recomended for operations that modify the turtles in the agentset, only for read only operations
-// Any value setting should be done only on the turtle properties
-// Any actions that update the turtle should be done in the main thread later
-func (t *TurtleAgentSet) AskConcurrent(operation TurtleOperation, concurrency int) {
-	if operation == nil {
-		return
-	}
-
-	// Step 1: Concurrently gather turtles
-	var turtles []*Turtle
-	var mutex sync.Mutex
-	var gatherWG sync.WaitGroup
-	semaphore := make(chan struct{}, concurrency) // limit concurrent traversal
-
-	for first := t.turtles.First(); first != nil; first, _ = t.turtles.Next() {
-		semaphore <- struct{}{} // block if max concurrency is reached
-		gatherWG.Add(1)
-
-		go func(turtle *Turtle) {
-			defer gatherWG.Done()
-			defer func() { <-semaphore }() // release slot
-
-			mutex.Lock()
-			turtles = append(turtles, turtle)
-			mutex.Unlock()
-		}(first.(*Turtle))
-	}
-
-	gatherWG.Wait()
-
-	// Step 2: Process turtles concurrently
-	var processWG sync.WaitGroup
-	semaphore = make(chan struct{}, concurrency) // reuse semaphore for processing
-
-	for _, turtle := range turtles {
-		semaphore <- struct{}{}
-		processWG.Add(1)
-
-		go func(t *Turtle) {
-			defer processWG.Done()
-			defer func() { <-semaphore }() // release slot
-
-			operation(t)
-		}(turtle)
-	}
-
-	processWG.Wait()
 }
 
 func (t *TurtleAgentSet) AtPoints(m *Model, points []Coordinate) *TurtleAgentSet {

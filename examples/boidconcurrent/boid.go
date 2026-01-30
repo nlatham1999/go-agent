@@ -91,7 +91,6 @@ func (b *Boid) Go() {
 	timeNow := time.Now()
 
 	// apply the first two steps
-	// b.model.Turtles().AskConcurrent(
 	concurrency.AskTurtles(b.birds,
 		func(t *model.Turtle) {
 			b.seperation(t)
@@ -101,7 +100,6 @@ func (b *Boid) Go() {
 	)
 
 	// since alignment is using the vx and vy it needs to be slit into two steps
-	// b.model.Turtles().AskConcurrent(
 	concurrency.AskTurtles(b.birds,
 		func(t *model.Turtle) {
 			b.setAlignment(t)
@@ -139,10 +137,10 @@ func (b *Boid) seperation(t *model.Turtle) {
 		},
 	)
 	avoidFactor := b.avoidFactor
-	vx := t.GetPropertySafe("vx").(float64)
-	vy := t.GetPropertySafe("vy").(float64)
-	t.SetPropertySafe("vx", vx+(closeDx*avoidFactor))
-	t.SetPropertySafe("vy", vy+(closeDy*avoidFactor))
+	vx := t.GetProperty("vx").(float64)
+	vy := t.GetProperty("vy").(float64)
+	t.SetProperty("vx", vx+(closeDx*avoidFactor))
+	t.SetProperty("vy", vy+(closeDy*avoidFactor))
 }
 
 func (b *Boid) getAlignment(t *model.Turtle) {
@@ -153,8 +151,8 @@ func (b *Boid) getAlignment(t *model.Turtle) {
 	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				xvelAvg += t2.GetPropertySafe("vx").(float64)
-				yvelAvg += t2.GetPropertySafe("vy").(float64)
+				xvelAvg += t2.GetProperty("vx").(float64)
+				yvelAvg += t2.GetProperty("vy").(float64)
 				neighboringBoids++
 
 			}
@@ -163,27 +161,27 @@ func (b *Boid) getAlignment(t *model.Turtle) {
 	if neighboringBoids > 0 {
 		xvelAvg /= float64(neighboringBoids)
 		yvelAvg /= float64(neighboringBoids)
-		vx := t.GetPropertySafe("vx").(float64)
-		vy := t.GetPropertySafe("vy").(float64)
+		vx := t.GetProperty("vx").(float64)
+		vy := t.GetProperty("vy").(float64)
 		matchingFactor := b.matchingFactor
-		t.SetPropertySafe("vx-new", vx+(xvelAvg-vx)*matchingFactor)
-		t.SetPropertySafe("vy-new", vy+(yvelAvg-vy)*matchingFactor)
+		t.SetProperty("vx-new", vx+(xvelAvg-vx)*matchingFactor)
+		t.SetProperty("vy-new", vy+(yvelAvg-vy)*matchingFactor)
 	} else {
-		vx := t.GetPropertySafe("vx").(float64)
-		vy := t.GetPropertySafe("vy").(float64)
-		t.SetPropertySafe("vx-new", vx)
-		t.SetPropertySafe("vy-new", vy)
+		vx := t.GetProperty("vx").(float64)
+		vy := t.GetProperty("vy").(float64)
+		t.SetProperty("vx-new", vx)
+		t.SetProperty("vy-new", vy)
 	}
 }
 
 func (b *Boid) setAlignment(t *model.Turtle) {
-	vx := t.GetPropertySafe("vx-new").(float64)
-	vy := t.GetPropertySafe("vy-new").(float64)
+	vx := t.GetProperty("vx-new").(float64)
+	vy := t.GetProperty("vy-new").(float64)
 	// vx := b.properties[t]["vx-new"].(float64)
 	// vy := b.properties[t]["vy-new"].(float64)
 
-	t.SetPropertySafe("vx", vx)
-	t.SetPropertySafe("vy", vy)
+	t.SetProperty("vx", vx)
+	t.SetProperty("vy", vy)
 }
 
 func (b *Boid) cohesion(t *model.Turtle) {
@@ -203,11 +201,11 @@ func (b *Boid) cohesion(t *model.Turtle) {
 	if neighboringBoids > 0 {
 		xposAvg /= float64(neighboringBoids)
 		yposAvg /= float64(neighboringBoids)
-		vx := t.GetPropertySafe("vx").(float64)
-		vy := t.GetPropertySafe("vy").(float64)
+		vx := t.GetProperty("vx").(float64)
+		vy := t.GetProperty("vy").(float64)
 		centeringFactor := b.centeringFactor
-		t.SetPropertySafe("vx", vx+(xposAvg-t.XCor())*centeringFactor)
-		t.SetPropertySafe("vy", vy+(yposAvg-t.YCor())*centeringFactor)
+		t.SetProperty("vx", vx+(xposAvg-t.XCor())*centeringFactor)
+		t.SetProperty("vy", vy+(yposAvg-t.YCor())*centeringFactor)
 	}
 }
 
@@ -218,42 +216,42 @@ func (b *Boid) turnAwayFromEdges(t *model.Turtle) {
 	topMargin := b.model.MinYCor() + margin
 	bottomMargin := b.model.MaxXCor() - margin
 	turnFactor := b.turnFactor
-	vx := t.GetPropertySafe("vx").(float64)
-	vy := t.GetPropertySafe("vy").(float64)
+	vx := t.GetProperty("vx").(float64)
+	vy := t.GetProperty("vy").(float64)
 	if t.XCor() < leftMargin {
-		t.SetPropertySafe("vx", vx+turnFactor)
+		t.SetProperty("vx", vx+turnFactor)
 	}
 	if t.XCor() > rightMargin {
-		t.SetPropertySafe("vx", vx-turnFactor)
+		t.SetProperty("vx", vx-turnFactor)
 	}
 	if t.YCor() > bottomMargin {
-		t.SetPropertySafe("vy", vy-turnFactor)
+		t.SetProperty("vy", vy-turnFactor)
 	}
 	if t.YCor() < topMargin {
-		t.SetPropertySafe("vy", vy+turnFactor)
+		t.SetProperty("vy", vy+turnFactor)
 	}
 }
 
 func (b *Boid) limitSpeeds(t *model.Turtle) {
-	vx := t.GetPropertySafe("vx").(float64)
-	vy := t.GetPropertySafe("vy").(float64)
+	vx := t.GetProperty("vx").(float64)
+	vy := t.GetProperty("vy").(float64)
 	speed := math.Sqrt(vx*vx + vy*vy)
 	minSpeed := b.minSpeed
 	maxSpeed := b.maxSpeed
 	if speed > maxSpeed {
-		t.SetPropertySafe("vx", (vx/speed)*maxSpeed)
-		t.SetPropertySafe("vy", (vy/speed)*maxSpeed)
+		t.SetProperty("vx", (vx/speed)*maxSpeed)
+		t.SetProperty("vy", (vy/speed)*maxSpeed)
 	}
 	if speed < minSpeed {
-		t.SetPropertySafe("vx", (vx/speed)*minSpeed)
-		t.SetPropertySafe("vy", (vy/speed)*minSpeed)
+		t.SetProperty("vx", (vx/speed)*minSpeed)
+		t.SetProperty("vy", (vy/speed)*minSpeed)
 	}
 
 }
 
 func (b *Boid) updatePosition(t *model.Turtle) {
-	vx := t.GetPropertySafe("vx").(float64)
-	vy := t.GetPropertySafe("vy").(float64)
+	vx := t.GetProperty("vx").(float64)
+	vy := t.GetProperty("vy").(float64)
 	t.SetXY(t.XCor()+vx, t.YCor()+vy)
 }
 

@@ -245,15 +245,13 @@ func (p *Patch) turtlesHereBreeded(breed *TurtleBreed) *TurtleAgentSet {
 	return turtles
 }
 
+// GetProperty returns the patch property variable.
+// This method is thread-safe and can be called concurrently.
 func (p *Patch) GetProperty(key string) interface{} {
-	return p.patchProperties[key]
-}
-
-func (p *Patch) GetPropertySafe(key string) interface{} {
 	p.propertiesMutex.RLock()
 	defer p.propertiesMutex.RUnlock()
 
-	return p.GetProperty(key)
+	return p.patchProperties[key]
 }
 
 func (t *Patch) GetPropI(key string) int {
@@ -312,7 +310,12 @@ func (t *Patch) GetPropB(key string) bool {
 	}
 }
 
+// SetProperty sets the patch property variable.
+// This method is thread-safe and can be called concurrently.
 func (p *Patch) SetProperty(key string, value interface{}) {
+	p.propertiesMutex.Lock()
+	defer p.propertiesMutex.Unlock()
+
 	// if the value is an int, convert it to a float64
 	if _, ok := value.(int); ok {
 		value = float64(value.(int))
@@ -322,11 +325,4 @@ func (p *Patch) SetProperty(key string, value interface{}) {
 		return
 	}
 	p.patchProperties[key] = value
-}
-
-func (p *Patch) SetPropertySafe(key string, value interface{}) {
-	p.propertiesMutex.Lock()
-	defer p.propertiesMutex.Unlock()
-
-	p.SetProperty(key, value)
 }
