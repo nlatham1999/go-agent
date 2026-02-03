@@ -12,7 +12,9 @@ type Turtle struct {
 	positionMu sync.RWMutex // Protects xcor, ycor, heading, patch
 	xcor       float64
 	ycor       float64
+	zcor       float64
 	heading    float64 // direction the turtle is facing in radians
+	pitch      float64 // pitch of the turtle in radians (for 3D models)
 	patch      *Patch  // patch the turtle is on
 
 	who  int //the id of the turtle
@@ -63,6 +65,10 @@ func newTurtle(m *Model, who int, breed *TurtleBreed, x float64, y float64) *Tur
 
 	//link the turtle to the patch
 	t.patch = t.PatchHere()
+	// Initialize z coordinate from patch
+	if t.patch != nil {
+		t.zcor = float64(t.patch.z)
+	}
 	t.patch.addTurtle(t)
 
 	//set the turtle properties variables
@@ -172,17 +178,30 @@ func (t *Turtle) Die() {
 
 // returns the distance between the two turtles
 func (t *Turtle) DistanceTurtle(turtle *Turtle) float64 {
-	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, turtle.xcor, turtle.ycor)
+	if t.parent.Is3D() {
+		return t.parent.DistanceBetweenPointsXYZ(t.xcor, t.ycor, t.zcor, turtle.xcor, turtle.ycor, turtle.zcor)
+	} else {
+		return t.parent.DistanceBetweenPointsXY(t.xcor, t.ycor, turtle.xcor, turtle.ycor)
+	}
 }
 
 // returns the distance between the turtle and the middle of the patch
 func (t *Turtle) DistancePatch(patch *Patch) float64 {
-	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, patch.xFloat64, patch.yFloat64)
+	if t.parent.Is3D() {
+		return t.parent.DistanceBetweenPointsXYZ(t.xcor, t.ycor, t.zcor, patch.xFloat64, patch.yFloat64, patch.zFloat64)
+	} else {
+		return t.parent.DistanceBetweenPointsXY(t.xcor, t.ycor, patch.xFloat64, patch.yFloat64)
+	}
 }
 
 // returns the distance between the turtle and the x y coordinates
 func (t *Turtle) DistanceXY(x float64, y float64) float64 {
-	return t.parent.DistanceBetweenPoints(t.xcor, t.ycor, x, y)
+	return t.parent.DistanceBetweenPointsXY(t.xcor, t.ycor, x, y)
+}
+
+// returns the distance between the turtle and the x y z coordinates
+func (t *Turtle) DistanceXYZ(x float64, y float64, z float64) float64 {
+	return t.parent.DistanceBetweenPointsXYZ(t.xcor, t.ycor, t.zcor, x, y, z)
 }
 
 // moves the turtle to the neighboring patch that has the lowest value of the patch variable
@@ -214,21 +233,21 @@ func (t *Turtle) Downhill(patchVariable string) {
 		pos := p.patchNeighborsMap[minPatch]
 
 		switch pos {
-		case "left":
+		case "left", "leftFront", "leftBack":
 			t.SetHeading(LeftAngle)
-		case "topLeft":
+		case "topLeft", "topLeftFront", "topLeftBack":
 			t.SetHeading(UpAndLeftAngle)
-		case "top":
+		case "top", "topFront", "topBack":
 			t.SetHeading(UpAngle)
-		case "topRight":
+		case "topRight", "topRightFront", "topRightBack":
 			t.SetHeading(UpAndRightAngle)
-		case "right":
+		case "right", "rightFront", "rightBack":
 			t.SetHeading(RightAngle)
-		case "bottomRight":
+		case "bottomRight", "bottomRightFront", "bottomRightBack":
 			t.SetHeading(DownAndRightAngle)
-		case "bottom":
+		case "bottom", "bottomFront", "bottomBack":
 			t.SetHeading(DownAngle)
-		case "bottomLeft":
+		case "bottomLeft", "bottomLeftFront", "bottomLeftBack":
 			t.SetHeading(DownAndLeftAngle)
 		}
 
@@ -239,6 +258,7 @@ func (t *Turtle) Downhill(patchVariable string) {
 
 // moves the turtle to the neighboring4 patch that has the lowest value of the patch variable
 // if the current patch variable is the lowest then the turtle stays in place
+// if the model is 3D then it will also consider the patches that are above and below
 func (t *Turtle) Downhill4(patchVariable string) {
 
 	neighborsMap := make(map[*Patch]string)
@@ -265,6 +285,18 @@ func (t *Turtle) Downhill4(patchVariable string) {
 		neighborsMap[rightNeighbor] = "right"
 	}
 
+	if t.parent.Is3D() {
+		frontNeightbor := p.neighborsPatchMap["centerFront"]
+		if frontNeightbor != nil {
+			neighborsMap[frontNeightbor] = "front"
+		}
+
+		backNeighbor := p.neighborsPatchMap["centerBack"]
+		if backNeighbor != nil {
+			neighborsMap[backNeighbor] = "back"
+		}
+	}
+
 	// if the patch variable is not a number then return
 	if _, ok := t.parent.DefaultPatchProperties[patchVariable].(float64); !ok {
 		return
@@ -281,6 +313,8 @@ func (t *Turtle) Downhill4(patchVariable string) {
 	}
 
 	if minPatch != t.PatchHere() {
+
+		// @TODO handle front and back directions
 
 		pos := neighborsMap[minPatch]
 		switch pos {
@@ -301,12 +335,20 @@ func (t *Turtle) Downhill4(patchVariable string) {
 
 // faces the turtle passed in
 func (t *Turtle) FaceTurtle(turtle *Turtle) {
-	t.FaceXY(turtle.xcor, turtle.ycor)
+	if t.parent.Is3D() {
+		t.FaceXYZ(turtle.xcor, turtle.ycor, turtle.zcor)
+	} else {
+		t.FaceXY(turtle.xcor, turtle.ycor)
+	}
 }
 
 // faces the patch passed in
 func (t *Turtle) FacePatch(patch *Patch) {
-	t.FaceXY(patch.xFloat64, patch.yFloat64)
+	if t.parent.Is3D() {
+		t.FaceXYZ(patch.xFloat64, patch.yFloat64, patch.zFloat64)
+	} else {
+		t.FaceXY(patch.xFloat64, patch.yFloat64)
+	}
 }
 
 // faces the x y coordinates passed in
@@ -367,6 +409,24 @@ func (t *Turtle) FaceXY(x float64, y float64) {
 
 	a := math.Atan2(newDy, newDx)
 	t.setHeadingRadians(a)
+}
+
+// faces the x y z coordinates passed in
+func (t *Turtle) FaceXYZ(x float64, y float64, z float64) {
+	dx := x - t.xcor
+	dy := y - t.ycor
+	dz := z - t.zcor
+
+	// face the x y coordinates first
+	t.FaceXY(x, y)
+
+	// adjust the pitch
+	// no wrapping for z axis
+	// Calculate XY distance without wrapping for pitch calculation
+	distanceXY := math.Sqrt(dx*dx + dy*dy)
+
+	pitch := math.Atan2(dz, distanceXY)
+	t.setPitchRadians(pitch)
 }
 
 // Forward moves the turtle forward by the distance passed in and in relation to its heading.
@@ -436,6 +496,14 @@ func (t *Turtle) GetHeading() float64 {
 	return radiansToDegrees(t.heading)
 }
 
+// GetPitch returns the turtle's pitch in degrees (3D models only).
+// This method is thread-safe and can be called concurrently.
+func (t *Turtle) GetPitch() float64 {
+	t.positionMu.RLock()
+	defer t.positionMu.RUnlock()
+	return radiansToDegrees(t.pitch)
+}
+
 // SetHeading sets the turtle's heading in degrees.
 // This method is thread-safe and can be called concurrently.
 func (t *Turtle) SetHeading(heading float64) {
@@ -460,6 +528,10 @@ func (t *Turtle) setHeadingRadians(heading float64) {
 	t.heading = heading
 }
 
+func (t *Turtle) setPitchRadians(pitch float64) {
+	t.pitch = pitch
+}
+
 // Hide the turtle
 func (t *Turtle) Hide() {
 	t.Hidden = true
@@ -473,11 +545,18 @@ func (t *Turtle) Home() {
 // Jump moves the turtle forward by the specified distance without leaving a trail.
 // This method is thread-safe and can be called concurrently.
 func (t *Turtle) Jump(distance float64) {
-	// if t.CanMove(distance) {
-	xcor := t.xcor + distance*math.Cos(t.heading)
-	ycor := t.ycor + distance*math.Sin(t.heading)
-	t.SetXY(xcor, ycor)
-	// }
+	if t.parent.Is3D() {
+		// 3D movement with heading and pitch
+		xcor := t.xcor + distance*math.Cos(t.heading)*math.Cos(t.pitch)
+		ycor := t.ycor + distance*math.Sin(t.heading)*math.Cos(t.pitch)
+		zcor := t.zcor + distance*math.Sin(t.pitch)
+		t.SetXYZ(xcor, ycor, zcor)
+	} else {
+		// 2D movement
+		xcor := t.xcor + distance*math.Cos(t.heading)
+		ycor := t.ycor + distance*math.Sin(t.heading)
+		t.SetXY(xcor, ycor)
+	}
 }
 
 func (t *Turtle) SetLabel(label interface{}) {
@@ -511,7 +590,11 @@ func (t *Turtle) MoveToPatch(patch *Patch) {
 		return
 	}
 
-	t.SetXY(patch.xFloat64, patch.yFloat64)
+	if t.parent.Is3D() {
+		t.SetXYZ(patch.xFloat64, patch.yFloat64, patch.zFloat64)
+	} else {
+		t.SetXY(patch.xFloat64, patch.yFloat64)
+	}
 }
 
 // moves the turtle to the x y coordinates passed in
@@ -659,7 +742,12 @@ func (t *Turtle) PatchHere() *Patch {
 		return t.patch
 	}
 
-	p := t.parent.Patch(t.xcor, t.ycor)
+	var p *Patch
+	if t.parent.Is3D() {
+		p = t.parent.Patch3D(t.xcor, t.ycor, t.zcor)
+	} else {
+		p = t.parent.Patch(t.xcor, t.ycor)
+	}
 
 	t.patch = p
 
@@ -698,6 +786,24 @@ func (t *Turtle) SetXY(x float64, y float64) {
 
 	t.xcor = x
 	t.ycor = y
+
+	t.transferPatchOwnership()
+}
+
+// SetXYZ sets the turtle's position to the specified coordinates.
+// This method is thread-safe and can be called concurrently.
+func (t *Turtle) SetXYZ(x float64, y float64, z float64) {
+	t.positionMu.Lock()
+	defer t.positionMu.Unlock()
+
+	x, y, z, allowed := t.parent.convertXYZToInBounds(x, y, z)
+	if !allowed {
+		return
+	}
+
+	t.xcor = x
+	t.ycor = y
+	t.zcor = z
 
 	t.transferPatchOwnership()
 }
@@ -876,4 +982,12 @@ func (t *Turtle) YCor() float64 {
 	t.positionMu.RLock()
 	defer t.positionMu.RUnlock()
 	return t.ycor
+}
+
+// ZCor returns the turtle's z coordinate.
+// This method is thread-safe and can be called concurrently.
+func (t *Turtle) ZCor() float64 {
+	t.positionMu.RLock()
+	defer t.positionMu.RUnlock()
+	return t.zcor
 }

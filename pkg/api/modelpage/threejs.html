@@ -1,18 +1,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-    let scene, camera, renderer;
+    let scene, camera, renderer, controls;
     let patchGroup, turtleGroup, linkGroup;
-    let offsetX = 0, offsetY = 0;
+    let offsetX = 0, offsetY = 0, offsetZ = 0;
     let patchSize = 1;
-    let minPxCor = 0, minPyCor = 0, maxPxCor = 0, maxPyCor = 0;
+    let minPxCor = 0, minPyCor = 0, maxPxCor = 0, maxPyCor = 0, minPzCor = 0, maxPzCor = 0;
     let animateTimeout = 16;
+    let is3D = false;
+    let worldBoundaryBox = null;
 
     // Shared geometries and materials for reuse (major performance improvement)
     let sharedGeometries = {
         plane: null,
+        box: null,
         circle: null,
-        triangle: null
+        sphere: null,
+        triangle: null,
+        cone: null
     };
 
     // Object pools to reuse meshes instead of recreating
@@ -51,11 +57,12 @@
 
         // Create Scene
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x008000); // Green background
+        scene.background = new THREE.Color(0x000000); // Black background
 
-        // Camera
+        // Camera - will be replaced in updateScene based on is3D
+        // Default to orthographic for 2D
         camera = new THREE.OrthographicCamera(
-            -viewWidth, viewWidth, viewHeight, -viewHeight,  
+            -viewWidth, viewWidth, viewHeight, -viewHeight,
             0.1, 1000
         );
         camera.position.set(0, 0, 100);
@@ -115,6 +122,9 @@
     }
 
     function animate() {
+        if (controls) {
+            controls.update();
+        }
         renderer.render(scene, camera);
         setTimeout(animate, animateTimeout);
     }
@@ -141,30 +151,51 @@
 
     // Helper function to get or create a mesh from pool
     function getOrCreatePatch(index) {
-        if (patchPool[index]) {
+        if (patchPool[index] && patchPool[index].userData.is3D === is3D) {
             patchPool[index].visible = true;
             return patchPool[index];
         }
 
-        // Create shared geometry if needed
-        if (!sharedGeometries.plane) {
-            sharedGeometries.plane = new THREE.PlaneGeometry(1, 1);
+        // Remove old patch if 3D mode changed
+        if (patchPool[index]) {
+            patchGroup.remove(patchPool[index]);
+            patchPool[index].geometry.dispose();
+            patchPool[index].material.dispose();
         }
 
-        const material = new THREE.MeshBasicMaterial();
-        const mesh = new THREE.Mesh(sharedGeometries.plane, material);
+        let geometry, material, mesh;
+
+        if (is3D) {
+            // 3D mode: use box geometry
+            if (!sharedGeometries.box) {
+                sharedGeometries.box = new THREE.BoxGeometry(1, 1, 1);
+            }
+            geometry = sharedGeometries.box;
+            material = new THREE.MeshBasicMaterial({ transparent: true });
+            mesh = new THREE.Mesh(geometry, material);
+        } else {
+            // 2D mode: use plane geometry
+            if (!sharedGeometries.plane) {
+                sharedGeometries.plane = new THREE.PlaneGeometry(1, 1);
+            }
+            geometry = sharedGeometries.plane;
+            material = new THREE.MeshBasicMaterial({ transparent: true });
+            mesh = new THREE.Mesh(geometry, material);
+        }
+
+        mesh.userData.is3D = is3D;
         patchGroup.add(mesh);
         patchPool[index] = mesh;
         return mesh;
     }
 
     function getOrCreateTurtle(index, shape) {
-        if (turtlePool[index] && turtlePool[index].userData.shape === shape) {
+        if (turtlePool[index] && turtlePool[index].userData.shape === shape && turtlePool[index].userData.is3D === is3D) {
             turtlePool[index].visible = true;
             return turtlePool[index];
         }
 
-        // Remove old turtle if shape changed
+        // Remove old turtle if shape changed or 3D mode changed
         if (turtlePool[index]) {
             turtleGroup.remove(turtlePool[index]);
             turtlePool[index].geometry.dispose();
@@ -173,26 +204,49 @@
 
         let geometry, material, mesh;
 
-        if (shape === 'circle') {
-            if (!sharedGeometries.circle) {
-                sharedGeometries.circle = new THREE.CircleGeometry(0.5, 32);
+        if (is3D) {
+            // 3D shapes
+            if (shape === 'circle') {
+                if (!sharedGeometries.sphere) {
+                    sharedGeometries.sphere = new THREE.SphereGeometry(0.5, 16, 16);
+                }
+                geometry = sharedGeometries.sphere;
+                material = new THREE.MeshBasicMaterial();
+                mesh = new THREE.Mesh(geometry, material);
+            } else if (shape === 'triangle') {
+                if (!sharedGeometries.cone) {
+                    sharedGeometries.cone = new THREE.ConeGeometry(0.5, 1, 8);
+                }
+                geometry = sharedGeometries.cone;
+                material = new THREE.MeshBasicMaterial();
+                mesh = new THREE.Mesh(geometry, material);
+                // Rotate cone to point in +X direction (heading = 0)
+                mesh.rotation.z = -Math.PI / 2;
             }
-            geometry = sharedGeometries.circle;
-            material = new THREE.MeshBasicMaterial();
-            mesh = new THREE.Mesh(geometry, material);
-        } else if (shape === 'triangle') {
-            geometry = new THREE.BufferGeometry();
-            const vertices = new Float32Array([
-                0.5, 0, 0,
-                -0.5, -0.289, 0,
-                -0.5, 0.289, 0
-            ]);
-            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
-            mesh = new THREE.Mesh(geometry, material);
+        } else {
+            // 2D shapes
+            if (shape === 'circle') {
+                if (!sharedGeometries.circle) {
+                    sharedGeometries.circle = new THREE.CircleGeometry(0.5, 32);
+                }
+                geometry = sharedGeometries.circle;
+                material = new THREE.MeshBasicMaterial();
+                mesh = new THREE.Mesh(geometry, material);
+            } else if (shape === 'triangle') {
+                geometry = new THREE.BufferGeometry();
+                const vertices = new Float32Array([
+                    0.5, 0, 0,
+                    -0.5, -0.289, 0,
+                    -0.5, 0.289, 0
+                ]);
+                geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+                mesh = new THREE.Mesh(geometry, material);
+            }
         }
 
         mesh.userData.shape = shape;
+        mesh.userData.is3D = is3D;
         turtleGroup.add(mesh);
         turtlePool[index] = mesh;
         return mesh;
@@ -239,12 +293,15 @@
             return;
         }
 
+        // Update 3D mode flag
+        const was3D = is3D;
+        is3D = model.is3D || false;
+
         // Hide all objects first (will show the ones we need)
         patchPool.forEach(p => p && (p.visible = false));
         turtlePool.forEach(t => t && (t.visible = false));
         linkPool.forEach(l => l && (l.visible = false));
         spritePool.forEach(s => s && (s.visible = false));
-
 
         // get the screen dimensions
         let screenWidth = window.innerWidth; // right half
@@ -257,13 +314,76 @@
         let maxPatchHeight = screenHeight / model.height;
         patchSize = Math.min(maxPatchWidth, maxPatchHeight);
 
-        // Update camera
-        const halfWidth = (model.width * patchSize) / 2;
-        const halfHeight = (model.height * patchSize) / 2;
-        camera.left = -halfWidth;
-        camera.right = halfWidth;
-        camera.top = halfHeight;
-        camera.bottom = -halfHeight;
+        // Check if world dimensions have changed
+        const dimensionsChanged =
+            minPxCor !== model.minPxCor ||
+            maxPxCor !== model.maxPxCor ||
+            minPyCor !== model.minPyCor ||
+            maxPyCor !== model.maxPyCor ||
+            minPzCor !== (model.minPzCor || 0) ||
+            maxPzCor !== (model.maxPzCor || 0);
+
+        // Set offsets to center the model
+        offsetX = (model.maxPxCor + model.minPxCor) / 2;
+        offsetY = (model.maxPyCor + model.minPyCor) / 2;
+        offsetZ = is3D ? (model.maxPzCor + model.minPzCor) / 2 : 0;
+
+        minPxCor = model.minPxCor;
+        minPyCor = model.minPyCor;
+        maxPxCor = model.maxPxCor;
+        maxPyCor = model.maxPyCor;
+        minPzCor = model.minPzCor || 0;
+        maxPzCor = model.maxPzCor || 0;
+
+        // Update camera based on 3D mode
+        if (is3D && (!camera.isPerspectiveCamera || was3D !== is3D)) {
+            // Switch to perspective camera for 3D
+            const aspectRatio = screenWidth / screenHeight;
+            camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 10000);
+
+            // Position camera to view the entire 3D space
+            // Z axis is now vertical (Y in Three.js), XY plane is horizontal (XZ in Three.js)
+            const maxDim = Math.max(model.width, model.height, (maxPzCor - minPzCor + 1)) * patchSize;
+            camera.position.set(maxDim * 1.5, maxDim * 1.5, maxDim * 1.5);
+            camera.lookAt(0, 0, 0);
+            camera.up.set(0, 1, 0); // Ensure Y is up
+
+            // Add orbit controls for 3D navigation
+            if (controls) {
+                controls.dispose();
+            }
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 10;
+            controls.maxDistance = maxDim * 5;
+        } else if (!is3D && (camera.isPerspectiveCamera || was3D !== is3D)) {
+            // Switch to orthographic camera for 2D
+            const halfWidth = (model.width * patchSize) / 2;
+            const halfHeight = (model.height * patchSize) / 2;
+            camera = new THREE.OrthographicCamera(
+                -halfWidth, halfWidth, halfHeight, -halfHeight,
+                0.1, 1000
+            );
+            camera.position.set(0, 0, 100);
+            camera.lookAt(0, 0, 0);
+
+            // Remove orbit controls for 2D
+            if (controls) {
+                controls.dispose();
+                controls = null;
+            }
+        } else if (!is3D) {
+            // Update existing orthographic camera
+            const halfWidth = (model.width * patchSize) / 2;
+            const halfHeight = (model.height * patchSize) / 2;
+            camera.left = -halfWidth;
+            camera.right = halfWidth;
+            camera.top = halfHeight;
+            camera.bottom = -halfHeight;
+        }
+
         camera.updateProjectionMatrix();
 
         // Update renderer
@@ -279,16 +399,40 @@
         renderer.setSize(viewWidth, viewHeight);
         renderer.domElement.style.width = `${viewWidth}px`;
         renderer.domElement.style.height = `${viewHeight}px`;
-
-        // set an offset to center the model
-        offsetX = (model.maxPxCor + model.minPxCor) / 2;
-        offsetY = (model.maxPyCor + model.minPyCor) / 2; 
-
-        minPxCor = model.minPxCor;
-        minPyCor = model.minPyCor;
-        maxPxCor = model.maxPxCor;
-        maxPyCor = model.maxPyCor;
         
+
+        // Update or create world boundary box for 3D mode
+        if (is3D) {
+            if (!worldBoundaryBox || was3D !== is3D || dimensionsChanged) {
+                // Remove old boundary if exists
+                if (worldBoundaryBox) {
+                    scene.remove(worldBoundaryBox);
+                    worldBoundaryBox.geometry.dispose();
+                    worldBoundaryBox.material.dispose();
+                }
+
+                // Create world boundary box
+                // Map model dimensions to Three.js: X→X, Y→Z, Z→Y (Z is vertical)
+                const worldWidth = (model.maxPxCor - model.minPxCor + 1) * patchSize; // X dimension
+                const worldHeight = (model.maxPzCor - model.minPzCor + 1) * patchSize; // Model Z → Three.js Y (vertical)
+                const worldDepth = (model.maxPyCor - model.minPyCor + 1) * patchSize; // Model Y → Three.js Z
+
+                const boundaryGeometry = new THREE.BoxGeometry(worldWidth, worldHeight, worldDepth);
+                const edges = new THREE.EdgesGeometry(boundaryGeometry);
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+                worldBoundaryBox = new THREE.LineSegments(edges, lineMaterial);
+                worldBoundaryBox.position.set(0, 0, 0);
+                scene.add(worldBoundaryBox);
+            }
+        } else {
+            // Remove boundary box in 2D mode
+            if (worldBoundaryBox) {
+                scene.remove(worldBoundaryBox);
+                worldBoundaryBox.geometry.dispose();
+                worldBoundaryBox.material.dispose();
+                worldBoundaryBox = null;
+            }
+        }
 
         // Update Patches - reuse existing meshes
         model.patches.forEach((patch, index) => {
@@ -297,11 +441,34 @@
             // Update color
             mesh.material.color.setRGB(patch.color.r / 255, patch.color.g / 255, patch.color.b / 255);
 
+            // Make black patches transparent
+            if (patch.color.r === 0 && patch.color.g === 0 && patch.color.b === 0) {
+                mesh.material.opacity = 0;
+            } else {
+                mesh.material.opacity = 1;
+            }
+
             // Update position and scale
             const relativeX = patch.x;
             const relativeY = patch.y;
-            mesh.position.set((relativeX - offsetX) * patchSize, (relativeY - offsetY) * patchSize, 0);
-            mesh.scale.set(patchSize, patchSize, 1);
+            const relativeZ = is3D ? (patch.z || 0) : 0;
+
+            if (is3D) {
+                // Map model coordinates to Three.js: X→X, Y→Z, Z→Y (Z is vertical)
+                const posX = (relativeX - offsetX) * patchSize;
+                const posY = (relativeZ - offsetZ) * patchSize; // Model Z → Three.js Y
+                const posZ = (relativeY - offsetY) * patchSize; // Model Y → Three.js Z
+
+                mesh.position.set(posX, posY, posZ);
+                mesh.scale.set(patchSize, patchSize, patchSize);
+            } else {
+                mesh.position.set(
+                    (relativeX - offsetX) * patchSize,
+                    (relativeY - offsetY) * patchSize,
+                    0
+                );
+                mesh.scale.set(patchSize, patchSize, 1);
+            }
         });
 
         // Update Turtles - reuse existing meshes
@@ -315,17 +482,40 @@
             // Update position
             const relativeX = turtle.x;
             const relativeY = turtle.y;
-            const posX = (relativeX - offsetX) * patchSize;
-            const posY = (relativeY - offsetY) * patchSize;
-            mesh.position.set(posX, posY, 0.1);
+            const relativeZ = is3D ? (turtle.z || 0) : 0;
+
+            let posX, posY, posZ;
+            if (is3D) {
+                // Map model coordinates to Three.js: X→X, Y→Z, Z→Y (Z is vertical)
+                posX = (relativeX - offsetX) * patchSize;
+                posY = (relativeZ - offsetZ) * patchSize; // Model Z → Three.js Y
+                posZ = (relativeY - offsetY) * patchSize; // Model Y → Three.js Z
+            } else {
+                posX = (relativeX - offsetX) * patchSize;
+                posY = (relativeY - offsetY) * patchSize;
+                posZ = 0.1;
+            }
+
+            mesh.position.set(posX, posY, posZ);
 
             // Update scale based on size
             const size = turtle.size * patchSize;
-            mesh.scale.set(size, size, 1);
+            if (is3D) {
+                mesh.scale.set(size, size, size);
+            } else {
+                mesh.scale.set(size, size, 1);
+            }
 
-            // Update rotation for triangles
+            // Update rotation for triangles/cones
             if (turtle.shape === 'triangle') {
-                mesh.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
+                if (is3D) {
+                    // In 3D, rotate cone to face the heading
+                    // Cone default is pointing up (+Y), rotate to point along heading
+                    mesh.rotation.set(0, 0, THREE.MathUtils.degToRad(turtle.heading) - Math.PI / 2);
+                } else {
+                    // In 2D, just rotate around Z axis
+                    mesh.rotation.z = THREE.MathUtils.degToRad(turtle.heading);
+                }
             }
 
             // Handle labels
@@ -344,7 +534,7 @@
 
                 sprite.userData.texture.needsUpdate = true;
                 sprite.scale.set(patchSize * 1.5, patchSize * 1.5, 1);
-                sprite.position.set(posX, posY, 0.2);
+                sprite.position.set(posX, posY + 0.1, posZ); // Offset slightly above turtle in Y (vertical)
             }
         });
 
@@ -359,12 +549,22 @@
 
                 // Update positions
                 const positions = line.geometry.attributes.position.array;
-                positions[0] = (link.end1X - offsetX) * patchSize;
-                positions[1] = (link.end1Y - offsetY) * patchSize;
-                positions[2] = 0.05;
-                positions[3] = (link.end2X - offsetX) * patchSize;
-                positions[4] = (link.end2Y - offsetY) * patchSize;
-                positions[5] = 0.05;
+                if (is3D) {
+                    // Map model coordinates to Three.js: X→X, Y→Z, Z→Y (Z is vertical)
+                    positions[0] = (link.end1X - offsetX) * patchSize;
+                    positions[1] = ((link.end1Z || 0) - offsetZ) * patchSize; // Model Z → Three.js Y
+                    positions[2] = (link.end1Y - offsetY) * patchSize; // Model Y → Three.js Z
+                    positions[3] = (link.end2X - offsetX) * patchSize;
+                    positions[4] = ((link.end2Z || 0) - offsetZ) * patchSize; // Model Z → Three.js Y
+                    positions[5] = (link.end2Y - offsetY) * patchSize; // Model Y → Three.js Z
+                } else {
+                    positions[0] = (link.end1X - offsetX) * patchSize;
+                    positions[1] = (link.end1Y - offsetY) * patchSize;
+                    positions[2] = 0.05;
+                    positions[3] = (link.end2X - offsetX) * patchSize;
+                    positions[4] = (link.end2Y - offsetY) * patchSize;
+                    positions[5] = 0.05;
+                }
                 line.geometry.attributes.position.needsUpdate = true;
             }
         });

@@ -793,7 +793,7 @@ func TestTurtlesInRadiusWrappingOff(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc := m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc := m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -815,7 +815,7 @@ func TestTurtlesInRadiusWrappingOff(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -837,7 +837,7 @@ func TestTurtlesInRadiusWrappingOff(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -859,7 +859,7 @@ func TestTurtlesInRadiusWrappingOff(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -908,7 +908,7 @@ func TestTurtlesInRadiusWrappingOn(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc := m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc := m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -930,7 +930,7 @@ func TestTurtlesInRadiusWrappingOn(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -952,7 +952,7 @@ func TestTurtlesInRadiusWrappingOn(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())
@@ -974,7 +974,7 @@ func TestTurtlesInRadiusWrappingOn(t *testing.T) {
 		return t.DistanceXY(xCor, yCor) <= radius
 	})
 
-	turtlesInRadiusFunc = m.TurtlesInRadius(xCor, yCor, radius)
+	turtlesInRadiusFunc = m.TurtlesInRadiusXY(xCor, yCor, radius)
 
 	if turtlesInRadiusBruteForce.Count() != turtlesInRadiusFunc.Count() {
 		t.Errorf("Expected %d turtles, got %d", turtlesInRadiusBruteForce.Count(), turtlesInRadiusFunc.Count())

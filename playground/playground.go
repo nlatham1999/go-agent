@@ -35,9 +35,11 @@ func (s *Sim) Init() {
 		WrappingX:  false,
 		WrappingY:  false,
 		MinPxCor:   -10, // min x patch coordinate
-		MaxPxCor:   3,   // max x patch coordinate
+		MaxPxCor:   10,  // max x patch coordinate
 		MinPyCor:   -10, // min y patch coordinate
-		MaxPyCor:   3,   // max y patch coordinate
+		MaxPyCor:   10,  // max y patch coordinate
+		MinPzCor:   -10, // min z patch coordinate
+		MaxPzCor:   10,  // max z patch coordinate
 		RandomSeed: 10,  // random seed
 		TurtleProperties: map[string]interface{}{
 			"newHeading": nil,
@@ -54,29 +56,37 @@ func (s *Sim) SetUp() error {
 	s.model.CreateTurtles(1, func(t *model.Turtle) {
 		t.Color = model.Red
 		t.SetSize(.25)
-		t.SetXY(0, 0)
+		t.SetXYZ(9, 9, 9)
 	})
 
 	return nil
 }
 
 func (s *Sim) Go() {
-	if s.MouseClicked {
-		fmt.Println("Mouse clicked at", s.MouseXClicked, s.MouseYClicked)
-		s.MouseClicked = false
-		p := s.model.Patch(s.MouseXClicked, s.MouseYClicked)
-		if p == nil {
-			return
-		}
-		p.Color.SetColor(model.White)
-	}
+	// if s.MouseClicked {
+	// 	fmt.Println("Mouse clicked at", s.MouseXClicked, s.MouseYClicked)
+	// 	s.MouseClicked = false
+	// 	p := s.model.Patch(s.MouseXClicked, s.MouseYClicked)
+	// 	if p == nil {
+	// 		return
+	// 	}
+	// 	p.Color.SetColor(model.White)
+	// }
 
-	if s.MouseMoved {
-		t := s.model.Turtle(0)
-		t.FaceXY(s.MouseX, s.MouseY)
-		t.Forward(0.1)
-		s.MouseMoved = false
-	}
+	// if s.MouseMoved {
+	// 	t := s.model.Turtle(0)
+	// 	t.FaceXY(s.MouseX, s.MouseY)
+	// 	t.Forward(0.1)
+	// 	s.MouseMoved = false
+	// }
+
+	s.model.Turtles().Ask(
+		func(t *model.Turtle) {
+			t.FacePatch(s.model.Patch3D(0, 0, 0))
+			t.Forward(0.1)
+			fmt.Println(t.XCor(), t.YCor(), t.ZCor())
+		},
+	)
 }
 
 func (s *Sim) Stats() map[string]interface{} {

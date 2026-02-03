@@ -183,7 +183,11 @@ func (l *Link) Heading() (float64, error) {
 
 // returns the distance between the two ends of the link
 func (l *Link) Length() float64 {
-	return l.parent.DistanceBetweenPoints(l.end1.xcor, l.end1.ycor, l.end2.xcor, l.end2.ycor)
+	if l.parent.Is3D() {
+		return l.parent.DistanceBetweenPointsXYZ(l.end1.xcor, l.end1.ycor, l.end1.zcor, l.end2.xcor, l.end2.ycor, l.end2.zcor)
+	} else {
+		return l.parent.DistanceBetweenPointsXY(l.end1.xcor, l.end1.ycor, l.end2.xcor, l.end2.ycor)
+	}
 }
 
 // returns the other end of the link that is not the given turtle

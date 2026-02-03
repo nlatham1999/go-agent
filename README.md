@@ -17,6 +17,13 @@ For a demo run `go run main.go`
 
 This is the library that is used to create and interact with a model. For an exhaustive list of all the functions look here: https://github.com/nlatham1999/go-agent/blob/main/pkg/model/doc.md
 
+### Examples
+Examples can be found in [examples/](examples/) and can be imported and ran
+```
+import "github.com/nlatham1999/go-agent/examples/boid"
+```
+
+
 ### High Level Overview
 
 The [Model](https://github.com/nlatham1999/go-agent/blob/main/pkg/model/doc.md#func-newmodel) struct holds the state of the model and comes with a bunch of functions to interact with the different agents 
@@ -138,3 +145,5 @@ For simulation forward type models concurrency will not ruin determinism, two se
 -  [x] rename pcolor to color
 -  [x] labelColor on turtles should be public, same with label
 -  [x] seperate concurrency package
+-  [ ] make a version of patch agent set where there's no functions, so that the list of patches can be retrieved safely. Need to think about this
+-  [ ] sorted set should have an ask function with a bool return to exit early. Like a "ask until"

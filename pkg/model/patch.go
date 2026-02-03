@@ -10,9 +10,10 @@ type Patch struct {
 	// should never be changed
 	x int // x coordinate of the patch
 	y int // y coordinate of the patch
+	z int // z coordinate of the patch (for 3D models)
 
 	// this corresponds to the position in the patches array
-	// set as x*m.worldWidth + y
+	// set z*m.worldHeight + x*m.worldWidth + y
 	// maps to parent.posOfPatches[index]
 	index int
 
@@ -21,6 +22,7 @@ type Patch struct {
 	//we have float54 versions of the variables so that we don't have to do a bunch of conversions
 	xFloat64 float64
 	yFloat64 float64
+	zFloat64 float64
 
 	Color Color
 
@@ -39,13 +41,15 @@ type Patch struct {
 	neighborsPatchMap map[string]*Patch
 }
 
-func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *Patch {
+func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int, z int) *Patch {
 
 	patch := &Patch{
 		x:        x,
 		y:        y,
+		z:        z,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
+		zFloat64: float64(z),
 		Color:    Color{},
 		turtles:  make(map[*TurtleBreed]*TurtleAgentSet),
 		parent:   m,
@@ -101,17 +105,17 @@ func (p *Patch) removeTurtle(t *Turtle) {
 
 // returns the distance of this patch to the provided turtle
 func (p *Patch) DistanceTurtle(t *Turtle) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, t.xcor, t.ycor)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, t.xcor, t.ycor)
 }
 
 // returns the distance of this patch to the provided patch
 func (p *Patch) DistancePatch(patch *Patch) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, patch.xFloat64, patch.yFloat64)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, patch.xFloat64, patch.yFloat64)
 }
 
 // Returns the distance of this patch from the provided x y coordinates
 func (p *Patch) DistanceXY(x float64, y float64) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, x, y)
 }
 
 // returns the neighbors of this patch
@@ -121,7 +125,15 @@ func (p *Patch) Neighbors() *PatchAgentSet {
 	return neighbors
 }
 
+// returns the neighbors of this patch at the given z offset
+func (p *Patch) NeighborsAtZOffset(zOffset int) *PatchAgentSet {
+	neighbors := p.parent.neighborsAtZOffset(p, zOffset)
+
+	return neighbors
+}
+
 // returns the neighbors of this patch that are to the top, bottom, left, and right of this patch
+// if 3D will also include the patches above and below
 func (p *Patch) Neighbors4() *PatchAgentSet {
 	neighbors := p.parent.neighbors4(p)
 
@@ -158,6 +170,10 @@ func (p *Patch) XCor() int {
 // returns the y coordinate of this patch
 func (p *Patch) YCor() int {
 	return p.y
+}
+
+func (p *Patch) ZCor() int {
+	return p.z
 }
 
 // resest the patch to the default values

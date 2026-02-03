@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/nlatham1999/go-agent/examples/boid"
+	"github.com/nlatham1999/go-agent/examples/boid3D"
 	"github.com/nlatham1999/go-agent/examples/boidconcurrent"
 	"github.com/nlatham1999/go-agent/examples/flocking"
 	"github.com/nlatham1999/go-agent/examples/gol"
+	"github.com/nlatham1999/go-agent/examples/golgrowth"
 	mouseinteractions "github.com/nlatham1999/go-agent/examples/mouse-interactions"
 	"github.com/nlatham1999/go-agent/examples/prims"
+	"github.com/nlatham1999/go-agent/examples/prims3d"
 	"github.com/nlatham1999/go-agent/pkg/api"
 	"github.com/nlatham1999/go-agent/playground"
 )
@@ -28,6 +31,9 @@ func RunServer() {
 	playground := playground.NewSim()
 	flocking := flocking.NewFlocking()
 	mouseInteractions := mouseinteractions.NewSim()
+	boid3d := boid3D.NewBoid3D()
+	golgrowth := golgrowth.NewGol()
+	prims3d := prims3d.NewPrims()
 
 	agentApi, err := api.NewApi(
 		map[string]api.ModelInterface{
@@ -38,6 +44,9 @@ func RunServer() {
 			"playground":        playground,
 			"flocking":          flocking,
 			"mouseinteractions": mouseInteractions,
+			"boid3D":            boid3d,
+			"golgrowth":         golgrowth,
+			"prims3d":           prims3d,
 		},
 		api.ApiSettings{
 			StoreSteps: false,
@@ -49,6 +58,9 @@ func RunServer() {
 				"playground":        "🎮 Playground",
 				"flocking":          "🐦 Flocking",
 				"mouseinteractions": "🖱️ Mouse Interactions",
+				"boid3D":            "🐦 3D Boid Movement",
+				"golgrowth":         "🟩 3D visualization of Game of Life growth",
+				"prims3d":           "🧱 3D Prim's Maze Generation",
 			},
 			ButtonDescriptions: map[string]string{
 				"gameoflife":        "Conway's Game of Life",
@@ -58,6 +70,9 @@ func RunServer() {
 				"playground":        "Playground for quick testing",
 				"flocking":          "Flocking simulation",
 				"mouseinteractions": "Mouse interactions example",
+				"boid3D":            "Simulating flocking birds in 3D",
+				"golgrowth":         "3D visualization of Game of Life growth",
+				"prims3d":           "Generating mazes using Prim's algorithm in 3D",
 			},
 		},
 	)

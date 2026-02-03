@@ -11,17 +11,22 @@ type Model struct {
 	MaxPxCor    int      `json:"maxPxCor"`
 	MinPyCor    int      `json:"minPyCor"`
 	MaxPyCor    int      `json:"maxPyCor"`
+	MinPzCor    int      `json:"minPzCor"`
+	MaxPzCor    int      `json:"maxPzCor"`
+	Is3D        bool     `json:"is3D"`
 }
 
 type Patch struct {
 	X     int   `json:"x"`
 	Y     int   `json:"y"`
+	Z     int   `json:"z"`
 	Color Color `json:"color"`
 }
 
 type Turtle struct {
 	X          float64     `json:"x"`
 	Y          float64     `json:"y"`
+	Z          float64     `json:"z"`
 	Color      Color       `json:"color"`
 	Size       float64     `json:"size"`
 	Who        int         `json:"who"`
@@ -43,8 +48,10 @@ type Link struct {
 	End2       int         `json:"end2"`
 	End1X      float64     `json:"end1X"`
 	End1Y      float64     `json:"end1Y"`
+	End1Z      float64     `json:"end1Z"`
 	End2X      float64     `json:"end2X"`
 	End2Y      float64     `json:"end2Y"`
+	End2Z      float64     `json:"end2Z"`
 	End1Size   float64     `json:"end1Size"`
 	End2Size   float64     `json:"end2Size"`
 	Directed   bool        `json:"directed"`

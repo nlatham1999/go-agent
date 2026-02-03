@@ -18,7 +18,7 @@ func TestTurtlesInRadiusZeroRadius(t *testing.T) {
 	turtle.SetXY(5, 5)
 
 	// Query with radius 0 - returns empty set (radius 0 means infinitesimally small circle)
-	result := m.TurtlesInRadius(5, 5, 0)
+	result := m.TurtlesInRadiusXY(5, 5, 0)
 
 	if result.Count() != 0 {
 		t.Errorf("Expected 0 turtles with radius 0, got %d", result.Count())
@@ -33,7 +33,7 @@ func TestTurtlesInRadiusNegativeRadius(t *testing.T) {
 	m.CreateTurtles(10, nil)
 
 	// Query with negative radius - should return empty set
-	result := m.TurtlesInRadius(5, 5, -1)
+	result := m.TurtlesInRadiusXY(5, 5, -1)
 
 	if result.Count() != 0 {
 		t.Errorf("Expected 0 turtles with negative radius, got %d", result.Count())
@@ -58,7 +58,7 @@ func TestTurtlesInRadiusLargerThanWorld(t *testing.T) {
 	})
 
 	// Query with radius larger than world diagonal
-	result := m.TurtlesInRadius(0, 0, 1000)
+	result := m.TurtlesInRadiusXY(0, 0, 1000)
 
 	// Should return all turtles
 	if result.Count() != 100 {
@@ -73,7 +73,7 @@ func TestTurtlesInRadiusEmptyWorld(t *testing.T) {
 
 	// No turtles created
 
-	result := m.TurtlesInRadius(0, 0, 5)
+	result := m.TurtlesInRadiusXY(0, 0, 5)
 
 	if result.Count() != 0 {
 		t.Errorf("Expected 0 turtles in empty world, got %d", result.Count())
@@ -100,7 +100,7 @@ func TestTurtlesInRadiusOnBoundary(t *testing.T) {
 	})
 
 	// Query at boundary
-	result := m.TurtlesInRadius(10, 10, 1)
+	result := m.TurtlesInRadiusXY(10, 10, 1)
 
 	if result.Count() != 10 {
 		t.Errorf("Expected 10 turtles at boundary, got %d", result.Count())
@@ -527,13 +527,13 @@ func TestDistanceBetweenPointsWithWrappingEdgeCases(t *testing.T) {
 	m := model.NewModel(settings)
 
 	// Same point should be distance 0
-	dist := m.DistanceBetweenPoints(5, 5, 5, 5)
+	dist := m.DistanceBetweenPointsXY(5, 5, 5, 5)
 	if dist != 0 {
 		t.Errorf("Expected distance 0 for same point, got %v", dist)
 	}
 
 	// Opposite corners with wrapping should be close
-	dist = m.DistanceBetweenPoints(-10, -10, 10, 10)
+	dist = m.DistanceBetweenPointsXY(-10, -10, 10, 10)
 	// With wrapping, shortest path might be smaller than direct distance
 	if dist > 30 { // Just sanity check
 		t.Errorf("Expected reasonable wrapped distance, got %v", dist)
@@ -657,7 +657,7 @@ func TestConcurrentTurtlesInRadius(t *testing.T) {
 			for j := 0; j < 10; j++ {
 				x := float64(m.RandomXCor())
 				y := float64(m.RandomYCor())
-				_ = m.TurtlesInRadius(x, y, 10)
+				_ = m.TurtlesInRadiusXY(x, y, 10)
 			}
 			done <- true
 		}()

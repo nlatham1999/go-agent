@@ -127,7 +127,7 @@ func (b *Boid) Go() {
 func (b *Boid) seperation(t *model.Turtle) {
 	closeDx := 0.0
 	closeDy := 0.0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.protectedRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.protectedRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				closeDx += t.XCor() - t2.XCor()
@@ -148,7 +148,7 @@ func (b *Boid) getAlignment(t *model.Turtle) {
 	xvelAvg := 0.0
 	yvelAvg := 0.0
 	neighboringBoids := 0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				xvelAvg += t2.GetProperty("vx").(float64)
@@ -188,7 +188,7 @@ func (b *Boid) cohesion(t *model.Turtle) {
 	xposAvg := 0.0
 	yposAvg := 0.0
 	neighboringBoids := 0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				xposAvg += t2.XCor()

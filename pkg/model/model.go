@@ -27,14 +27,19 @@ type Model struct {
 
 	maxPxCor    int     //the maximum x coordinate
 	maxPyCor    int     //the maximum y coordinate
+	maxPzCor    int     //the maximum z coordinate
 	minPxCor    int     //the minimum x coordinate
 	minPyCor    int     //the minimum y coordinate
+	minPzCor    int     //the minimum z coordinate
 	maxXCor     float64 //the maximum x coordinate as a float, adds .5 to the max x cor
 	maxYCor     float64 //the maximum y coordinate as a float, adds .5 to the max y cor
+	maxZCor     float64 //the maximum z coordinate as a float, adds .5 to the max z cor
 	minXCor     float64 //the minimum x coordinate as a float, subtracts .5 from the min x cor
 	minYCor     float64 //the minimum y coordinate as a float, subtracts .5 from the min y cor
+	minZCor     float64 //the minimum z coordinate as a float, subtracts .5 from the min z cor
 	worldWidth  int     //the width of the world
 	worldHeight int     //the height of the world
+	worldDepth  int     //the depth of the world (Z axis)
 	wrappingX   bool    //if the world wraps around in the x direction
 	wrappingY   bool    //if the world wraps around in the y direction
 
@@ -97,14 +102,19 @@ func NewModel(
 	model := &Model{
 		maxPxCor:               settings.MaxPxCor,
 		maxPyCor:               settings.MaxPyCor,
+		maxPzCor:               settings.MaxPzCor,
 		minPxCor:               settings.MinPxCor,
 		minPyCor:               settings.MinPyCor,
+		minPzCor:               settings.MinPzCor,
 		maxXCor:                float64(settings.MaxPxCor) + .5,
 		maxYCor:                float64(settings.MaxPyCor) + .5,
+		maxZCor:                float64(settings.MaxPzCor) + .5,
 		minXCor:                float64(settings.MinPxCor) - .5,
 		minYCor:                float64(settings.MinPyCor) - .5,
+		minZCor:                float64(settings.MinPzCor) - .5,
 		worldWidth:             settings.MaxPxCor - settings.MinPxCor + 1,
 		worldHeight:            settings.MaxPyCor - settings.MinPyCor + 1,
+		worldDepth:             settings.MaxPzCor - settings.MinPzCor + 1,
 		DefaultPatchProperties: settings.PatchProperties,
 		wrappingX:              settings.WrappingX,
 		wrappingY:              settings.WrappingY,
@@ -175,58 +185,88 @@ func NewModel(
 func (m *Model) buildPatches() {
 	m.Patches = NewPatchAgentSet([]*Patch{})
 	m.posOfPatches = make(map[int]*Patch)
-	for i := m.minPyCor; i <= m.maxPyCor; i++ {
-		for j := m.minPxCor; j <= m.maxPxCor; j++ {
-			x := j
-			y := i
-			p := newPatch(m, m.DefaultPatchProperties, x, y)
-			m.Patches.Add(p)
-			index := y*m.worldHeight + x
-			m.posOfPatches[index] = p
-			p.index = index
+	for y := m.minPyCor; y <= m.maxPyCor; y++ {
+		for x := m.minPxCor; x <= m.maxPxCor; x++ {
+			for z := m.minPzCor; z <= m.maxPzCor; z++ {
+				p := newPatch(m, m.DefaultPatchProperties, x, y, z)
+				m.Patches.Add(p)
+				index := m.patchIndex(x, y, z)
+				m.posOfPatches[index] = p
+				p.index = index
+			}
 		}
+	}
+
+	zOffsets := []int{0}
+	if m.Is3D() {
+		zOffsets = []int{-1, 0, 1}
 	}
 
 	m.Patches.Ask(func(p *Patch) {
 		p.patchNeighborsMap = map[*Patch]string{}
 		p.neighborsPatchMap = map[string]*Patch{}
 
-		left := m.leftNeighbor(p)
-		p.patchNeighborsMap[left] = "left"
-		p.neighborsPatchMap["left"] = left
+		for _, zOffset := range zOffsets {
 
-		topLeft := m.topLeftNeighbor(p)
-		p.patchNeighborsMap[topLeft] = "topLeft"
-		p.neighborsPatchMap["topLeft"] = topLeft
+			zSuffix := ""
+			if zOffset < 0 {
+				zSuffix = "Front"
+			} else if zOffset > 0 {
+				zSuffix = "Back"
+			}
 
-		top := m.topNeighbor(p)
-		p.patchNeighborsMap[top] = "top"
-		p.neighborsPatchMap["top"] = top
+			left := m.leftNeighbor(p, zOffset)
+			p.patchNeighborsMap[left] = "left" + zSuffix
+			p.neighborsPatchMap["left"+zSuffix] = left
 
-		topRight := m.topRightNeighbor(p)
-		p.patchNeighborsMap[topRight] = "topRight"
-		p.neighborsPatchMap["topRight"] = topRight
+			topLeft := m.topLeftNeighbor(p, zOffset)
+			p.patchNeighborsMap[topLeft] = "topLeft" + zSuffix
+			p.neighborsPatchMap["topLeft"+zSuffix] = topLeft
 
-		right := m.rightNeighbor(p)
-		p.patchNeighborsMap[right] = "right"
-		p.neighborsPatchMap["right"] = right
+			top := m.topNeighbor(p, zOffset)
+			p.patchNeighborsMap[top] = "top" + zSuffix
+			p.neighborsPatchMap["top"+zSuffix] = top
 
-		bottomRight := m.bottomRightNeighbor(p)
-		p.patchNeighborsMap[bottomRight] = "bottomRight"
-		p.neighborsPatchMap["bottomRight"] = bottomRight
+			topRight := m.topRightNeighbor(p, zOffset)
+			p.patchNeighborsMap[topRight] = "topRight" + zSuffix
+			p.neighborsPatchMap["topRight"+zSuffix] = topRight
 
-		bottom := m.bottomNeighbor(p)
-		p.patchNeighborsMap[bottom] = "bottom"
-		p.neighborsPatchMap["bottom"] = bottom
+			right := m.rightNeighbor(p, zOffset)
+			p.patchNeighborsMap[right] = "right" + zSuffix
+			p.neighborsPatchMap["right"+zSuffix] = right
 
-		bottomLeft := m.bottomLeftNeighbor(p)
-		p.patchNeighborsMap[bottomLeft] = "bottomLeft"
-		p.neighborsPatchMap["bottomLeft"] = bottomLeft
+			bottomRight := m.bottomRightNeighbor(p, zOffset)
+			p.patchNeighborsMap[bottomRight] = "bottomRight" + zSuffix
+			p.neighborsPatchMap["bottomRight"+zSuffix] = bottomRight
+
+			bottom := m.bottomNeighbor(p, zOffset)
+			p.patchNeighborsMap[bottom] = "bottom" + zSuffix
+			p.neighborsPatchMap["bottom"+zSuffix] = bottom
+
+			bottomLeft := m.bottomLeftNeighbor(p, zOffset)
+			p.patchNeighborsMap[bottomLeft] = "bottomLeft" + zSuffix
+			p.neighborsPatchMap["bottomLeft"+zSuffix] = bottomLeft
+
+			if zOffset != 0 {
+				frontBack := m.zNeighbor(p, zOffset)
+				p.patchNeighborsMap[frontBack] = "center" + zSuffix
+				p.neighborsPatchMap["center"+zSuffix] = frontBack
+			}
+		}
 	})
 }
 
-func (m *Model) patchIndex(x int, y int) int {
-	return y*m.worldHeight + x
+func (m *Model) patchIndex(x int, y int, z int) int {
+
+	xOffset := x - m.minPxCor
+	yOffset := y - m.minPyCor
+	pos := m.patchIndexZ(z) + yOffset*m.worldWidth + xOffset
+	return pos
+}
+
+func (m *Model) patchIndexZ(z int) int {
+	zOffset := z - m.minPzCor
+	return zOffset * m.worldWidth * m.worldHeight
 }
 
 func (m *Model) TurtleBreed(breedName string) *TurtleBreed {
@@ -382,6 +422,24 @@ func (m *Model) convertXYToInBounds(x float64, y float64) (float64, float64, boo
 	return x, y, true
 }
 
+// returns the new x y z and if it is in bounds
+// returns false if the x y z is not in bounds and the topology does not allow it
+func (m *Model) convertXYZToInBounds(x float64, y float64, z float64) (float64, float64, float64, bool) {
+
+	// Check X and Y bounds with wrapping support
+	x, y, inBounds := m.convertXYToInBounds(x, y)
+	if !inBounds {
+		return x, y, z, false
+	}
+
+	// Check Z bounds (no wrapping support for 3D)
+	if z < m.minZCor || z >= m.maxZCor {
+		return x, y, z, false
+	}
+
+	return x, y, z, true
+}
+
 // kills a turtle
 func (m *Model) KillTurtle(turtle *Turtle) {
 
@@ -532,6 +590,11 @@ func (m *Model) DirectedLinkBreeds() []*LinkBreed {
 	return arr
 }
 
+// returns if the model is 3D
+func (m *Model) Is3D() bool {
+	return m.worldDepth > 1
+}
+
 // returns the undirected link breed associated with the name
 func (m *Model) UndirectedLinkBreed(name string) *LinkBreed {
 	return m.undirectedLinkBreeds[name]
@@ -565,14 +628,13 @@ func (m *Model) Links() *LinkAgentSet {
 	return m.links
 }
 
-// returns the distance between two points
-// convertXYToInBounds should be called before this function
-func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
-
+func (m *Model) distanceBetweenPoints(x1 float64, y1 float64, z1 float64, x2 float64, y2 float64, z2 float64) float64 {
 	deltaX := x1 - x2
 	deltaY := y1 - y2
 
-	distance := math.Sqrt(deltaX*deltaX + deltaY*deltaY)
+	deltaZ := z1 - z2
+
+	distance := math.Sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ)
 
 	if !m.wrappingX && !m.wrappingY {
 		return distance
@@ -582,18 +644,30 @@ func (m *Model) DistanceBetweenPoints(x1 float64, y1 float64, x2 float64, y2 flo
 	deltaYInverse := float64(m.worldHeight) - math.Abs(deltaY)
 
 	if m.wrappingX {
-		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY))
+		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaY*deltaY+deltaZ*deltaZ))
 	}
 
 	if m.wrappingY {
-		distance = math.Min(distance, math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse))
+		distance = math.Min(distance, math.Sqrt(deltaX*deltaX+deltaYInverse*deltaYInverse+deltaZ*deltaZ))
 	}
 
 	if m.wrappingX && m.wrappingY {
-		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse))
+		distance = math.Min(distance, math.Sqrt(deltaXInverse*deltaXInverse+deltaYInverse*deltaYInverse+deltaZ*deltaZ))
 	}
 
 	return distance
+}
+
+// returns the distance between two points
+// convertXYToInBounds should be called before this function
+func (m *Model) DistanceBetweenPointsXY(x1 float64, y1 float64, x2 float64, y2 float64) float64 {
+	return m.distanceBetweenPoints(x1, y1, 0, x2, y2, 0)
+}
+
+// returns the distance between two points in 3D
+// convertXYZToInBounds should be called before this function
+func (m *Model) DistanceBetweenPointsXYZ(x1 float64, y1 float64, z1 float64, x2 float64, y2 float64, z2 float64) float64 {
+	return m.distanceBetweenPoints(x1, y1, z1, x2, y2, z2)
 }
 
 // layout the turtles in a circle with the specified radius
@@ -657,6 +731,18 @@ func (m *Model) MaxPyCor() int {
 	return m.maxPyCor
 }
 
+// returns the maximum patch z coordinate
+// the maximum z coordinate for a turtle is MaxPzCor() + .5
+func (m *Model) MaxPzCor() int {
+	return m.maxPzCor
+}
+
+// returns the minimum patch z coordinate
+// the minimum z coordinate for a turtle is MinPzCor() - .5
+func (m *Model) MinPzCor() int {
+	return m.minPzCor
+}
+
 // returns the minimum patch x coordinate
 // the minimum x coordinate for a turtle is MinPxCor() - .5
 func (m *Model) MinPxCor() int {
@@ -677,6 +763,10 @@ func (m *Model) MaxYCor() float64 {
 	return m.maxYCor
 }
 
+func (m *Model) MaxZCor() float64 {
+	return m.maxZCor
+}
+
 func (m *Model) MinXCor() float64 {
 	return m.minXCor
 }
@@ -685,14 +775,18 @@ func (m *Model) MinYCor() float64 {
 	return m.minYCor
 }
 
+func (m *Model) MinZCor() float64 {
+	return m.minZCor
+}
+
 // does not implement wrappimg, that is the responsibilty of the caller
 // should only be called by Patch()!!! since Patch correctly converts the floats to ints
-func (m *Model) getPatchAtCoords(x int, y int) *Patch {
-	if x < m.minPxCor || x > m.maxPxCor || y < m.minPyCor || y > m.maxPyCor {
+func (m *Model) getPatchAtCoords(x int, y int, z int) *Patch {
+	if x < m.minPxCor || x > m.maxPxCor || y < m.minPyCor || y > m.maxPyCor || z < m.minPzCor || z > m.maxPzCor {
 		return nil
 	}
 
-	pos := y*m.worldHeight + x
+	pos := m.patchIndex(x, y, z)
 
 	return m.getPatchAtPos(pos)
 }
@@ -707,7 +801,7 @@ func (m *Model) RandomAmount(n int) int {
 	return m.randomGenerator.IntN(n)
 }
 
-func (m *Model) topLeftNeighbor(p *Patch) *Patch {
+func (m *Model) topLeftNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x - 1
 	y := p.y - 1
 
@@ -727,12 +821,12 @@ func (m *Model) topLeftNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, y)
+	n := m.patchIndex(x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) topNeighbor(p *Patch) *Patch {
+func (m *Model) topNeighbor(p *Patch, zOffset int) *Patch {
 	y := p.y - 1
 
 	if y < m.minPyCor {
@@ -743,12 +837,12 @@ func (m *Model) topNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(p.x, y)
+	n := m.patchIndex(p.x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) topRightNeighbor(p *Patch) *Patch {
+func (m *Model) topRightNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x + 1
 	y := p.y - 1
 
@@ -768,12 +862,12 @@ func (m *Model) topRightNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, y)
+	n := m.patchIndex(x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) leftNeighbor(p *Patch) *Patch {
+func (m *Model) leftNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x - 1
 
 	if x < m.minPxCor {
@@ -784,12 +878,12 @@ func (m *Model) leftNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, p.y)
+	n := m.patchIndex(x, p.y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) rightNeighbor(p *Patch) *Patch {
+func (m *Model) rightNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x + 1
 
 	if x > m.maxPxCor {
@@ -800,12 +894,12 @@ func (m *Model) rightNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, p.y)
+	n := m.patchIndex(x, p.y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
+func (m *Model) bottomLeftNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x - 1
 	y := p.y + 1
 
@@ -825,12 +919,12 @@ func (m *Model) bottomLeftNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, y)
+	n := m.patchIndex(x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) bottomNeighbor(p *Patch) *Patch {
+func (m *Model) bottomNeighbor(p *Patch, zOffset int) *Patch {
 	y := p.y + 1
 
 	if y > m.maxPyCor {
@@ -841,12 +935,12 @@ func (m *Model) bottomNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(p.x, y)
+	n := m.patchIndex(p.x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
-func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
+func (m *Model) bottomRightNeighbor(p *Patch, zOffset int) *Patch {
 	x := p.x + 1
 	y := p.y + 1
 
@@ -866,11 +960,24 @@ func (m *Model) bottomRightNeighbor(p *Patch) *Patch {
 		}
 	}
 
-	n := m.patchIndex(x, y)
+	n := m.patchIndex(x, y, p.z+zOffset)
 
 	return m.getPatchAtPos(n)
 }
 
+func (m *Model) zNeighbor(p *Patch, zOffset int) *Patch {
+	z := p.z + zOffset
+
+	if z < m.minPzCor || z > m.maxPzCor {
+		return nil
+	}
+
+	n := m.patchIndex(p.x, p.y, z)
+
+	return m.getPatchAtPos(n)
+}
+
+// @TODO why are we iterating through the map instead of just accessing the values?
 func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	n := sortedset.NewSortedSet()
 
@@ -883,6 +990,37 @@ func (m *Model) neighbors(p *Patch) *PatchAgentSet {
 	return &PatchAgentSet{
 		patches: n,
 	}
+}
+
+func (m *Model) neighborsAtZOffset(p *Patch, zOffset int) *PatchAgentSet {
+
+	if zOffset < -1 || zOffset > 1 {
+		return NewPatchAgentSet([]*Patch{})
+	}
+
+	suffix := ""
+	if zOffset < 0 {
+		suffix = "Front"
+	} else if zOffset > 0 {
+		suffix = "Back"
+	}
+
+	nameList := []string{
+		"topLeft" + suffix,
+		"top" + suffix,
+		"topRight" + suffix,
+		"left" + suffix,
+		"right" + suffix,
+		"bottomLeft" + suffix,
+		"bottom" + suffix,
+		"bottomRight" + suffix,
+	}
+
+	if suffix != "" {
+		nameList = append(nameList, "center"+suffix)
+	}
+
+	return m.neighborsFromList(p, nameList)
 }
 
 func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
@@ -913,6 +1051,21 @@ func (m *Model) neighbors4(p *Patch) *PatchAgentSet {
 	}
 }
 
+func (m *Model) neighborsFromList(p *Patch, neighborNames []string) *PatchAgentSet {
+	n := sortedset.NewSortedSet()
+
+	for _, name := range neighborNames {
+		neighbor := p.neighborsPatchMap[name]
+		if neighbor != nil {
+			n.Add(neighbor)
+		}
+	}
+
+	return &PatchAgentSet{
+		patches: n,
+	}
+}
+
 func (m *Model) getPatchAtPos(x int) *Patch {
 	return m.posOfPatches[x]
 }
@@ -920,10 +1073,31 @@ func (m *Model) getPatchAtPos(x int) *Patch {
 // returns the patch at the provided x y coordinates
 func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 
+	x, y, _ := m.floatPCoordsToInts(pxcor, pycor, 0)
+	if x == nil || y == nil {
+		return nil
+	}
+
+	return m.getPatchAtCoords(*x, *y, 0)
+}
+
+// returns the patch at the provided x y z coordinates
+func (m *Model) Patch3D(pxcor float64, pycor float64, pzcor float64) *Patch {
+
+	x, y, z := m.floatPCoordsToInts(pxcor, pycor, pzcor)
+	if x == nil || y == nil || z == nil {
+		return nil
+	}
+
+	return m.getPatchAtCoords(*x, *y, *z)
+}
+
+func (m *Model) floatPCoordsToInts(pxcor float64, pycor float64, pzcor float64) (*int, *int, *int) {
 	// round the x and y except in cases where the x or y is the min value
 	// since the min value will be -*.5 and we want to round up in that case
 	var x int
 	var y int
+	var z int
 	if pxcor == m.minXCor {
 		x = int(math.Ceil(pxcor))
 	} else {
@@ -936,13 +1110,19 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 		y = int(math.Round(pycor))
 	}
 
+	if pzcor == m.minZCor {
+		z = int(math.Ceil(pzcor))
+	} else {
+		z = int(math.Round(pzcor))
+	}
+
 	// check if the x and y are within the world bounds
 	// if wrapping is enabled then adjust the x and y to be within the world bounds if needed
 	if x < m.minPxCor {
 		if m.wrappingX {
 			x = m.maxPxCor + 1 + ((x - m.minPxCor) % m.worldWidth)
 		} else {
-			return nil
+			return nil, nil, nil
 		}
 	}
 
@@ -950,7 +1130,7 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 		if m.wrappingY {
 			y = m.maxPyCor + 1 + ((y - m.minPyCor) % m.worldHeight)
 		} else {
-			return nil
+			return nil, nil, nil
 		}
 	}
 
@@ -958,7 +1138,7 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 		if m.wrappingX {
 			x = (x-m.maxPxCor)%m.worldWidth + m.minPxCor - 1
 		} else {
-			return nil
+			return nil, nil, nil
 		}
 	}
 
@@ -966,11 +1146,35 @@ func (m *Model) Patch(pxcor float64, pycor float64) *Patch {
 		if m.wrappingY {
 			y = (y-m.maxPyCor)%m.worldHeight + m.minPyCor - 1
 		} else {
-			return nil
+			return nil, nil, nil
 		}
 	}
 
-	return m.getPatchAtCoords(x, y)
+	// no wrapping for z
+	if z < m.minPzCor || z > m.maxPzCor {
+		return nil, nil, nil
+	}
+
+	return &x, &y, &z
+}
+
+// returns the patch agentset at the provided z layer
+// @TODO instead of iterating through and building a new agentset each time, we should store the patch layers in the model at initialization
+func (m *Model) PatchAtZLayer(zLayer int) *PatchAgentSet {
+	patches := NewPatchAgentSet([]*Patch{})
+
+	if zLayer < m.minPzCor || zLayer > m.maxPzCor {
+		return patches
+	}
+
+	startPos := m.patchIndexZ(zLayer)
+	endPos := m.patchIndexZ(zLayer + 1)
+
+	for i := startPos; i < endPos; i++ {
+		patches.Add(m.getPatchAtPos(i))
+	}
+
+	return patches
 }
 
 func (m *Model) RandomColor() Color {
@@ -1009,6 +1213,11 @@ func (m *Model) RandomXCor() float64 {
 // returns a random y cor that is within the world bounds
 func (m *Model) RandomYCor() float64 {
 	return m.RandomFloat(m.maxYCor-m.minYCor) + m.minYCor
+}
+
+// returns a random z cor that is within the world bounds
+func (m *Model) RandomZCor() float64 {
+	return m.RandomFloat(m.maxZCor-m.minZCor) + m.minZCor
 }
 
 // sets the tick counter to zero
@@ -1098,7 +1307,7 @@ func (m *Model) TurtleWillCollide(turtle *Turtle, distance float64, biggestSize 
 	}
 
 	// get the turtles that are in the radius of the turtle and who might be given the biggest possible size
-	potentialTurtles := m.TurtlesInRadius(tX, tY, radius+(biggestSize/2))
+	potentialTurtles := m.TurtlesInRadiusXY(tX, tY, radius+(biggestSize/2))
 
 	// remove the turtle from the potential turtles
 	potentialTurtles.Remove(turtle)
@@ -1123,6 +1332,8 @@ func (m *Model) Turtles() *TurtleAgentSet {
 }
 
 // returns true if the two turtles are within the provided distanc
+// only works for 2D worlds
+// @TODO update for 3D worlds
 func (m *Model) TurtlesCollide(t1 *Turtle, t2 *Turtle, t1dist float64, t2dist float64, difference float64) bool {
 
 	t1dx := t1dist * math.Cos(t1.heading)
@@ -1144,7 +1355,7 @@ func (m *Model) TurtlesCollide(t1 *Turtle, t2 *Turtle, t1dist float64, t2dist fl
 		return false
 	}
 
-	distance := m.DistanceBetweenPoints(t1X, t1Y, t2X, t2Y)
+	distance := m.DistanceBetweenPointsXY(t1X, t1Y, t2X, t2Y)
 
 	radius1 := t1.GetSize() / 2
 
@@ -1176,91 +1387,151 @@ func (m *Model) turtlesAtCoordsBreeded(breed *TurtleBreed, pxcor float64, pycor 
 	return patch.turtlesHereBreeded(breed)
 }
 
-// returns an agentset of turtles that are within the provided radius of the provided x y coordinates
-func (m *Model) TurtlesInRadius(xCor float64, yCor float64, radius float64) *TurtleAgentSet {
-	// xMin, xMax := int(math.Floor(cx-r)), int(math.Ceil(cx+r))
-	// yMin, yMax := int(math.Floor(cy-r)), int(math.Ceil(cy+r))
-
+func (m *Model) TurtlesInRadius(xCor float64, yCor float64, zCor float64, radius float64, use3D bool) *TurtleAgentSet {
 	xMin := int(math.Floor(xCor - radius))
 	xMax := int(math.Ceil(xCor + radius))
 	yMin := int(math.Floor(yCor - radius))
 	yMax := int(math.Ceil(yCor + radius))
+	zMin := int(math.Floor(zCor - radius))
+	zMax := int(math.Ceil(zCor + radius))
 
-	//are we going to be looping through more patches than there are turtles?
-	//if so, just loop through all the turtles
-	if (xMax-xMin+1)*(yMax-yMin+1) > m.turtles.Count() {
+	// Calculate number of patches to check
+	patchCount := (xMax - xMin + 1) * (yMax - yMin + 1)
+	if use3D {
+		patchCount *= (zMax - zMin + 1)
+	}
+
+	// If we're going to be looping through more patches than there are turtles,
+	// just loop through all the turtles
+	if patchCount > m.turtles.Count() {
 		return m.Turtles().With(func(t *Turtle) bool {
-			return m.DistanceBetweenPoints(xCor, yCor, t.XCor(), t.YCor()) <= radius
+			if use3D {
+				return m.DistanceBetweenPointsXYZ(xCor, yCor, zCor, t.XCor(), t.YCor(), t.ZCor()) <= radius
+			}
+			return m.DistanceBetweenPointsXY(xCor, yCor, t.XCor(), t.YCor()) <= radius
 		})
 	}
 
 	patchesFullyInsideRadius := make([]*Patch, 0)
 	patchesPartiallyInsideRadius := make([]*Patch, 0)
 
+	// Iterate through patches in 2D or 3D
+	zRange := []int{0} // Default for 2D
+	if use3D {
+		zRange = make([]int, zMax-zMin+1)
+		for i := range zRange {
+			zRange[i] = zMin + i
+		}
+	}
+
 	for x := xMin; x <= xMax; x++ {
 		for y := yMin; y <= yMax; y++ {
-
-			// get the patch, this will handle wrapping
-			// if it is nil, then that probably means the world is not wrapping and the x y is out of bounds
-			patch := m.Patch(float64(x), float64(y))
-			if patch == nil {
-				continue
-			}
-
-			// if there are no turtles on the patch then we can skip it
-			if patch.TurtlesHere().Count() == 0 {
-				continue
-			}
-
-			// get the center of the patch from the patch
-			// this makes sure that this is actually the center of the patch, just in case the coords shifted due to world wrapping
-			px := float64(patch.XCor())
-			py := float64(patch.YCor())
-
-			// patch corners
-			corners := [4][2]float64{
-				{px - 0.5, py - 0.5}, // bottom-left
-				{px + 0.5, py - 0.5}, // bottom-right
-				{px - 0.5, py + 0.5}, // top-left
-				{px + 0.5, py + 0.5}, // top-right
-			}
-
-			// check how many corners are inside the circle
-			insideCount := 0
-			for _, corner := range corners {
-				if m.DistanceBetweenPoints(xCor, yCor, corner[0], corner[1]) <= radius {
-					insideCount++
+			for _, z := range zRange {
+				// Get the patch
+				var patch *Patch
+				if use3D {
+					patch = m.Patch3D(float64(x), float64(y), float64(z))
+				} else {
+					patch = m.Patch(float64(x), float64(y))
 				}
-			}
 
-			// classify
-			if insideCount == 4 {
-				patchesFullyInsideRadius = append(patchesFullyInsideRadius, patch)
-			} else if insideCount > 0 {
-				patchesPartiallyInsideRadius = append(patchesPartiallyInsideRadius, patch)
+				if patch == nil {
+					continue
+				}
+
+				// If there are no turtles on the patch then we can skip it
+				if patch.TurtlesHere().Count() == 0 {
+					continue
+				}
+
+				// Get the center of the patch
+				px := float64(patch.XCor())
+				py := float64(patch.YCor())
+				pz := float64(patch.ZCor())
+
+				// Check patch corners
+				var insideCount int
+				var totalCorners int
+
+				if use3D {
+					// 8 corners of a cube
+					corners := [8][3]float64{
+						{px - 0.5, py - 0.5, pz - 0.5},
+						{px + 0.5, py - 0.5, pz - 0.5},
+						{px - 0.5, py + 0.5, pz - 0.5},
+						{px + 0.5, py + 0.5, pz - 0.5},
+						{px - 0.5, py - 0.5, pz + 0.5},
+						{px + 0.5, py - 0.5, pz + 0.5},
+						{px - 0.5, py + 0.5, pz + 0.5},
+						{px + 0.5, py + 0.5, pz + 0.5},
+					}
+					totalCorners = 8
+					for _, corner := range corners {
+						if m.DistanceBetweenPointsXYZ(xCor, yCor, zCor, corner[0], corner[1], corner[2]) <= radius {
+							insideCount++
+						}
+					}
+				} else {
+					// 4 corners of a square
+					corners := [4][2]float64{
+						{px - 0.5, py - 0.5},
+						{px + 0.5, py - 0.5},
+						{px - 0.5, py + 0.5},
+						{px + 0.5, py + 0.5},
+					}
+					totalCorners = 4
+					for _, corner := range corners {
+						if m.DistanceBetweenPointsXY(xCor, yCor, corner[0], corner[1]) <= radius {
+							insideCount++
+						}
+					}
+				}
+
+				// Classify patch
+				if insideCount == totalCorners {
+					patchesFullyInsideRadius = append(patchesFullyInsideRadius, patch)
+				} else if insideCount > 0 {
+					patchesPartiallyInsideRadius = append(patchesPartiallyInsideRadius, patch)
+				}
 			}
 		}
 	}
 
 	turtles := NewTurtleAgentSet(nil)
 
-	// add turtles from patches that are fully inside the radius
+	// Add turtles from patches that are fully inside the radius
 	for _, patch := range patchesFullyInsideRadius {
 		patch.TurtlesHere().Ask(func(t *Turtle) {
 			turtles.Add(t)
 		})
 	}
 
-	// add turtles from patches that are partially inside the radius provided they are within the radius
+	// Add turtles from patches that are partially inside the radius provided they are within the radius
 	for _, patch := range patchesPartiallyInsideRadius {
 		patch.TurtlesHere().Ask(func(t *Turtle) {
-			if m.DistanceBetweenPoints(xCor, yCor, t.XCor(), t.YCor()) <= radius {
-				turtles.Add(t)
+			if use3D {
+				if m.DistanceBetweenPointsXYZ(xCor, yCor, zCor, t.XCor(), t.YCor(), t.ZCor()) <= radius {
+					turtles.Add(t)
+				}
+			} else {
+				if m.DistanceBetweenPointsXY(xCor, yCor, t.XCor(), t.YCor()) <= radius {
+					turtles.Add(t)
+				}
 			}
 		})
 	}
 
 	return turtles
+}
+
+// returns an agentset of turtles that are within the provided radius of the provided x y coordinates
+func (m *Model) TurtlesInRadiusXY(xCor float64, yCor float64, radius float64) *TurtleAgentSet {
+	return m.TurtlesInRadius(xCor, yCor, 0, radius, false)
+}
+
+// returns an agentset of turtles that are within the provided radius of the provided x y z coordinates
+func (m *Model) TurtlesInRadiusXYZ(xCor float64, yCor float64, zCor float64, radius float64) *TurtleAgentSet {
+	return m.TurtlesInRadius(xCor, yCor, zCor, radius, true)
 }
 
 // returns the turtle agentset that is on the provided patch

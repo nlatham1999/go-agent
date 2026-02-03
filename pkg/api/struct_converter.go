@@ -18,6 +18,9 @@ func convertModelToApiModel(model *model.Model) *Model {
 		MaxPxCor:    model.MaxPxCor(),
 		MinPyCor:    model.MinPyCor(),
 		MaxPyCor:    model.MaxPyCor(),
+		MinPzCor:    model.MinPzCor(),
+		MaxPzCor:    model.MaxPzCor(),
+		Is3D:        model.Is3D(),
 	}
 	return &apiModel
 }
@@ -28,6 +31,7 @@ func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
 		apiPatch := Patch{
 			X:     patch.XCor(),
 			Y:     patch.YCor(),
+			Z:     patch.ZCor(),
 			Color: convertColorToApiColor(patch.Color),
 		}
 		apiPatches = append(apiPatches, apiPatch)
@@ -51,6 +55,7 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 		apiTurtle := Turtle{
 			X:          turtle.XCor(),
 			Y:          turtle.YCor(),
+			Z:          turtle.ZCor(),
 			Color:      convertColorToApiColor(turtle.Color),
 			Size:       turtle.GetSize(),
 			Who:        turtle.Who(),
@@ -82,8 +87,10 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Directed:   link.Directed(),
 			End1X:      link.End1().XCor(),
 			End1Y:      link.End1().YCor(),
+			End1Z:      link.End1().ZCor(),
 			End2X:      link.End2().XCor(),
 			End2Y:      link.End2().YCor(),
+			End2Z:      link.End2().ZCor(),
 			End1Size:   link.End1().GetSize(),
 			End2Size:   link.End2().GetSize(),
 			Color:      convertColorToApiColor(link.Color),
