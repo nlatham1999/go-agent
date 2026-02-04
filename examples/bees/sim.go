@@ -78,7 +78,7 @@ func (b *Bees) SetUp() error {
 	b.model.Patches.Ask(
 		func(p *model.Patch) {
 			nectar := p.GetPropI("nectar")
-			p.PColor.SetColorRGB(0, nectar, 0)
+			p.Color.SetColorRGB(0, nectar, 0)
 		},
 	)
 
@@ -94,8 +94,8 @@ func (b *Bees) SetUp() error {
 		},
 	)
 
-	b.model.Patch(0, 0).PColor.SetColor(model.Red)
-	b.model.Patch(1, 0).PColor.SetColor(model.Blue)
+	b.model.Patch(0, 0).Color.SetColor(model.Red)
+	b.model.Patch(1, 0).Color.SetColor(model.Blue)
 
 	scouts := b.model.TurtleBreed("scouts")
 	scouts.CreateAgents(b.scouts,

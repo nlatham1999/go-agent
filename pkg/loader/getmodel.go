@@ -40,9 +40,9 @@ func convertPatchSet(patches *model.PatchAgentSet) []Patch {
 	apiPatches := make([]Patch, 0, patches.Count())
 	patches.Ask(func(patch *model.Patch) {
 		apiPatch := Patch{
-			X:     patch.PXCor(),
-			Y:     patch.PYCor(),
-			Color: convertColor(patch.PColor),
+			X:     patch.XCor(),
+			Y:     patch.YCor(),
+			Color: convertColor(patch.Color),
 		}
 		apiPatches = append(apiPatches, apiPatch)
 	})
@@ -71,7 +71,7 @@ func convertTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 			Shape:      turtle.Shape,
 			Heading:    turtle.GetHeading(),
 			Label:      turtle.GetLabel(),
-			LabelColor: convertColor(turtle.GetLabelColor()),
+			LabelColor: convertColor(turtle.LabelColor),
 			Breed:      turtle.BreedName(),
 		}
 		apiTurtles = append(apiTurtles, apiTurtle)
@@ -98,7 +98,7 @@ func convertLinkSet(links *model.LinkAgentSet) []Link {
 			Label:      link.Label,
 			LabelColor: convertColor(link.LabelColor),
 			Size:       link.Size,
-			Hidden:     link.Hidden,
+			Hidden:     link.IsHidden(),
 			Breed:      link.BreedName(),
 		}
 		apiLinks = append(apiLinks, apiLink)

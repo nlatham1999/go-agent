@@ -3,19 +3,29 @@ package api
 import "fmt"
 
 type Widget struct {
-	PrettyName         string   `json:"prettyName"`
-	Id                 string   `json:"targetVariable"`
-	WidgetType         string   `json:"widgetType"`
-	WidgetValueType    string   `json:"widgetValueType"`
-	MinValue           string   `json:"minValue"`
-	MaxValue           string   `json:"maxValue"`
-	DefaultValue       string   `json:"defaultValue"`
-	StepAmount         string   `json:"stepAmount"`
-	Target             func()   `json:"target"` // this is a function that will be called when the widget is interacted with if the type is a button
-	ValuePointerInt    *int     `json:"valuePointerInt"`
-	ValuePointerFloat  *float64 `json:"valuePointerFloat"`
-	ValuePointerString *string  `json:"valuePointerString"`
-	ValuePointerBool   *bool    `json:"valuePointerBool"`
+	PrettyName         string       `json:"prettyName"`
+	Id                 string       `json:"id"`
+	WidgetType         string       `json:"widgetType"`
+	WidgetValueType    string       `json:"widgetValueType"`
+	MinValue           string       `json:"minValue"`
+	MaxValue           string       `json:"maxValue"`
+	DefaultValue       string       `json:"defaultValue"`
+	StepAmount         string       `json:"stepAmount"`
+	CurrentValue       string       `json:"currentValue"`
+	Target             func()       `json:"-"` // this is a function that will be called when the widget is interacted with if the type is a button
+	ValuePointerInt    *int         `json:"-"`
+	ValuePointerFloat  *float64     `json:"-"`
+	ValuePointerString *string      `json:"-"`
+	ValuePointerBool   *bool        `json:"-"`
+	ValuePointerGraph  *GraphWidget `json:"-"`
+}
+
+type GraphWidget struct {
+	XLabel  string   `json:"xLabel"`
+	YLabel  string   `json:"yLabel"`
+	Title   string   `json:"title"`
+	XValues []string `json:"xValues"`
+	YValues []string `json:"yValues"`
 }
 
 func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *float64) Widget {
@@ -32,6 +42,20 @@ func NewFloatSliderWidget(prettyName, id, minValue, maxValue, defaultValue, step
 	}
 }
 
+func NewIntSliderWidget(prettyName, id, minValue, maxValue, defaultValue, stepAmount string, valuePointer *int) Widget {
+	return Widget{
+		PrettyName:      prettyName,
+		Id:              id,
+		WidgetType:      "slider",
+		WidgetValueType: "int",
+		MinValue:        minValue,
+		MaxValue:        maxValue,
+		DefaultValue:    defaultValue,
+		StepAmount:      stepAmount,
+		ValuePointerInt: valuePointer,
+	}
+}
+
 func NewButtonWidget(prettyName, id string, target func()) Widget {
 	return Widget{
 		PrettyName: prettyName,
@@ -39,6 +63,17 @@ func NewButtonWidget(prettyName, id string, target func()) Widget {
 		WidgetType: "button",
 		Target:     target,
 	}
+}
+
+func NewGraphWidget(title string, id string, xLabel string, yLabel string, xValues []string, yValues []string) GraphWidget {
+	return GraphWidget{
+		XLabel:  xLabel,
+		YLabel:  yLabel,
+		Title:   title,
+		XValues: xValues,
+		YValues: yValues,
+	}
+
 }
 
 func NewMouseXClickedHook(valuePointer *float64) Widget {
@@ -95,53 +130,27 @@ func NewMouseMovedHook(valuePointer *bool) Widget {
 	}
 }
 
-func (w *Widget) render(offset int) string {
-
-	if w.WidgetType == "background" {
-		return ""
+func (w *Widget) getCurrentValue() string {
+	if w.ValuePointerInt != nil {
+		return fmt.Sprintf("%d", *w.ValuePointerInt)
 	}
-
-	id := w.Id + "-widget"
-
-	html := "<div class='widget widget-" + w.WidgetType + "' style='top:" + fmt.Sprintf("%d", offset*65) + "px;'>"
-	//label for id
-	if w.WidgetType == "text" {
-		html += `<label for="` + id + `">` + w.PrettyName + `</label>`
-		//input type text with id and dynamic name (TargetVariable as the name)
-		html += `<input type="text" id="` + id + `" name="` + w.Id + `" hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `">`
-	}
-	if w.WidgetType == "slider" {
-
-		initialValue := w.DefaultValue
-		if w.ValuePointerInt != nil {
-			initialValue = fmt.Sprintf("%d", *w.ValuePointerInt)
+	if w.ValuePointerFloat != nil {
+		value := fmt.Sprintf("%f", *w.ValuePointerFloat)
+		// remove trailing zeros
+		for len(value) > 0 && value[len(value)-1] == '0' {
+			value = value[:len(value)-1]
 		}
-		if w.ValuePointerFloat != nil {
-			initialValue = fmt.Sprintf("%f", *w.ValuePointerFloat)
-			// remove trailing zeros
-			for initialValue[len(initialValue)-1] == '0' {
-				initialValue = initialValue[:len(initialValue)-1]
-			}
+		// remove trailing decimal point
+		if len(value) > 0 && value[len(value)-1] == '.' {
+			value = value[:len(value)-1]
 		}
-
-		labelId := id + "-label"
-		html += `<div>`
-		html += `<label for="` + id + `">` + w.PrettyName + `: <span id="` + labelId + `">` + initialValue + `</span></label>`
-		html += `</div>`
-		//input type range with id and dynamic name (TargetVariable as the name)
-		html += `<input type="range" id="` + id + `" name="` + w.Id + `" 
-		min="` + w.MinValue + `" max="` + w.MaxValue + `" value="` + initialValue + `"`
-		if w.StepAmount != "" {
-			html += `step="` + w.StepAmount + `"`
-		}
-		html += `hx-get="/updatedynamic" hx-trigger="change" hx-include="#` + id + `"
-		oninput="document.getElementById('` + labelId + `').innerText = this.value;">`
+		return value
 	}
-	if w.WidgetType == "button" {
-		html += `<button id="` + id + `" hx-swap="none" hx-get="/updatedynamic" hx-trigger="click" hx-vals='{"` + w.Id + `": "test"}'>` + w.PrettyName + `</button>`
+	if w.ValuePointerString != nil {
+		return *w.ValuePointerString
 	}
-
-	html += "</div>"
-
-	return html
+	if w.ValuePointerBool != nil {
+		return fmt.Sprintf("%t", *w.ValuePointerBool)
+	}
+	return w.DefaultValue
 }

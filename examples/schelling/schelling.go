@@ -74,13 +74,13 @@ func (s *Schelling) SetUp() error {
 	s.model.Patches.Ask(
 		func(p *model.Patch) {
 			if p.GetProperty("group") == "none" {
-				p.PColor = model.Black
+				p.Color = model.Black
 				s.unpopulatedPatches.Add(p)
 			} else if p.GetProperty("group") == "red" {
-				p.PColor = model.Red
+				p.Color = model.Red
 				s.populatedPatches.Add(p)
 			} else if p.GetProperty("group") == "blue" {
-				p.PColor = model.Blue
+				p.Color = model.Blue
 				s.populatedPatches.Add(p)
 			}
 		},
@@ -135,11 +135,11 @@ func (s *Schelling) Go() {
 	s.model.Patches.Ask(
 		func(p *model.Patch) {
 			if p.GetProperty("group") == "none" {
-				p.PColor = model.Black
+				p.Color = model.Black
 			} else if p.GetProperty("group") == "red" {
-				p.PColor = model.Red
+				p.Color = model.Red
 			} else if p.GetProperty("group") == "blue" {
-				p.PColor = model.Blue
+				p.Color = model.Blue
 			}
 		},
 	)

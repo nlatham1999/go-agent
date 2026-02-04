@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/nlatham1999/go-agent/pkg/api"
+	"github.com/nlatham1999/go-agent/pkg/concurrency"
 	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
@@ -28,6 +29,8 @@ type Boid struct {
 	turtleSize      float64
 
 	properties map[*model.Turtle]map[string]interface{}
+
+	birds []*model.Turtle
 }
 
 func NewBoid() *Boid {
@@ -69,13 +72,15 @@ func (b *Boid) Init() {
 func (b *Boid) SetUp() error {
 	b.model.ClearAll()
 
-	b.model.CreateTurtles(b.numBirds,
+	birds, _ := b.model.CreateTurtles(b.numBirds,
 		func(t *model.Turtle) {
 			t.SetXY(b.model.RandomXCor(), b.model.RandomYCor())
 			t.SetSize(b.turtleSize)
 			t.Shape = "triangle"
 		},
 	)
+
+	b.birds = birds.List()
 
 	b.model.ResetTicks()
 	return nil
@@ -86,7 +91,7 @@ func (b *Boid) Go() {
 	timeNow := time.Now()
 
 	// apply the first two steps
-	b.model.Turtles().AskConcurrent(
+	concurrency.AskTurtles(b.birds,
 		func(t *model.Turtle) {
 			b.seperation(t)
 			b.getAlignment(t)
@@ -95,7 +100,7 @@ func (b *Boid) Go() {
 	)
 
 	// since alignment is using the vx and vy it needs to be slit into two steps
-	b.model.Turtles().AskConcurrent(
+	concurrency.AskTurtles(b.birds,
 		func(t *model.Turtle) {
 			b.setAlignment(t)
 			b.cohesion(t)
@@ -105,10 +110,12 @@ func (b *Boid) Go() {
 		100,
 	)
 
-	b.model.Turtles().Ask(
+	// b.model.Turtles().Ask(
+	concurrency.AskTurtles(b.birds,
 		func(t *model.Turtle) {
 			b.updatePosition(t)
 		},
+		100,
 	)
 
 	b.model.Tick()
@@ -120,7 +127,7 @@ func (b *Boid) Go() {
 func (b *Boid) seperation(t *model.Turtle) {
 	closeDx := 0.0
 	closeDy := 0.0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.protectedRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.protectedRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				closeDx += t.XCor() - t2.XCor()
@@ -141,11 +148,11 @@ func (b *Boid) getAlignment(t *model.Turtle) {
 	xvelAvg := 0.0
 	yvelAvg := 0.0
 	neighboringBoids := 0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
-				xvelAvg += t2.GetPropertySafe("vx").(float64)
-				yvelAvg += t2.GetPropertySafe("vy").(float64)
+				xvelAvg += t2.GetProperty("vx").(float64)
+				yvelAvg += t2.GetProperty("vy").(float64)
 				neighboringBoids++
 
 			}
@@ -154,16 +161,16 @@ func (b *Boid) getAlignment(t *model.Turtle) {
 	if neighboringBoids > 0 {
 		xvelAvg /= float64(neighboringBoids)
 		yvelAvg /= float64(neighboringBoids)
-		vx := t.GetPropertySafe("vx").(float64)
-		vy := t.GetPropertySafe("vy").(float64)
+		vx := t.GetProperty("vx").(float64)
+		vy := t.GetProperty("vy").(float64)
 		matchingFactor := b.matchingFactor
-		t.SetPropertySafe("vx-new", vx+(xvelAvg-vx)*matchingFactor)
-		t.SetPropertySafe("vy-new", vy+(yvelAvg-vy)*matchingFactor)
+		t.SetProperty("vx-new", vx+(xvelAvg-vx)*matchingFactor)
+		t.SetProperty("vy-new", vy+(yvelAvg-vy)*matchingFactor)
 	} else {
-		vx := t.GetPropertySafe("vx").(float64)
-		vy := t.GetPropertySafe("vy").(float64)
-		t.SetPropertySafe("vx-new", vx)
-		t.SetPropertySafe("vy-new", vy)
+		vx := t.GetProperty("vx").(float64)
+		vy := t.GetProperty("vy").(float64)
+		t.SetProperty("vx-new", vx)
+		t.SetProperty("vy-new", vy)
 	}
 }
 
@@ -181,7 +188,7 @@ func (b *Boid) cohesion(t *model.Turtle) {
 	xposAvg := 0.0
 	yposAvg := 0.0
 	neighboringBoids := 0
-	b.model.TurtlesInRadius(t.XCor(), t.YCor(), b.visibleRange).Ask(
+	b.model.TurtlesInRadiusXY(t.XCor(), t.YCor(), b.visibleRange).Ask(
 		func(t2 *model.Turtle) {
 			if t != t2 {
 				xposAvg += t2.XCor()

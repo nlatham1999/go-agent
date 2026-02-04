@@ -11,7 +11,7 @@ type Link struct {
 	Color      Color       // Color of the link
 	end1       *Turtle     // the two ends of the link
 	end2       *Turtle     // the two ends of the link
-	Hidden     bool        // whether the link is hidden or not
+	hidden     bool        // whether the link is hidden or not
 	directed   bool        // whether the link is directed or not
 	breed      *LinkBreed  // Breed of the link
 	Shape      string      // Shape of the link
@@ -41,11 +41,13 @@ func newLink(model *Model, breed *LinkBreed, end1 *Turtle, end2 *Turtle, directe
 		directed: directed,
 		parent:   model,
 		Size:     1,
-		Hidden:   false,
+		hidden:   false,
 		Color:    White,
 	}
 
 	model.links.Add(l)
+
+	model.ShownLinks.Add(l)
 
 	if directed {
 		model.directedLinkBreeds[breed.name].links.Add(l)
@@ -150,7 +152,13 @@ func (l *Link) SetBreed(breed *LinkBreed) {
 
 // sets the link to be hidden
 func (l *Link) Hide() {
-	l.Hidden = true
+	l.hidden = true
+	l.parent.ShownLinks.Remove(l)
+}
+
+// returns whether the link is hidden
+func (l *Link) IsHidden() bool {
+	return l.hidden
 }
 
 // returns the heading in degrees from end1 to end2. Returns an error if the link has zero length
@@ -175,7 +183,11 @@ func (l *Link) Heading() (float64, error) {
 
 // returns the distance between the two ends of the link
 func (l *Link) Length() float64 {
-	return l.parent.DistanceBetweenPoints(l.end1.xcor, l.end1.ycor, l.end2.xcor, l.end2.ycor)
+	if l.parent.Is3D() {
+		return l.parent.DistanceBetweenPointsXYZ(l.end1.xcor, l.end1.ycor, l.end1.zcor, l.end2.xcor, l.end2.ycor, l.end2.zcor)
+	} else {
+		return l.parent.DistanceBetweenPointsXY(l.end1.xcor, l.end1.ycor, l.end2.xcor, l.end2.ycor)
+	}
 }
 
 // returns the other end of the link that is not the given turtle
@@ -189,5 +201,8 @@ func (l *Link) OtherEnd(t *Turtle) *Turtle {
 
 // sets the link to be visible
 func (l *Link) Show() {
-	l.Hidden = false
+	l.hidden = false
+	if !l.parent.ShownLinks.Contains(l) {
+		l.parent.ShownLinks.Add(l)
+	}
 }

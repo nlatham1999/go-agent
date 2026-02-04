@@ -1,1 +1,4 @@
 *.txt
+/vendor
+*.csv
+/notes.txt

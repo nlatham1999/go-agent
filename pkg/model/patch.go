@@ -2,6 +2,7 @@ package model
 
 import (
 	"math"
+	"sync"
 )
 
 // Patches are agents that resemble the physical space
@@ -9,9 +10,10 @@ type Patch struct {
 	// should never be changed
 	x int // x coordinate of the patch
 	y int // y coordinate of the patch
+	z int // z coordinate of the patch (for 3D models)
 
 	// this corresponds to the position in the patches array
-	// set as x*m.worldWidth + y
+	// set z*m.worldHeight + x*m.worldWidth + y
 	// maps to parent.posOfPatches[index]
 	index int
 
@@ -20,35 +22,40 @@ type Patch struct {
 	//we have float54 versions of the variables so that we don't have to do a bunch of conversions
 	xFloat64 float64
 	yFloat64 float64
+	zFloat64 float64
 
-	PColor Color
+	Color Color
 
 	//instead it might be faster having a PatchesOwn for each data type to reduce type assertions
+	propertiesMutex sync.RWMutex // allows for concurrent access to properties
 	patchProperties map[string]interface{}
 
 	Label       interface{}
 	PlabelColor Color
 
-	turtles map[*TurtleBreed]*TurtleAgentSet // sets of turtles keyed by breed
+	turtlesMutex sync.RWMutex                     // allows for concurrent access to turtles
+	turtles      map[*TurtleBreed]*TurtleAgentSet // sets of turtles keyed by breed
 
 	// patch to string and string to patch for the neighbors
 	patchNeighborsMap map[*Patch]string
 	neighborsPatchMap map[string]*Patch
 }
 
-func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *Patch {
+func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int, z int) *Patch {
 
 	patch := &Patch{
 		x:        x,
 		y:        y,
+		z:        z,
 		xFloat64: float64(x),
 		yFloat64: float64(y),
-		PColor:   Color{},
+		zFloat64: float64(z),
+		Color:    Color{},
 		turtles:  make(map[*TurtleBreed]*TurtleAgentSet),
 		parent:   m,
 	}
 
-	patch.PColor.SetColor(Black)
+	patch.Color.SetColor(Black)
 
 	patch.patchProperties = map[string]interface{}{}
 	for key, value := range patchProperties {
@@ -60,6 +67,9 @@ func newPatch(m *Model, patchProperties map[string]interface{}, x int, y int) *P
 
 // links a turtle to this patch
 func (p *Patch) addTurtle(t *Turtle) {
+	p.turtlesMutex.Lock()
+	defer p.turtlesMutex.Unlock()
+
 	if _, ok := p.turtles[t.breed]; !ok {
 		p.turtles[t.breed] = NewTurtleAgentSet([]*Turtle{})
 	}
@@ -77,6 +87,9 @@ func (p *Patch) addTurtle(t *Turtle) {
 
 // unlinks a turtle from this patch
 func (p *Patch) removeTurtle(t *Turtle) {
+	p.turtlesMutex.Lock()
+	defer p.turtlesMutex.Unlock()
+
 	if _, ok := p.turtles[t.breed]; ok {
 		p.turtles[t.breed].Remove(t)
 	}
@@ -92,17 +105,17 @@ func (p *Patch) removeTurtle(t *Turtle) {
 
 // returns the distance of this patch to the provided turtle
 func (p *Patch) DistanceTurtle(t *Turtle) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, t.xcor, t.ycor)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, t.xcor, t.ycor)
 }
 
 // returns the distance of this patch to the provided patch
 func (p *Patch) DistancePatch(patch *Patch) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, patch.xFloat64, patch.yFloat64)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, patch.xFloat64, patch.yFloat64)
 }
 
 // Returns the distance of this patch from the provided x y coordinates
 func (p *Patch) DistanceXY(x float64, y float64) float64 {
-	return p.parent.DistanceBetweenPoints(p.xFloat64, p.yFloat64, x, y)
+	return p.parent.DistanceBetweenPointsXY(p.xFloat64, p.yFloat64, x, y)
 }
 
 // returns the neighbors of this patch
@@ -112,7 +125,15 @@ func (p *Patch) Neighbors() *PatchAgentSet {
 	return neighbors
 }
 
+// returns the neighbors of this patch at the given z offset
+func (p *Patch) NeighborsAtZOffset(zOffset int) *PatchAgentSet {
+	neighbors := p.parent.neighborsAtZOffset(p, zOffset)
+
+	return neighbors
+}
+
 // returns the neighbors of this patch that are to the top, bottom, left, and right of this patch
+// if 3D will also include the patches above and below
 func (p *Patch) Neighbors4() *PatchAgentSet {
 	neighbors := p.parent.neighbors4(p)
 
@@ -142,18 +163,22 @@ func (p *Patch) PatchAtHeadingAndDistance(heading float64, distance float64) *Pa
 }
 
 // returns the x coordinate of this patch
-func (p *Patch) PXCor() int {
+func (p *Patch) XCor() int {
 	return p.x
 }
 
 // returns the y coordinate of this patch
-func (p *Patch) PYCor() int {
+func (p *Patch) YCor() int {
 	return p.y
+}
+
+func (p *Patch) ZCor() int {
+	return p.z
 }
 
 // resest the patch to the default values
 func (p *Patch) Reset(patchProperties map[string]interface{}) {
-	p.PColor.SetColor(Black)
+	p.Color.SetColor(Black)
 
 	for key, value := range patchProperties {
 		p.patchProperties[key] = value
@@ -213,6 +238,8 @@ func (p *Patch) TowardsXY(x float64, y float64) float64 {
 // if you want to get the turtles of a specific breed, use turtleBreed.TurtlesOnPatch(patch)
 // the agentset returned is a pointer to the agentset in the patch, to get a copy of the agentset call .Copy()
 func (p *Patch) TurtlesHere() *TurtleAgentSet {
+	p.turtlesMutex.RLock()
+	defer p.turtlesMutex.RUnlock()
 
 	generalBreed := p.parent.breeds[BreedNone]
 
@@ -234,7 +261,12 @@ func (p *Patch) turtlesHereBreeded(breed *TurtleBreed) *TurtleAgentSet {
 	return turtles
 }
 
+// GetProperty returns the patch property variable.
+// This method is thread-safe and can be called concurrently.
 func (p *Patch) GetProperty(key string) interface{} {
+	p.propertiesMutex.RLock()
+	defer p.propertiesMutex.RUnlock()
+
 	return p.patchProperties[key]
 }
 
@@ -294,7 +326,12 @@ func (t *Patch) GetPropB(key string) bool {
 	}
 }
 
+// SetProperty sets the patch property variable.
+// This method is thread-safe and can be called concurrently.
 func (p *Patch) SetProperty(key string, value interface{}) {
+	p.propertiesMutex.Lock()
+	defer p.propertiesMutex.Unlock()
+
 	// if the value is an int, convert it to a float64
 	if _, ok := value.(int); ok {
 		value = float64(value.(int))

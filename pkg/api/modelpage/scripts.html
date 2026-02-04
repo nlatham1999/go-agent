@@ -1,5 +1,372 @@
 <script>
 
+    // Track widget structure to detect changes
+    let currentWidgetStructure = null;
+
+    // Store chart instances for updates
+    let chartInstances = {};
+
+    function getWidgetStructureHash(widgets) {
+        // Create a hash of widget IDs and types to detect structural changes
+        return widgets.map(w => `${w.id}:${w.widgetType}`).join('|');
+    }
+
+    // Widget rendering functions
+    function renderWidget(widget) {
+        const widgetDiv = document.createElement('div');
+        widgetDiv.className = `widget widget-${widget.widgetType}`;
+        widgetDiv.setAttribute('data-widget-index', widget.index);
+        widgetDiv.setAttribute('data-widget-id', widget.id);
+
+        const widgetId = `${widget.id}-widget`;
+
+        if (widget.widgetType === 'text') {
+            const label = document.createElement('label');
+            label.setAttribute('for', widgetId);
+            label.textContent = widget.prettyName;
+            widgetDiv.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = widgetId;
+            input.name = widget.id;
+            input.setAttribute('hx-get', '/updatedynamic');
+            input.setAttribute('hx-trigger', 'change');
+            input.setAttribute('hx-include', `#${widgetId}`);
+            input.value = widget.currentValue || widget.defaultValue || '';
+            widgetDiv.appendChild(input);
+        } else if (widget.widgetType === 'slider') {
+            const labelDiv = document.createElement('div');
+            const label = document.createElement('label');
+            label.setAttribute('for', widgetId);
+
+            const labelId = `${widgetId}-label`;
+            const valueSpan = document.createElement('span');
+            valueSpan.id = labelId;
+            valueSpan.textContent = widget.currentValue || widget.defaultValue;
+
+            label.textContent = `${widget.prettyName}: `;
+            label.appendChild(valueSpan);
+            labelDiv.appendChild(label);
+            widgetDiv.appendChild(labelDiv);
+
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.id = widgetId;
+            input.name = widget.id;
+            input.min = widget.minValue;
+            input.max = widget.maxValue;
+            input.value = widget.currentValue || widget.defaultValue;
+            if (widget.stepAmount) {
+                input.step = widget.stepAmount;
+            }
+            input.setAttribute('hx-get', '/updatedynamic');
+            input.setAttribute('hx-trigger', 'change');
+            input.setAttribute('hx-include', `#${widgetId}`);
+
+            // Track slider interaction to prevent sync conflicts
+            input.addEventListener('mousedown', () => {
+                activeSliders.add(widgetId);
+            });
+            input.addEventListener('touchstart', () => {
+                activeSliders.add(widgetId);
+            });
+
+            // Keep in active set during dragging
+            input.addEventListener('input', () => {
+                activeSliders.add(widgetId);
+            });
+
+            // Remove from active set after user releases
+            input.addEventListener('mouseup', () => {
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+            input.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+
+            // Also handle when mouse leaves while dragging
+            input.addEventListener('mouseleave', () => {
+                // Only remove if not currently being dragged (no mouse button pressed)
+                setTimeout(() => {
+                    activeSliders.delete(widgetId);
+                }, 300);
+            });
+
+            input.oninput = function() {
+                document.getElementById(labelId).textContent = this.value;
+            };
+            widgetDiv.appendChild(input);
+        } else if (widget.widgetType === 'button') {
+            const button = document.createElement('button');
+            button.id = widgetId;
+            button.textContent = widget.prettyName;
+            button.setAttribute('hx-swap', 'none');
+            button.setAttribute('hx-get', '/updatedynamic');
+            button.setAttribute('hx-trigger', 'click');
+            button.setAttribute('hx-vals', `{"${widget.id}": "test"}`);
+            widgetDiv.appendChild(button);
+        } else if (widget.widgetType === 'stat') {
+            const statDiv = document.createElement('div');
+            statDiv.id = widget.id;
+            statDiv.textContent = `${widget.prettyName}: ${widget.currentValue}`;
+            widgetDiv.appendChild(statDiv);
+        } else if (widget.widgetType === 'graph') {
+            // Parse graph data from JSON
+            let graphData;
+            try {
+                graphData = JSON.parse(widget.currentValue);
+                console.log('Parsed graph data:', graphData);
+            } catch (e) {
+                console.error('Failed to parse graph data:', e, 'Raw value:', widget.currentValue);
+                const errorDiv = document.createElement('div');
+                errorDiv.textContent = `Error parsing graph: ${widget.prettyName}`;
+                errorDiv.style.color = '#ef4444';
+                widgetDiv.appendChild(errorDiv);
+                return widgetDiv;
+            }
+
+            // Create container for the graph
+            const graphContainer = document.createElement('div');
+            graphContainer.className = 'graph-container';
+            graphContainer.style.width = '400px';
+            graphContainer.style.height = '300px';
+            graphContainer.style.position = 'relative';
+            graphContainer.style.minWidth = '200px';
+            graphContainer.style.minHeight = '150px';
+
+            // Create canvas for chart
+            const canvas = document.createElement('canvas');
+            canvas.id = `${widget.id}-canvas`;
+            canvas.style.display = 'block';
+
+            // Create resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'graph-resize-handle';
+            resizeHandle.style.position = 'absolute';
+            resizeHandle.style.bottom = '0';
+            resizeHandle.style.right = '0';
+            resizeHandle.style.width = '15px';
+            resizeHandle.style.height = '15px';
+            resizeHandle.style.cursor = 'nwse-resize';
+            resizeHandle.style.background = 'var(--accent-softer)';
+            resizeHandle.style.borderRadius = '0 0 4px 0';
+
+            graphContainer.appendChild(canvas);
+            graphContainer.appendChild(resizeHandle);
+            widgetDiv.appendChild(graphContainer);
+
+            // Store graph data for later chart creation
+            widgetDiv.dataset.graphData = JSON.stringify(graphData);
+        }
+
+        return widgetDiv;
+    }
+
+    function createOrUpdateChart(widgetId, graphData) {
+        console.log('createOrUpdateChart called for', widgetId, 'with data:', graphData);
+
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+
+        const canvasId = `${widgetId}-canvas`;
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error('Canvas not found for', canvasId, 'Available canvases:',
+                Array.from(document.querySelectorAll('canvas')).map(c => c.id));
+            return;
+        }
+
+        console.log('Canvas found:', canvas, 'Size:', canvas.width, 'x', canvas.height);
+
+        // Convert string arrays to numbers for Y values
+        const yValues = graphData.yValues.map(v => parseFloat(v));
+        console.log('Y values:', yValues);
+
+        // If chart already exists, update it
+        if (chartInstances[widgetId]) {
+            console.log('Updating existing chart for', widgetId);
+            const chart = chartInstances[widgetId];
+            chart.data.labels = graphData.xValues;
+            chart.data.datasets[0].data = yValues;
+            chart.options.plugins.title.text = graphData.title;
+            chart.update('none'); // Update without animation for performance
+            return;
+        }
+
+        console.log('Creating new chart for', widgetId);
+
+        // Create new chart
+        const rootStyles = getComputedStyle(document.documentElement);
+        const accentColor = rootStyles.getPropertyValue('--accent-color').trim() || '#8e8e93';
+        const accentSoft = rootStyles.getPropertyValue('--accent-soft').trim() || 'rgba(142, 142, 147, 0.2)';
+        const textPrimary = rootStyles.getPropertyValue('--text-color').trim() || '#f5f5f7';
+        const textSecondary = rootStyles.getPropertyValue('--text-secondary').trim() || '#a1a1a6';
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: graphData.xValues || [],
+                datasets: [{
+                    label: '',
+                    data: yValues,
+                    borderColor: accentColor,
+                    backgroundColor: accentSoft,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Disable animation for performance
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            color: textSecondary,
+                            font: {
+                                family: '"Space Mono", monospace',
+                                size: 11
+                            }
+                        }
+                    },
+                    title: {
+                        display: !!graphData.title,
+                        text: graphData.title || '',
+                        color: textPrimary,
+                        font: {
+                            size: 16,
+                            weight: 'bold',
+                            family: '"Space Mono", monospace'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 15
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: !!graphData.xLabel,
+                            text: graphData.xLabel || '',
+                            color: textSecondary,
+                            font: {
+                                size: 12,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        ticks: {
+                            color: textSecondary,
+                            maxTicksLimit: 10,
+                            font: {
+                                size: 10,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: false,
+                            text: graphData.yLabel || '',
+                            color: textSecondary,
+                            font: {
+                                size: 12,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        ticks: {
+                            color: textSecondary,
+                            font: {
+                                size: 10,
+                                family: '"Space Mono", monospace'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.08)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        chartInstances[widgetId] = chart;
+        console.log('Chart created successfully for', widgetId, 'Chart instance:', chart);
+    }
+
+    function loadWidgets() {
+        fetch('/widgets')
+            .then(response => response.json())
+            .then(widgets => {
+                console.log('Loaded widgets:', widgets);
+
+                // Find graph widgets
+                const graphWidgets = widgets.filter(w => w.widgetType === 'graph');
+                console.log('Graph widgets:', graphWidgets);
+
+                // Initialize structure tracking
+                currentWidgetStructure = getWidgetStructureHash(widgets);
+
+                const container = document.getElementById('widgetContainer');
+                container.innerHTML = '';
+
+                widgets.forEach(widget => {
+                    const widgetElement = renderWidget(widget);
+                    container.appendChild(widgetElement);
+                });
+
+                // Re-initialize HTMX for new elements
+                if (window.htmx) {
+                    htmx.process(container);
+                }
+
+                // Apply widget positions and dragging
+                initWidgetDragging();
+                initGraphResizing();
+                applyWidgetPositions();
+
+                // Create charts for all graph widgets after DOM is ready
+                setTimeout(() => {
+                    console.log('Creating charts after timeout...');
+                    const graphDivs = document.querySelectorAll('.widget-graph');
+                    console.log('Found graph divs:', graphDivs.length);
+
+                    graphDivs.forEach(widgetDiv => {
+                        const widgetId = widgetDiv.getAttribute('data-widget-id');
+                        const graphDataStr = widgetDiv.dataset.graphData;
+                        console.log('Processing graph widget:', widgetId, 'Data:', graphDataStr);
+
+                        if (graphDataStr) {
+                            try {
+                                const graphData = JSON.parse(graphDataStr);
+                                createOrUpdateChart(widgetId, graphData);
+                            } catch (e) {
+                                console.error('Failed to create chart for', widgetId, e);
+                            }
+                        } else {
+                            console.error('No graph data found for', widgetId);
+                        }
+                    });
+                }, 100);
+            })
+            .catch(error => console.error('Error loading widgets:', error));
+    }
+
     const goRepeatText = document.getElementById('goRepeat').innerText;
 
     const goOnceButton = document.getElementById('goOnce');
@@ -64,49 +431,301 @@
     //     console.log('Restored scroll position:', savedScrollPosition);
     // });
 
-    // make the widget draggable
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".widget").forEach(widget => {
-            let isDragging = false;
-            let offsetX, offsetY;
+    // Widget dragging with position persistence
+    let dragState = {
+        isDragging: false,
+        currentWidget: null,
+        offsetX: 0,
+        offsetY: 0
+    };
 
-            widget.addEventListener("mousedown", (e) => {
-                if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return; // prevent dragging inside inputs
-                isDragging = true;
-                offsetX = e.clientX - widget.offsetLeft;
-                offsetY = e.clientY - widget.offsetTop;
-                widget.style.cursor = "grabbing";
-            });
+    // Track which sliders are being actively used to prevent sync conflicts
+    let activeSliders = new Set();
 
-            document.addEventListener("mousemove", (e) => {
-                if (!isDragging) return;
-                widget.style.left = e.clientX - offsetX + "px";
-                widget.style.top = e.clientY - offsetY + "px";
-            });
+    // Track last graph data to prevent unnecessary updates
+    let lastGraphData = {};
 
-            document.addEventListener("mouseup", () => {
-                isDragging = false;
-                widget.style.cursor = "grab";
-            });
-        });
-    });
-
-    // function to /loadstats that will load the stats every .5 seconds
-    function updateStats() {
-        fetch('/loadstats')
-            .then(response => response.json())
-            .then(data => {
-                Object.entries(data).forEach(([key, value]) => {
-                    let statDiv = document.getElementById(`stats-${key}`);
-                    if (statDiv) {
-                        statDiv.textContent = `${key}: ${value}`;
-                    }
-                });
-            })
-            .catch(error => console.error('Error loading stats:', error));
+    // Load saved widget positions from localStorage
+    function loadWidgetPositions() {
+        const saved = localStorage.getItem('widgetPositions');
+        return saved ? JSON.parse(saved) : {};
     }
 
-    setInterval(updateStats, 500);
+    // Save widget positions to localStorage
+    function saveWidgetPosition(widgetId, left, top) {
+        const positions = loadWidgetPositions();
+        positions[widgetId] = { left, top };
+        localStorage.setItem('widgetPositions', JSON.stringify(positions));
+    }
+
+    // Load saved graph dimensions from localStorage
+    function loadGraphDimensions() {
+        const saved = localStorage.getItem('graphDimensions');
+        return saved ? JSON.parse(saved) : {};
+    }
+
+    // Save graph dimensions to localStorage
+    function saveGraphDimension(widgetId, width, height) {
+        const dimensions = loadGraphDimensions();
+        dimensions[widgetId] = { width, height };
+        localStorage.setItem('graphDimensions', JSON.stringify(dimensions));
+    }
+
+    // Apply saved positions to widgets or set default positions
+    function applyWidgetPositions() {
+        const positions = loadWidgetPositions();
+        const dimensions = loadGraphDimensions();
+
+        document.querySelectorAll('.widget').forEach(widget => {
+            const widgetId = getWidgetId(widget);
+            if (positions[widgetId]) {
+                // Apply saved position
+                widget.style.left = positions[widgetId].left + 'px';
+                widget.style.top = positions[widgetId].top + 'px';
+            } else {
+                // Set default position based on widget index
+                const index = parseInt(widget.getAttribute('data-widget-index') || 0);
+                widget.style.left = '0px';
+                widget.style.top = (index * 65) + 'px';
+            }
+
+            // Apply saved graph dimensions if this is a graph widget
+            const graphContainer = widget.querySelector('.graph-container');
+            if (graphContainer && dimensions[widgetId]) {
+                graphContainer.style.width = dimensions[widgetId].width + 'px';
+                graphContainer.style.height = dimensions[widgetId].height + 'px';
+
+                // Trigger chart resize
+                const chart = chartInstances[widgetId];
+                if (chart) {
+                    chart.resize();
+                }
+            }
+        });
+    }
+
+    // Get unique widget ID
+    function getWidgetId(widget) {
+        // Use the data-widget-id attribute which is unique for each widget
+        return widget.getAttribute('data-widget-id');
+    }
+
+    // Initialize dragging for all widgets
+    function initWidgetDragging() {
+        document.querySelectorAll('.widget').forEach(widget => {
+            // Remove old listeners if any
+            widget.onmousedown = null;
+
+            widget.addEventListener('mousedown', (e) => {
+                // Prevent dragging when interacting with inputs, buttons, sliders, or resize handles
+                if (e.target.tagName === 'TEXTAREA' ||
+                    e.target.tagName === 'INPUT' ||
+                    e.target.tagName === 'BUTTON' ||
+                    e.target.classList.contains('graph-resize-handle')) {
+                    return;
+                }
+
+                dragState.isDragging = true;
+                dragState.currentWidget = widget;
+                dragState.offsetX = e.clientX - widget.offsetLeft;
+                dragState.offsetY = e.clientY - widget.offsetTop;
+                widget.style.cursor = 'grabbing';
+                widget.style.zIndex = '1000';
+                widget.style.transition = 'none'; // Disable transition during drag
+                e.preventDefault();
+            });
+        });
+    }
+
+    // Resize state for graphs
+    let resizeState = {
+        isResizing: false,
+        currentWidget: null,
+        currentContainer: null,
+        startX: 0,
+        startY: 0,
+        startWidth: 0,
+        startHeight: 0
+    };
+
+    // Initialize resizing for graph widgets
+    function initGraphResizing() {
+        document.querySelectorAll('.graph-resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // Prevent widget dragging
+                const widget = handle.closest('.widget');
+                const graphContainer = handle.closest('.graph-container');
+
+                resizeState.isResizing = true;
+                resizeState.currentWidget = widget;
+                resizeState.currentContainer = graphContainer;
+                resizeState.startX = e.clientX;
+                resizeState.startY = e.clientY;
+                resizeState.startWidth = graphContainer.offsetWidth;
+                resizeState.startHeight = graphContainer.offsetHeight;
+
+                e.preventDefault();
+            });
+        });
+    }
+
+    // Global mouse move handler for graph resizing
+    document.addEventListener('mousemove', (e) => {
+        if (resizeState.isResizing && resizeState.currentContainer) {
+            const deltaX = e.clientX - resizeState.startX;
+            const deltaY = e.clientY - resizeState.startY;
+
+            const newWidth = Math.max(200, resizeState.startWidth + deltaX);
+            const newHeight = Math.max(150, resizeState.startHeight + deltaY);
+
+            resizeState.currentContainer.style.width = newWidth + 'px';
+            resizeState.currentContainer.style.height = newHeight + 'px';
+
+            // Update chart
+            const widgetId = getWidgetId(resizeState.currentWidget);
+            const chart = chartInstances[widgetId];
+            if (chart) {
+                chart.resize();
+            }
+        }
+    });
+
+    // Global mouse up handler for graph resizing
+    document.addEventListener('mouseup', () => {
+        if (resizeState.isResizing && resizeState.currentWidget && resizeState.currentContainer) {
+            // Save dimensions
+            const widgetId = getWidgetId(resizeState.currentWidget);
+            saveGraphDimension(
+                widgetId,
+                resizeState.currentContainer.offsetWidth,
+                resizeState.currentContainer.offsetHeight
+            );
+
+            resizeState.isResizing = false;
+            resizeState.currentWidget = null;
+            resizeState.currentContainer = null;
+        }
+    });
+
+    // Global mouse move handler for instant dragging
+    document.addEventListener('mousemove', (e) => {
+        if (!dragState.isDragging || !dragState.currentWidget) return;
+
+        const newLeft = e.clientX - dragState.offsetX;
+        const newTop = e.clientY - dragState.offsetY;
+        dragState.currentWidget.style.left = newLeft + 'px';
+        dragState.currentWidget.style.top = newTop + 'px';
+    });
+
+    // Global mouse up handler
+    document.addEventListener('mouseup', () => {
+        if (dragState.isDragging && dragState.currentWidget) {
+            dragState.currentWidget.style.cursor = 'move';
+            dragState.currentWidget.style.zIndex = '';
+            dragState.currentWidget.style.transition = ''; // Re-enable transition
+
+            // Save position
+            const widgetId = getWidgetId(dragState.currentWidget);
+            saveWidgetPosition(
+                widgetId,
+                parseInt(dragState.currentWidget.style.left),
+                parseInt(dragState.currentWidget.style.top)
+            );
+
+            dragState.isDragging = false;
+            dragState.currentWidget = null;
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded. Chart.js available:', typeof Chart !== 'undefined');
+        if (typeof Chart !== 'undefined') {
+            console.log('Chart.js version:', Chart.version);
+        }
+        loadWidgets();
+    });
+
+    // Periodically reload widget values from server (lightweight sync)
+    function startWidgetSync() {
+        setInterval(() => {
+            fetch('/widget-values')
+                .then(response => response.json())
+                .then(widgets => {
+                    // Just update values - no structure checking or reconfiguration
+                    widgets.forEach(widget => {
+                        const widgetElement = document.querySelector(`[data-widget-id="${widget.id}"]`);
+                        if (!widgetElement) return;
+
+                        const widgetId = `${widget.id}-widget`;
+
+                        // Update stat values
+                        if (widget.widgetType === 'stat') {
+                            const statDiv = document.getElementById(widget.id);
+                            if (statDiv) {
+                                // Extract the label from existing text (everything before the colon)
+                                const currentText = statDiv.textContent;
+                                const colonIndex = currentText.indexOf(':');
+                                const label = colonIndex !== -1 ? currentText.substring(0, colonIndex + 1) : widget.id + ':';
+                                statDiv.textContent = `${label} ${widget.currentValue}`;
+                            }
+                        }
+
+                        // Update graph values
+                        if (widget.widgetType === 'graph') {
+                            try {
+                                const graphData = JSON.parse(widget.currentValue);
+
+                                // Only update if data has actually changed (check array lengths and last values)
+                                const lastData = lastGraphData[widget.id];
+                                const dataChanged = !lastData ||
+                                    lastData.xLength !== graphData.xValues.length ||
+                                    lastData.yLength !== graphData.yValues.length ||
+                                    (graphData.yValues.length > 0 && lastData.lastY !== graphData.yValues[graphData.yValues.length - 1]);
+
+                                if (dataChanged) {
+                                    lastGraphData[widget.id] = {
+                                        xLength: graphData.xValues.length,
+                                        yLength: graphData.yValues.length,
+                                        lastY: graphData.yValues.length > 0 ? graphData.yValues[graphData.yValues.length - 1] : null
+                                    };
+                                    createOrUpdateChart(widget.id, graphData);
+                                }
+                            } catch (e) {
+                                console.error('Failed to parse graph data during sync:', e);
+                            }
+                        }
+
+                        // Update slider values if they've changed server-side
+                        if (widget.widgetType === 'slider') {
+                            const input = document.getElementById(widgetId);
+                            const label = document.getElementById(`${widgetId}-label`);
+
+                            // Only update if user isn't actively changing it and it's not in the active set
+                            if (input && document.activeElement !== input && !activeSliders.has(widgetId)) {
+                                input.value = widget.currentValue;
+                                if (label) {
+                                    label.textContent = widget.currentValue;
+                                }
+                            }
+                        } else if (widget.widgetType === 'text') {
+                            const input = document.getElementById(widgetId);
+
+                            // Only update if user isn't actively changing it
+                            if (input && document.activeElement !== input) {
+                                input.value = widget.currentValue;
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error syncing widgets:', error));
+        }, 500); // Sync every 500ms
+    }
+
+    // Start syncing after initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        startWidgetSync();
+    });
 
     // if goOnce is clicked, set replayTick to empty string
     goOnceButton.addEventListener('click', function() {

@@ -17,6 +17,13 @@ For a demo run `go run main.go`
 
 This is the library that is used to create and interact with a model. For an exhaustive list of all the functions look here: https://github.com/nlatham1999/go-agent/blob/main/pkg/model/doc.md
 
+### Examples
+Examples can be found in [examples/](examples/) and can be imported and ran
+```
+import "github.com/nlatham1999/go-agent/examples/boid"
+```
+
+
 ### High Level Overview
 
 The [Model](https://github.com/nlatham1999/go-agent/blob/main/pkg/model/doc.md#func-newmodel) struct holds the state of the model and comes with a bunch of functions to interact with the different agents 
@@ -93,11 +100,9 @@ below is a sample of a wolf and sheep model where patches are grass or dirt and 
 ```
 
 ### Concurrency
-Concurrency is currently supported only for turtles via AskConcurrent, SetPropertySafe and GetPropertySafe  
+Concurrency is currently supported only for turtles via SetPropertySafe and GetPropertySafe  
 
-Suggested use is to leverage concurrency to read turtle attributes and store values in the turtle properties, and then to go through each turtle on a single thread and use the set attributes to move the turtle.  
-
-This is because any actions moving the turtle can affect other pieces  
+For simulation forward type models concurrency will not ruin determinism, two sets of conccurent actions can be created, a read group and a write group that happens after all the reads are done. For continuous models however, concurrency ruins determinism.
 
 ## TODO
   
@@ -107,7 +112,7 @@ This is because any actions moving the turtle can affect other pieces
     - collision detection layer they can add on
 -  [x]  patches, turtles "own" should be renamed to "properties"  
 -  [x] there should be a way to pass in the mouse x and y, maybe as a dynamic variable?  
--  [ ] build widgets in js  
+-  [x] build widgets in js  
 -  [ ] implement subtract-headings  
 -  [ ] implement dx and dy  
 -  [x] make sure that distance works with wrap around on the horizontal  
@@ -116,26 +121,29 @@ This is because any actions moving the turtle can affect other pieces
 -  [x] move folder structure so packages are in pkg folder
 -  [x] have main screen and then model running on second
 -  [x] make link types in threejs render properly
--  [ ] concurrency on patches and links
+-  [x] concurrency on patches and links
 -  [ ] 3D
 -  [x] collision detection
 -  [ ] labels on turtles and links
 -  [ ] setting the color should be a setcolor function
 -  [x] make moving on world wrapping on left and down work 🤦‍♂️
--  [ ] make setxy able to be called concurrently
+-  [x] make setxy able to be called concurrently
 -  [x] remove tie modes
--  [ ] make change patch ownership able to be called concurrently
--  [ ] have descendents public
--  [ ] button widgets
+-  [x] make change patch ownership able to be called concurrently
+-  [x] button widgets
 -  [ ] enable setting x,y, height(?) and width on widgets
--  [ ] update readme on concurrency
--  [ ] remove collision detection and make a seperate package
--  [ ] speed improvements on rendering
+-  [x] update readme on concurrency
+-  [x] remove collision detection
+-  [ ] make a seperate package for collision detection
+-  [x] speed improvements on rendering
 -  [x] on sliders, if the value is set, than use that value when loading
 -  [ ] agentset copy funcs
 -  [ ] stats should just be widgets
 -  [x] loading unloading model type to enable storing into json
 -  [ ] threejs should not be setting the css values
 -  [ ] Should be a createLink func at the model level
--  [ ] rename pcolor to color
--  [ ] labelColor on turtles should be public, same with label
+-  [x] rename pcolor to color
+-  [x] labelColor on turtles should be public, same with label
+-  [x] seperate concurrency package
+-  [ ] make a version of patch agent set where there's no functions, so that the list of patches can be retrieved safely. Need to think about this
+-  [ ] sorted set should have an ask function with a bool return to exit early. Like a "ask until"

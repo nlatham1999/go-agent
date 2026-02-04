@@ -1,7 +1,11 @@
 package gol
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/nlatham1999/go-agent/pkg/api"
+	"github.com/nlatham1999/go-agent/pkg/concurrency"
 	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
@@ -15,6 +19,10 @@ type Gol struct {
 	minNeighborsToReproduce int
 	maxNeighborsToReproduce int
 	initialAlive            float64
+	worldSize               int
+	numAliveGraph           api.GraphWidget
+
+	patches []*model.Patch
 }
 
 func NewGol() *Gol {
@@ -26,49 +34,64 @@ func (g *Gol) Model() *model.Model {
 }
 
 func (g *Gol) Init() {
-	settings := model.ModelSettings{
-		PatchProperties: map[string]interface{}{
-			"alive":      true,
-			"alive-next": true,
-		},
-		MinPxCor: 0,
-		MaxPxCor: 20,
-		MinPyCor: 0,
-		MaxPyCor: 20,
-	}
-
-	g.model = model.NewModel(settings)
 
 	g.minNeighborsToLive = 2
 	g.maxNeighborsToLive = 3
 	g.minNeighborsToReproduce = 3
 	g.maxNeighborsToReproduce = 3
 	g.initialAlive = 0.5
+	g.worldSize = 12
+	g.numAliveGraph = api.NewGraphWidget("Number Alive", "num-alive-graph", "ticks", "count", []string{}, []string{})
+
+	_ = g.SetUp()
 }
 
 func (g *Gol) SetUp() error {
-	g.model.ClearAll()
+
+	settings := model.ModelSettings{
+		PatchProperties: map[string]interface{}{
+			"alive":      true,
+			"alive-next": true,
+		},
+		MinPxCor: 0,
+		MaxPxCor: g.worldSize,
+		MinPyCor: 0,
+		MaxPyCor: g.worldSize,
+	}
+
+	g.model = model.NewModel(settings)
 
 	g.model.Patches.Ask(
 		func(p *model.Patch) {
 			if v := g.model.RandomFloat(1); v < g.initialAlive {
 				p.SetProperty("alive", true)
 				p.SetProperty("alive-next", true)
-				p.PColor.SetColor(model.Green)
+				p.Color.SetColor(model.Green)
 			} else {
 				p.SetProperty("alive", false)
 				p.SetProperty("alive-next", false)
-				p.PColor.SetColor(model.Black)
+				p.Color.SetColor(model.Black)
 			}
 		},
 	)
+
+	g.numAliveGraph.XValues = []string{}
+	g.numAliveGraph.YValues = []string{}
+
+	g.patches = g.model.Patches.List()
 
 	return nil
 }
 
 func (g *Gol) Go() {
 
-	g.model.Patches.Ask(
+	currentTime := time.Now()
+	defer func(startTime time.Time) {
+		fmt.Println("Time per tick (ms):", time.Since(currentTime).Milliseconds())
+	}(currentTime)
+
+	// g.model.Patches.Ask(
+	concurrency.AskPatches(g.patches,
 		func(p *model.Patch) {
 
 			//get neighboring patches
@@ -76,11 +99,11 @@ func (g *Gol) Go() {
 
 			//count the number of alive neighbors
 			aliveNeighbors := neighbors.With(func(p *model.Patch) bool {
-				alive := p.GetPropB("alive")
+				alive := p.GetProperty("alive").(bool)
 				return alive
 			}).Count()
 
-			alive := p.GetPropB("alive")
+			alive := p.GetProperty("alive").(bool)
 			if alive {
 				if aliveNeighbors < g.minNeighborsToLive {
 					p.SetProperty("alive-next", false)
@@ -95,18 +118,26 @@ func (g *Gol) Go() {
 				}
 			}
 		},
+		10,
 	)
 
-	g.model.Patches.Ask(
+	// g.model.Patches.Ask(
+	concurrency.AskPatches(g.patches,
 		func(p *model.Patch) {
-			p.SetProperty("alive", p.GetPropB("alive-next"))
-			if p.GetPropB("alive") {
-				p.PColor.SetColor(model.Green)
+			p.SetProperty("alive", p.GetProperty("alive-next").(bool))
+			if p.GetProperty("alive").(bool) {
+				p.Color.SetColor(model.Green)
 			} else {
-				p.PColor.SetColor(model.Black)
+				p.Color.SetColor(model.Black)
 			}
 		},
+		10,
 	)
+
+	g.numAliveGraph.XValues = append(g.numAliveGraph.XValues, fmt.Sprintf("%d", g.model.Ticks))
+	g.numAliveGraph.YValues = append(g.numAliveGraph.YValues, fmt.Sprintf("%d", g.model.Patches.With(func(p *model.Patch) bool {
+		return p.GetProperty("alive").(bool)
+	}).Count()))
 
 	g.model.Tick()
 }
@@ -114,14 +145,15 @@ func (g *Gol) Go() {
 func (g *Gol) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"num-alive": g.model.Patches.With(func(p *model.Patch) bool {
-			return p.GetPropB("alive")
+			return p.GetProperty("alive").(bool)
 		}).Count(),
+		"num-alive-graph": g.numAliveGraph,
 	}
 }
 
 func (g *Gol) Stop() bool {
 	return g.model.Patches.All(func(p *model.Patch) bool {
-		return !p.GetPropB("alive")
+		return !p.GetProperty("alive").(bool)
 	})
 }
 
@@ -178,5 +210,6 @@ func (g *Gol) Widgets() []api.Widget {
 			StepAmount:        "0.01",
 			ValuePointerFloat: &g.initialAlive,
 		},
+		api.NewIntSliderWidget("World Size", "world-size", "10", "100", "12", "1", &g.worldSize),
 	}
 }

@@ -10,7 +10,7 @@ func convertModelToApiModel(model *model.Model) *Model {
 	apiModel := Model{
 		Patches:     convertPatchSetToApiPatchSet(model.Patches),
 		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles()),
-		Links:       convertLinkSetToApiLinkSet(model.Links()),
+		Links:       convertLinkSetToApiLinkSet(model.ShownLinks),
 		Ticks:       model.Ticks,
 		WorldWidth:  model.WorldWidth(),
 		WorldHeight: model.WorldHeight(),
@@ -18,6 +18,9 @@ func convertModelToApiModel(model *model.Model) *Model {
 		MaxPxCor:    model.MaxPxCor(),
 		MinPyCor:    model.MinPyCor(),
 		MaxPyCor:    model.MaxPyCor(),
+		MinPzCor:    model.MinPzCor(),
+		MaxPzCor:    model.MaxPzCor(),
+		Is3D:        model.Is3D(),
 	}
 	return &apiModel
 }
@@ -26,9 +29,10 @@ func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
 	apiPatches := make([]Patch, 0, patches.Count())
 	patches.Ask(func(patch *model.Patch) {
 		apiPatch := Patch{
-			X:     patch.PXCor(),
-			Y:     patch.PYCor(),
-			Color: convertColorToApiColor(patch.PColor),
+			X:     patch.XCor(),
+			Y:     patch.YCor(),
+			Z:     patch.ZCor(),
+			Color: convertColorToApiColor(patch.Color),
 		}
 		apiPatches = append(apiPatches, apiPatch)
 	})
@@ -51,13 +55,14 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 		apiTurtle := Turtle{
 			X:          turtle.XCor(),
 			Y:          turtle.YCor(),
+			Z:          turtle.ZCor(),
 			Color:      convertColorToApiColor(turtle.Color),
 			Size:       turtle.GetSize(),
 			Who:        turtle.Who(),
 			Shape:      turtle.Shape,
 			Heading:    turtle.GetHeading(),
 			Label:      turtle.GetLabel(),
-			LabelColor: convertColorToApiColor(turtle.GetLabelColor()),
+			LabelColor: convertColorToApiColor(turtle.LabelColor),
 		}
 		apiTurtles = append(apiTurtles, apiTurtle)
 	})
@@ -67,6 +72,11 @@ func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
 func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 	apiLinks := make([]Link, 0, links.Count())
 	links.Ask(func(link *model.Link) {
+
+		if link.IsHidden() {
+			return
+		}
+
 		if link.End1() == nil || link.End2() == nil {
 			fmt.Println("Link has nil ends")
 			return
@@ -77,15 +87,17 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			Directed:   link.Directed(),
 			End1X:      link.End1().XCor(),
 			End1Y:      link.End1().YCor(),
+			End1Z:      link.End1().ZCor(),
 			End2X:      link.End2().XCor(),
 			End2Y:      link.End2().YCor(),
+			End2Z:      link.End2().ZCor(),
 			End1Size:   link.End1().GetSize(),
 			End2Size:   link.End2().GetSize(),
 			Color:      convertColorToApiColor(link.Color),
 			Label:      link.Label,
 			LabelColor: convertColorToApiColor(link.LabelColor),
 			Size:       link.Size,
-			Hidden:     link.Hidden,
+			Hidden:     link.IsHidden(),
 		}
 		apiLinks = append(apiLinks, apiLink)
 	})

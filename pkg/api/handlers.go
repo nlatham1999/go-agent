@@ -17,8 +17,7 @@ func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Setting up model")
-
+	// if we are currently running a goRepeat, stop it
 	if a.goRepeatRunning {
 		a.stopRepeating <- struct{}{}
 		a.goRepeatRunning = false
@@ -182,11 +181,7 @@ func (a *Api) ModelPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := map[string]interface{}{
-		"Widgets": a.buildWidgets(),
-	}
-
-	tmpl.Execute(w, data)
+	tmpl.Execute(w, nil)
 
 	// load the threejs html as a string
 	jsTml, err := template.New("content").Parse(modelPageThreeJS)
@@ -387,4 +382,179 @@ func (a *Api) setTickValueHandler(w http.ResponseWriter, r *http.Request) {
 
 	a.tickValue = tick
 	w.WriteHeader(http.StatusOK)
+}
+
+func (a *Api) widgetsHandler(w http.ResponseWriter, r *http.Request) {
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
+
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
+
+	widgets := a.currentModel.Widgets()
+	stats := a.currentModel.Stats()
+
+	// Create JSON-serializable widget data
+	widgetData := make([]map[string]interface{}, 0)
+
+	// Add tick stat as first widget
+	tickData := map[string]interface{}{
+		"prettyName":      "Ticks",
+		"id":              "stats-ticks",
+		"widgetType":      "stat",
+		"widgetValueType": "int",
+		"currentValue":    fmt.Sprintf("%d", a.currentModel.Model().Ticks),
+		"index":           0,
+	}
+	widgetData = append(widgetData, tickData)
+
+	// Add other stats
+	index := 1
+	for key, value := range stats {
+		if value == nil {
+			value = "null"
+		}
+
+		// if value is type GraphWidget, marshal it differently
+		valueStr := ""
+		widgetType := "stat"
+
+		// Check for both GraphWidget value and *GraphWidget pointer
+		var graphWidget *GraphWidget
+		if gw, ok := value.(GraphWidget); ok {
+			fmt.Printf("Found GraphWidget (value) for key %s\n", key)
+			graphWidget = &gw
+		} else if gw, ok := value.(*GraphWidget); ok {
+			fmt.Printf("Found GraphWidget (pointer) for key %s\n", key)
+			graphWidget = gw
+		}
+
+		if graphWidget != nil {
+			valueBytes, err := json.Marshal(graphWidget)
+			if err != nil {
+				http.Error(w, "error marshaling graph widget", http.StatusInternalServerError)
+				return
+			}
+			valueStr = string(valueBytes)
+			widgetType = "graph"
+			fmt.Printf("Marshaled graph widget for %s: %s\n", key, valueStr)
+		} else {
+			valueStr = fmt.Sprintf("%v", value)
+		}
+
+		statData := map[string]interface{}{
+			"prettyName":   key,
+			"id":           fmt.Sprintf("stats-%s", key),
+			"widgetType":   widgetType,
+			"currentValue": valueStr,
+			"index":        index,
+		}
+		widgetData = append(widgetData, statData)
+		index++
+	}
+
+	// Add model widgets
+	for _, widget := range widgets {
+		if widget.WidgetType == "background" {
+			continue
+		}
+
+		data := map[string]interface{}{
+			"prettyName":      widget.PrettyName,
+			"id":              widget.Id,
+			"widgetType":      widget.WidgetType,
+			"widgetValueType": widget.WidgetValueType,
+			"minValue":        widget.MinValue,
+			"maxValue":        widget.MaxValue,
+			"defaultValue":    widget.DefaultValue,
+			"stepAmount":      widget.StepAmount,
+			"currentValue":    widget.getCurrentValue(),
+			"index":           index,
+		}
+		widgetData = append(widgetData, data)
+		index++
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(widgetData)
+}
+
+// Lightweight handler that only returns widget IDs and current values for syncing
+func (a *Api) widgetValuesHandler(w http.ResponseWriter, r *http.Request) {
+	a.funcMutext.Lock()
+	defer a.funcMutext.Unlock()
+
+	if a.currentModel == nil {
+		http.Error(w, "Model not instantiated", http.StatusNotFound)
+		return
+	}
+
+	widgets := a.currentModel.Widgets()
+	stats := a.currentModel.Stats()
+
+	// Create minimal JSON data with only ID and current value
+	valueData := make([]map[string]interface{}, 0)
+
+	// Add tick stat
+	valueData = append(valueData, map[string]interface{}{
+		"id":           "stats-ticks",
+		"currentValue": fmt.Sprintf("%d", a.currentModel.Model().Ticks),
+		"widgetType":   "stat",
+	})
+
+	// Add other stats
+	for key, value := range stats {
+		if value == nil {
+			value = "null"
+		}
+
+		valueStr := ""
+		widgetType := "stat"
+
+		// Check for GraphWidget types
+		var graphWidget *GraphWidget
+		if gw, ok := value.(GraphWidget); ok {
+			graphWidget = &gw
+		} else if gw, ok := value.(*GraphWidget); ok {
+			graphWidget = gw
+		}
+
+		if graphWidget != nil {
+			valueBytes, err := json.Marshal(graphWidget)
+			if err != nil {
+				http.Error(w, "error marshaling graph widget", http.StatusInternalServerError)
+				return
+			}
+			valueStr = string(valueBytes)
+			widgetType = "graph"
+		} else {
+			valueStr = fmt.Sprintf("%v", value)
+		}
+
+		valueData = append(valueData, map[string]interface{}{
+			"id":           fmt.Sprintf("stats-%s", key),
+			"currentValue": valueStr,
+			"widgetType":   widgetType,
+		})
+	}
+
+	// Add model widgets
+	for _, widget := range widgets {
+		if widget.WidgetType == "background" {
+			continue
+		}
+
+		valueData = append(valueData, map[string]interface{}{
+			"id":           widget.Id,
+			"currentValue": widget.getCurrentValue(),
+			"widgetType":   widget.WidgetType,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(valueData)
 }

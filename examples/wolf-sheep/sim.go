@@ -68,10 +68,10 @@ func (ws *WolfSheep) SetUp() error {
 		func(p *model.Patch) {
 
 			if ws.m.RandomFloat(1) < 0.5 {
-				p.PColor.SetColor(model.Green)
+				p.Color.SetColor(model.Green)
 				p.SetProperty("countdown", ws.grassRegrowthTime)
 			} else {
-				p.PColor.SetColor(model.Brown)
+				p.Color.SetColor(model.Brown)
 				p.SetProperty("countdown", ws.grassRegrowthTime)
 			}
 		},
@@ -85,7 +85,7 @@ func (ws *WolfSheep) SetUp() error {
 			// t.Shape("sheep")
 			t.Color.SetColor(model.White)
 			// t.Size(1.5)
-			t.SetLabelColor(model.Blue)
+			t.LabelColor = model.Blue
 			t.SetProperty("energy", ws.m.RandomInt(2*ws.sheepGainFromFood))
 			t.SetXY(ws.m.RandomXCor(), ws.m.RandomYCor())
 			t.SetSize(.5)
@@ -97,7 +97,7 @@ func (ws *WolfSheep) SetUp() error {
 			// t.Shape("wolf")
 			t.Color.SetColor(model.Black)
 			// t.Size(2)
-			t.SetLabelColor(model.White)
+			t.LabelColor = model.White
 			t.SetProperty("energy", ws.m.RandomInt(2*ws.wolfGainFromFood))
 			t.SetXY(float64(ws.m.RandomXCor()), ws.m.RandomYCor())
 			t.SetSize(.5)
@@ -183,8 +183,8 @@ func (ws *WolfSheep) move(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) EatGrass(t *model.Turtle) {
-	if t.PatchHere().PColor == model.Green {
-		t.PatchHere().PColor.SetColor(model.Brown)
+	if t.PatchHere().Color == model.Green {
+		t.PatchHere().Color.SetColor(model.Brown)
 		t.SetProperty("energy", t.GetProperty("energy").(int)+ws.sheepGainFromFood)
 	}
 }
@@ -251,9 +251,9 @@ func (ws *WolfSheep) Death(t *model.Turtle) {
 }
 
 func (ws *WolfSheep) growGrass(p *model.Patch) {
-	if p.PColor == model.Brown {
+	if p.Color == model.Brown {
 		if p.GetPropI("countdown") <= 0 {
-			p.PColor.SetColor(model.Green)
+			p.Color.SetColor(model.Green)
 			p.SetProperty("countdown", ws.grassRegrowthTime)
 		} else {
 			p.SetProperty("countdown", p.GetPropI("countdown")-1)
@@ -263,7 +263,7 @@ func (ws *WolfSheep) growGrass(p *model.Patch) {
 
 func (ws *WolfSheep) grass() *model.PatchAgentSet {
 	return ws.m.Patches.With(func(p *model.Patch) bool {
-		return p.PColor == model.Green
+		return p.Color == model.Green
 	})
 }
 

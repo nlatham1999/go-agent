@@ -2,7 +2,9 @@ package model
 
 // all api functions for turtles that deal with links
 
-// creates a directed link from the current turtle to the turtle passed in
+// CreateLinkToTurtle creates a directed link from the current turtle to the turtle passed in.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) CreateLinkToTurtle(breed *LinkBreed, turtle *Turtle, operation LinkOperation) (*Link, error) {
 
 	// if the breed is nil, then use the default breed
@@ -22,8 +24,10 @@ func (t *Turtle) CreateLinkToTurtle(breed *LinkBreed, turtle *Turtle, operation 
 	return l, nil
 }
 
-// creates a directed link from the current turtle to the turtles passed in
-// if a link creation errors, than it is skipped
+// CreateLinksToSet creates a directed link from the current turtle to the turtles passed in.
+// If a link creation errors, then it is skipped.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) CreateLinksToSet(breed *LinkBreed, turtles *TurtleAgentSet, operation LinkOperation) {
 
 	// if the breed is nil, then use the default breed
@@ -43,7 +47,9 @@ func (t *Turtle) CreateLinksToSet(breed *LinkBreed, turtles *TurtleAgentSet, ope
 	linksAdded.Ask(operation)
 }
 
-// creates an undirected breed link from the current turtle with the turtle passed in
+// CreateLinkWithTurtle creates an undirected breed link from the current turtle with the turtle passed in.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) CreateLinkWithTurtle(breed *LinkBreed, turtle *Turtle, operation LinkOperation) (*Link, error) {
 
 	// if the breed is nil, then use the default breed
@@ -64,8 +70,10 @@ func (t *Turtle) CreateLinkWithTurtle(breed *LinkBreed, turtle *Turtle, operatio
 
 }
 
-// creates an undirected breed link from the current turtle with the turtles passed in
-// if a link creation errors, than it is skipped
+// CreateLinksWithSet creates an undirected breed link from the current turtle with the turtles passed in.
+// If a link creation errors, then it is skipped.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) CreateLinksWithSet(breed *LinkBreed, turtles *TurtleAgentSet, operation LinkOperation) {
 
 	// if the breed is nil, then use the default breed
@@ -85,7 +93,9 @@ func (t *Turtle) CreateLinksWithSet(breed *LinkBreed, turtles *TurtleAgentSet, o
 	linksAdded.Ask(operation)
 }
 
-// creates a directed breed link from the current turtle with the turtle passed in
+// CreateLinkFromTurtle creates a directed breed link from the current turtle with the turtle passed in.
+//
+// WARNING: Not thread-safe. Do not call concurrently from multiple goroutines.
 func (t *Turtle) CreateLinkFromTurtle(breed *LinkBreed, turtle *Turtle, operation LinkOperation) (*Link, error) {
 
 	// if the breed is nil, then use the default breed
