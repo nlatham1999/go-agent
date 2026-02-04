@@ -46,8 +46,8 @@
         --border-radius-large: 10px;
     } */
 
-    /*modern dark theme with gradients*/
-    :root {
+    /*modern dark theme with gradients (backup)*/
+    /* :root {
         --background-color: #0f172a;
         --background-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         --widget-background-color: rgba(30, 41, 59, 0.8);
@@ -73,6 +73,76 @@
         --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
         --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
         --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+    } */
+
+    /*professional slate + teal theme (backup)*/
+    /* :root {
+        --background-color: #0b1118;
+        --background-gradient: linear-gradient(135deg, #0b1118 0%, #121a24 100%);
+        --widget-background-color: rgba(18, 26, 36, 0.85);
+        --button-group-background-color: rgba(11, 17, 24, 0.7);
+        --scrollbar-color: #2dd4bf;
+        --slider-color: #2dd4bf;
+        --text-color: #e6edf3;
+        --text-secondary: #a7b4c5;
+        --border-color: rgba(45, 212, 191, 0.18);
+        --button-group-border-color: rgba(45, 212, 191, 0.35);
+        --label-and-input-border-color: rgba(45, 212, 191, 0.28);
+        --button-text-color: #0b1118;
+        --label-and-input-text-color: #e6edf3;
+        --button-background-color: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+        --button-hover-background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+        --input-background-color: rgba(11, 17, 24, 0.85);
+        --button-hover-text-color: #ffffff;
+        --accent-glow: rgba(45, 212, 191, 0.35);
+
+        --border-radius: 8px;
+        --border-radius-large: 12px;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.12);
+        --shadow-md: 0 6px 14px rgba(0, 0, 0, 0.18);
+        --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.25);
+        --shadow-glow: 0 0 22px rgba(45, 212, 191, 0.25);
+    } */
+
+    /*macOS dark mode inspired (neutral, no blue)*/
+    :root {
+        --background-color: #0b0b0c;
+        --background-gradient: linear-gradient(135deg, #0b0b0c 0%, #141517 100%);
+        --widget-background-color: rgba(23, 24, 26, 0.9);
+        --button-group-background-color: rgba(17, 18, 20, 0.8);
+        --scrollbar-color: #8e8e93;
+        --slider-color: #8e8e93;
+        --text-color: #f5f5f7;
+        --text-secondary: #a1a1a6;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --button-group-border-color: rgba(255, 255, 255, 0.12);
+        --label-and-input-border-color: rgba(255, 255, 255, 0.16);
+        --button-text-color: #0b0b0c;
+        --label-and-input-text-color: #f5f5f7;
+        --button-background-color: linear-gradient(135deg, #a1a1a6 0%, #c7c7cc 100%);
+        --button-hover-background: linear-gradient(135deg, #8e8e93 0%, #a1a1a6 100%);
+        --input-background-color: rgba(17, 18, 20, 0.9);
+        --button-hover-text-color: #ffffff;
+        --accent-glow: rgba(161, 161, 166, 0.25);
+
+        --accent-color: #8e8e93;
+        --accent-strong: #6e6e73;
+        --accent-soft: rgba(142, 142, 147, 0.2);
+        --accent-softer: rgba(142, 142, 147, 0.35);
+        --accent-hover: #a1a1a6;
+        --focus-ring: rgba(142, 142, 147, 0.25);
+        --widget-surface: rgba(30, 32, 36, 0.78);
+        --widget-surface-strong: rgba(30, 32, 36, 0.92);
+        --widget-canvas-surface: rgba(17, 18, 20, 0.6);
+        --button-group-button-bg: rgba(142, 142, 147, 0.12);
+        --button-group-button-hover-bg: rgba(142, 142, 147, 0.22);
+
+        --border-radius: 8px;
+        --border-radius-large: 12px;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+        --shadow-md: 0 6px 14px rgba(0, 0, 0, 0.28);
+        --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.35);
+        --shadow-glow: 0 0 20px rgba(10, 132, 255, 0.2);
     }
 
     .nunito-font {
@@ -88,7 +158,7 @@
         position: absolute;
         left: 1vw;
         top: .4vh;
-        color: white;
+        color: var(--text-color);
         margin: 10px;
     }
     body {
@@ -145,12 +215,13 @@
     #modelControls {
         display: flex;
         align-items: flex-start;
+        flex-wrap: nowrap;
         gap: 15px;
         position: relative;
         left: 1vw;
         top: 10vh;
         transform: translateY(-50%);
-        width: 40vw;
+        width: 48vw;
     }
     .buttonGroup {
         display: flex;
@@ -161,19 +232,20 @@
         background: var(--button-group-background-color);
         backdrop-filter: blur(10px);
         box-shadow: var(--shadow-md);
+        flex: 0 0 auto;
     }
 
     .buttonGroupButton {
         border: 1px solid var(--button-group-border-color);
-        background: rgba(59, 130, 246, 0.2);
+        background: var(--button-group-button-bg);
         color: var(--text-color) !important;
         backdrop-filter: blur(5px);
     }
 
     .buttonGroupButton:hover {
-        background: rgba(59, 130, 246, 0.4);
+        background: var(--button-group-button-hover-bg);
         color: var(--text-color) !important;
-        border-color: #3b82f6;
+        border-color: var(--accent-color);
     }
     .labelAndInput {
         background: var(--button-group-background-color);
@@ -188,11 +260,13 @@
         border-radius: var(--border-radius-large);
         box-shadow: var(--shadow-md);
         transition: all 0.3s ease;
+        flex: 0 0 auto;
+        min-width: 180px;
     }
 
     .labelAndInput:hover {
-        border-color: #3b82f6;
-        box-shadow: var(--shadow-lg), 0 0 15px rgba(59, 130, 246, 0.2);
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-lg), 0 0 15px var(--accent-soft);
     }
 
     .labelAndInputLabel {
@@ -203,6 +277,7 @@
 
     #speedControl {
         padding-bottom: 14px;
+        min-width: 150px;
     }
     #speedSlider {
         background: var(--label-and-input-border-color) ;
@@ -218,7 +293,7 @@
     #widgetContainer {
         position: absolute;
         left: 1vw;
-        top: 15vh;
+        top: calc(15vh + 8px);
         height: 78vh;
         width: 45vw;
         background: var(--widget-background-color);
@@ -247,13 +322,13 @@
     }
 
     #widgetContainer::-webkit-scrollbar-thumb:hover {
-        background: #60a5fa;
+        background: var(--accent-hover);
     }
 
     /* make widget class have borders and be draggable*/
     .widget {
         cursor: move;
-        background: rgba(30, 41, 59, 0.6);
+        background: var(--widget-surface);
         backdrop-filter: blur(8px);
         position: absolute;
         overflow: auto;
@@ -262,8 +337,8 @@
     }
 
     .widget:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 4px 12px var(--accent-soft);
     }
 
     .widget-text {
@@ -292,23 +367,23 @@
     .widget-graph {
         border-radius: var(--border-radius-large);
         padding: 20px;
-        background: rgba(30, 41, 59, 0.9);
+        background: var(--widget-surface-strong);
         width: fit-content;
         height: fit-content;
     }
 
     .widget-graph canvas {
         border-radius: var(--border-radius);
-        background: rgba(15, 23, 42, 0.5);
+        background: var(--widget-canvas-surface);
         padding: 8px;
     }
 
     /* make inputs on click have a border */
     input[type="number"]:focus,
     input[type="text"]:focus {
-        border: 2px solid #3b82f6;
+        border: 2px solid var(--accent-color);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
     input[type="number"],
@@ -327,7 +402,7 @@
 
     input[type="number"]:hover,
     input[type="text"]:hover {
-        border-color: #3b82f6;
+        border-color: var(--accent-color);
     }
 
 
@@ -338,14 +413,14 @@
             appearance: none;
             width: 100%;
             height: 6px;
-            background: rgba(59, 130, 246, 0.2);
+            background: var(--accent-soft);
             border-radius: 3px;
             outline: none;
             transition: all 0.3s ease;
         }
 
         input[type='range']:hover {
-            background: rgba(59, 130, 246, 0.3);
+            background: var(--accent-softer);
         }
 
         input[type='range']::-webkit-slider-runnable-track {
@@ -368,8 +443,8 @@
         }
 
         input[type='range']::-webkit-slider-thumb:hover {
-            background: #60a5fa;
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+            background: var(--accent-hover);
+            box-shadow: 0 0 12px var(--accent-softer);
             transform: scale(1.1);
         }
     }
@@ -381,7 +456,7 @@
     }
 
     input[type="range"]::-moz-range-track {
-        background-color: rgba(59, 130, 246, 0.2);
+        background-color: var(--accent-soft);
         border-radius: 3px;
         height: 6px;
     }
@@ -398,8 +473,8 @@
     }
 
     input[type="range"]::-moz-range-thumb:hover {
-        background: #60a5fa;
-        box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        background: var(--accent-hover);
+        box-shadow: 0 0 12px var(--accent-softer);
     }
 
     /* IE*/
@@ -409,7 +484,7 @@
     }
 
     input[type="range"]::-ms-fill-upper {
-        background-color: rgba(59, 130, 246, 0.2);
+        background-color: var(--accent-soft);
         border-radius: 3px;
     }
 

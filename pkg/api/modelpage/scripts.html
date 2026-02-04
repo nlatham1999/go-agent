@@ -153,7 +153,7 @@
             resizeHandle.style.width = '15px';
             resizeHandle.style.height = '15px';
             resizeHandle.style.cursor = 'nwse-resize';
-            resizeHandle.style.background = 'rgba(59, 130, 246, 0.5)';
+            resizeHandle.style.background = 'var(--accent-softer)';
             resizeHandle.style.borderRadius = '0 0 4px 0';
 
             graphContainer.appendChild(canvas);
@@ -204,6 +204,11 @@
         console.log('Creating new chart for', widgetId);
 
         // Create new chart
+        const rootStyles = getComputedStyle(document.documentElement);
+        const accentColor = rootStyles.getPropertyValue('--accent-color').trim() || '#8e8e93';
+        const accentSoft = rootStyles.getPropertyValue('--accent-soft').trim() || 'rgba(142, 142, 147, 0.2)';
+        const textPrimary = rootStyles.getPropertyValue('--text-color').trim() || '#f5f5f7';
+        const textSecondary = rootStyles.getPropertyValue('--text-secondary').trim() || '#a1a1a6';
         const ctx = canvas.getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -212,8 +217,8 @@
                 datasets: [{
                     label: '',
                     data: yValues,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: accentColor,
+                    backgroundColor: accentSoft,
                     borderWidth: 2,
                     tension: 0.3,
                     fill: true,
@@ -229,7 +234,7 @@
                     legend: {
                         display: false,
                         labels: {
-                            color: '#cbd5e1',
+                            color: textSecondary,
                             font: {
                                 family: '"Space Mono", monospace',
                                 size: 11
@@ -239,7 +244,7 @@
                     title: {
                         display: !!graphData.title,
                         text: graphData.title || '',
-                        color: '#f1f5f9',
+                        color: textPrimary,
                         font: {
                             size: 16,
                             weight: 'bold',
@@ -256,14 +261,14 @@
                         title: {
                             display: !!graphData.xLabel,
                             text: graphData.xLabel || '',
-                            color: '#cbd5e1',
+                            color: textSecondary,
                             font: {
                                 size: 12,
                                 family: '"Space Mono", monospace'
                             }
                         },
                         ticks: {
-                            color: '#94a3b8',
+                            color: textSecondary,
                             maxTicksLimit: 10,
                             font: {
                                 size: 10,
@@ -271,28 +276,28 @@
                             }
                         },
                         grid: {
-                            color: 'rgba(203, 213, 225, 0.1)'
+                            color: 'rgba(255, 255, 255, 0.08)'
                         }
                     },
                     y: {
                         title: {
                             display: false,
                             text: graphData.yLabel || '',
-                            color: '#cbd5e1',
+                            color: textSecondary,
                             font: {
                                 size: 12,
                                 family: '"Space Mono", monospace'
                             }
                         },
                         ticks: {
-                            color: '#94a3b8',
+                            color: textSecondary,
                             font: {
                                 size: 10,
                                 family: '"Space Mono", monospace'
                             }
                         },
                         grid: {
-                            color: 'rgba(203, 213, 225, 0.1)'
+                            color: 'rgba(255, 255, 255, 0.08)'
                         },
                         beginAtZero: true
                     }
