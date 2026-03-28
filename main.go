@@ -9,6 +9,7 @@ import (
 	"github.com/nlatham1999/go-agent/examples/flocking"
 	"github.com/nlatham1999/go-agent/examples/gol"
 	"github.com/nlatham1999/go-agent/examples/golgrowth"
+	"github.com/nlatham1999/go-agent/examples/llm3d"
 	mouseinteractions "github.com/nlatham1999/go-agent/examples/mouse-interactions"
 	"github.com/nlatham1999/go-agent/examples/prims"
 	"github.com/nlatham1999/go-agent/examples/prims3d"
@@ -34,6 +35,7 @@ func RunServer() {
 	boid3d := boid3D.NewBoid3D()
 	golgrowth := golgrowth.NewGol()
 	prims3d := prims3d.NewPrims()
+	llm3dSim := llm3d.NewSim()
 
 	agentApi, err := api.NewApi(
 		map[string]api.ModelInterface{
@@ -47,6 +49,7 @@ func RunServer() {
 			"boid3D":            boid3d,
 			"golgrowth":         golgrowth,
 			"prims3d":           prims3d,
+			"llm3d":             llm3dSim,
 		},
 		api.ApiSettings{
 			StoreSteps: false,
@@ -61,6 +64,7 @@ func RunServer() {
 				"boid3D":            "🐦 3D Boid Movement",
 				"golgrowth":         "🟩 3D visualization of Game of Life growth",
 				"prims3d":           "🧱 3D Prim's Maze Generation",
+				"llm3d":             "🤖 LLM 3D Turtle",
 			},
 			ButtonDescriptions: map[string]string{
 				"gameoflife":        "Conway's Game of Life",
@@ -73,6 +77,7 @@ func RunServer() {
 				"boid3D":            "Simulating flocking birds in 3D",
 				"golgrowth":         "3D visualization of Game of Life growth",
 				"prims3d":           "Generating mazes using Prim's algorithm in 3D",
+				"llm3d":             "A single turtle in 3D controlled by a ChatGPT agent",
 			},
 		},
 	)

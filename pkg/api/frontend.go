@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/nlatham1999/go-agent/pkg/state"
 )
 
 //go:embed modelpage/index.html
@@ -29,7 +31,7 @@ var (
 	statsKeys = []string{}
 )
 
-func (a *Api) renderLink(tmpl *strings.Builder, link Link, model *Model, patchSize int, screenHeight float64) {
+func (a *Api) renderLink(tmpl *strings.Builder, link state.Link, model *state.Model, patchSize int, screenHeight float64) {
 
 	if link.Hidden {
 		return

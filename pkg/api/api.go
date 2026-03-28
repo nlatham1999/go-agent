@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/nlatham1999/go-agent/pkg/state"
 )
 
 type Api struct {
@@ -25,7 +26,7 @@ type Api struct {
 	goRepeatMutex   sync.Mutex // Mutex for the goRepeatHandler
 	concurrentCall  bool
 
-	stepData    map[int]*Model
+	stepData    map[int]*state.Model
 	oldestValue int
 
 	tickValue int //used for loading the model frontend
@@ -53,7 +54,7 @@ func NewApi(models map[string]ModelInterface, settings ApiSettings) (*Api, error
 		models:          models,
 		simulationSpeed: 100 * time.Millisecond,
 		settings:        settings,
-		stepData:        map[int]*Model{},
+		stepData:        map[int]*state.Model{},
 	}, nil
 }
 

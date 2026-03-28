@@ -122,7 +122,7 @@ For simulation forward type models concurrency will not ruin determinism, two se
 -  [x] have main screen and then model running on second
 -  [x] make link types in threejs render properly
 -  [x] concurrency on patches and links
--  [ ] 3D
+-  [x] 3D
 -  [x] collision detection
 -  [ ] labels on turtles and links
 -  [ ] setting the color should be a setcolor function
@@ -147,3 +147,4 @@ For simulation forward type models concurrency will not ruin determinism, two se
 -  [x] seperate concurrency package
 -  [ ] make a version of patch agent set where there's no functions, so that the list of patches can be retrieved safely. Need to think about this
 -  [ ] sorted set should have an ask function with a bool return to exit early. Like a "ask until"
+-  [ ] consider adding a read-optimized snapshot state on `model.Model`, with `pkg/model` as the authoritative mutable runtime and `pkg/state` as a periodically replaced concurrent-read snapshot
