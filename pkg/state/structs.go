@@ -1,4 +1,4 @@
-package api
+package state
 
 type Model struct {
 	Patches     []Patch  `json:"patches"`

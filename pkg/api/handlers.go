@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/nlatham1999/go-agent/pkg/state"
 )
 
 func (a *Api) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +34,7 @@ func (a *Api) setUpHandler(w http.ResponseWriter, r *http.Request) {
 	a.concurrentCall = true
 
 	a.tickValue = -1
-	a.stepData = map[int]*Model{}
+	a.stepData = map[int]*state.Model{}
 	a.oldestValue = 0
 
 	err := a.currentModel.SetUp()
@@ -97,7 +98,7 @@ func (a *Api) goRepeatHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) storeStepData() {
 	if a.settings.StoreSteps {
 		// Store the model
-		model := convertModelToApiModel(a.currentModel.Model())
+		model := state.FromModel(a.currentModel.Model())
 		a.stepData[model.Ticks] = model
 
 		// Remove the oldest step if we have reached the maximum number of steps
@@ -261,7 +262,7 @@ func (a *Api) modelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model := convertModelToApiModel(a.currentModel.Model())
+	model := state.FromModel(a.currentModel.Model())
 
 	//return the model as json
 	w.Header().Set("Content-Type", "application/json")
@@ -314,7 +315,7 @@ func (a *Api) updateDynamicVariableHandler(w http.ResponseWriter, r *http.Reques
 
 		widget, found := a.currentModelWidgets[name]
 		if !found {
-			fmt.Println("Widget not found", name)
+			// fmt.Println("Widget not found", name)
 			continue
 		}
 

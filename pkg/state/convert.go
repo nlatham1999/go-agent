@@ -1,4 +1,4 @@
-package api
+package state
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 	"github.com/nlatham1999/go-agent/pkg/model"
 )
 
-func convertModelToApiModel(model *model.Model) *Model {
-	apiModel := Model{
-		Patches:     convertPatchSetToApiPatchSet(model.Patches),
-		Turtles:     convertTurtleSetToApiTurtleSet(model.Turtles()),
-		Links:       convertLinkSetToApiLinkSet(model.ShownLinks),
+func FromModel(model *model.Model) *Model {
+	stateModel := Model{
+		Patches:     convertPatchSet(model.Patches),
+		Turtles:     convertTurtleSet(model.Turtles()),
+		Links:       convertLinkSet(model.ShownLinks),
 		Ticks:       model.Ticks,
 		WorldWidth:  model.WorldWidth(),
 		WorldHeight: model.WorldHeight(),
@@ -22,57 +22,68 @@ func convertModelToApiModel(model *model.Model) *Model {
 		MaxPzCor:    model.MaxPzCor(),
 		Is3D:        model.Is3D(),
 	}
-	return &apiModel
+	return &stateModel
 }
 
-func convertPatchSetToApiPatchSet(patches *model.PatchAgentSet) []Patch {
-	apiPatches := make([]Patch, 0, patches.Count())
-	patches.Ask(func(patch *model.Patch) {
-		apiPatch := Patch{
-			X:     patch.XCor(),
-			Y:     patch.YCor(),
-			Z:     patch.ZCor(),
-			Color: convertColorToApiColor(patch.Color),
-		}
-		apiPatches = append(apiPatches, apiPatch)
-	})
-	return apiPatches
+func FromPatch(patch *model.Patch) *Patch {
+	if patch == nil {
+		return nil
+	}
+
+	statePatch := Patch{
+		X:     patch.XCor(),
+		Y:     patch.YCor(),
+		Z:     patch.ZCor(),
+		Color: FromColor(patch.Color),
+	}
+	return &statePatch
 }
 
-func convertColorToApiColor(color model.Color) Color {
-	apiColor := Color{
+func FromColor(color model.Color) Color {
+	stateColor := Color{
 		Red:   color.Red,
 		Green: color.Green,
 		Blue:  color.Blue,
 		Alpha: color.Alpha,
 	}
-	return apiColor
+	return stateColor
 }
 
-func convertTurtleSetToApiTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
-	apiTurtles := make([]Turtle, 0, turtles.Count())
+func convertPatchSet(patches *model.PatchAgentSet) []Patch {
+	statePatches := make([]Patch, 0, patches.Count())
+	patches.Ask(func(patch *model.Patch) {
+		statePatches = append(statePatches, *FromPatch(patch))
+	})
+	return statePatches
+}
+
+func convertColor(color model.Color) Color {
+	return FromColor(color)
+}
+
+func convertTurtleSet(turtles *model.TurtleAgentSet) []Turtle {
+	stateTurtles := make([]Turtle, 0, turtles.Count())
 	turtles.Ask(func(turtle *model.Turtle) {
-		apiTurtle := Turtle{
+		stateTurtle := Turtle{
 			X:          turtle.XCor(),
 			Y:          turtle.YCor(),
 			Z:          turtle.ZCor(),
-			Color:      convertColorToApiColor(turtle.Color),
+			Color:      convertColor(turtle.Color),
 			Size:       turtle.GetSize(),
 			Who:        turtle.Who(),
 			Shape:      turtle.Shape,
 			Heading:    turtle.GetHeading(),
 			Label:      turtle.GetLabel(),
-			LabelColor: convertColorToApiColor(turtle.LabelColor),
+			LabelColor: convertColor(turtle.LabelColor),
 		}
-		apiTurtles = append(apiTurtles, apiTurtle)
+		stateTurtles = append(stateTurtles, stateTurtle)
 	})
-	return apiTurtles
+	return stateTurtles
 }
 
-func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
-	apiLinks := make([]Link, 0, links.Count())
+func convertLinkSet(links *model.LinkAgentSet) []Link {
+	stateLinks := make([]Link, 0, links.Count())
 	links.Ask(func(link *model.Link) {
-
 		if link.IsHidden() {
 			return
 		}
@@ -81,7 +92,8 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			fmt.Println("Link has nil ends")
 			return
 		}
-		apiLink := Link{
+
+		stateLink := Link{
 			End1:       link.End1().Who(),
 			End2:       link.End2().Who(),
 			Directed:   link.Directed(),
@@ -93,13 +105,13 @@ func convertLinkSetToApiLinkSet(links *model.LinkAgentSet) []Link {
 			End2Z:      link.End2().ZCor(),
 			End1Size:   link.End1().GetSize(),
 			End2Size:   link.End2().GetSize(),
-			Color:      convertColorToApiColor(link.Color),
+			Color:      convertColor(link.Color),
 			Label:      link.Label,
-			LabelColor: convertColorToApiColor(link.LabelColor),
+			LabelColor: convertColor(link.LabelColor),
 			Size:       link.Size,
 			Hidden:     link.IsHidden(),
 		}
-		apiLinks = append(apiLinks, apiLink)
+		stateLinks = append(stateLinks, stateLink)
 	})
-	return apiLinks
+	return stateLinks
 }
